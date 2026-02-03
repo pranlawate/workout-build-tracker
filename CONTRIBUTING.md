@@ -2,6 +2,52 @@
 
 **Last Updated:** 2026-02-03
 **Project Phase:** Design Complete → Implementation Starting
+**Training Structure:** Upper/Lower Split (4-workout rotation)
+
+---
+
+## Training Program Context
+
+### User Profile
+**Experience:** Beginner (< 6 months training)
+**Physical Condition:**
+- Stiff shoulders (desk posture)
+- Weak lower back
+- Weak legs
+- Current: 4-day body part split, 25-30 exercises/week
+
+**Training Goals:**
+- Master proper form across all movement patterns
+- Build strength and stamina without excessive fatigue
+- Improve flexibility and joint mobility
+- Optimize gym membership value (2-6 days/week flexibility)
+
+### Final Design: Upper/Lower Split
+
+**Chosen Structure:** 4-workout rotation
+- **Upper A:** Horizontal Push/Pull (chest, back, shoulders - horizontal plane)
+- **Lower A:** Bilateral/Compound (quads, hamstrings, glutes - squat/hinge focus)
+- **Upper B:** Vertical Push/Pull (chest, back, shoulders - vertical plane)
+- **Lower B:** Unilateral/Accessory (single-leg work, hip abductors, core)
+
+**Why Upper/Lower (Not Full Body):**
+- ✅ Can train consecutive days (Upper → Lower = no muscle overlap)
+- ✅ Flexible 2-6 days/week scheduling (maximizes gym value)
+- ✅ Only 6-8 exercises per session (vs current 10)
+- ✅ Each muscle 2x/week (optimal for beginners)
+- ✅ Matches user's mental model (upper/lower split)
+- ✅ Addresses weaknesses: rotator cuff work, extra core volume, hip abductors
+
+**Volume Comparison:**
+- Current: 10 exercises/session, 25-30 exercises/week, "collectively tiring"
+- BUILD: 6-8 exercises/session, 24-28 exercises/week, sustainable
+
+**Key Design Decisions:**
+1. **Exercise order matters:** Compound before isolation (e.g., rows before bicep curls)
+2. **Edge muscles included:** Rotator cuff (band pull-aparts, face pulls), hip abductors (leg abduction machine), extra core work
+3. **Equipment progression:** Dumbbells → Barbells after 8+ weeks with specific benchmarks
+4. **Muscle-specific recovery:** 48hr for major muscles, 24hr for arms/calves
+5. **Deload logic:** Time (6+ weeks) + Volume (8+ cycles) + Frequency (≥1 cycle/week)
 
 ---
 
@@ -55,6 +101,7 @@
 - 85% of sets logged in 1 tap (using suggested weight)
 - Large tap targets (60px buttons minimum)
 - Works offline (basic PWA)
+- Workout selector shows: Upper A, Lower A, Upper B, Lower B
 
 ### Phase 2: Intelligence Layer
 **Features:**
@@ -64,10 +111,11 @@
 9. Body weight tracking (weekly prompts, trend analysis)
 
 **Acceptance Criteria:**
-- Recovery warnings prevent <48hr muscle overlap
-- Deload triggers after 8 cycles in 6+ weeks at ≥1 cycle/week
-- Equipment progression shows % progress with stability signals
-- Weight trends filter out weekly fluctuations
+- Recovery warnings prevent <48hr muscle overlap (Upper A → Upper B needs 48hr)
+- Deload triggers: `weeks ≥ 6 AND cycles ≥ 8 AND avgCyclesPerWeek ≥ 1.0`
+- Equipment progression criteria for barbell transition (see design docs)
+- Muscle-specific recovery tracking (major muscles 48hr, arms/calves 24hr)
+- Body weight trend smoothing (±0.2-0.7kg weekly fluctuations ignored)
 
 ### Phase 3: Polish & Refinement
 **Features:**
@@ -320,22 +368,79 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 **Primary References:**
 - [UI/UX Design](docs/design/2026-02-03-ui-ux-design.md) - All screen layouts, interactions
-- [Workout Structure](docs/design/2026-02-03-workout-structure.md) - Full Body program design
+- [Workout Structure](docs/design/2026-02-03-workout-structure.md) - **Upper/Lower Split program** (4 workouts)
 - [Session Summary](docs/design/2026-02-03-session-summary-v2.1.md) - Design decisions rationale
+- [BUILD Specification](docs/design/BUILD-SPECIFICATION.md) - Training program spec v2.0
+- [Data Model](docs/design/2026-02-02-data-model-design.md) - Storage structure, progression logic
+- [Routine Analysis](docs/design/2026-02-03-current-routine-analysis.md) - User's current routine and equipment
 
 **Key Constraints from Design:**
 - Mobile-first (Moto Edge 60 Pro, 6.7" display)
 - No scrolling during active set entry (~480px viewport)
 - Smart defaults (85% of sets = 1 tap)
-- Color-coded badges (🔵🟢🟡🔴⭐)
-- Beginner starting weights (1-2.5kg DBs)
+- Color-coded progression badges (🔵🟢🟡🔴⭐)
+- Beginner starting weights (1-2.5kg DBs for true beginners, 7.5kg for current user)
+- Workout rotation: Upper A → Lower A → Upper B → Lower B → repeat
+
+**Training Program Structure:**
+
+**Upper A - Horizontal Push/Pull:**
+- DB Flat Bench Press (3×8-12)
+- Seated Cable Row (3×10-12)
+- DB Chest Fly (3×10-12)
+- T-Bar Row (3×10-12)
+- DB Lateral Raises (2×12-15)
+- Face Pulls (2×15-20)
+- Band Pull-Aparts (2×15-20)
+
+**Lower A - Bilateral/Compound:**
+- Hack Squat (3×8-12)
+- Leg Curl (3×10-12)
+- Leg Extension (3×10-12)
+- 45° Hyperextension (3×10-12)
+- Standing Calf Raise (3×15-20)
+- Plank (3×30-60s)
+
+**Upper B - Vertical Push/Pull:**
+- Lat Pulldown (3×8-12)
+- DB Shoulder Press (3×8-12)
+- Chest-Supported Row (3×10-12)
+- Incline DB Press (3×10-12)
+- Reverse Fly (2×12-15)
+- Band Pull-Aparts (2×15-20)
+- Dead Bug (3×10-12/side)
+
+**Lower B - Unilateral/Accessory:**
+- DB Goblet Squat (3×8-12)
+- DB Romanian Deadlift (3×10-12)
+- Leg Abduction (3×12-15)
+- Hip Thrust (3×10-12)
+- Seated Calf Raise (3×15-20)
+- Side Plank (3×30s/side)
+
+**Equipment Progression Benchmarks:**
+
+When to start using barbells/advanced equipment:
+- **Barbell Bench Press:** DB Bench 3×12 @ 20kg/hand, good shoulder mobility
+- **Barbell Back Squat:** Goblet Squat 3×12 @ 20kg+, Hack Squat 3×12 @ 40kg+
+- **Barbell Deadlift:** DB RDL 3×12 @ 25kg/hand, Hyperextension 3×15 @ BW+10kg
+- **EZ Curl Bar:** DB Curl 3×12 @ 5kg/hand (ready in 1-2 months)
+- **Dips:** Push-ups 3×15, Bench 3×12 @ 25kg/hand (6-12 months)
+- **Estimated timeline:** 3-6 months before barbell work
 
 **Before implementing any screen:**
 1. Read relevant section in UI/UX design doc
-2. Note viewport constraints
-3. Identify tap targets and sizes
+2. Note viewport constraints (no scrolling during active set)
+3. Identify tap targets and sizes (60px min)
 4. Implement exactly as designed
-5. Test on mobile viewport
+5. Test on mobile viewport (400-430px width)
+
+**Critical Implementation Notes:**
+- Workout selector: 4 buttons (Upper A, Lower A, Upper B, Lower B)
+- Recovery warnings: Check muscle overlap, not calendar days
+- Exercise order: Compound before isolation (rows before bicep curls)
+- RIR tracking: Required for all sets (0-4 dropdown)
+- Deload logic: `weeks ≥ 6 AND cycles ≥ 8 AND avgCyclesPerWeek ≥ 1.0`
 
 ---
 
@@ -413,13 +518,16 @@ workout-build-tracker/
 
 ## Critical Reminders
 
-1. **Design documents are source of truth** - Implement what's designed
+1. **Design documents are source of truth** - Implement Upper/Lower Split as designed
 2. **Test-driven development is required** - Tests before implementation
 3. **Mobile-first, always** - Test on 400px viewport
 4. **Verify before claiming done** - Use verification skill
 5. **Privacy-first, no tracking** - All data stays local
 6. **Zero dependencies** - Vanilla JS only
 7. **Offline-capable** - PWA must work without network
+8. **Exercise order matters** - Compound before isolation (prevent pre-fatigue)
+9. **User's weaknesses addressed** - Rotator cuff work, extra core, hip abductors included
+10. **Recovery is muscle-specific** - 48hr major muscles, 24hr arms/calves
 
 ---
 
