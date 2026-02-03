@@ -1,0 +1,33 @@
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# User data (exported backups)
+*.backup
+backups/
+user-data/
+
+# Build artifacts (if we add a build step later)
+dist/
+build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node modules (if we add tooling later)
+node_modules/
+package-lock.json
+yarn.lock
