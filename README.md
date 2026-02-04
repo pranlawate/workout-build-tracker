@@ -1,6 +1,6 @@
 # BUILD Workout Tracker
 
-A Progressive Web App for tracking strength training workouts, designed for beginners following a full-body training program.
+A Progressive Web App for tracking strength training workouts, designed for beginners following an Upper/Lower Split program.
 
 ## Overview
 
@@ -22,12 +22,20 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 ## Project Status
 
-**Current Phase**: Design Complete, Implementation Starting
+**Current Phase**: MVP Complete - Core Modules Implemented
 
 ✅ UI/UX design finalized
-✅ Training structure defined (Full Body 3x/week)
+✅ Training structure defined (Upper/Lower Split 4x/week)
 ✅ Data model designed
-🚧 Implementation in progress
+✅ **MVP implementation complete** (6 of 6 tasks)
+- ✅ Test infrastructure (44 tests passing)
+- ✅ Storage module (localStorage wrapper)
+- ✅ Workout definitions (4 workouts, 26 exercises)
+- ✅ Progression engine (double progression logic)
+- ✅ Workout manager (rotation + recovery tracking)
+- ✅ HTML/CSS structure (PWA-ready)
+
+🚧 UI integration layer (next phase)
 
 ## Technology Stack
 
@@ -38,9 +46,12 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 ## Documentation
 
+- [BUILD Training Specification](BUILD-SPECIFICATION.md) - Complete training program definition
 - [UI/UX Design](docs/design/2026-02-03-ui-ux-design.md)
 - [Training Structure](docs/design/2026-02-03-workout-structure.md)
-- Implementation Plan (coming soon)
+- [Data Model Design](docs/design/2026-02-02-data-model-design.md)
+- [MVP Implementation Plan](docs/plans/2026-02-03-mvp-implementation-plan.md) - ✅ Complete
+- [Development Guidelines](CONTRIBUTING.md)
 
 ## Development
 
@@ -48,6 +59,15 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 # Clone repository
 git clone <repo-url>
 cd workout-build-tracker
+
+# Install dependencies (test runner only)
+npm install
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
 
 # Open in browser (no build step needed)
 # Simply open src/index.html in your browser
@@ -58,23 +78,33 @@ python -m http.server 8000
 
 ## Features
 
-### Core Tracking
-- Full-body workout rotation (A/B/C)
-- Set-by-set logging with RIR (Reps in Reserve)
-- Auto-filled weights from last workout
-- Large touch targets for gym use
+### Core Tracking (✅ Implemented)
+- Upper/Lower Split rotation (UPPER_A → LOWER_A → UPPER_B → LOWER_B)
+- 26 exercises with starting weights and progression rules
+- Double progression algorithm (reps → weight)
+- Exercise history tracking (8 workouts retained)
+- Muscle-specific recovery tracking (48hr major muscle groups)
 
-### Intelligence Layer
-- Recovery warnings (48hr muscle overlap detection)
-- Deload triggers (cycle + time + frequency logic)
-- Equipment progression tracking (auto-stability calculation)
-- Body weight trend analysis (fluctuation-aware)
+### Data Layer (✅ Implemented)
+- localStorage persistence with error handling
+- Workout rotation state management
+- Exercise-specific history with 8-workout limit
+- Robust parsing for special rep formats (time-based, unilateral)
+- Input validation and graceful error recovery
 
-### User Experience
-- Progressive disclosure (expand current, collapse completed)
-- No scrolling during set entry
-- Color-coded progression badges
-- Offline capability
+### User Interface (✅ Structure Complete)
+- Mobile-first design (optimized for 400-430px width)
+- Dark theme with purple gradient accents
+- Large touch targets (60px minimum)
+- PWA manifest for standalone installation
+- Two-screen architecture (home + workout)
+
+### Coming Next (Post-MVP)
+- UI controller (wire JavaScript to HTML)
+- In-workout set logging interface
+- Progression feedback (color-coded badges)
+- Service worker (offline caching)
+- Integration tests
 
 ## License
 
