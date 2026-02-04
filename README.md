@@ -1,5 +1,10 @@
 # BUILD Workout Tracker
 
+![Tests](https://img.shields.io/badge/tests-44%20passing-brightgreen)
+![MVP](https://img.shields.io/badge/MVP-complete-blue)
+![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 A Progressive Web App for tracking strength training workouts, designed for beginners following an Upper/Lower Split program.
 
 ## Overview
@@ -108,7 +113,7 @@ python -m http.server 8000
 
 ## License
 
-MIT (to be added)
+MIT - See [LICENSE](LICENSE) file for details
 
 ## Author
 
