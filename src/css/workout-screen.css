@@ -1,0 +1,94 @@
+/* In-Workout Screen Styles */
+
+.exercise-item {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.exercise-name {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.exercise-meta {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin-bottom: var(--spacing-sm);
+}
+
+.sets-container {
+  margin-top: var(--spacing-md);
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr;
+  gap: var(--spacing-sm);
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.set-label {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+.set-input {
+  background: var(--color-surface-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-size: var(--font-md);
+  font-weight: 600;
+  padding: var(--spacing-sm);
+  text-align: center;
+  min-height: var(--tap-target-min);
+}
+
+.set-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.set-input::placeholder {
+  color: var(--color-text-dim);
+}
+
+.input-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-dim);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.set-inputs {
+  display: flex;
+  flex-direction: column;
+}
+
+#timer {
+  font-family: 'Courier New', monospace;
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.exercise-notes {
+  font-size: var(--font-sm);
+  color: var(--color-info);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: rgba(66, 153, 225, 0.1);
+  border-radius: 6px;
+}
