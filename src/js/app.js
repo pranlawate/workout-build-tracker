@@ -119,6 +119,16 @@ class App {
   }
 
   showHomeScreen() {
+    // Stop timer (Task 9)
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+
+    // Clean up session data
+    this.workoutSession = null;
+    this.currentWorkout = null;
+
     const workoutScreen = document.getElementById('workout-screen');
     const homeScreen = document.getElementById('home-screen');
     if (workoutScreen && homeScreen) {
@@ -243,11 +253,22 @@ class App {
   }
 
   attachSetInputListeners() {
-    const inputs = document.querySelectorAll('.set-input');
+    const exerciseList = document.getElementById('exercise-list');
+    if (!exerciseList) return;
 
-    inputs.forEach(input => {
-      input.addEventListener('change', (e) => this.handleSetInput(e));
-    });
+    // Remove old listener if exists
+    if (this.setInputHandler) {
+      exerciseList.removeEventListener('change', this.setInputHandler);
+    }
+
+    // Use event delegation on parent
+    this.setInputHandler = (e) => {
+      if (e.target.classList.contains('set-input')) {
+        this.handleSetInput(e);
+      }
+    };
+
+    exerciseList.addEventListener('change', this.setInputHandler);
   }
 
   handleSetInput(event) {
@@ -256,6 +277,10 @@ class App {
     const setIndex = parseInt(input.dataset.set);
     const field = input.dataset.field;
     const value = parseFloat(input.value);
+
+    // Validate input
+    if (isNaN(value) || value < 0) return;
+    if (field === 'rir' && value > 10) return;
 
     // Ensure sets array exists for this exercise
     const exercise = this.workoutSession.exercises[exerciseIndex];
@@ -270,33 +295,39 @@ class App {
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
-    // Save each exercise's history
-    this.workoutSession.exercises.forEach((exerciseSession, index) => {
-      const exerciseDef = this.currentWorkout.exercises[index];
-      const exerciseKey = `${this.currentWorkout.name} - ${exerciseDef.name}`;
+    try {
+      // Save each exercise's history
+      this.workoutSession.exercises.forEach((exerciseSession, index) => {
+        const exerciseDef = this.currentWorkout.exercises[index];
+        const exerciseKey = `${this.currentWorkout.name} - ${exerciseDef.name}`;
 
-      // Get existing history
-      const history = this.storage.getExerciseHistory(exerciseKey);
+        // Get existing history
+        const history = this.storage.getExerciseHistory(exerciseKey);
 
-      // Add new workout entry
-      const newEntry = {
-        date: this.workoutSession.startTime.toISOString(),
-        sets: exerciseSession.sets.filter(set => set.reps > 0) // Only save completed sets
-      };
+        // Add new workout entry
+        const newEntry = {
+          date: this.workoutSession.startTime.toISOString(),
+          sets: exerciseSession.sets.filter(set => set.reps > 0)
+        };
 
-      history.push(newEntry);
+        // Only save if there are completed sets
+        if (newEntry.sets.length > 0) {
+          history.push(newEntry);
+          this.storage.saveExerciseHistory(exerciseKey, history);
+        }
+      });
 
-      // Save updated history (storage.js limits to 8 workouts)
-      this.storage.saveExerciseHistory(exerciseKey, history);
-    });
+      // Update workout rotation
+      this.workoutManager.completeWorkout(this.currentWorkout.name);
 
-    // Update workout rotation
-    this.workoutManager.completeWorkout(this.currentWorkout.name);
+      // Show confirmation and return home
+      alert(`✅ ${this.currentWorkout.displayName} completed!`);
 
-    // Show confirmation and return home
-    alert(`✅ ${this.currentWorkout.displayName} completed!`);
-
-    this.showHomeScreen();
+      this.showHomeScreen();
+    } catch (error) {
+      console.error('Failed to save workout:', error);
+      alert('⚠️ Failed to save workout. Please try again or check storage.');
+    }
   }
 }
 
