@@ -89,6 +89,11 @@ class App {
     const nextWorkoutName = this.workoutManager.getNextWorkout();
     this.currentWorkout = getWorkout(nextWorkoutName);
 
+    if (!this.currentWorkout) {
+      console.error(`Cannot start workout: ${nextWorkoutName} not found`);
+      return;
+    }
+
     // Switch to workout screen
     const homeScreen = document.getElementById('home-screen');
     const workoutScreen = document.getElementById('workout-screen');
