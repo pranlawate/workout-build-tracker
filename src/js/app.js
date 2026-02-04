@@ -21,6 +21,11 @@ class App {
     const nextWorkoutName = this.workoutManager.getNextWorkout();
     const nextWorkout = getWorkout(nextWorkoutName);
 
+    if (!nextWorkout) {
+      console.error(`Unknown workout: ${nextWorkoutName}`);
+      return;
+    }
+
     // Update workout name
     const workoutNameEl = document.getElementById('next-workout-name');
     if (workoutNameEl) {
@@ -85,8 +90,12 @@ class App {
     this.currentWorkout = getWorkout(nextWorkoutName);
 
     // Switch to workout screen
-    document.getElementById('home-screen').classList.remove('active');
-    document.getElementById('workout-screen').classList.add('active');
+    const homeScreen = document.getElementById('home-screen');
+    const workoutScreen = document.getElementById('workout-screen');
+    if (homeScreen && workoutScreen) {
+      homeScreen.classList.remove('active');
+      workoutScreen.classList.add('active');
+    }
 
     // Update workout screen title
     const titleEl = document.getElementById('workout-title');
@@ -99,8 +108,12 @@ class App {
   }
 
   showHomeScreen() {
-    document.getElementById('workout-screen').classList.remove('active');
-    document.getElementById('home-screen').classList.add('active');
+    const workoutScreen = document.getElementById('workout-screen');
+    const homeScreen = document.getElementById('home-screen');
+    if (workoutScreen && homeScreen) {
+      workoutScreen.classList.remove('active');
+      homeScreen.classList.add('active');
+    }
 
     this.updateHomeScreen();
   }
