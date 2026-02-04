@@ -6,11 +6,87 @@
  * 2. ALL sets maintained RIR >= minimum target
  */
 
-export function shouldIncreaseWeight(sets, exercise) {
-  if (!sets || sets.length === 0) return false;
+// Plateau detection threshold (number of sessions at same weight)
+const PLATEAU_THRESHOLD = 3;
 
-  const [min, max] = exercise.repRange.split('-').map(Number);
-  const [rirMin, rirMax] = exercise.rirTarget.split('-').map(Number);
+/**
+ * Parse rep range to extract min and max values
+ * Handles formats: '8-12', '30-60s', '10-12/side', '30s/side'
+ */
+function parseRepRange(repRange) {
+  if (!repRange || typeof repRange !== 'string') {
+    throw new Error('Invalid rep range: must be a non-empty string');
+  }
+
+  // Remove suffixes (/side, s) in the correct order
+  let cleanRange = repRange.replace(/\/side/g, '').replace(/s/g, '');
+  const parts = cleanRange.split('-');
+
+  if (parts.length === 1) {
+    // Single value like '30s/side'
+    const value = Number(parts[0]);
+    if (isNaN(value)) {
+      throw new Error(`Invalid rep range format: ${repRange}`);
+    }
+    return { min: value, max: value };
+  }
+
+  const min = Number(parts[0]);
+  const max = Number(parts[1]);
+
+  if (isNaN(min) || isNaN(max)) {
+    throw new Error(`Invalid rep range format: ${repRange}`);
+  }
+
+  return { min, max };
+}
+
+/**
+ * Parse RIR target to extract min and max values
+ * Handles formats: '2-3', '3'
+ */
+function parseRIRTarget(rirTarget) {
+  if (!rirTarget || typeof rirTarget !== 'string') {
+    throw new Error('Invalid RIR target: must be a non-empty string');
+  }
+
+  const parts = rirTarget.split('-');
+
+  if (parts.length === 1) {
+    // Single value like '3'
+    const value = Number(parts[0]);
+    if (isNaN(value)) {
+      throw new Error(`Invalid RIR target format: ${rirTarget}`);
+    }
+    return { min: value, max: value };
+  }
+
+  const min = Number(parts[0]);
+  const max = Number(parts[1]);
+
+  if (isNaN(min) || isNaN(max)) {
+    throw new Error(`Invalid RIR target format: ${rirTarget}`);
+  }
+
+  return { min, max };
+}
+
+export function shouldIncreaseWeight(sets, exercise) {
+  // Input validation
+  if (!sets || !Array.isArray(sets) || sets.length === 0) {
+    return false;
+  }
+
+  if (!exercise || typeof exercise !== 'object') {
+    throw new Error('Invalid exercise: must be an object');
+  }
+
+  if (!exercise.repRange || !exercise.rirTarget) {
+    throw new Error('Exercise must have repRange and rirTarget properties');
+  }
+
+  const { max } = parseRepRange(exercise.repRange);
+  const { min: rirMin } = parseRIRTarget(exercise.rirTarget);
 
   // All sets must hit max reps
   const allSetsMaxReps = sets.every(set => set.reps >= max);
@@ -29,10 +105,10 @@ export function getProgressionStatus(history, exercise) {
 
   if (readyToProgress) return 'ready';
 
-  // Check for plateau (3+ sessions at same weight)
-  if (history.length >= 3) {
-    const last3 = history.slice(-3);
-    const weights = last3.map(w => w.sets[0].weight);
+  // Check for plateau (sessions at same weight)
+  if (history.length >= PLATEAU_THRESHOLD) {
+    const lastN = history.slice(-PLATEAU_THRESHOLD);
+    const weights = lastN.map(w => w.sets[0].weight);
     const allSameWeight = weights.every(w => w === weights[0]);
 
     if (allSameWeight) return 'plateau';

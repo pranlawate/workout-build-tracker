@@ -55,6 +55,176 @@ describe('Progression Engine', () => {
       const result = shouldIncreaseWeight(sets, exercise);
       assert.strictEqual(result, false);
     });
+
+    // Special format tests
+    describe('single RIR value', () => {
+      test('should handle single RIR value (Face Pulls)', () => {
+        const sets = [
+          { weight: 12.5, reps: 20, rir: 3 },
+          { weight: 12.5, reps: 20, rir: 3 }
+        ];
+        const exercise = { repRange: '15-20', rirTarget: '3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, true);
+      });
+
+      test('should return false with single RIR when below target', () => {
+        const sets = [
+          { weight: 12.5, reps: 20, rir: 2 },
+          { weight: 12.5, reps: 20, rir: 3 }
+        ];
+        const exercise = { repRange: '15-20', rirTarget: '3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, false);
+      });
+    });
+
+    describe('time-based rep ranges', () => {
+      test('should handle time-based rep range (Plank)', () => {
+        const sets = [
+          { weight: 0, reps: 60, rir: 2 },
+          { weight: 0, reps: 60, rir: 2 },
+          { weight: 0, reps: 60, rir: 3 }
+        ];
+        const exercise = { repRange: '30-60s', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, true);
+      });
+
+      test('should return false when time-based reps below max', () => {
+        const sets = [
+          { weight: 0, reps: 45, rir: 2 },
+          { weight: 0, reps: 50, rir: 2 },
+          { weight: 0, reps: 55, rir: 2 }
+        ];
+        const exercise = { repRange: '30-60s', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, false);
+      });
+    });
+
+    describe('unilateral rep ranges', () => {
+      test('should handle unilateral rep range (Dead Bug)', () => {
+        const sets = [
+          { weight: 0, reps: 12, rir: 2 },
+          { weight: 0, reps: 12, rir: 2 },
+          { weight: 0, reps: 12, rir: 3 }
+        ];
+        const exercise = { repRange: '10-12/side', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, true);
+      });
+
+      test('should return false when unilateral reps below max', () => {
+        const sets = [
+          { weight: 0, reps: 10, rir: 2 },
+          { weight: 0, reps: 11, rir: 2 },
+          { weight: 0, reps: 11, rir: 2 }
+        ];
+        const exercise = { repRange: '10-12/side', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, false);
+      });
+    });
+
+    describe('time-based unilateral rep ranges', () => {
+      test('should handle time+unilateral rep range (Side Plank)', () => {
+        const sets = [
+          { weight: 0, reps: 30, rir: 2 },
+          { weight: 0, reps: 30, rir: 2 },
+          { weight: 0, reps: 30, rir: 3 }
+        ];
+        const exercise = { repRange: '30s/side', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, true);
+      });
+
+      test('should return false when time+unilateral reps below max', () => {
+        const sets = [
+          { weight: 0, reps: 25, rir: 2 },
+          { weight: 0, reps: 28, rir: 2 },
+          { weight: 0, reps: 29, rir: 2 }
+        ];
+        const exercise = { repRange: '30s/side', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, false);
+      });
+    });
+
+    describe('input validation', () => {
+      test('should return false for empty sets array', () => {
+        const sets = [];
+        const exercise = { repRange: '8-12', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, false);
+      });
+
+      test('should return false for null sets', () => {
+        const sets = null;
+        const exercise = { repRange: '8-12', rirTarget: '2-3' };
+
+        const result = shouldIncreaseWeight(sets, exercise);
+        assert.strictEqual(result, false);
+      });
+
+      test('should throw error for invalid exercise object', () => {
+        const sets = [{ weight: 20, reps: 12, rir: 2 }];
+
+        assert.throws(
+          () => shouldIncreaseWeight(sets, null),
+          /Invalid exercise/
+        );
+      });
+
+      test('should throw error for missing repRange', () => {
+        const sets = [{ weight: 20, reps: 12, rir: 2 }];
+        const exercise = { rirTarget: '2-3' };
+
+        assert.throws(
+          () => shouldIncreaseWeight(sets, exercise),
+          /repRange and rirTarget/
+        );
+      });
+
+      test('should throw error for missing rirTarget', () => {
+        const sets = [{ weight: 20, reps: 12, rir: 2 }];
+        const exercise = { repRange: '8-12' };
+
+        assert.throws(
+          () => shouldIncreaseWeight(sets, exercise),
+          /repRange and rirTarget/
+        );
+      });
+
+      test('should throw error for invalid repRange format', () => {
+        const sets = [{ weight: 20, reps: 12, rir: 2 }];
+        const exercise = { repRange: 'invalid', rirTarget: '2-3' };
+
+        assert.throws(
+          () => shouldIncreaseWeight(sets, exercise),
+          /Invalid rep range format/
+        );
+      });
+
+      test('should throw error for invalid rirTarget format', () => {
+        const sets = [{ weight: 20, reps: 12, rir: 2 }];
+        const exercise = { repRange: '8-12', rirTarget: 'invalid' };
+
+        assert.throws(
+          () => shouldIncreaseWeight(sets, exercise),
+          /Invalid RIR target format/
+        );
+      });
+    });
   });
 
   describe('getProgressionStatus', () => {
