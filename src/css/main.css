@@ -1,0 +1,207 @@
+:root {
+  --color-bg: #0a0a0a;
+  --color-surface: #1a1a1a;
+  --color-surface-light: #2a2a2a;
+  --color-text: #e0e0e0;
+  --color-text-dim: #a0a0a0;
+  --color-primary: #667eea;
+  --color-success: #48bb78;
+  --color-warning: #f6ad55;
+  --color-danger: #fc8181;
+  --color-info: #4299e1;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  --tap-target-min: 44px;
+  --tap-target-large: 60px;
+  --tap-target-huge: 70px;
+
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 24px;
+  --font-xxl: 32px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* Screen Management */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: 60px;
+}
+
+.app-header h1 {
+  font-size: var(--font-xl);
+  font-weight: 600;
+}
+
+.icon-btn {
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: var(--font-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.icon-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Screen Content */
+.screen-content {
+  flex: 1;
+  padding: var(--spacing-md);
+}
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: var(--font-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-large {
+  min-height: var(--tap-target-large);
+  padding: var(--spacing-md);
+}
+
+/* Cards */
+.workout-card,
+.recovery-card,
+.quick-actions {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.workout-card h2,
+.recovery-card h3,
+.quick-actions h3 {
+  font-size: var(--font-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text);
+}
+
+.workout-name {
+  font-size: var(--font-xxl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.meta {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Quick Actions */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.action-btn {
+  min-height: var(--tap-target-large);
+  background: var(--color-surface-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--color-text);
+  font-size: var(--font-md);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.action-btn:active {
+  background: var(--color-surface);
+}
+
+/* Recovery Status */
+.recovery-ok {
+  color: var(--color-success);
+  font-size: var(--font-md);
+}
+
+.recovery-warning {
+  color: var(--color-warning);
+  font-size: var(--font-md);
+}
+
+/* Mobile optimizations */
+@media (max-width: 400px) {
+  .screen-content {
+    padding: var(--spacing-sm);
+  }
+
+  .workout-card,
+  .recovery-card,
+  .quick-actions {
+    padding: var(--spacing-md);
+  }
+}

@@ -1,0 +1,11 @@
+/* Screen-specific styles */
+
+/* Home Screen */
+#home-screen .screen-content {
+  padding-bottom: var(--spacing-xl);
+}
+
+/* Workout Screen */
+#workout-screen {
+  /* Will be populated as we build workout UI */
+}
