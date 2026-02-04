@@ -1,8 +1,6 @@
 import { strict as assert } from 'assert';
 import { test, describe, beforeEach } from 'node:test';
 import './setup.js';
-
-// Import will fail - we haven't created the file yet
 import { StorageManager } from '../../src/js/modules/storage.js';
 
 describe('StorageManager', () => {
@@ -63,6 +61,71 @@ describe('StorageManager', () => {
     const retrieved = storage.getExerciseHistory(exerciseKey);
 
     assert.strictEqual(retrieved.length, 8);
-    assert.strictEqual(retrieved[0].date, '2026-02-03'); // Newest first
+    // slice(-8) keeps last 8 items, so oldest kept is index 2 (2026-02-03)
+    assert.strictEqual(retrieved[0].date, '2026-02-03');
+  });
+
+  // Error handling tests
+  describe('error handling', () => {
+    test('should handle corrupt rotation JSON data gracefully', () => {
+      localStorage.setItem('build_workout_rotation', 'invalid{json}');
+      const rotation = storage.getRotation();
+
+      // Should return default instead of crashing
+      assert.strictEqual(rotation.lastWorkout, null);
+      assert.strictEqual(rotation.nextSuggested, 'UPPER_A');
+    });
+
+    test('should handle corrupt exercise history JSON data gracefully', () => {
+      const exerciseKey = 'UPPER_A - DB Bench Press';
+      localStorage.setItem('build_exercise_' + exerciseKey, 'not{valid]json');
+      const history = storage.getExerciseHistory(exerciseKey);
+
+      // Should return empty array instead of crashing
+      assert.deepStrictEqual(history, []);
+    });
+
+    test('should handle non-array exercise history data gracefully', () => {
+      const exerciseKey = 'UPPER_A - DB Bench Press';
+      localStorage.setItem('build_exercise_' + exerciseKey, '{"not":"an array"}');
+      const history = storage.getExerciseHistory(exerciseKey);
+
+      // Should return empty array for invalid data structure
+      assert.deepStrictEqual(history, []);
+    });
+
+    test('should throw error for invalid rotation input', () => {
+      assert.throws(() => {
+        storage.saveRotation(null);
+      }, /Invalid rotation data/);
+
+      assert.throws(() => {
+        storage.saveRotation('not an object');
+      }, /Invalid rotation data/);
+    });
+
+    test('should throw error for invalid exercise key', () => {
+      assert.throws(() => {
+        storage.saveExerciseHistory('', []);
+      }, /Invalid exerciseKey/);
+
+      assert.throws(() => {
+        storage.saveExerciseHistory(null, []);
+      }, /Invalid exerciseKey/);
+
+      assert.throws(() => {
+        storage.getExerciseHistory('');
+      }, /Invalid exerciseKey/);
+    });
+
+    test('should throw error for invalid history input', () => {
+      assert.throws(() => {
+        storage.saveExerciseHistory('valid-key', 'not an array');
+      }, /Invalid history/);
+
+      assert.throws(() => {
+        storage.saveExerciseHistory('valid-key', null);
+      }, /Invalid history/);
+    });
   });
 });
