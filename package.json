@@ -1,0 +1,19 @@
+{
+  "name": "build-tracker",
+  "version": "1.0.0",
+  "description": "Mobile-first PWA for tracking Upper/Lower Split workouts with smart progression",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/unit/**/*.test.js",
+    "test:watch": "node --test --watch tests/unit/**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plawate/workout-build-tracker.git"
+  },
+  "author": "Pranav Lawate <pran.lawate@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
