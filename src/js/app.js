@@ -847,12 +847,16 @@ class App {
     // Don't unlock beyond total sets
     if (nextSetIndex >= exerciseDef.sets) return;
 
-    // Find next set row
+    // Find current and next set rows
     const exerciseItem = document.querySelector(
       `.exercise-item[data-exercise-index="${exerciseIndex}"]`
     );
 
     if (!exerciseItem) return;
+
+    const currentSetRow = exerciseItem.querySelector(
+      `.set-row[data-set-number="${completedSetIndex + 1}"]`
+    );
 
     const nextSetRow = exerciseItem.querySelector(
       `.set-row[data-set-number="${nextSetIndex + 1}"]`
@@ -860,8 +864,18 @@ class App {
 
     if (!nextSetRow) return;
 
+    // Remove sticky class and LOG SET button from current set
+    if (currentSetRow) {
+      currentSetRow.classList.remove('sticky-set');
+      const currentLogBtn = currentSetRow.querySelector('.log-set-btn');
+      if (currentLogBtn) currentLogBtn.remove();
+    }
+
     // Remove locked state
     nextSetRow.classList.remove('locked');
+
+    // Add sticky class to next set
+    nextSetRow.classList.add('sticky-set');
 
     // Enable inputs
     const inputs = nextSetRow.querySelectorAll('input, select');
@@ -884,6 +898,18 @@ class App {
 
     // Reps input - leave empty for user to fill
     // RIR select - keep default
+
+    // Add LOG SET button to next set
+    const logButton = document.createElement('button');
+    logButton.className = 'log-set-btn';
+    logButton.dataset.exercise = exerciseIndex;
+    logButton.dataset.set = nextSetIndex;
+    logButton.textContent = `LOG SET ${nextSetIndex + 1}`;
+
+    // Add click handler
+    logButton.addEventListener('click', (e) => this.handleLogSet(e));
+
+    nextSetRow.appendChild(logButton);
   }
 
   checkExerciseCompletion(exerciseIndex) {
