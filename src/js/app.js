@@ -590,14 +590,38 @@ class App {
     const exerciseIndex = parseInt(button.dataset.exercise);
     const setIndex = parseInt(button.dataset.set);
 
-    const exercise = this.workoutSession.exercises[exerciseIndex];
-    const set = exercise.sets[setIndex];
+    // Read values directly from input fields
+    const weightInput = document.querySelector(
+      `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="weight"]`
+    );
+    const repsInput = document.querySelector(
+      `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="reps"]`
+    );
+    const rirInput = document.querySelector(
+      `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="rir"]`
+    );
 
-    // Validate set is complete
-    if (!set || !set.weight || !set.reps || set.rir === undefined) {
+    const weight = parseFloat(weightInput?.value);
+    const reps = parseInt(repsInput?.value);
+    const rir = parseInt(rirInput?.value);
+
+    // Validate all fields are filled
+    if (!weight || weight <= 0 || !reps || reps <= 0 || rir === undefined || isNaN(rir)) {
       alert('Please fill in all fields (Weight, Reps, RIR) before logging set');
       return;
     }
+
+    // Ensure session data exists for this set
+    const exercise = this.workoutSession.exercises[exerciseIndex];
+    if (!exercise.sets[setIndex]) {
+      exercise.sets[setIndex] = {};
+    }
+
+    // Update session data with values from inputs
+    const set = exercise.sets[setIndex];
+    set.weight = weight;
+    set.reps = reps;
+    set.rir = rir;
 
     // Visual feedback
     button.textContent = '✓ LOGGED';
