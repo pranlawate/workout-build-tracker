@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import { test, describe, beforeEach } from 'node:test';
 import './setup.js';
-import { BarbellProgressionTracker } from '../../src/js/modules/barbell-progression-tracker.js';
-import { StorageManager } from '../../src/js/modules/storage.js';
+import { BarbellProgressionTracker } from '../../js/modules/barbell-progression-tracker.js';
+import { StorageManager } from '../../js/modules/storage.js';
 
 describe('BarbellProgressionTracker', () => {
   let storage;

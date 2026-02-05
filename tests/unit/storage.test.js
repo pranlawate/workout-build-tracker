@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { test, describe, beforeEach } from 'node:test';
 import './setup.js';
-import { StorageManager } from '../../src/js/modules/storage.js';
+import { StorageManager } from '../../js/modules/storage.js';
 
 describe('StorageManager', () => {
   let storage;

@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import { test, describe, beforeEach } from 'node:test';
 import './setup.js';
-import { WorkoutManager } from '../../src/js/modules/workout-manager.js';
-import { StorageManager } from '../../src/js/modules/storage.js';
+import { WorkoutManager } from '../../js/modules/workout-manager.js';
+import { StorageManager } from '../../js/modules/storage.js';
 
 describe('WorkoutManager', () => {
   let manager;

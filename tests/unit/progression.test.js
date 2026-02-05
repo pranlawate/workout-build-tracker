@@ -4,7 +4,7 @@ import {
   shouldIncreaseWeight,
   getProgressionStatus,
   getNextWeight
-} from '../../src/js/modules/progression.js';
+} from '../../js/modules/progression.js';
 
 describe('Progression Engine', () => {
   describe('shouldIncreaseWeight', () => {

@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { test, describe } from 'node:test';
-import { WORKOUTS, getWorkout, getAllWorkouts } from '../../src/js/modules/workouts.js';
+import { WORKOUTS, getWorkout, getAllWorkouts } from '../../js/modules/workouts.js';
 
 describe('Workout Definitions', () => {
   test('should have 4 workout types', () => {

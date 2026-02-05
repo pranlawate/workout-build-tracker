@@ -111,9 +111,53 @@ class App {
   }
 
   initializeApp() {
+    this.setupBrowserHistory();
     this.updateHomeScreen();
     this.attachEventListeners();
     this.initializeNumberOverlay();
+  }
+
+  setupBrowserHistory() {
+    // Set initial state (home screen)
+    if (!window.history.state) {
+      window.history.replaceState({ screen: 'home' }, '', '');
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', (event) => {
+      if (!event.state) {
+        // No state means we've gone back to initial page load
+        this.navigateToScreen('home');
+        return;
+      }
+
+      // Navigate to the screen in history state
+      this.navigateToScreen(event.state.screen, event.state.data);
+    });
+  }
+
+  navigateToScreen(screen, data = {}) {
+    switch (screen) {
+      case 'home':
+        this.showHomeScreen(false); // false = don't push to history
+        break;
+      case 'workout':
+        // Workout screen doesn't use history (modal-like behavior)
+        break;
+      case 'history':
+        this.showHistoryScreen(false);
+        break;
+      case 'exercise-detail':
+        if (data.exerciseKey) {
+          this.showExerciseDetail(data.exerciseKey, false);
+        }
+        break;
+      case 'progress':
+        this.showProgressDashboard(false);
+        break;
+      default:
+        this.showHomeScreen(false);
+    }
   }
 
   updateHomeScreen() {
@@ -379,7 +423,7 @@ class App {
     }, 1000);
   }
 
-  showHomeScreen() {
+  showHomeScreen(pushHistory = true) {
     // Stop timer (Task 9)
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -399,6 +443,11 @@ class App {
     }
 
     this.updateHomeScreen();
+
+    // Push to browser history
+    if (pushHistory && window.history.state?.screen !== 'home') {
+      window.history.pushState({ screen: 'home' }, '', '');
+    }
   }
 
   renderExercises() {
@@ -1320,21 +1369,35 @@ class App {
     });
   }
 
-  showHistoryScreen() {
+  showHistoryScreen(pushHistory = true) {
     this.hideAllScreens();
     const historyScreen = document.getElementById('history-screen');
     if (historyScreen) {
       historyScreen.classList.add('active');
       this.historyListScreen.render();
     }
+
+    // Push to browser history
+    if (pushHistory) {
+      window.history.pushState({ screen: 'history' }, '', '');
+    }
   }
 
-  showExerciseDetail(exerciseKey) {
+  showExerciseDetail(exerciseKey, pushHistory = true) {
     this.hideAllScreens();
     const detailScreen = document.getElementById('exercise-detail-screen');
     if (detailScreen) {
       detailScreen.classList.add('active');
       this.exerciseDetailScreen.render(exerciseKey);
+    }
+
+    // Push to browser history
+    if (pushHistory) {
+      window.history.pushState(
+        { screen: 'exercise-detail', data: { exerciseKey } },
+        '',
+        ''
+      );
     }
   }
 
@@ -1832,7 +1895,7 @@ class App {
     });
   }
 
-  showProgressDashboard() {
+  showProgressDashboard(pushHistory = true) {
     this.hideAllScreens();
     const progressScreen = document.getElementById('progress-screen');
     if (progressScreen) {
@@ -1865,6 +1928,11 @@ class App {
     const progressBackBtn = document.getElementById('progress-back-btn');
     if (progressBackBtn) {
       progressBackBtn.onclick = () => this.showHomeScreen();
+    }
+
+    // Push to browser history
+    if (pushHistory) {
+      window.history.pushState({ screen: 'progress' }, '', '');
     }
   }
 
