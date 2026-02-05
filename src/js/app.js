@@ -352,9 +352,20 @@ class App {
 
   renderSets(exercise, lastWorkout, exerciseIndex) {
     let html = '';
+    let currentSetIndex = 0;
+
+    // Determine which set is current (first incomplete)
+    const sessionExercise = this.workoutSession?.exercises[exerciseIndex];
+    if (sessionExercise) {
+      currentSetIndex = sessionExercise.sets.findIndex(s =>
+        !s || s.reps === 0 || !s.weight || s.rir === undefined
+      );
+      if (currentSetIndex === -1) currentSetIndex = exercise.sets - 1;
+    }
 
     for (let setNum = 1; setNum <= exercise.sets; setNum++) {
-      const lastSet = lastWorkout?.sets?.[setNum - 1];
+      const setIndex = setNum - 1;
+      const lastSet = lastWorkout?.sets?.[setIndex];
       const defaultWeight = lastSet?.weight || exercise.startingWeight;
       const defaultReps = lastSet?.reps || '';
 
@@ -364,13 +375,26 @@ class App {
         return min;
       })();
 
-      // Only Set 1 is enabled initially
-      const isLocked = setNum > 1;
+      // Determine set state
+      const isCurrent = setIndex === currentSetIndex;
+      const isLocked = setIndex > currentSetIndex;
       const disabledAttr = isLocked ? 'disabled' : '';
       const lockedClass = isLocked ? 'locked' : '';
+      const stickyClass = isCurrent ? 'sticky-set' : '';
+
+      // LOG SET button only for current set
+      const logButtonHtml = isCurrent ? `
+        <button
+          class="log-set-btn"
+          data-exercise="${exerciseIndex}"
+          data-set="${setIndex}"
+        >
+          LOG SET ${setNum}
+        </button>
+      ` : '';
 
       html += `
-        <div class="set-row ${lockedClass}" data-set-number="${setNum}">
+        <div class="set-row ${lockedClass} ${stickyClass}" data-set-number="${setNum}">
           <span class="set-label">
             Set ${setNum}
             ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
@@ -382,7 +406,7 @@ class App {
               type="number"
               class="set-input"
               data-exercise="${exerciseIndex}"
-              data-set="${setNum - 1}"
+              data-set="${setIndex}"
               data-field="weight"
               value="${defaultWeight}"
               step="0.5"
@@ -397,7 +421,7 @@ class App {
               type="number"
               class="set-input"
               data-exercise="${exerciseIndex}"
-              data-set="${setNum - 1}"
+              data-set="${setIndex}"
               data-field="reps"
               value="${defaultReps}"
               min="0"
@@ -414,7 +438,7 @@ class App {
             <select
               class="set-input rir-select"
               data-exercise="${exerciseIndex}"
-              data-set="${setNum - 1}"
+              data-set="${setIndex}"
               data-field="rir"
               value="${defaultRir}"
               ${disabledAttr}
@@ -427,6 +451,8 @@ class App {
               <option value="5" ${defaultRir >= 5 ? 'selected' : ''}>5+</option>
             </select>
           </div>
+
+          ${logButtonHtml}
         </div>
       `;
     }
@@ -497,6 +523,13 @@ class App {
     };
 
     exerciseList.addEventListener('change', this.setInputHandler);
+
+    // Add LOG SET button handler
+    exerciseList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('log-set-btn')) {
+        this.handleLogSet(e);
+      }
+    });
   }
 
   handleSetInput(event) {
@@ -534,6 +567,37 @@ class App {
 
       // Check if all sets completed for current exercise
       this.checkExerciseCompletion(exerciseIndex);
+    }
+  }
+
+  handleLogSet(event) {
+    const button = event.target;
+    const exerciseIndex = parseInt(button.dataset.exercise);
+    const setIndex = parseInt(button.dataset.set);
+
+    const exercise = this.workoutSession.exercises[exerciseIndex];
+    const set = exercise.sets[setIndex];
+
+    // Validate set is complete
+    if (!set || !set.weight || !set.reps || set.rir === undefined) {
+      alert('Please fill in all fields (Weight, Reps, RIR) before logging set');
+      return;
+    }
+
+    // Visual feedback
+    button.textContent = '✓ LOGGED';
+    button.disabled = true;
+    button.style.background = 'var(--color-success)';
+
+    // Trigger progression check and unlock
+    this.checkSetProgression(exerciseIndex, setIndex);
+    this.unlockNextSet(exerciseIndex, setIndex);
+    this.checkExerciseCompletion(exerciseIndex);
+
+    // Note: showPostSetFeedback will be implemented in Task 26
+    // For now, just call it as a no-op if it doesn't exist
+    if (this.showPostSetFeedback) {
+      this.showPostSetFeedback(exerciseIndex, setIndex, set);
     }
   }
 
