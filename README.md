@@ -1,11 +1,13 @@
 # BUILD Workout Tracker
 
-![Tests](https://img.shields.io/badge/tests-44%20passing-brightgreen)
-![MVP](https://img.shields.io/badge/MVP-complete-blue)
+![Tests](https://img.shields.io/badge/tests-110%20passing-brightgreen)
+![Status](https://img.shields.io/badge/status-production-blue)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 A Progressive Web App for tracking strength training workouts, designed for beginners following an Upper/Lower Split program.
+
+**🚀 Live App:** [https://pranlawate.github.io/workout-build-tracker/](https://pranlawate.github.io/workout-build-tracker/)
 
 ## Overview
 
@@ -14,9 +16,11 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 - **Smart defaults**: 85% of sets logged in 1 tap
 - **Auto-progression tracking**: Intelligent weight/rep suggestions
 - **Recovery monitoring**: Prevents overtraining with muscle-specific rest periods
-- **Equipment progression**: Guides transition from dumbbells to barbells
+- **Equipment progression**: Tracks readiness for barbell exercises with strength, mobility, and pain criteria
 - **Deload automation**: Smart fatigue detection and recovery weeks
-- **Offline-first**: Works without internet connection
+- **Performance analysis**: Real-time alerts for weight regression and form breakdown
+- **Offline-first**: Works without internet connection, installable as PWA
+- **Browser navigation**: Full support for browser back button (SPA experience)
 
 ## Design Philosophy
 
@@ -27,28 +31,30 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 ## Project Status
 
-**Current Phase**: Production-Ready MVP - All Core Features Complete
+**Current Phase**: Production Deployment - 68% Complete (52/76 features)
 
-✅ UI/UX design finalized
-✅ Training structure defined (Upper/Lower Split 4x/week)
-✅ Data model designed
+🚀 **Deployed:** [https://pranlawate.github.io/workout-build-tracker/](https://pranlawate.github.io/workout-build-tracker/)
 
-✅ **Backend modules complete** (6 of 6 tasks)
-- ✅ Test infrastructure (44 tests passing)
-- ✅ Storage module (localStorage wrapper)
+✅ **Core Features (100% Complete)**
+- ✅ Backend modules (StorageManager, WorkoutManager, Progression Engine, DeloadManager)
+- ✅ Test infrastructure (110 tests passing - unit + integration)
 - ✅ Workout definitions (4 workouts, 26 exercises)
-- ✅ Progression engine (double progression logic)
-- ✅ Workout manager (rotation + recovery tracking)
-- ✅ HTML/CSS structure (PWA-ready)
+- ✅ Progressive disclosure UI (collapse completed, hide upcoming, expand current)
+- ✅ PWA support (Service Worker, offline-first, installable)
+- ✅ Data portability (JSON export/import with validation)
+- ✅ Performance analysis (weight regression, form breakdown, rep drop detection)
+- ✅ Barbell progression tracker (readiness criteria for Bench Press, Back Squat, Deadlift)
+- ✅ Browser navigation (full back button support, SPA experience)
 
-✅ **UI Integration Complete** (3 of 3 tasks)
-- ✅ Home screen with workout rotation
-- ✅ In-workout UI with set logging
-- ✅ Progression UI with visual feedback
+🚧 **Designed But Not Implemented** (24 features remaining)
+- Enhanced tracking metrics (sleep, stress, energy, fatigue scoring)
+- Post-workout summary screen
+- Progress dashboard with statistics
+- Exercise history charts (Canvas-based)
+- Body weight tracking with trends
+- Weekly summary analytics
 
-✅ **PWA & Testing Complete** (2 of 2 tasks)
-- ✅ Service Worker for offline functionality
-- ✅ Comprehensive integration test checklist
+See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for detailed progress tracking.
 
 ## Technology Stack
 
@@ -70,7 +76,7 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 ```bash
 # Clone repository
-git clone <repo-url>
+git clone https://github.com/pranlawate/workout-build-tracker.git
 cd workout-build-tracker
 
 # Install dependencies (test runner only)
@@ -83,10 +89,27 @@ npm test
 npm run test:watch
 
 # Open in browser (no build step needed)
-# Simply open src/index.html in your browser
+# Simply open index.html in your browser
 # Or use a local server:
 python -m http.server 8000
-# Navigate to http://localhost:8000/src/
+# Navigate to http://localhost:8000/
+```
+
+### Project Structure
+
+```
+workout-build-tracker/
+├── index.html          # Entry point
+├── manifest.json       # PWA manifest
+├── sw.js              # Service worker
+├── css/               # Stylesheets
+├── js/                # Application code
+│   ├── app.js         # Main controller
+│   ├── modules/       # Core modules
+│   ├── screens/       # Screen components
+│   └── utils/         # Utilities
+├── tests/             # Test suite (110 tests)
+└── docs/              # Documentation
 ```
 
 ## Features
@@ -127,11 +150,27 @@ python -m http.server 8000
 - ✅ Cache-first strategy with automatic updates
 - ✅ Comprehensive integration test checklist
 
-### Ready for Production
-The app is fully functional with all core features complete. Next steps:
-- Deploy to production (GitHub Pages or custom domain)
-- Performance monitoring and optimization
-- Optional features (export history, custom workouts)
+### Deployment
+
+**Production:** Deployed on GitHub Pages at [https://pranlawate.github.io/workout-build-tracker/](https://pranlawate.github.io/workout-build-tracker/)
+
+**PWA Installation:**
+1. Visit the live app on your mobile device
+2. Chrome: Tap "Add to Home Screen" from the browser menu
+3. iOS Safari: Tap Share → Add to Home Screen
+4. The app works offline after first visit
+
+**Cache Management:**
+- Service Worker caches all assets for offline use
+- Version: `build-tracker-v3` (auto-updates on new deployments)
+- Clear cache: Browser settings → Site storage → Clear & reset
+
+### Next Features (Planned)
+- Enhanced tracking metrics (sleep, stress, energy)
+- Post-workout summary screen
+- Progress dashboard with charts
+- Body weight tracking with trends
+- Weekly summary analytics
 
 ## License
 

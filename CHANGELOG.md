@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-02-05
+
+### Added
+- **GitHub Pages Deployment:** App now live at https://pranlawate.github.io/workout-build-tracker/
+- **Browser Navigation Support:** Full browser back/forward button integration for SPA experience
+- **History State Management:** Proper navigation between screens using History API
+- **Service Worker Cache Versioning:** Automatic cache updates for new deployments
+
+### Fixed
+- Browser back button now navigates within app instead of leaving it
+- Browser back from workout screen returns to home screen
+- Browser back from settings modal closes overlay properly
+- Service worker cache now updates when new version deployed
+
+### Changed
+- Moved app files from `src/` to root directory for GitHub Pages compatibility
+- Updated test imports to reflect new file structure
+- Bumped service worker cache to v3 for deployment
+
+### Technical
+- Implemented `popstate` event listener for browser navigation
+- Added `navigateToScreen()` router function
+- Updated all screen navigation methods to push history states
+- Created `closeSettingsModal()` for proper modal cleanup
+- Modified `proceedWithWorkout()` to push workout state
+- Fixed test file paths after directory restructure
+
+**Tests:** All 110 tests passing
+
+---
+
 ### Added - Advanced Reset Options (2026-02-05)
 
 **Emergency Recovery Tools:**
