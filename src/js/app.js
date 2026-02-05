@@ -238,7 +238,12 @@ class App {
       const lastSet = lastWorkout?.sets?.[setNum - 1];
       const defaultWeight = lastSet?.weight || exercise.startingWeight;
       const defaultReps = lastSet?.reps || '';
-      const defaultRir = lastSet?.rir || '';
+
+      // Default RIR to minimum of target range (per design spec)
+      const defaultRir = lastSet?.rir ?? (() => {
+        const [min] = exercise.rirTarget.split('-').map(Number);
+        return min;
+      })();
 
       html += `
         <div class="set-row">
