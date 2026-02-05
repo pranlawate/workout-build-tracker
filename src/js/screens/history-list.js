@@ -21,6 +21,10 @@ export class HistoryListScreen {
       if (history.length === 0) return null;
 
       const lastEntry = history[history.length - 1];
+
+      // Add null check for lastEntry.date
+      if (!lastEntry.date) return null;
+
       const lastDate = new Date(lastEntry.date);
       const lastWeight = lastEntry.sets[0]?.weight || 0;
 
@@ -50,40 +54,51 @@ export class HistoryListScreen {
     const container = document.getElementById('history-list');
     if (!container) return;
 
-    const exercises = this.getAllExercisesWithHistory();
+    try {
+      const exercises = this.getAllExercisesWithHistory();
 
-    if (exercises.length === 0) {
+      if (exercises.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-state-icon">📊</p>
+            <p class="empty-state-text">No workout history yet</p>
+            <p class="empty-state-hint">Complete your first workout to see progress here</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Group by workout
+      const grouped = exercises.reduce((acc, ex) => {
+        if (!acc[ex.workoutName]) acc[ex.workoutName] = [];
+        acc[ex.workoutName].push(ex);
+        return acc;
+      }, {});
+
+      let html = '';
+      for (const [workoutName, exList] of Object.entries(grouped)) {
+        html += `
+          <div class="workout-group">
+            <h3 class="workout-group-title">${this.escapeHtml(workoutName)}</h3>
+            ${exList.map(ex => this.renderExerciseCard(ex)).join('')}
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+
+      // Attach click handlers
+      this.attachClickHandlers();
+    } catch (error) {
+      console.error('Failed to render history list:', error);
       container.innerHTML = `
         <div class="empty-state">
-          <p class="empty-state-icon">📊</p>
-          <p class="empty-state-text">No workout history yet</p>
-          <p class="empty-state-hint">Complete your first workout to see progress here</p>
-        </div>
-      `;
-      return;
-    }
-
-    // Group by workout
-    const grouped = exercises.reduce((acc, ex) => {
-      if (!acc[ex.workoutName]) acc[ex.workoutName] = [];
-      acc[ex.workoutName].push(ex);
-      return acc;
-    }, {});
-
-    let html = '';
-    for (const [workoutName, exList] of Object.entries(grouped)) {
-      html += `
-        <div class="workout-group">
-          <h3 class="workout-group-title">${this.escapeHtml(workoutName)}</h3>
-          ${exList.map(ex => this.renderExerciseCard(ex)).join('')}
+          <p class="empty-state-icon">⚠️</p>
+          <p class="empty-state-text">Unable to load history</p>
+          <p class="empty-state-hint">There was a problem loading your workout data. Please try again later.</p>
         </div>
       `;
     }
-
-    container.innerHTML = html;
-
-    // Attach click handlers
-    this.attachClickHandlers();
   }
 
   renderExerciseCard(exercise) {
