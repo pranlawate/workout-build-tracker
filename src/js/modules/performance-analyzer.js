@@ -15,15 +15,23 @@ export class PerformanceAnalyzer {
    * @returns {Object|null} Alert object if regression detected, null otherwise
    */
   detectWeightRegression(history) {
-    // Need at least 2 sessions to compare
-    if (history.length < 2) return null;
+    if (!history || history.length < 2) return null;
 
     const twoSessionsAgo = history[history.length - 2];
     const lastSession = history[history.length - 1];
 
-    // Get weight from first set of each session
-    const oldWeight = twoSessionsAgo.sets[0]?.weight || 0;
-    const newWeight = lastSession.sets[0]?.weight || 0;
+    // Guard against missing sets
+    if (!twoSessionsAgo?.sets?.length || !lastSession?.sets?.length) {
+      return null;
+    }
+
+    const oldWeight = twoSessionsAgo.sets[0]?.weight;
+    const newWeight = lastSession.sets[0]?.weight;
+
+    // Only flag if we have valid weight data
+    if (oldWeight === undefined || newWeight === undefined) {
+      return null;
+    }
 
     if (newWeight < oldWeight) {
       return {
@@ -42,14 +50,21 @@ export class PerformanceAnalyzer {
    * @returns {Object|null} Alert object if rep drop detected, null otherwise
    */
   detectRepDrop(history) {
-    if (history.length < 2) return null;
+    if (!history || history.length < 2) return null;
 
     const twoSessionsAgo = history[history.length - 2];
     const lastSession = history[history.length - 1];
 
+    if (!twoSessionsAgo?.sets?.length || !lastSession?.sets?.length) {
+      return null;
+    }
+
     // Calculate average reps per session
     const avgRepsOld = twoSessionsAgo.sets.reduce((sum, set) => sum + (set.reps || 0), 0) / twoSessionsAgo.sets.length;
     const avgRepsNew = lastSession.sets.reduce((sum, set) => sum + (set.reps || 0), 0) / lastSession.sets.length;
+
+    // Avoid division by zero
+    if (avgRepsOld === 0) return null;
 
     // Check if reps dropped by 25% or more
     const dropPercentage = (avgRepsOld - avgRepsNew) / avgRepsOld;
