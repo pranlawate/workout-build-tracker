@@ -400,6 +400,9 @@ class App {
     const set = exercise.sets[setIndex];
     if (set.weight > 0 && set.reps > 0 && set.rir >= 0) {
       this.checkSetProgression(exerciseIndex, setIndex);
+
+      // Check if all sets completed for current exercise
+      this.checkExerciseCompletion(exerciseIndex);
     }
   }
 
@@ -427,6 +430,43 @@ class App {
       setRow.style.borderLeft = '4px solid var(--color-danger)';
     } else {
       setRow.style.borderLeft = '4px solid var(--color-info)';
+    }
+  }
+
+  checkExerciseCompletion(exerciseIndex) {
+    // Only check current exercise
+    if (exerciseIndex !== this.currentExerciseIndex) return;
+
+    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const exerciseSession = this.workoutSession.exercises[exerciseIndex];
+
+    // Count completed sets (sets with all three values)
+    const completedSets = exerciseSession.sets.filter(set =>
+      set && set.weight > 0 && set.reps > 0 && set.rir >= 0
+    ).length;
+
+    // If all sets completed, advance to next exercise
+    if (completedSets >= exerciseDef.sets) {
+      this.advanceToNextExercise();
+    }
+  }
+
+  advanceToNextExercise() {
+    // Don't advance past last exercise
+    if (this.currentExerciseIndex >= this.currentWorkout.exercises.length - 1) {
+      return;
+    }
+
+    // Increment index
+    this.currentExerciseIndex++;
+
+    // Re-render to update state classes
+    this.renderExercises();
+
+    // Scroll to current exercise
+    const currentExercise = document.querySelector('.exercise-item.current');
+    if (currentExercise) {
+      currentExercise.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
