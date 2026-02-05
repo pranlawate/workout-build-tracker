@@ -1192,6 +1192,26 @@ class App {
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
+    // Check how many exercises are completed
+    const totalExercises = this.currentWorkout.exercises.length;
+    const completedCount = this.currentWorkout.exercises.filter((_, index) =>
+      this.isExerciseCompleted(index)
+    ).length;
+
+    // If not all exercises are completed, show warning
+    if (completedCount < totalExercises) {
+      const incompleteExercises = this.currentWorkout.exercises
+        .map((ex, idx) => ({ name: ex.name, completed: this.isExerciseCompleted(idx) }))
+        .filter(ex => !ex.completed)
+        .map(ex => ex.name);
+
+      const confirmMessage = `⚠️ Incomplete Workout\n\nYou've completed ${completedCount} of ${totalExercises} exercises.\n\nIncomplete exercises:\n${incompleteExercises.map(name => `• ${name}`).join('\n')}\n\nDo you want to finish the workout anyway?\n\n✅ YES - Save partial workout\n❌ NO - Continue training`;
+
+      if (!confirm(confirmMessage)) {
+        return; // User chose to continue training
+      }
+    }
+
     try {
       // Save each exercise's history
       this.workoutSession.exercises.forEach((exerciseSession, index) => {
