@@ -2,6 +2,7 @@ import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
 import { DeloadManager } from './modules/deload.js';
 import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
+import { BarbellProgressionTracker } from './modules/barbell-progression-tracker.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { HistoryListScreen } from './screens/history-list.js';
@@ -259,13 +260,11 @@ class App {
       settingsBtn.addEventListener('click', () => this.showSettingsModal());
     }
 
-    // Placeholder buttons (only Progress now)
-    const placeholderButtons = document.querySelectorAll('.action-btn:nth-child(2)'); // Only Progress button
-    placeholderButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        alert('⏳ This feature is coming soon!\n\nCurrently available:\n✅ Workout logging\n✅ History viewing\n✅ Data export/import');
-      });
-    });
+    // Progress button
+    const progressBtn = document.getElementById('progress-btn');
+    if (progressBtn) {
+      progressBtn.addEventListener('click', () => this.showProgressDashboard());
+    }
   }
 
   startWorkout() {
@@ -1826,6 +1825,85 @@ class App {
         modal.style.display = 'none';
       };
     });
+  }
+
+  showProgressDashboard() {
+    this.hideAllScreens();
+    const progressScreen = document.getElementById('progress-screen');
+    if (progressScreen) {
+      progressScreen.classList.add('active');
+    }
+
+    // Initialize tracker
+    const tracker = new BarbellProgressionTracker(this.storage);
+
+    // Get readiness data
+    const benchReadiness = tracker.getBarbellBenchReadiness();
+    const squatReadiness = tracker.getBarbellSquatReadiness();
+    const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
+
+    // Render dashboard
+    const progressContent = document.getElementById('progress-content');
+    if (progressContent) {
+      progressContent.innerHTML = `
+        <div class="progress-dashboard">
+          <h3 class="dashboard-title">🎯 Equipment Progression Milestones</h3>
+
+          ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
+          ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
+          ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
+        </div>
+      `;
+    }
+
+    // Attach back button
+    const progressBackBtn = document.getElementById('progress-back-btn');
+    if (progressBackBtn) {
+      progressBackBtn.onclick = () => this.showHomeScreen();
+    }
+  }
+
+  renderProgressionCard(name, readiness) {
+    const { percentage, strengthMet, weeksMet, mobilityMet, painFree, blockers, strengthProgress, weeksProgress, mobilityProgress } = readiness;
+
+    // Calculate progress bar width
+    const barWidth = percentage;
+
+    // Determine next step or blocker
+    const nextStep = blockers.length > 0
+      ? `Next: ${blockers[0]}`
+      : '🎉 Ready for barbell transition!';
+
+    return `
+      <div class="progression-card">
+        <h4 class="progression-title">─── ${this.escapeHtml(name)} ───</h4>
+        <div class="progression-percentage">Progress: ${percentage}%</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" style="width: ${barWidth}%"></div>
+        </div>
+
+        <div class="criteria-list">
+          ${this.renderCriterion('Strength', strengthMet, strengthProgress)}
+          ${this.renderCriterion('Training weeks', weeksMet, weeksProgress)}
+          ${this.renderCriterion('Mobility', mobilityMet, mobilityProgress)}
+          ${this.renderCriterion('Pain-free', painFree, 100)}
+        </div>
+
+        <div class="next-step">${this.escapeHtml(nextStep)}</div>
+      </div>
+    `;
+  }
+
+  renderCriterion(name, met, progress) {
+    const icon = met ? '✅' : progress > 0 ? '⏳' : '❌';
+    const status = met ? 'met' : progress > 0 ? 'progress' : 'not-started';
+
+    return `
+      <div class="criterion criterion-${status}">
+        <span class="criterion-icon">${icon}</span>
+        <span class="criterion-text">${this.escapeHtml(name)}</span>
+      </div>
+    `;
   }
 
   completeWorkout() {

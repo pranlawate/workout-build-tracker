@@ -52,7 +52,7 @@
           <h3>Quick Actions</h3>
           <div class="action-grid">
             <button class="action-btn">📊 History</button>
-            <button class="action-btn">📈 Progress</button>
+            <button id="progress-btn" class="action-btn">📈 Progress</button>
           </div>
         </section>
 
@@ -120,6 +120,21 @@
 
         <div id="workout-history-list">
           <!-- Populated by ExerciseDetailScreen -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Progress Dashboard Screen -->
+    <div id="progress-screen" class="screen">
+      <header class="app-header">
+        <button id="progress-back-btn" class="icon-btn">←</button>
+        <h1>Progress Dashboard</h1>
+        <button class="icon-btn">⚙️</button>
+      </header>
+
+      <main class="screen-content">
+        <div id="progress-content">
+          <!-- Populated by showProgressDashboard() -->
         </div>
       </main>
     </div>

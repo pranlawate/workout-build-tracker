@@ -328,6 +328,112 @@ body {
   text-align: center;
 }
 
+/* Progress Dashboard */
+.progress-dashboard {
+  padding: var(--spacing-md) 0;
+}
+
+.dashboard-title {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-lg);
+  color: var(--color-text);
+}
+
+.progression-card {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progression-title {
+  text-align: center;
+  font-size: var(--font-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.progression-percentage {
+  text-align: center;
+  font-size: var(--font-xl);
+  font-weight: bold;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-primary);
+}
+
+.progress-bar-container {
+  height: 24px;
+  background: var(--color-surface-light);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.criteria-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.criterion {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  background: var(--color-surface-light);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.criterion-met {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.criterion-progress {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.criterion-not-started {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.criterion-icon {
+  font-size: var(--font-lg);
+  flex-shrink: 0;
+}
+
+.criterion-text {
+  flex: 1;
+  font-size: var(--font-md);
+  color: var(--color-text);
+}
+
+.next-step {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: rgba(6, 182, 212, 0.15);
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--color-primary);
+  font-size: var(--font-md);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
 /* Mobile optimizations */
 @media (max-width: 400px) {
   .screen-content {
@@ -346,5 +452,13 @@ body {
 
   .mobility-buttons button {
     width: 100%;
+  }
+
+  .progression-card {
+    padding: var(--spacing-md);
+  }
+
+  .dashboard-title {
+    font-size: var(--font-md);
   }
 }
