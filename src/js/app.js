@@ -3,6 +3,10 @@ import { WorkoutManager } from './modules/workout-manager.js';
 import { DeloadManager } from './modules/deload.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
+import { HistoryListScreen } from './screens/history-list.js';
+import { ExerciseDetailScreen } from './screens/exercise-detail.js';
+import { EditEntryModal } from './modals/edit-entry-modal.js';
+import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/export-import.js';
 
 class App {
   constructor() {
@@ -11,6 +15,24 @@ class App {
     this.deloadManager = new DeloadManager(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
+
+    // History and detail screens
+    this.historyListScreen = new HistoryListScreen(
+      this.storage,
+      (exerciseKey) => this.showExerciseDetail(exerciseKey)
+    );
+
+    this.exerciseDetailScreen = new ExerciseDetailScreen(
+      this.storage,
+      () => this.showHistoryScreen(),
+      (exerciseKey, index) => this.editEntry(exerciseKey, index),
+      (exerciseKey, index) => this.deleteEntry(exerciseKey, index)
+    );
+
+    this.editEntryModal = new EditEntryModal(
+      this.storage,
+      (exerciseKey) => this.exerciseDetailScreen.render(exerciseKey)
+    );
 
     this.initializeApp();
   }
@@ -152,11 +174,35 @@ class App {
       });
     }
 
-    // Placeholder buttons (not yet implemented)
-    const placeholderButtons = document.querySelectorAll('.action-btn, #settings-btn, #workout-settings-btn');
+    // History button
+    const historyBtn = document.querySelector('.action-btn:nth-child(1)'); // First action button
+    if (historyBtn) {
+      historyBtn.addEventListener('click', () => this.showHistoryScreen());
+    }
+
+    // History back button
+    const historyBackBtn = document.getElementById('history-back-btn');
+    if (historyBackBtn) {
+      historyBackBtn.addEventListener('click', () => this.showHomeScreen());
+    }
+
+    // Exercise detail back button
+    const detailBackBtn = document.getElementById('exercise-detail-back-btn');
+    if (detailBackBtn) {
+      detailBackBtn.addEventListener('click', () => this.showHistoryScreen());
+    }
+
+    // Settings button
+    const settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => this.showSettingsModal());
+    }
+
+    // Placeholder buttons (only Progress now)
+    const placeholderButtons = document.querySelectorAll('.action-btn:nth-child(2)'); // Only Progress button
     placeholderButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        alert('⏳ This feature is coming soon!\n\nCurrently available:\n✅ Workout logging\n✅ Progression tracking\n✅ Offline mode');
+        alert('⏳ This feature is coming soon!\n\nCurrently available:\n✅ Workout logging\n✅ History viewing\n✅ Data export/import');
       });
     });
   }
@@ -1187,6 +1233,146 @@ class App {
         overlay.classList.add('active');
       }
     });
+  }
+
+  showHistoryScreen() {
+    this.hideAllScreens();
+    const historyScreen = document.getElementById('history-screen');
+    if (historyScreen) {
+      historyScreen.classList.add('active');
+      this.historyListScreen.render();
+    }
+  }
+
+  showExerciseDetail(exerciseKey) {
+    this.hideAllScreens();
+    const detailScreen = document.getElementById('exercise-detail-screen');
+    if (detailScreen) {
+      detailScreen.classList.add('active');
+      this.exerciseDetailScreen.render(exerciseKey);
+    }
+  }
+
+  hideAllScreens() {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => screen.classList.remove('active'));
+  }
+
+  editEntry(exerciseKey, index) {
+    this.editEntryModal.show(exerciseKey, index);
+  }
+
+  deleteEntry(exerciseKey, index) {
+    const history = this.storage.getExerciseHistory(exerciseKey);
+
+    if (confirm('Delete this workout entry? This cannot be undone.')) {
+      history.splice(index, 1);
+      this.storage.saveExerciseHistory(exerciseKey, history);
+
+      // Re-render detail screen
+      this.exerciseDetailScreen.render(exerciseKey);
+    }
+  }
+
+  showSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+
+    // Attach handlers
+    const closeBtn = document.getElementById('settings-close-btn');
+    if (closeBtn) {
+      closeBtn.onclick = () => modal.style.display = 'none';
+    }
+
+    const exportBtn = document.getElementById('export-data-btn');
+    if (exportBtn) {
+      exportBtn.onclick = () => this.handleExport();
+    }
+
+    const importBtn = document.getElementById('import-data-btn');
+    if (importBtn) {
+      importBtn.onclick = () => this.handleImportClick();
+    }
+
+    const fileInput = document.getElementById('import-file-input');
+    if (fileInput) {
+      fileInput.onchange = (e) => this.handleImportFile(e);
+    }
+  }
+
+  handleExport() {
+    try {
+      const jsonData = exportWorkoutData(this.storage);
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `workout-data-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+
+      alert('✅ Data exported successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('❌ Export failed. Please try again.');
+    }
+  }
+
+  handleImportClick() {
+    const fileInput = document.getElementById('import-file-input');
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  async handleImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      // Show preview
+      const summary = getDataSummary(data);
+      const confirmed = confirm(
+        `Import Data Preview:\n\n` +
+        `Exercises: ${summary.exerciseCount}\n` +
+        `Total Workouts: ${summary.totalWorkouts}\n` +
+        `Date Range: ${summary.dateRange}\n` +
+        `Size: ${(summary.storageSize / 1024).toFixed(1)} KB\n\n` +
+        `⚠️ This will replace all existing data.\n\n` +
+        `Continue with import?`
+      );
+
+      if (!confirmed) {
+        // Reset file input
+        event.target.value = '';
+        return;
+      }
+
+      // Import
+      importWorkoutData(text, this.storage);
+
+      alert('✅ Data imported successfully');
+
+      // Close modal and refresh home screen
+      const modal = document.getElementById('settings-modal');
+      if (modal) modal.style.display = 'none';
+
+      this.showHomeScreen();
+
+    } catch (error) {
+      console.error('Import failed:', error);
+      alert(`❌ Import failed: ${error.message}`);
+    } finally {
+      // Reset file input
+      event.target.value = '';
+    }
   }
 
   completeWorkout() {
