@@ -26,7 +26,16 @@ self.addEventListener('install', (event) => {
         console.log('Service Worker: Caching files');
         return cache.addAll(CACHE_URLS);
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('Service Worker: Install complete');
+        return self.skipWaiting();
+      })
+      .catch((error) => {
+        console.error('Service Worker: Install failed', error);
+        // Still skip waiting even if caching fails partially
+        // This allows the SW to activate and try again later
+        return self.skipWaiting();
+      })
   );
 });
 
@@ -89,6 +98,9 @@ self.addEventListener('fetch', (event) => {
 
 // Listen for messages from the client
 self.addEventListener('message', (event) => {
+  // Validate that message is from a client we control
+  if (!event.source) return;
+
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }

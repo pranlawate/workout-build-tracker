@@ -76,25 +76,32 @@
   <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
+      let refreshing = false;
+
+      // Reload page when new Service Worker takes control
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
             console.log('Service Worker registered:', registration.scope);
 
-            // Check for updates every 60 seconds
-            setInterval(() => {
-              registration.update();
-            }, 60000);
-
             // Listen for new Service Worker waiting
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
+              if (!newWorker) return;
+
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New Service Worker available
                   if (confirm('New version available! Reload to update?')) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
+                    // Note: page will reload when controllerchange event fires above
                   }
                 }
               });
