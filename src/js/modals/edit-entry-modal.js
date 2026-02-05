@@ -126,7 +126,8 @@ export class EditEntryModal {
     }
 
     // Update sets
-    entry.sets.forEach((set, i) => {
+    for (let i = 0; i < entry.sets.length; i++) {
+      const set = entry.sets[i];
       const weightInput = document.querySelector(`.edit-input[data-set="${i}"][data-field="weight"]`);
       const repsInput = document.querySelector(`.edit-input[data-set="${i}"][data-field="reps"]`);
       const rirInput = document.querySelector(`.edit-input[data-set="${i}"][data-field="rir"]`);
@@ -135,15 +136,31 @@ export class EditEntryModal {
       if (repsInput) set.reps = parseInt(repsInput.value);
       if (rirInput) set.rir = parseInt(rirInput.value);
 
-      // Validate
-      if (set.weight <= 0 || set.reps <= 0 || set.rir < 0) {
-        alert('Invalid values. Please check your inputs.');
-        throw new Error('Invalid set values');
+      // Validate using Number.isFinite() to catch NaN and empty strings
+      if (!Number.isFinite(set.weight) || set.weight <= 0) {
+        alert(`Invalid weight for Set ${i + 1}. Please enter a positive number.`);
+        return;
       }
-    });
 
-    // Save
-    this.storage.saveExerciseHistory(this.currentExerciseKey, history);
+      if (!Number.isFinite(set.reps) || set.reps <= 0) {
+        alert(`Invalid reps for Set ${i + 1}. Please enter a positive number.`);
+        return;
+      }
+
+      if (!Number.isFinite(set.rir) || set.rir < 0 || set.rir > 5) {
+        alert(`Invalid RIR for Set ${i + 1}. Must be between 0 and 5.`);
+        return;
+      }
+    }
+
+    // Save with error handling
+    try {
+      this.storage.saveExerciseHistory(this.currentExerciseKey, history);
+    } catch (error) {
+      console.error('Failed to save exercise history:', error);
+      alert('Failed to save changes. Please try again.');
+      return;
+    }
 
     // Callback
     if (this.onSave) {
