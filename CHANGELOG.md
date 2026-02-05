@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Advanced Reset Options (2026-02-05)
+
+**Emergency Recovery Tools:**
+- Three reset options accessible from Settings modal during workouts
+- Reset Rotation Only: Fixes stuck progression while preserving workout history
+- Clear History Only: Removes all logs while keeping current rotation state
+- Reset Everything: Complete factory reset for critical bugs
+
+**Safety Features:**
+- Clear confirmation dialogs explaining what each option does
+- Double confirmation for destructive actions (history/full reset)
+- Visual distinction with warning (orange) and danger (red) buttons
+- Detailed descriptions under each button
+
+**Use Cases:**
+- Fix rotation bugs during workout without losing history
+- Start fresh after testing or corrupted data
+- Emergency recovery when app gets stuck
+
 ### Added - History & Progress Feature (2026-02-05)
 
 **Complete Workout History Management:**
