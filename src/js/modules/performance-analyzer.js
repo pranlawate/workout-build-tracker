@@ -81,6 +81,71 @@ export class PerformanceAnalyzer {
   }
 
   /**
+   * Check if reps vary 50%+ within same session (form breakdown indicator)
+   * @param {Array} history - Exercise history array
+   * @param {Array} currentSets - Current session sets (optional)
+   * @returns {Object|null} Warning object if variance detected, null otherwise
+   */
+  detectIntraSetVariance(history, currentSets = []) {
+    // Use current session if logging in progress, otherwise use last completed session
+    const setsToAnalyze = currentSets.length > 0 ? currentSets : history[history.length - 1]?.sets || [];
+
+    if (!Array.isArray(setsToAnalyze) || setsToAnalyze.length < 2) {
+      return null;
+    }
+
+    const reps = setsToAnalyze.map(set => set.reps || 0).filter(r => r > 0);
+    if (reps.length < 2) return null;
+
+    const maxReps = Math.max(...reps);
+    const minReps = Math.min(...reps);
+
+    // Check if difference is 50% or more of max
+    const variance = (maxReps - minReps) / maxReps;
+
+    if (variance >= 0.5) {
+      return {
+        status: 'warning',
+        message: `⚠️ Reps inconsistent within session (${reps.join('/')}) - form may be breaking down`,
+        pattern: 'form_breakdown'
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check if RIR is consistently 0-1 (training too close to failure)
+   * @param {Array} history - Exercise history array
+   * @param {Array} currentSets - Current session sets (optional)
+   * @returns {Object|null} Warning object if low RIR detected, null otherwise
+   */
+  detectLowRIR(history, currentSets = []) {
+    // Use current session if logging in progress, otherwise use last completed session
+    const setsToAnalyze = currentSets.length > 0 ? currentSets : history[history.length - 1]?.sets || [];
+
+    if (!Array.isArray(setsToAnalyze) || setsToAnalyze.length === 0) {
+      return null;
+    }
+
+    // Check if ALL sets have RIR 0 or 1
+    const allLowRIR = setsToAnalyze.every(set => {
+      const rir = set.rir !== undefined ? set.rir : 999; // Default high if missing
+      return rir <= 1;
+    });
+
+    if (allLowRIR && setsToAnalyze.length > 0) {
+      return {
+        status: 'warning',
+        message: '⚠️ Training too close to failure - leave 2-3 reps in reserve',
+        pattern: 'form_breakdown'
+      };
+    }
+
+    return null;
+  }
+
+  /**
    * Analyze exercise performance and return warnings if issues detected
    * @param {string} exerciseKey - Exercise identifier (e.g., "UPPER_A - Dumbbell Bench Press")
    * @param {Array} currentSets - Current session sets being logged (optional, for real-time analysis)
@@ -89,8 +154,9 @@ export class PerformanceAnalyzer {
   analyzeExercisePerformance(exerciseKey, currentSets = []) {
     const history = this.storage.getExerciseHistory(exerciseKey);
 
-    // Minimum data requirement: need at least 2 previous workouts
-    if (history.length < 2) {
+    // Minimum data requirement: need at least 2 previous workouts for regression
+    // But can still check form breakdown on current session with just 1 workout in history
+    if (history.length < 1) {
       return {
         status: 'good',
         message: null,
@@ -98,12 +164,21 @@ export class PerformanceAnalyzer {
       };
     }
 
-    // Check for regression patterns (red alerts)
-    const weightRegression = this.detectWeightRegression(history);
-    if (weightRegression) return weightRegression;
+    // Check for regression patterns first (red alerts) - requires 2+ sessions
+    if (history.length >= 2) {
+      const weightRegression = this.detectWeightRegression(history);
+      if (weightRegression) return weightRegression;
 
-    const repDrop = this.detectRepDrop(history);
-    if (repDrop) return repDrop;
+      const repDrop = this.detectRepDrop(history);
+      if (repDrop) return repDrop;
+    }
+
+    // Check for form breakdown (yellow warnings) - works with current session
+    const variance = this.detectIntraSetVariance(history, currentSets);
+    if (variance) return variance;
+
+    const lowRIR = this.detectLowRIR(history, currentSets);
+    if (lowRIR) return lowRIR;
 
     // No issues detected
     return {
