@@ -2,7 +2,7 @@
 
 **Version:** 2.0 - Enhanced
 **Last Updated:** 2026-02-02
-**Status:** Custom BWS-Inspired Program
+**Status:** Custom Beginner Program
 
 This document is the **authoritative source of information** for the web-based gym tracker. It defines training philosophy, structure, workouts, progression rules, and safety constraints. The tracker should reflect this logic exactly.
 
@@ -439,7 +439,7 @@ The tracker should support:
 
 **Official Name:** Custom BUILD-Style Beginner Program
 
-**Description:** A BWS-inspired muscle-building program customized for beginners with stiff shoulders, weak lower back, and weak legs. Emphasizes dumbbell/cable work before barbell progression, with automated deload tracking and fatigue monitoring.
+**Description:** A muscle-building program designed for beginners with stiff shoulders, weak lower back, and weak legs. Emphasizes dumbbell/cable work before barbell progression, with automated deload tracking and fatigue monitoring.
 
 ---
 

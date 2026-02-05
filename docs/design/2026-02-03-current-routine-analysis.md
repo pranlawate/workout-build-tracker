@@ -54,7 +54,7 @@
 
 ### Additional Work
 - **Cardio:** 5-8 minutes post-workout (elliptical/bike, moderate/low intensity)
-- **Warm-up:** BWS warm-up guide before each workout
+- **Warm-up:** Standard warm-up protocol before each workout
 - **Core:** None (no dedicated core work)
 
 ### Weekly Volume Summary

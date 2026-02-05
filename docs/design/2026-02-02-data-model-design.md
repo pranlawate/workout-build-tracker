@@ -10,13 +10,13 @@
 
 ## Executive Summary
 
-This document defines the complete design for the Custom BUILD-Style Beginner Training Tracker, a new Progressive Web App built from scratch. This is a **BWS-inspired but customized** program optimized for beginners with stiff shoulders, weak lower back, and weak legs.
+This document defines the complete design for the Custom BUILD-Style Beginner Training Tracker, a new Progressive Web App built from scratch. This is a **customized** program optimized for beginners with stiff shoulders, weak lower back, and weak legs.
 
 The tracker replaces day-based workout scheduling with auto-regulating A/B/C rotation, replaces RPE with RIR tracking, implements strict double progression rules, and includes fatigue monitoring with automated deload triggers.
 
 **Key Decision:** Build as a new modular project in `/build/` subdirectory rather than retrofitting the existing 10,817-line SHRED tracker.
 
-**Research Validation:** Cross-checked against official BWS BUILD programs. This spec is custom-modified to address user-specific weaknesses while following BWS training principles.
+**Research Validation:** This spec is custom-modified to address user-specific weaknesses while following evidence-based training principles.
 
 ---
 
