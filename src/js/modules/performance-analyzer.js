@@ -1,8 +1,26 @@
 // src/js/modules/performance-analyzer.js
 
 /**
- * Analyzes exercise performance history to detect regression and form breakdown
- * Read-only module - never modifies localStorage
+ * PerformanceAnalyzer - Automated form quality and regression detection
+ *
+ * DESIGN PHILOSOPHY:
+ * - Read-only: Never modifies localStorage
+ * - Conservative: High thresholds to avoid false positives
+ * - Context-aware: Skips analysis during deload
+ * - Real-time: Works with incomplete session data
+ *
+ * DETECTION RULES:
+ * - Red Alert (regression): Weight dropped OR reps dropped 25%+
+ * - Yellow Warning (form breakdown): Reps vary 50%+ OR all sets RIR 0-1
+ * - Requires 2+ previous workouts for regression detection
+ * - Can detect form breakdown with just current session data
+ *
+ * @example
+ * const analyzer = new PerformanceAnalyzer(storageManager);
+ * const result = analyzer.analyzeExercisePerformance('UPPER_A - Bench Press', currentSets);
+ * if (result.status === 'alert') {
+ *   console.log(result.message); // Show warning to user
+ * }
  */
 export class PerformanceAnalyzer {
   constructor(storageManager) {
