@@ -314,18 +314,24 @@ class App {
           </div>
 
           <div class="set-inputs">
-            <label class="input-label">RIR</label>
-            <input
-              type="number"
-              class="set-input"
+            <label class="input-label">
+              RIR
+              <span class="rir-help" title="Reps In Reserve - How many more reps you could do">ℹ️</span>
+            </label>
+            <select
+              class="set-input rir-select"
               data-exercise="${exerciseIndex}"
               data-set="${setNum - 1}"
               data-field="rir"
               value="${defaultRir}"
-              min="0"
-              max="10"
-              placeholder="0"
-            />
+            >
+              <option value="0" ${defaultRir === 0 ? 'selected' : ''}>0 (Failure)</option>
+              <option value="1" ${defaultRir === 1 ? 'selected' : ''}>1</option>
+              <option value="2" ${defaultRir === 2 ? 'selected' : ''}>2 (Target)</option>
+              <option value="3" ${defaultRir === 3 ? 'selected' : ''}>3 (Target)</option>
+              <option value="4" ${defaultRir === 4 ? 'selected' : ''}>4</option>
+              <option value="5" ${defaultRir >= 5 ? 'selected' : ''}>5+</option>
+            </select>
           </div>
         </div>
       `;
@@ -418,6 +424,11 @@ class App {
 
     // Update the value
     exercise.sets[setIndex][field] = value;
+
+    // Update color for RIR dropdown
+    if (field === 'rir' && input.tagName === 'SELECT') {
+      input.setAttribute('value', value.toString());
+    }
 
     // Check if this set is complete (has weight, reps, and RIR)
     const set = exercise.sets[setIndex];
