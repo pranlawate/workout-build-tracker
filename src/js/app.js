@@ -90,17 +90,13 @@ class App {
     // Check for deload trigger
     const deloadCheck = this.deloadManager.shouldTriggerDeload();
     if (deloadCheck.trigger) {
-      // For now, just log - UI will be in Task 29
-      console.log('Deload trigger detected:', deloadCheck);
-      // this.showDeloadModal(deloadCheck); // Will implement in Task 29
+      this.showDeloadModal(deloadCheck);
     }
 
     // Show deload banner if active
     const deloadState = this.storage.getDeloadState();
     if (deloadState.active) {
-      // For now, just log - UI will be in Task 29
-      console.log('Deload active:', deloadState);
-      // this.showDeloadBanner(deloadState); // Will implement in Task 29
+      this.showDeloadBanner(deloadState);
     }
 
     // Update recovery status
@@ -713,6 +709,110 @@ class App {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 300);
     }, 4000);
+  }
+
+  showDeloadModal(deloadCheck) {
+    const modal = document.getElementById('deload-modal');
+    const body = document.getElementById('deload-modal-body');
+
+    // Determine trigger message
+    let triggerMsg = '';
+    if (deloadCheck.reason === 'time') {
+      triggerMsg = `You've completed ${deloadCheck.weeks} weeks of training!`;
+    } else if (deloadCheck.reason === 'performance') {
+      triggerMsg = `Performance decreased on ${deloadCheck.regressions} exercises.`;
+    } else if (deloadCheck.reason === 'fatigue') {
+      triggerMsg = `High fatigue detected (score: ${deloadCheck.score}).`;
+    }
+
+    body.innerHTML = `
+      <div class="deload-trigger-reason">
+        <strong>Trigger:</strong> ${triggerMsg}
+      </div>
+
+      <div class="deload-explanation">
+        <h3>Why deload now?</h3>
+        <ul>
+          <li>Prevent fatigue accumulation</li>
+          <li>Allow full recovery</li>
+          <li>Come back stronger</li>
+        </ul>
+      </div>
+
+      <div class="deload-type-selector">
+        <div class="deload-type-option selected" data-type="standard">
+          <strong>Standard Deload (Recommended)</strong>
+          <p>Reduce sets by 40-50%. Keep weights. Focus on perfect form. Duration: 7 days.</p>
+        </div>
+
+        <div class="deload-type-option" data-type="light">
+          <strong>Light Deload</strong>
+          <p>Reduce weight by 20%. Keep sets. Focus on form and ROM. Duration: 7 days.</p>
+        </div>
+
+        <div class="deload-type-option" data-type="active_recovery">
+          <strong>Active Recovery Week</strong>
+          <p>No resistance training. Light stretching, walking, foam rolling. Duration: 7 days.</p>
+        </div>
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+
+    // Type selection
+    let selectedType = 'standard';
+    body.querySelectorAll('.deload-type-option').forEach(option => {
+      option.addEventListener('click', () => {
+        body.querySelectorAll('.deload-type-option').forEach(o =>
+          o.classList.remove('selected')
+        );
+        option.classList.add('selected');
+        selectedType = option.dataset.type;
+      });
+    });
+
+    // Button handlers
+    document.getElementById('start-deload-btn').onclick = () => {
+      this.deloadManager.startDeload(selectedType);
+      modal.style.display = 'none';
+      this.updateHomeScreen();
+    };
+
+    document.getElementById('postpone-deload-btn').onclick = () => {
+      this.deloadManager.postponeDeload();
+      modal.style.display = 'none';
+    };
+
+    document.getElementById('dismiss-deload-btn').onclick = () => {
+      const deloadState = this.storage.getDeloadState();
+      deloadState.lastDeloadDate = new Date().toISOString();
+      this.storage.saveDeloadState(deloadState);
+      modal.style.display = 'none';
+    };
+  }
+
+  showDeloadBanner(deloadState) {
+    const banner = document.getElementById('deload-banner');
+    const details = document.getElementById('banner-details');
+
+    const daysRemaining = this.deloadManager.getDaysRemaining();
+    const typeLabel = {
+      standard: 'Standard',
+      light: 'Light',
+      active_recovery: 'Active Recovery'
+    }[deloadState.deloadType] || 'Standard';
+
+    details.textContent = `${typeLabel} - ${daysRemaining} days remaining`;
+    banner.classList.add('active');
+
+    // End early button
+    document.getElementById('end-deload-btn').onclick = () => {
+      if (confirm('Are you sure you want to end deload early?')) {
+        this.deloadManager.endDeload();
+        banner.classList.remove('active');
+        this.updateHomeScreen();
+      }
+    };
   }
 
   checkSetProgression(exerciseIndex, setIndex) {

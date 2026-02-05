@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/sticky-input.css">
   <link rel="stylesheet" href="css/post-set-feedback.css">
   <link rel="stylesheet" href="css/number-overlay.css">
+  <link rel="stylesheet" href="css/deload-modal.css">
 </head>
 <body>
   <div id="app">
@@ -134,6 +135,33 @@
       </div>
 
       <button id="overlay-confirm" class="overlay-confirm">CONFIRM</button>
+    </div>
+  </div>
+
+  <!-- Deload Modal -->
+  <div id="deload-modal" class="modal" style="display: none;">
+    <div class="modal-content deload-modal">
+      <h2>⚠️ Deload Week Recommended</h2>
+      <div id="deload-modal-body">
+        <!-- populated by JavaScript -->
+      </div>
+      <div class="modal-actions">
+        <button id="start-deload-btn" class="btn btn-primary">Start Deload Now</button>
+        <button id="postpone-deload-btn" class="btn btn-secondary">Remind Me Next Workout</button>
+        <button id="dismiss-deload-btn" class="btn btn-tertiary">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deload Banner (shown during deload week) -->
+  <div id="deload-banner" class="deload-banner" style="display: none;">
+    <div class="banner-content">
+      <span class="banner-icon">🟡</span>
+      <div class="banner-text">
+        <strong>DELOAD WEEK</strong>
+        <span id="banner-details"><!-- type and days remaining --></span>
+      </div>
+      <button id="end-deload-btn" class="banner-action">End Early</button>
     </div>
   </div>
 
