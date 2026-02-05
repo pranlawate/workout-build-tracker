@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/post-set-feedback.css">
   <link rel="stylesheet" href="css/number-overlay.css">
   <link rel="stylesheet" href="css/deload-modal.css">
+  <link rel="stylesheet" href="css/history-screen.css">
 </head>
 <body>
   <div id="app">
@@ -81,6 +82,21 @@
         <button id="complete-workout-btn" class="btn-primary btn-large" style="display: none;">
           COMPLETE WORKOUT
         </button>
+      </main>
+    </div>
+
+    <!-- History Screen -->
+    <div id="history-screen" class="screen">
+      <header class="app-header">
+        <button id="history-back-btn" class="icon-btn">←</button>
+        <h1>Workout History</h1>
+        <span></span>
+      </header>
+
+      <main class="screen-content">
+        <div id="history-list">
+          <!-- Populated by HistoryListScreen -->
+        </div>
       </main>
     </div>
   </div>
