@@ -1,7 +1,7 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
 import { getWorkout } from './modules/workouts.js';
-import { getProgressionStatus, shouldIncreaseWeight } from './modules/progression.js';
+import { getProgressionStatus, shouldIncreaseWeight, getNextWeight } from './modules/progression.js';
 
 class App {
   constructor() {
@@ -10,6 +10,17 @@ class App {
     this.currentWorkout = null;
 
     this.initializeApp();
+  }
+
+  escapeHtml(text) {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
   }
 
   initializeApp() {
@@ -183,7 +194,7 @@ class App {
       return `
         <div class="exercise-item" data-exercise-index="${index}">
           <div class="exercise-header">
-            <h3 class="exercise-name">${exercise.name}</h3>
+            <h3 class="exercise-name">${this.escapeHtml(exercise.name)}</h3>
             ${this.renderProgressionBadge(exercise, history)}
           </div>
 
@@ -197,7 +208,7 @@ class App {
             ${this.renderSets(exercise, lastWorkout, index)}
           </div>
 
-          ${exercise.notes ? `<p class="exercise-notes">💡 ${exercise.notes}</p>` : ''}
+          ${exercise.notes ? `<p class="exercise-notes">💡 ${this.escapeHtml(exercise.notes)}</p>` : ''}
         </div>
       `;
     }).join('');
@@ -298,9 +309,9 @@ class App {
 
     const status = getProgressionStatus(history, exercise);
 
-    if (status === 'ready' && lastWorkout) {
+    if (status === 'ready' && lastWorkout?.sets?.length > 0) {
       const lastWeight = lastWorkout.sets[0].weight;
-      const nextWeight = lastWeight + exercise.weightIncrement;
+      const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
       return `<p class="progression-hint success">✨ Increase to ${nextWeight}kg this session!</p>`;
     }
 
@@ -308,7 +319,7 @@ class App {
       return `<p class="progression-hint warning">⚠️ Same weight for 3+ sessions. Consider deload or form check.</p>`;
     }
 
-    if (status === 'normal' && lastWorkout) {
+    if (status === 'normal' && lastWorkout?.sets?.length > 0) {
       const lastSet = lastWorkout.sets[lastWorkout.sets.length - 1];
       const [min, max] = exercise.repRange.split('-').map(Number);
 
