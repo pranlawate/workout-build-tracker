@@ -37,3 +37,36 @@
   color: var(--color-text-dim);
   font-family: 'Courier New', monospace;
 }
+
+/* Performance Analysis Badges */
+.performance-badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 6px;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  margin-top: var(--spacing-xs);
+  line-height: 1.4;
+}
+
+.badge-alert {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning);
+}
+
+/* Make badges more prominent on small screens */
+@media (max-width: 768px) {
+  .performance-badge {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: var(--spacing-sm);
+  }
+}
