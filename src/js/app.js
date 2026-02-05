@@ -899,6 +899,10 @@ class App {
     // Reps input - leave empty for user to fill
     // RIR select - keep default
 
+    // Remove any existing LOG SET button from next set (prevent duplicates)
+    const existingBtn = nextSetRow.querySelector('.log-set-btn');
+    if (existingBtn) existingBtn.remove();
+
     // Add LOG SET button to next set
     const logButton = document.createElement('button');
     logButton.className = 'log-set-btn';
