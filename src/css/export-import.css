@@ -77,3 +77,48 @@
   color: var(--color-text-dim);
   line-height: 1.6;
 }
+
+/* Reset Options */
+.warning-text {
+  color: var(--color-warning);
+  font-weight: 500;
+}
+
+.btn-warning {
+  background: var(--color-warning);
+  color: white;
+  border: none;
+  margin-bottom: var(--spacing-xs);
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-warning:active {
+  background: #b45309;
+  transform: scale(0.98);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+  border: none;
+  margin-bottom: var(--spacing-xs);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-danger:active {
+  background: #b91c1c;
+  transform: scale(0.98);
+}
+
+.reset-description {
+  font-size: var(--font-xs);
+  color: var(--color-text-dim);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.4;
+}

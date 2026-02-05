@@ -1410,6 +1410,117 @@ class App {
     if (fileInput) {
       fileInput.onchange = (e) => this.handleImportFile(e);
     }
+
+    // Reset buttons
+    const resetRotationBtn = document.getElementById('reset-rotation-btn');
+    if (resetRotationBtn) {
+      resetRotationBtn.onclick = () => this.handleResetRotation();
+    }
+
+    const resetHistoryBtn = document.getElementById('reset-history-btn');
+    if (resetHistoryBtn) {
+      resetHistoryBtn.onclick = () => this.handleResetHistory();
+    }
+
+    const resetAllBtn = document.getElementById('reset-all-btn');
+    if (resetAllBtn) {
+      resetAllBtn.onclick = () => this.handleResetAll();
+    }
+  }
+
+  handleResetRotation() {
+    const confirmed = confirm(
+      '🔄 Reset Rotation State?\n\n' +
+      'This will:\n' +
+      '• Reset workout progression to Upper A\n' +
+      '• Clear your current streak\n' +
+      '• Reset cycle count\n\n' +
+      '✅ Keep all exercise history\n\n' +
+      'Continue?'
+    );
+
+    if (!confirmed) return;
+
+    // Reset rotation to initial state
+    this.storage.saveRotation({
+      nextSuggested: 'UPPER_A',
+      currentStreak: 0,
+      lastDate: null,
+      sequence: [],
+      cycleCount: 0
+    });
+
+    alert('✅ Rotation reset successfully!\n\nYour workout history is preserved.');
+
+    // Close modal and refresh home screen
+    const modal = document.getElementById('settings-modal');
+    if (modal) modal.style.display = 'none';
+    this.showHomeScreen();
+  }
+
+  handleResetHistory() {
+    const confirmed = confirm(
+      '🗑️ Clear All Exercise History?\n\n' +
+      'This will:\n' +
+      '• Delete all workout logs\n' +
+      '• Remove all exercise history\n\n' +
+      '✅ Keep current rotation state\n\n' +
+      '⚠️ THIS CANNOT BE UNDONE!\n\n' +
+      'Continue?'
+    );
+
+    if (!confirmed) return;
+
+    // Double confirmation for destructive action
+    const doubleConfirm = confirm(
+      'Are you absolutely sure?\n\n' +
+      'All your workout history will be permanently deleted.'
+    );
+
+    if (!doubleConfirm) return;
+
+    // Clear all exercise history
+    const allKeys = Object.keys(localStorage).filter(k => k.startsWith('build_exercise_'));
+    allKeys.forEach(key => localStorage.removeItem(key));
+
+    alert('✅ Exercise history cleared!\n\nYour rotation state is preserved.');
+
+    // Close modal and refresh home screen
+    const modal = document.getElementById('settings-modal');
+    if (modal) modal.style.display = 'none';
+    this.showHomeScreen();
+  }
+
+  handleResetAll() {
+    const confirmed = confirm(
+      '⚠️ Reset Everything?\n\n' +
+      'This will:\n' +
+      '• Delete all workout logs\n' +
+      '• Reset all progression\n' +
+      '• Clear deload state\n' +
+      '• Reset to factory defaults\n\n' +
+      '⚠️ THIS CANNOT BE UNDONE!\n\n' +
+      'Continue?'
+    );
+
+    if (!confirmed) return;
+
+    // Double confirmation for destructive action
+    const doubleConfirm = confirm(
+      'Are you absolutely sure?\n\n' +
+      'The entire app will be reset to initial state.'
+    );
+
+    if (!doubleConfirm) return;
+
+    // Clear all app data
+    const allKeys = Object.keys(localStorage).filter(k => k.startsWith('build_'));
+    allKeys.forEach(key => localStorage.removeItem(key));
+
+    alert('✅ App reset complete!\n\nReloading...');
+
+    // Reload the page to reinitialize everything
+    location.reload();
   }
 
   handleExport() {
