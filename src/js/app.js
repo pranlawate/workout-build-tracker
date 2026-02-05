@@ -265,6 +265,12 @@ class App {
     if (progressBtn) {
       progressBtn.addEventListener('click', () => this.showProgressDashboard());
     }
+
+    // Workout settings button
+    const workoutSettingsBtn = document.getElementById('workout-settings-btn');
+    if (workoutSettingsBtn) {
+      workoutSettingsBtn.addEventListener('click', () => this.showSettingsModal());
+    }
   }
 
   startWorkout() {
@@ -338,11 +344,10 @@ class App {
       return;
     }
 
-    // Switch to workout screen
-    const homeScreen = document.getElementById('home-screen');
+    // Hide all screens first, then show workout screen
+    this.hideAllScreens();
     const workoutScreen = document.getElementById('workout-screen');
-    if (homeScreen && workoutScreen) {
-      homeScreen.classList.remove('active');
+    if (workoutScreen) {
       workoutScreen.classList.add('active');
     }
 
