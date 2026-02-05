@@ -375,7 +375,7 @@ class App {
       currentSetIndex = sessionExercise.sets.findIndex(s =>
         !s || s.reps === 0 || !s.weight || s.rir === undefined
       );
-      if (currentSetIndex === -1) currentSetIndex = exercise.sets - 1;
+      if (currentSetIndex === -1) currentSetIndex = 0;
     }
 
     for (let setNum = 1; setNum <= exercise.sets; setNum++) {
