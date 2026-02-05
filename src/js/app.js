@@ -380,15 +380,21 @@ class App {
 
     for (let setNum = 1; setNum <= exercise.sets; setNum++) {
       const setIndex = setNum - 1;
+
+      // Check if we have session data for this set (from current workout)
+      const sessionSet = sessionExercise?.sets?.[setIndex];
+      const hasSessionData = sessionSet && sessionSet.weight > 0;
+
+      // Use session data if available, otherwise use last workout data
       const lastSet = lastWorkout?.sets?.[setIndex];
-      const defaultWeight = lastSet?.weight || exercise.startingWeight;
-      const defaultReps = lastSet?.reps || '';
+      const defaultWeight = hasSessionData ? sessionSet.weight : (lastSet?.weight || exercise.startingWeight);
+      const defaultReps = hasSessionData ? sessionSet.reps : (lastSet?.reps || '');
 
       // Default RIR to minimum of target range (per design spec)
-      const defaultRir = lastSet?.rir ?? (() => {
+      const defaultRir = hasSessionData ? sessionSet.rir : (lastSet?.rir ?? (() => {
         const [min] = exercise.rirTarget.split('-').map(Number);
         return min;
-      })();
+      })());
 
       // Determine set state
       const isCurrent = setIndex === currentSetIndex;
