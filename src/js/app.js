@@ -601,6 +601,75 @@ class App {
     }
   }
 
+  showPostSetFeedback(exerciseIndex, setIndex, set) {
+    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const sessionExercise = this.workoutSession.exercises[exerciseIndex];
+
+    // Parse rep range
+    const [minReps, maxReps] = exerciseDef.repRange.split('-').map(Number);
+    const [minRir, maxRir] = exerciseDef.rirTarget.split('-').map(Number);
+
+    // Determine feedback message and color
+    let message = '';
+    let colorClass = 'info';
+
+    // Check if hitting progression criteria
+    if (set.reps >= maxReps && set.rir >= minRir) {
+      message = `🟢 Great set! Hitting max reps with good reserve.`;
+      colorClass = 'success';
+
+      // Check if this could trigger progression
+      const allSetsMaxReps = sessionExercise.sets
+        .filter(s => s && s.reps > 0)
+        .every(s => s.reps >= maxReps && s.rir >= minRir);
+
+      if (allSetsMaxReps && setIndex === exerciseDef.sets - 1) {
+        message = `🟢 All sets hit ${maxReps} reps! Increase weight next workout.`;
+      }
+    }
+    // Check if reps too low
+    else if (set.reps < minReps) {
+      message = `🔴 Below target range. Consider reducing weight next set.`;
+      colorClass = 'danger';
+    }
+    // Check if RIR too low
+    else if (set.rir < minRir) {
+      message = `🟡 Too close to failure (RIR ${set.rir}). Aim for RIR ${minRir}-${maxRir}.`;
+      colorClass = 'warning';
+    }
+    // Normal progress
+    else {
+      message = `🔵 Good progress - aim for ${maxReps} reps on next set.`;
+      colorClass = 'info';
+    }
+
+    // Display feedback
+    this.displayFeedbackToast(message, colorClass);
+  }
+
+  displayFeedbackToast(message, colorClass) {
+    // Remove existing toast if present
+    const existing = document.querySelector('.feedback-toast');
+    if (existing) existing.remove();
+
+    // Create toast
+    const toast = document.createElement('div');
+    toast.className = `feedback-toast ${colorClass}`;
+    toast.textContent = message;
+
+    // Add to DOM
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
   checkSetProgression(exerciseIndex, setIndex) {
     const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
     const set = this.workoutSession.exercises[exerciseIndex].sets[setIndex];
