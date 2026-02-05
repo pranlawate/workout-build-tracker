@@ -210,6 +210,14 @@ export class StorageManager {
    * @param {'yes'|'no'|'not_sure'} response - User's response
    */
   saveMobilityCheck(criteriaKey, response) {
+    // Input validation
+    if (!criteriaKey || typeof criteriaKey !== 'string') {
+      throw new Error('Invalid criteria key: must be a non-empty string');
+    }
+    if (!['yes', 'no', 'not_sure'].includes(response)) {
+      throw new Error('Invalid response: must be yes, no, or not_sure');
+    }
+
     const allChecks = this.getMobilityChecksData();
     if (!allChecks[criteriaKey]) {
       allChecks[criteriaKey] = [];
@@ -218,6 +226,11 @@ export class StorageManager {
       date: new Date().toISOString().split('T')[0],
       response: response
     });
+
+    // Limit to last 10 entries
+    if (allChecks[criteriaKey].length > 10) {
+      allChecks[criteriaKey] = allChecks[criteriaKey].slice(-10);
+    }
 
     try {
       const serialized = JSON.stringify(allChecks);
@@ -265,6 +278,17 @@ export class StorageManager {
    * @param {'minor'|'significant'|null} severity - Pain severity
    */
   savePainReport(exerciseKey, hadPain, location, severity) {
+    // Input validation
+    if (!exerciseKey || typeof exerciseKey !== 'string') {
+      throw new Error('Invalid exercise key: must be a non-empty string');
+    }
+    if (typeof hadPain !== 'boolean') {
+      throw new Error('hadPain must be boolean');
+    }
+    if (severity !== null && !['minor', 'significant'].includes(severity)) {
+      throw new Error('Invalid severity: must be minor, significant, or null');
+    }
+
     const allPain = this.getPainHistoryData();
     if (!allPain[exerciseKey]) {
       allPain[exerciseKey] = [];
@@ -275,6 +299,11 @@ export class StorageManager {
       location: location,
       severity: severity
     });
+
+    // Limit to last 10 entries
+    if (allPain[exerciseKey].length > 10) {
+      allPain[exerciseKey] = allPain[exerciseKey].slice(-10);
+    }
 
     try {
       const serialized = JSON.stringify(allPain);

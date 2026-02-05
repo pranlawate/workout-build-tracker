@@ -75,6 +75,84 @@ describe('StorageManager - Barbell Progression Extensions', () => {
       // Should return empty array instead of crashing
       assert.deepStrictEqual(checks, []);
     });
+
+    describe('Input Validation', () => {
+      test('should throw error for invalid criteriaKey (null)', () => {
+        assert.throws(
+          () => storage.saveMobilityCheck(null, 'yes'),
+          { message: 'Invalid criteria key: must be a non-empty string' }
+        );
+      });
+
+      test('should throw error for invalid criteriaKey (empty string)', () => {
+        assert.throws(
+          () => storage.saveMobilityCheck('', 'yes'),
+          { message: 'Invalid criteria key: must be a non-empty string' }
+        );
+      });
+
+      test('should throw error for invalid criteriaKey (number)', () => {
+        assert.throws(
+          () => storage.saveMobilityCheck(123, 'yes'),
+          { message: 'Invalid criteria key: must be a non-empty string' }
+        );
+      });
+
+      test('should throw error for invalid response value', () => {
+        assert.throws(
+          () => storage.saveMobilityCheck('bench_overhead_mobility', 'invalid'),
+          { message: 'Invalid response: must be yes, no, or not_sure' }
+        );
+      });
+
+      test('should throw error for invalid response type', () => {
+        assert.throws(
+          () => storage.saveMobilityCheck('bench_overhead_mobility', null),
+          { message: 'Invalid response: must be yes, no, or not_sure' }
+        );
+      });
+
+      test('should accept all valid response values', () => {
+        assert.doesNotThrow(() => storage.saveMobilityCheck('test_criteria', 'yes'));
+        assert.doesNotThrow(() => storage.saveMobilityCheck('test_criteria', 'no'));
+        assert.doesNotThrow(() => storage.saveMobilityCheck('test_criteria', 'not_sure'));
+      });
+    });
+
+    describe('History Size Limiting', () => {
+      test('should limit mobility checks to 10 entries per criteria', () => {
+        // Add 11 entries
+        for (let i = 0; i < 11; i++) {
+          storage.saveMobilityCheck('bench_overhead_mobility', i % 2 === 0 ? 'yes' : 'no');
+        }
+
+        const checks = storage.getMobilityChecks('bench_overhead_mobility');
+        assert.strictEqual(checks.length, 10, 'Should only keep last 10 entries');
+
+        // First entry should be the second one we added (index 1, which is odd)
+        assert.strictEqual(checks[0].response, 'no');
+        // Last entry should be the 11th one we added (index 10, which is even)
+        assert.strictEqual(checks[9].response, 'yes');
+      });
+
+      test('should not affect other criteria when limiting one', () => {
+        // Add 11 entries to first criteria
+        for (let i = 0; i < 11; i++) {
+          storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
+        }
+
+        // Add 5 entries to second criteria
+        for (let i = 0; i < 5; i++) {
+          storage.saveMobilityCheck('squat_ankle_mobility', 'no');
+        }
+
+        const benchChecks = storage.getMobilityChecks('bench_overhead_mobility');
+        const squatChecks = storage.getMobilityChecks('squat_ankle_mobility');
+
+        assert.strictEqual(benchChecks.length, 10);
+        assert.strictEqual(squatChecks.length, 5);
+      });
+    });
   });
 
   describe('Pain Report Storage', () => {
@@ -154,6 +232,101 @@ describe('StorageManager - Barbell Progression Extensions', () => {
 
       // Should return empty array instead of crashing
       assert.deepStrictEqual(history, []);
+    });
+
+    describe('Input Validation', () => {
+      test('should throw error for invalid exerciseKey (null)', () => {
+        assert.throws(
+          () => storage.savePainReport(null, false, null, null),
+          { message: 'Invalid exercise key: must be a non-empty string' }
+        );
+      });
+
+      test('should throw error for invalid exerciseKey (empty string)', () => {
+        assert.throws(
+          () => storage.savePainReport('', false, null, null),
+          { message: 'Invalid exercise key: must be a non-empty string' }
+        );
+      });
+
+      test('should throw error for invalid exerciseKey (number)', () => {
+        assert.throws(
+          () => storage.savePainReport(123, false, null, null),
+          { message: 'Invalid exercise key: must be a non-empty string' }
+        );
+      });
+
+      test('should throw error for invalid hadPain type (string)', () => {
+        assert.throws(
+          () => storage.savePainReport('UPPER_A - DB Bench Press', 'yes', null, null),
+          { message: 'hadPain must be boolean' }
+        );
+      });
+
+      test('should throw error for invalid hadPain type (null)', () => {
+        assert.throws(
+          () => storage.savePainReport('UPPER_A - DB Bench Press', null, null, null),
+          { message: 'hadPain must be boolean' }
+        );
+      });
+
+      test('should throw error for invalid severity value', () => {
+        assert.throws(
+          () => storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'extreme'),
+          { message: 'Invalid severity: must be minor, significant, or null' }
+        );
+      });
+
+      test('should accept null severity', () => {
+        assert.doesNotThrow(() =>
+          storage.savePainReport('UPPER_A - DB Bench Press', false, null, null)
+        );
+      });
+
+      test('should accept valid severity values', () => {
+        assert.doesNotThrow(() =>
+          storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor')
+        );
+        assert.doesNotThrow(() =>
+          storage.savePainReport('UPPER_A - DB Bench Press', true, 'elbow', 'significant')
+        );
+      });
+    });
+
+    describe('History Size Limiting', () => {
+      test('should limit pain reports to 10 entries per exercise', () => {
+        // Add 11 entries
+        for (let i = 0; i < 11; i++) {
+          const severity = i % 2 === 0 ? 'minor' : 'significant';
+          storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', severity);
+        }
+
+        const history = storage.getPainHistory('UPPER_A - DB Bench Press');
+        assert.strictEqual(history.length, 10, 'Should only keep last 10 entries');
+
+        // First entry should be the second one we added (index 1, which is odd)
+        assert.strictEqual(history[0].severity, 'significant');
+        // Last entry should be the 11th one we added (index 10, which is even)
+        assert.strictEqual(history[9].severity, 'minor');
+      });
+
+      test('should not affect other exercises when limiting one', () => {
+        // Add 11 entries to first exercise
+        for (let i = 0; i < 11; i++) {
+          storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor');
+        }
+
+        // Add 5 entries to second exercise
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport('LOWER_A - Squat', true, 'knee', 'significant');
+        }
+
+        const benchHistory = storage.getPainHistory('UPPER_A - DB Bench Press');
+        const squatHistory = storage.getPainHistory('LOWER_A - Squat');
+
+        assert.strictEqual(benchHistory.length, 10);
+        assert.strictEqual(squatHistory.length, 5);
+      });
     });
   });
 });
