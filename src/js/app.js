@@ -1285,35 +1285,52 @@ class App {
   }
 
   checkAndRollbackRotation(deletedExerciseKey, deletedDate) {
+    console.log('[ROLLBACK DEBUG] Starting rollback check for:', deletedExerciseKey);
     const rotation = this.storage.getRotation();
 
     // Step 1: Check if deleted entry was from the most recent completed workout
-    if (!rotation.lastDate) return;
+    if (!rotation.lastDate) {
+      console.log('[ROLLBACK DEBUG] Early exit: No lastDate in rotation');
+      return;
+    }
 
     const deletedDateObj = new Date(deletedDate);
     const lastWorkoutDateObj = new Date(rotation.lastDate);
+    console.log('[ROLLBACK DEBUG] Deleted date:', deletedDateObj.toDateString());
+    console.log('[ROLLBACK DEBUG] Last workout date:', lastWorkoutDateObj.toDateString());
 
     // Compare dates (same day)
     if (deletedDateObj.toDateString() !== lastWorkoutDateObj.toDateString()) {
+      console.log('[ROLLBACK DEBUG] Early exit: Date mismatch (deleted from older workout)');
       return; // Deleted entry is from an older workout, don't roll back
     }
 
     // Step 2: Determine which workout this exercise belonged to
     const workoutName = deletedExerciseKey.split(' - ')[0]; // e.g., "UPPER_A"
+    console.log('[ROLLBACK DEBUG] Workout name:', workoutName);
     const workout = getWorkout(workoutName);
 
-    if (!workout) return;
+    if (!workout) {
+      console.log('[ROLLBACK DEBUG] Early exit: Workout not found');
+      return;
+    }
 
     // Step 3: Check if ANY exercises from that workout still have history for that date
+    console.log('[ROLLBACK DEBUG] Checking for remaining exercises from this workout...');
     const hasRemainingExercises = workout.exercises.some(exercise => {
       const key = `${workoutName} - ${exercise.name}`;
       const history = this.storage.getExerciseHistory(key);
-      return history.some(h =>
+      const hasMatch = history.some(h =>
         new Date(h.date).toDateString() === deletedDateObj.toDateString()
       );
+      if (hasMatch) {
+        console.log('[ROLLBACK DEBUG] Found remaining exercise:', exercise.name);
+      }
+      return hasMatch;
     });
 
     if (hasRemainingExercises) {
+      console.log('[ROLLBACK DEBUG] Early exit: Other exercises from this session still exist');
       return; // Other exercises from that session still exist, don't roll back
     }
 
