@@ -140,6 +140,71 @@ export class StorageManager {
   }
 
   /**
+   * Retrieves deload state from localStorage
+   * @returns {Object} Deload state object
+   */
+  getDeloadState() {
+    const data = this.storage.getItem('build_deload_state');
+    if (!data) {
+      return {
+        active: false,
+        deloadType: null,  // 'standard' | 'light' | 'active_recovery'
+        startDate: null,
+        endDate: null,
+        lastDeloadDate: null,
+        weeksSinceDeload: 0,
+        dismissedCount: 0
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(data);
+      // Ensure all fields exist (backward compatibility)
+      return {
+        active: parsed.active || false,
+        deloadType: parsed.deloadType || null,
+        startDate: parsed.startDate || null,
+        endDate: parsed.endDate || null,
+        lastDeloadDate: parsed.lastDeloadDate || null,
+        weeksSinceDeload: parsed.weeksSinceDeload || 0,
+        dismissedCount: parsed.dismissedCount || 0
+      };
+    } catch (error) {
+      console.error('Failed to parse deload state, returning default:', error);
+      return {
+        active: false,
+        deloadType: null,
+        startDate: null,
+        endDate: null,
+        lastDeloadDate: null,
+        weeksSinceDeload: 0,
+        dismissedCount: 0
+      };
+    }
+  }
+
+  /**
+   * Saves deload state to localStorage
+   * @param {Object} deloadState - Deload state object
+   * @throws {Error} If deloadState is invalid or storage fails
+   */
+  saveDeloadState(deloadState) {
+    if (!deloadState || typeof deloadState !== 'object') {
+      throw new Error('Invalid deloadState: must be an object');
+    }
+
+    try {
+      const serialized = JSON.stringify(deloadState);
+      this.storage.setItem('build_deload_state', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save deload state: ${error.message}`);
+    }
+  }
+
+  /**
    * Clears all BUILD Tracker data from localStorage
    */
   clearAll() {

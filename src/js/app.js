@@ -1,5 +1,6 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
+import { DeloadManager } from './modules/deload.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 
@@ -7,6 +8,7 @@ class App {
   constructor() {
     this.storage = new StorageManager();
     this.workoutManager = new WorkoutManager(this.storage);
+    this.deloadManager = new DeloadManager(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
 
@@ -83,6 +85,22 @@ class App {
           <span class="progress-value">${nextDeload} cycles away</span>
         </div>
       `;
+    }
+
+    // Check for deload trigger
+    const deloadCheck = this.deloadManager.shouldTriggerDeload();
+    if (deloadCheck.trigger) {
+      // For now, just log - UI will be in Task 29
+      console.log('Deload trigger detected:', deloadCheck);
+      // this.showDeloadModal(deloadCheck); // Will implement in Task 29
+    }
+
+    // Show deload banner if active
+    const deloadState = this.storage.getDeloadState();
+    if (deloadState.active) {
+      // For now, just log - UI will be in Task 29
+      console.log('Deload active:', deloadState);
+      // this.showDeloadBanner(deloadState); // Will implement in Task 29
     }
 
     // Update recovery status
