@@ -36,6 +36,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Export format: versioned JSON with metadata
 - Retina display support for charts
 
+### Fixed - History & Progress Bug Fixes (2026-02-05)
+
+**Rotation Rollback on Deletion:**
+- Fixed bug where deleting all exercises from the most recent workout didn't revert rotation state
+- App now properly rolls back streak, next workout, and cycle count when all exercises from a workout session are deleted
+- Prevents getting stuck on wrong workout suggestion after deletion
+- Added intelligent detection to only rollback when deleting from the most recent workout
+- Properly handles partial deletions (only rolls back when ALL exercises from session are deleted)
+
 ### Added - Complete UX Polish (Tasks 19-30)
 
 **Missing Features Implementation:**
