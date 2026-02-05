@@ -10,6 +10,31 @@ export class PerformanceAnalyzer {
   }
 
   /**
+   * CONSERVATIVE DETECTION PHILOSOPHY
+   *
+   * This analyzer uses high thresholds to avoid false positives:
+   * - Requires 2+ previous workouts before flagging regression
+   * - Weight regression: Must decrease vs 2 sessions ago (not just 1)
+   * - Rep drop: Must be 25%+ decline (not minor fluctuation)
+   * - Intra-set variance: Must be 50%+ difference (allows normal fatigue)
+   * - Low RIR: Must be ALL sets at 0-1 (not just one hard set)
+   * - Skips analysis during deload (prevents false alarms)
+   *
+   * Design goal: Warn only on clear patterns, not normal variation.
+   */
+
+  /**
+   * Check if user is currently in deload mode
+   * Prevents false positives during intentional performance reduction
+   * @returns {boolean} True if in deload mode
+   */
+  isInDeload() {
+    // Check deload state from storage
+    const deloadState = this.storage.getDeloadState?.() || { active: false };
+    return deloadState.active === true;
+  }
+
+  /**
    * Check if weight decreased compared to 2 sessions ago
    * @param {Array} history - Exercise history array (sorted oldest to newest)
    * @returns {Object|null} Alert object if regression detected, null otherwise
@@ -153,6 +178,15 @@ export class PerformanceAnalyzer {
    */
   analyzeExercisePerformance(exerciseKey, currentSets = []) {
     const history = this.storage.getExerciseHistory(exerciseKey);
+
+    // Skip analysis if in deload mode (intentional performance reduction)
+    if (this.isInDeload()) {
+      return {
+        status: 'good',
+        message: null,
+        pattern: null
+      };
+    }
 
     // Minimum data requirement: need at least 2 previous workouts for regression
     // But can still check form breakdown on current session with just 1 workout in history
