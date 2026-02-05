@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - History & Progress Feature (2026-02-05)
+
+**Complete Workout History Management:**
+- History List screen showing all exercises with summary data
+- Exercise Detail screen with visual progress chart
+- Canvas-based weight progression charts (last 8 workouts)
+- Edit workout entries (fix typos, correct data)
+- Delete workout entries (remove bad data)
+- Export all data to JSON (backup)
+- Import data from JSON (restore)
+- Data validation on import
+- Empty states and error handling
+
+**User Experience:**
+- Grouped exercises by workout type
+- "Days ago" relative dates
+- Visual chart showing weight progression
+- Confirmation dialogs for destructive actions
+- Toast notifications for success/error
+- Settings modal with data management
+
+**Technical:**
+- Zero external dependencies (vanilla JS + Canvas)
+- 7 new files (3 screens, 1 modal, 1 chart component, 1 utility module)
+- 3 new CSS files
+- localStorage architecture maintained
+- Export format: versioned JSON with metadata
+- Retina display support for charts
+
 ### Added - Complete UX Polish (Tasks 19-30)
 
 **Missing Features Implementation:**
