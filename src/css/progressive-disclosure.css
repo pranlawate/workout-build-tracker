@@ -1,0 +1,62 @@
+/* Progressive Disclosure - Exercise Visibility States */
+
+.exercise-item {
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+/* Completed exercises - collapsed with checkmark */
+.exercise-item.completed {
+  max-height: 60px;
+}
+
+.exercise-item.completed .sets-container,
+.exercise-item.completed .exercise-meta,
+.exercise-item.completed .progression-hint,
+.exercise-item.completed .exercise-notes {
+  display: none;
+}
+
+.exercise-item.completed .exercise-header::before {
+  content: '✓ ';
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+/* Current exercise - fully expanded */
+.exercise-item.current {
+  max-height: none;
+  border-left: 4px solid var(--color-primary);
+  background: rgba(102, 126, 234, 0.05);
+}
+
+/* Upcoming exercises - collapsed, no details */
+.exercise-item.upcoming {
+  max-height: 60px;
+  opacity: 0.6;
+}
+
+.exercise-item.upcoming .sets-container,
+.exercise-item.upcoming .exercise-meta,
+.exercise-item.upcoming .progression-hint,
+.exercise-item.upcoming .exercise-notes {
+  display: none;
+}
+
+.exercise-item.upcoming .exercise-header::after {
+  content: ' ▼';
+  color: var(--color-text-dim);
+  font-size: var(--font-sm);
+}
+
+/* Tap to expand upcoming exercises */
+.exercise-item.upcoming,
+.exercise-item.completed {
+  cursor: pointer;
+}
+
+.exercise-item.upcoming:hover,
+.exercise-item.completed:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.02);
+}
