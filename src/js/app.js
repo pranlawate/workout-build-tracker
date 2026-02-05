@@ -1,6 +1,7 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
 import { DeloadManager } from './modules/deload.js';
+import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { HistoryListScreen } from './screens/history-list.js';
@@ -13,6 +14,7 @@ class App {
     this.storage = new StorageManager();
     this.workoutManager = new WorkoutManager(this.storage);
     this.deloadManager = new DeloadManager(this.storage);
+    this.performanceAnalyzer = new PerformanceAnalyzer(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
 
@@ -46,6 +48,29 @@ class App {
       "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  /**
+   * Get performance badge HTML for an exercise during workout
+   * @param {string} exerciseKey - Exercise identifier
+   * @param {Array} currentSets - Current logged sets for this exercise
+   * @returns {string} HTML string for badge, or empty string if no issues
+   */
+  getPerformanceBadge(exerciseKey, currentSets = []) {
+    const analysis = this.performanceAnalyzer.analyzeExercisePerformance(exerciseKey, currentSets);
+
+    if (analysis.status === 'good' || !analysis.message) {
+      return '';
+    }
+
+    const badgeClass = analysis.status === 'alert' ? 'badge-alert' : 'badge-warning';
+    const icon = analysis.status === 'alert' ? '🔴' : '🟡';
+
+    return `
+      <div class="performance-badge ${badgeClass}">
+        ${icon} ${this.escapeHtml(analysis.message)}
+      </div>
+    `;
   }
 
   initializeApp() {
@@ -362,6 +387,10 @@ class App {
         sets: []
       });
 
+      // Get performance badge for this exercise
+      const exerciseSession = this.workoutSession.exercises[index];
+      const performanceBadge = this.getPerformanceBadge(exerciseKey, exerciseSession.sets);
+
       // Determine exercise state
       let stateClass = '';
       if (index < this.currentExerciseIndex) {
@@ -385,6 +414,8 @@ class App {
           <p class="exercise-meta">
             ${exercise.sets} sets × ${exercise.repRange} reps @ RIR ${exercise.rirTarget}
           </p>
+
+          ${performanceBadge}
 
           ${this.renderProgressionHint(exercise, history, lastWorkout)}
 
