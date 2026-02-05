@@ -1356,7 +1356,7 @@ class App {
     // Refresh home screen if it's visible to show updated state
     const homeScreen = document.getElementById('home-screen');
     if (homeScreen && homeScreen.classList.contains('active')) {
-      this.updateHomeScreen();
+      this.showHomeScreen();
     }
   }
 
