@@ -1504,7 +1504,7 @@ git commit -m "feat: add basic HTML structure and PWA setup
 - Implement color scheme and spacing system
 - Large tap targets (60px minimum)
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+"
 ```
 
 ---
