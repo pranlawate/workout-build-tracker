@@ -23,6 +23,8 @@
   <link rel="stylesheet" href="css/number-overlay.css">
   <link rel="stylesheet" href="css/deload-modal.css">
   <link rel="stylesheet" href="css/history-screen.css">
+  <link rel="stylesheet" href="css/progress-chart.css">
+  <link rel="stylesheet" href="css/exercise-detail.css">
 </head>
 <body>
   <div id="app">
@@ -96,6 +98,26 @@
       <main class="screen-content">
         <div id="history-list">
           <!-- Populated by HistoryListScreen -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Exercise Detail Screen -->
+    <div id="exercise-detail-screen" class="screen">
+      <header class="app-header">
+        <button id="exercise-detail-back-btn" class="icon-btn">←</button>
+        <h1 id="exercise-detail-title">Exercise</h1>
+        <span></span>
+      </header>
+
+      <main class="screen-content">
+        <div class="chart-container">
+          <h3 class="chart-title">Weight Progression</h3>
+          <canvas id="progress-chart"></canvas>
+        </div>
+
+        <div id="workout-history-list">
+          <!-- Populated by ExerciseDetailScreen -->
         </div>
       </main>
     </div>

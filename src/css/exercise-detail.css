@@ -1,0 +1,39 @@
+/* src/css/exercise-detail.css */
+
+/* Exercise Detail Screen */
+.history-entry {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.history-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.history-date {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.history-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.edit-entry-btn,
+.delete-entry-btn {
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+}
+
+.history-sets {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  font-family: 'Courier New', monospace;
+}
