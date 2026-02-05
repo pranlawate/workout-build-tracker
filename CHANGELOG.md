@@ -40,6 +40,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated storage schema for deload state
 - All features follow zero-dependency philosophy
 
+### Fixed - Post-Launch Polish & Bug Fixes (2026-02-05)
+
+**Theme & Layout:**
+- Replaced purple gradient theme with clean cyan (#06b6d4) solid colors
+- Fixed responsive grid layout (50px 85px 65px 95px columns)
+- Made inputs directly editable (removed readonly attribute)
+- Increased RIR column width to accommodate dropdown text
+
+**Progressive Unlocking Workflow:**
+- LOG SET button now reads values directly from DOM inputs
+- Button moves to next set after logging (Set 1 → Set 2 → Set 3)
+- Pre-fills weight AND reps from previous set when unlocking
+- Prevents duplicate LOG SET buttons
+- Removed auto-advance on input change (requires LOG SET click)
+
+**Session Data Persistence:**
+- Preserved logged values when navigating between exercises
+- Fixed re-render issues that wiped session data
+- Session data now takes priority over lastWorkout defaults
+- Non-destructive DOM updates (CSS classes only)
+
+**Validation & Completion:**
+- Exercise completion now validates actual logged sets (not just index)
+- Checkmark only appears when all sets have weight/reps/RIR
+- Incomplete workout confirmation dialog
+- Partial workouts save history but don't affect rotation/recovery/streak
+- Detailed error messages show which fields are missing
+
+**Technical:**
+- 17 bug fix commits
+- Improved event handler architecture (delegation vs direct)
+- Data-driven state management
+- Proper validation before visual updates
+
 ### Added - Full MVP Complete (Tasks 7-11)
 
 **UI Integration (Tasks 7-9):**
