@@ -40,3 +40,34 @@
 - ES6 modules: Use `export class` and `import { ClassName }` syntax
 - Initialize in App constructor: Add managers after storage/workoutManager/deloadManager
 - Method naming: camelCase for methods, PascalCase for classes
+
+## Real-Time UI Update Patterns
+
+- Badge container pattern: Wrap dynamic content in dedicated container div with stable class name
+- Example: `<div class="performance-badge-container">${badgeHtml}</div>`
+- Update pattern: Find container by querySelector, update innerHTML without re-rendering parent
+- Use `data-exercise-index` attributes for targeted DOM queries
+- Call update methods after state changes (e.g., `updatePerformanceBadge()` after `handleLogSet()`)
+
+## Error Handling Patterns
+
+- Two-layer defense: Null guards in methods + try-catch in public API
+- Safe fallback: Always return valid data structure on error (e.g., `{ status: 'good', message: null, pattern: null }`)
+- Error logging: Use `console.error('[ModuleName] Description:', error)` for debugging
+- Never crash the app: Wrap public methods in try-catch, log errors, return safe defaults
+- Guard early: Check for null/undefined at method entry, return early if invalid
+
+## CSS Badge Styling
+
+- Semi-transparent backgrounds: Use `rgba()` with 0.15 alpha for subtlety
+- Color coding: Danger (red #ef4444), Warning (orange #f59e0b)
+- Mobile responsive: Use `@media (max-width: 768px)` for full-width badges
+- CSS variables: Reference existing theme variables (--spacing-xs, --font-sm, --color-danger, etc.)
+
+## Testing Approach
+
+- Integration tests: Create test report with manual test scenarios (docs/performance-analyzer-integration-test-report.md)
+- Edge case testing: Test with null data, empty arrays, malformed localStorage
+- Browser console testing: Use dynamic imports to test modules in isolation
+- Test data injection: Manually set localStorage values to create specific scenarios
+- Real-world scenarios: Document step-by-step user workflows for each feature
