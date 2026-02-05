@@ -341,9 +341,9 @@ describe('BarbellProgressionTracker', () => {
     });
   });
 
-  describe('calculateStrengthProgress helper', () => {
+  describe('_calculateStrengthProgress helper', () => {
     test('should return 0 when no history exists', () => {
-      const progress = tracker.calculateStrengthProgress('UPPER_A - DB Flat Bench Press', 20, 12, 3, 2);
+      const progress = tracker._calculateStrengthProgress('UPPER_A - DB Flat Bench Press', 20, 12, 3, 2);
       assert.strictEqual(progress, 0);
     });
 
@@ -359,7 +359,7 @@ describe('BarbellProgressionTracker', () => {
         progressionStatus: 'ready'
       }]);
 
-      const progress = tracker.calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
+      const progress = tracker._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
       assert.strictEqual(progress, 100);
     });
 
@@ -375,7 +375,7 @@ describe('BarbellProgressionTracker', () => {
         progressionStatus: 'normal'
       }]);
 
-      const progress = tracker.calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
+      const progress = tracker._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
       assert.strictEqual(progress, 80); // 15/20 = 0.75, 0.75 * 80 + 20 = 60 + 20 = 80
     });
 
@@ -391,14 +391,14 @@ describe('BarbellProgressionTracker', () => {
         progressionStatus: 'normal'
       }]);
 
-      const progress = tracker.calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
+      const progress = tracker._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
       assert.strictEqual(progress, 80); // Weight met (80%) but reps not all hit (0%)
     });
   });
 
-  describe('calculateWeeksProgress helper', () => {
+  describe('_calculateWeeksProgress helper', () => {
     test('should return 0 when no history exists', () => {
-      const progress = tracker.calculateWeeksProgress('UPPER_A - DB Flat Bench Press', 12);
+      const progress = tracker._calculateWeeksProgress('UPPER_A - DB Flat Bench Press', 12);
       assert.strictEqual(progress, 0);
     });
 
@@ -410,7 +410,7 @@ describe('BarbellProgressionTracker', () => {
         progressionStatus: 'normal'
       }]);
 
-      const progress = tracker.calculateWeeksProgress(exerciseKey, 12);
+      const progress = tracker._calculateWeeksProgress(exerciseKey, 12);
       assert.strictEqual(progress, 0);
     });
 
@@ -431,7 +431,7 @@ describe('BarbellProgressionTracker', () => {
 
       storage.saveExerciseHistory(exerciseKey, workoutHistory);
 
-      const progress = tracker.calculateWeeksProgress(exerciseKey, 12);
+      const progress = tracker._calculateWeeksProgress(exerciseKey, 12);
       assert.strictEqual(progress, 50);
     });
 
@@ -453,14 +453,14 @@ describe('BarbellProgressionTracker', () => {
 
       storage.saveExerciseHistory(exerciseKey, workoutHistory);
 
-      const progress = tracker.calculateWeeksProgress(exerciseKey, 12);
+      const progress = tracker._calculateWeeksProgress(exerciseKey, 12);
       assert.strictEqual(progress, 100);
     });
   });
 
-  describe('calculateMobilityProgress helper', () => {
+  describe('_calculateMobilityProgress helper', () => {
     test('should return 0 when no checks exist', () => {
-      const progress = tracker.calculateMobilityProgress('bench_overhead_mobility', 5);
+      const progress = tracker._calculateMobilityProgress('bench_overhead_mobility', 5);
       assert.strictEqual(progress, 0);
     });
 
@@ -469,7 +469,7 @@ describe('BarbellProgressionTracker', () => {
         storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
       }
 
-      const progress = tracker.calculateMobilityProgress('bench_overhead_mobility', 5);
+      const progress = tracker._calculateMobilityProgress('bench_overhead_mobility', 5);
       assert.strictEqual(progress, 100);
     });
 
@@ -478,7 +478,7 @@ describe('BarbellProgressionTracker', () => {
         storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
       }
 
-      const progress = tracker.calculateMobilityProgress('bench_overhead_mobility', 5);
+      const progress = tracker._calculateMobilityProgress('bench_overhead_mobility', 5);
       assert.strictEqual(progress, 60);
     });
 
@@ -489,7 +489,7 @@ describe('BarbellProgressionTracker', () => {
       storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
       storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
 
-      const progress = tracker.calculateMobilityProgress('bench_overhead_mobility', 5);
+      const progress = tracker._calculateMobilityProgress('bench_overhead_mobility', 5);
       assert.strictEqual(progress, 40); // Only 2 consecutive from end
     });
 
@@ -499,7 +499,7 @@ describe('BarbellProgressionTracker', () => {
       storage.saveMobilityCheck('bench_overhead_mobility', 'not_sure');
       storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
 
-      const progress = tracker.calculateMobilityProgress('bench_overhead_mobility', 5);
+      const progress = tracker._calculateMobilityProgress('bench_overhead_mobility', 5);
       assert.strictEqual(progress, 20); // Only 1 consecutive from end
     });
 
@@ -508,14 +508,14 @@ describe('BarbellProgressionTracker', () => {
         storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
       }
 
-      const progress = tracker.calculateMobilityProgress('bench_overhead_mobility', 5);
+      const progress = tracker._calculateMobilityProgress('bench_overhead_mobility', 5);
       assert.strictEqual(progress, 100);
     });
   });
 
-  describe('isPainFree helper', () => {
+  describe('_isPainFree helper', () => {
     test('should return true when no pain history exists', () => {
-      const painFree = tracker.isPainFree(['UPPER_A - DB Flat Bench Press'], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree(['UPPER_A - DB Flat Bench Press'], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
     });
 
@@ -524,7 +524,7 @@ describe('BarbellProgressionTracker', () => {
       storage.savePainReport(exerciseKey, false, null, null);
       storage.savePainReport(exerciseKey, false, null, null);
 
-      const painFree = tracker.isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
     });
 
@@ -534,7 +534,7 @@ describe('BarbellProgressionTracker', () => {
         storage.savePainReport(exerciseKey, false, null, null);
       }
 
-      const painFree = tracker.isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
     });
 
@@ -545,7 +545,7 @@ describe('BarbellProgressionTracker', () => {
         storage.savePainReport(exerciseKey, false, null, null);
       }
 
-      const painFree = tracker.isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
     });
 
@@ -557,7 +557,7 @@ describe('BarbellProgressionTracker', () => {
       storage.savePainReport(exerciseKey, false, null, null);
       storage.savePainReport(exerciseKey, false, null, null);
 
-      const painFree = tracker.isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, false);
     });
 
@@ -571,7 +571,7 @@ describe('BarbellProgressionTracker', () => {
       storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
       storage.savePainReport(exerciseKey, false, null, null);
 
-      const painFree = tracker.isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true); // Only 1 relevant painful session
     });
 
@@ -592,7 +592,7 @@ describe('BarbellProgressionTracker', () => {
       storage.savePainReport(exerciseKey2, false, null, null);
       storage.savePainReport(exerciseKey2, false, null, null);
 
-      const painFree = tracker.isPainFree([exerciseKey1, exerciseKey2], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree([exerciseKey1, exerciseKey2], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, false);
     });
   });

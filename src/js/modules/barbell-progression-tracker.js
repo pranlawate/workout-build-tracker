@@ -3,6 +3,16 @@
  * Read-only analysis module - does not modify any state
  */
 export class BarbellProgressionTracker {
+  // Strength progress calculation weights
+  static WEIGHT_CONTRIBUTION_PERCENT = 80;
+  static REP_RIR_CONTRIBUTION_PERCENT = 20;
+
+  // Percentage formula weights
+  static STRENGTH_WEIGHT = 0.4;
+  static WEEKS_WEIGHT = 0.2;
+  static MOBILITY_WEIGHT = 0.3;
+  static PAIN_WEIGHT = 0.1;
+
   constructor(storage) {
     this.storage = storage;
   }
@@ -15,22 +25,22 @@ export class BarbellProgressionTracker {
     const exerciseKey = 'UPPER_A - DB Flat Bench Press';
 
     // Strength check: 20kg × 3×12 @ RIR 2-3
-    const strengthProgress = this.calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
     const strengthMet = strengthProgress >= 100;
 
     // Weeks check: 12+ weeks
-    const weeksProgress = this.calculateWeeksProgress(exerciseKey, 12);
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 12);
     const weeksMet = weeksProgress >= 100;
 
     // Mobility check: overhead without arch (5+ confirmations)
-    const mobilityProgress = this.calculateMobilityProgress('bench_overhead_mobility', 5);
+    const mobilityProgress = this._calculateMobilityProgress('bench_overhead_mobility', 5);
     const mobilityMet = mobilityProgress >= 100;
 
     // Pain check: no shoulder/elbow pain in last 5 workouts
-    const painFree = this.isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+    const painFree = this._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
 
     // Calculate overall percentage
-    const percentage = this.calculateOverallPercentage({
+    const percentage = this._calculateOverallPercentage({
       strengthMet, strengthProgress,
       weeksMet, weeksProgress,
       mobilityMet, mobilityProgress,
@@ -76,22 +86,22 @@ export class BarbellProgressionTracker {
     const exerciseKey = 'LOWER_B - DB Goblet Squat';
 
     // Strength check: 20kg × 3×12 @ RIR 2-3
-    const strengthProgress = this.calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
     const strengthMet = strengthProgress >= 100;
 
     // Weeks check: 16+ weeks
-    const weeksProgress = this.calculateWeeksProgress(exerciseKey, 16);
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 16);
     const weeksMet = weeksProgress >= 100;
 
     // Mobility check: heels flat (5+ confirmations)
-    const mobilityProgress = this.calculateMobilityProgress('squat_heel_flat', 5);
+    const mobilityProgress = this._calculateMobilityProgress('squat_heel_flat', 5);
     const mobilityMet = mobilityProgress >= 100;
 
     // Pain check: no knee/lower_back pain in last 5 workouts
-    const painFree = this.isPainFree([exerciseKey], ['knee', 'lower_back'], 5);
+    const painFree = this._isPainFree([exerciseKey], ['knee', 'lower_back'], 5);
 
     // Calculate overall percentage
-    const percentage = this.calculateOverallPercentage({
+    const percentage = this._calculateOverallPercentage({
       strengthMet, strengthProgress,
       weeksMet, weeksProgress,
       mobilityMet, mobilityProgress,
@@ -137,22 +147,22 @@ export class BarbellProgressionTracker {
     const exerciseKey = 'LOWER_B - DB Romanian Deadlift';
 
     // Strength check: 25kg × 3×12 @ RIR 2-3
-    const strengthProgress = this.calculateStrengthProgress(exerciseKey, 25, 12, 3, 2);
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 25, 12, 3, 2);
     const strengthMet = strengthProgress >= 100;
 
     // Weeks check: 20+ weeks
-    const weeksProgress = this.calculateWeeksProgress(exerciseKey, 20);
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 20);
     const weeksMet = weeksProgress >= 100;
 
     // Mobility check: toe touch (5+ confirmations)
-    const mobilityProgress = this.calculateMobilityProgress('deadlift_toe_touch', 5);
+    const mobilityProgress = this._calculateMobilityProgress('deadlift_toe_touch', 5);
     const mobilityMet = mobilityProgress >= 100;
 
     // Pain check: no lower_back pain in last 5 workouts
-    const painFree = this.isPainFree([exerciseKey], ['lower_back'], 5);
+    const painFree = this._isPainFree([exerciseKey], ['lower_back'], 5);
 
     // Calculate overall percentage
-    const percentage = this.calculateOverallPercentage({
+    const percentage = this._calculateOverallPercentage({
       strengthMet, strengthProgress,
       weeksMet, weeksProgress,
       mobilityMet, mobilityProgress,
@@ -200,7 +210,7 @@ export class BarbellProgressionTracker {
    * @returns {number} Progress from 0-100
    * @private
    */
-  calculateStrengthProgress(exerciseKey, targetWeight, targetReps, targetSets, minRIR) {
+  _calculateStrengthProgress(exerciseKey, targetWeight, targetReps, targetSets, minRIR) {
     const history = this.storage.getExerciseHistory(exerciseKey);
     if (!history || history.length === 0) return 0;
 
@@ -208,12 +218,15 @@ export class BarbellProgressionTracker {
     const currentWeight = recent.sets[0]?.weight || 0;
 
     // Weight progress (0-80%)
-    const weightProgress = Math.min(currentWeight / targetWeight, 1.0) * 80;
+    const weightProgress = Math.min(currentWeight / targetWeight, 1.0)
+      * BarbellProgressionTracker.WEIGHT_CONTRIBUTION_PERCENT;
 
     // Rep/RIR progress (0-20%)
     const allSetsHitReps = recent.sets.every(set => set.reps >= targetReps);
     const avgRIR = recent.sets.reduce((sum, set) => sum + set.rir, 0) / recent.sets.length;
-    const repProgress = (allSetsHitReps && avgRIR >= minRIR) ? 20 : 0;
+    const repProgress = (allSetsHitReps && avgRIR >= minRIR)
+      ? BarbellProgressionTracker.REP_RIR_CONTRIBUTION_PERCENT
+      : 0;
 
     return Math.min(weightProgress + repProgress, 100);
   }
@@ -225,7 +238,7 @@ export class BarbellProgressionTracker {
    * @returns {number} Progress from 0-100
    * @private
    */
-  calculateWeeksProgress(exerciseKey, targetWeeks) {
+  _calculateWeeksProgress(exerciseKey, targetWeeks) {
     const history = this.storage.getExerciseHistory(exerciseKey);
     if (!history || history.length < 2) return 0;
 
@@ -243,7 +256,7 @@ export class BarbellProgressionTracker {
    * @returns {number} Progress from 0-100
    * @private
    */
-  calculateMobilityProgress(criteriaKey, requiredConsecutive = 5) {
+  _calculateMobilityProgress(criteriaKey, requiredConsecutive = 5) {
     const checks = this.storage.getMobilityChecks(criteriaKey);
     if (checks.length === 0) return 0;
 
@@ -268,7 +281,7 @@ export class BarbellProgressionTracker {
    * @returns {boolean} True if pain-free, false if recurring pain
    * @private
    */
-  isPainFree(exerciseKeys, relevantLocations, requiredSessions = 5) {
+  _isPainFree(exerciseKeys, relevantLocations, requiredSessions = 5) {
     for (const exerciseKey of exerciseKeys) {
       const painHistory = this.storage.getPainHistory(exerciseKey);
       const recent = painHistory.slice(-requiredSessions);
@@ -278,7 +291,7 @@ export class BarbellProgressionTracker {
       }
 
       const painfulSessions = recent.filter(entry =>
-        entry.hadPain && relevantLocations.includes(entry.location)
+        entry.hadPain && entry.location && relevantLocations.includes(entry.location)
       ).length;
 
       // Allow max 1 painful session in last 5
@@ -295,14 +308,20 @@ export class BarbellProgressionTracker {
    * @returns {number} Overall percentage (0-100)
    * @private
    */
-  calculateOverallPercentage(criteria) {
-    const weights = { strength: 0.4, weeks: 0.2, mobility: 0.3, painFree: 0.1 };
-
+  _calculateOverallPercentage(criteria) {
     let total = 0;
-    total += criteria.strengthMet ? weights.strength * 100 : criteria.strengthProgress * weights.strength;
-    total += criteria.weeksMet ? weights.weeks * 100 : criteria.weeksProgress * weights.weeks;
-    total += criteria.mobilityMet ? weights.mobility * 100 : criteria.mobilityProgress * weights.mobility;
-    total += criteria.painFree ? weights.painFree * 100 : 0;
+    total += criteria.strengthMet
+      ? BarbellProgressionTracker.STRENGTH_WEIGHT * 100
+      : criteria.strengthProgress * BarbellProgressionTracker.STRENGTH_WEIGHT;
+    total += criteria.weeksMet
+      ? BarbellProgressionTracker.WEEKS_WEIGHT * 100
+      : criteria.weeksProgress * BarbellProgressionTracker.WEEKS_WEIGHT;
+    total += criteria.mobilityMet
+      ? BarbellProgressionTracker.MOBILITY_WEIGHT * 100
+      : criteria.mobilityProgress * BarbellProgressionTracker.MOBILITY_WEIGHT;
+    total += criteria.painFree
+      ? BarbellProgressionTracker.PAIN_WEIGHT * 100
+      : 0;
 
     return Math.floor(total);
   }
