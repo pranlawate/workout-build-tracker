@@ -103,6 +103,21 @@ class App {
       completeBtn.addEventListener('click', () => this.completeWorkout());
     }
 
+    // Exercise item click to expand (event delegation)
+    const exerciseList = document.getElementById('exercise-list');
+    if (exerciseList) {
+      exerciseList.addEventListener('click', (e) => {
+        const exerciseItem = e.target.closest('.exercise-item');
+        if (!exerciseItem) return;
+
+        // Only handle clicks on collapsed exercises
+        if (exerciseItem.classList.contains('completed') || exerciseItem.classList.contains('upcoming')) {
+          const exerciseIndex = parseInt(exerciseItem.dataset.exerciseIndex);
+          this.jumpToExercise(exerciseIndex);
+        }
+      });
+    }
+
     // Placeholder buttons (not yet implemented)
     const placeholderButtons = document.querySelectorAll('.action-btn, #settings-btn, #workout-settings-btn');
     placeholderButtons.forEach(btn => {
@@ -459,6 +474,25 @@ class App {
 
     // Increment index
     this.currentExerciseIndex++;
+
+    // Re-render to update state classes
+    this.renderExercises();
+
+    // Scroll to current exercise
+    const currentExercise = document.querySelector('.exercise-item.current');
+    if (currentExercise) {
+      currentExercise.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  jumpToExercise(exerciseIndex) {
+    // Validate index
+    if (exerciseIndex < 0 || exerciseIndex >= this.currentWorkout.exercises.length) {
+      return;
+    }
+
+    // Update current exercise index
+    this.currentExerciseIndex = exerciseIndex;
 
     // Re-render to update state classes
     this.renderExercises();
