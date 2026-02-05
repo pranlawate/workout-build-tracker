@@ -32,8 +32,8 @@
 
 .set-row {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 1fr;
-  gap: var(--spacing-sm);
+  grid-template-columns: 50px 85px 70px 70px;
+  gap: var(--spacing-xs);
   align-items: start;
   margin-bottom: var(--spacing-md);
 }
@@ -50,11 +50,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: var(--color-text);
-  font-size: var(--font-md);
+  font-size: var(--font-sm);
   font-weight: 600;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   text-align: center;
   min-height: var(--tap-target-min);
+  width: 100%;
 }
 
 .set-input:focus {

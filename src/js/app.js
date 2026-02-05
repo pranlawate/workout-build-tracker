@@ -417,58 +417,32 @@ class App {
 
           <div class="set-inputs">
             <label class="input-label">Weight (kg)</label>
-            <div class="input-with-edit">
-              <input
-                type="number"
-                class="set-input"
-                data-exercise="${exerciseIndex}"
-                data-set="${setIndex}"
-                data-field="weight"
-                value="${defaultWeight}"
-                step="0.5"
-                min="0"
-                ${disabledAttr}
-                readonly
-              />
-              <button
-                class="edit-icon"
-                data-exercise="${exerciseIndex}"
-                data-set="${setIndex}"
-                data-field="weight"
-                data-current-value="${defaultWeight}"
-                ${disabledAttr}
-              >
-                ✎
-              </button>
-            </div>
+            <input
+              type="number"
+              class="set-input"
+              data-exercise="${exerciseIndex}"
+              data-set="${setIndex}"
+              data-field="weight"
+              value="${defaultWeight}"
+              step="0.5"
+              min="0"
+              ${disabledAttr}
+            />
           </div>
 
           <div class="set-inputs">
             <label class="input-label">Reps</label>
-            <div class="input-with-edit">
-              <input
-                type="number"
-                class="set-input"
-                data-exercise="${exerciseIndex}"
-                data-set="${setIndex}"
-                data-field="reps"
-                value="${defaultReps}"
-                min="0"
-                placeholder="0"
-                ${disabledAttr}
-                readonly
-              />
-              <button
-                class="edit-icon"
-                data-exercise="${exerciseIndex}"
-                data-set="${setIndex}"
-                data-field="reps"
-                data-current-value="${defaultReps}"
-                ${disabledAttr}
-              >
-                ✎
-              </button>
-            </div>
+            <input
+              type="number"
+              class="set-input"
+              data-exercise="${exerciseIndex}"
+              data-set="${setIndex}"
+              data-field="reps"
+              value="${defaultReps}"
+              min="0"
+              placeholder="0"
+              ${disabledAttr}
+            />
           </div>
 
           <div class="set-inputs">

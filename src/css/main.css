@@ -1,14 +1,15 @@
 :root {
-  --color-bg: #0a0a0a;
-  --color-surface: #1a1a1a;
-  --color-surface-light: #2a2a2a;
-  --color-text: #e0e0e0;
-  --color-text-dim: #a0a0a0;
-  --color-primary: #667eea;
-  --color-success: #48bb78;
-  --color-warning: #f6ad55;
-  --color-danger: #fc8181;
-  --color-info: #4299e1;
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-light: #334155;
+  --color-text: #f1f5f9;
+  --color-text-dim: #94a3b8;
+  --color-primary: #06b6d4;
+  --color-accent: #0891b2;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -67,11 +68,12 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-primary);
   position: sticky;
   top: 0;
   z-index: 100;
   min-height: 60px;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
 }
 
 .app-header h1 {
@@ -107,18 +109,24 @@ body {
 /* Buttons */
 .btn-primary {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 12px;
   font-size: var(--font-lg);
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.2s;
+  transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--color-accent);
 }
 
 .btn-primary:active {
   transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(6, 182, 212, 0.3);
 }
 
 .btn-large {
@@ -148,10 +156,7 @@ body {
   font-size: var(--font-xxl);
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
 }
 
 .meta {
