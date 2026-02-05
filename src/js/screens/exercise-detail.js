@@ -19,7 +19,7 @@ export class ExerciseDetailScreen {
   render(exerciseKey) {
     this.currentExerciseKey = exerciseKey;
     const history = this.storage.getExerciseHistory(exerciseKey);
-    const [workoutName, exerciseName] = exerciseKey.split(' - ');
+    const [, exerciseName] = exerciseKey.split(' - ');
 
     // Update header
     const titleEl = document.getElementById('exercise-detail-title');
@@ -144,15 +144,20 @@ export class ExerciseDetailScreen {
       return;
     }
 
-    // Remove entry
-    history.splice(reversedIndex, 1);
-    this.storage.saveExerciseHistory(this.currentExerciseKey, history);
+    try {
+      // Remove entry
+      history.splice(reversedIndex, 1);
+      this.storage.saveExerciseHistory(this.currentExerciseKey, history);
 
-    // Re-render
-    this.render(this.currentExerciseKey);
+      // Re-render
+      this.render(this.currentExerciseKey);
 
-    // Show success message
-    this.showToast('✅ Workout deleted');
+      // Show success message
+      this.showToast('✅ Workout deleted');
+    } catch (error) {
+      console.error('Failed to delete workout:', error);
+      this.showToast('❌ Failed to delete workout');
+    }
   }
 
   showToast(message) {
