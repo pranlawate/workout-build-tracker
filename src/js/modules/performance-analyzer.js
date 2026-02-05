@@ -177,48 +177,59 @@ export class PerformanceAnalyzer {
    * @returns {Object} { status: 'good'|'warning'|'alert', message: string|null, pattern: string|null }
    */
   analyzeExercisePerformance(exerciseKey, currentSets = []) {
-    const history = this.storage.getExerciseHistory(exerciseKey);
+    try {
+      const history = this.storage.getExerciseHistory(exerciseKey);
 
-    // Skip analysis if in deload mode (intentional performance reduction)
-    if (this.isInDeload()) {
+      // Skip analysis if in deload mode (intentional performance reduction)
+      if (this.isInDeload()) {
+        return {
+          status: 'good',
+          message: null,
+          pattern: null
+        };
+      }
+
+      // Minimum data requirement: need at least 2 previous workouts for regression
+      // But can still check form breakdown on current session with just 1 workout in history
+      if (history.length < 1) {
+        return {
+          status: 'good',
+          message: null,
+          pattern: null
+        };
+      }
+
+      // Check for regression patterns first (red alerts) - requires 2+ sessions
+      if (history.length >= 2) {
+        const weightRegression = this.detectWeightRegression(history);
+        if (weightRegression) return weightRegression;
+
+        const repDrop = this.detectRepDrop(history);
+        if (repDrop) return repDrop;
+      }
+
+      // Check for form breakdown (yellow warnings) - works with current session
+      const variance = this.detectIntraSetVariance(history, currentSets);
+      if (variance) return variance;
+
+      const lowRIR = this.detectLowRIR(history, currentSets);
+      if (lowRIR) return lowRIR;
+
+      // No issues detected
+      return {
+        status: 'good',
+        message: null,
+        pattern: null
+      };
+
+    } catch (error) {
+      // Log error but don't crash the app
+      console.error('[PerformanceAnalyzer] Analysis failed:', error);
       return {
         status: 'good',
         message: null,
         pattern: null
       };
     }
-
-    // Minimum data requirement: need at least 2 previous workouts for regression
-    // But can still check form breakdown on current session with just 1 workout in history
-    if (history.length < 1) {
-      return {
-        status: 'good',
-        message: null,
-        pattern: null
-      };
-    }
-
-    // Check for regression patterns first (red alerts) - requires 2+ sessions
-    if (history.length >= 2) {
-      const weightRegression = this.detectWeightRegression(history);
-      if (weightRegression) return weightRegression;
-
-      const repDrop = this.detectRepDrop(history);
-      if (repDrop) return repDrop;
-    }
-
-    // Check for form breakdown (yellow warnings) - works with current session
-    const variance = this.detectIntraSetVariance(history, currentSets);
-    if (variance) return variance;
-
-    const lowRIR = this.detectLowRIR(history, currentSets);
-    if (lowRIR) return lowRIR;
-
-    // No issues detected
-    return {
-      status: 'good',
-      message: null,
-      pattern: null
-    };
   }
 }
