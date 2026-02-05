@@ -44,18 +44,40 @@ export class StorageManager {
       return {
         lastWorkout: null,
         lastDate: null,
-        nextSuggested: 'UPPER_A'
+        nextSuggested: 'UPPER_A',
+        sequence: [],
+        cycleCount: 0,
+        currentStreak: 0,
+        lastDeloadDate: null
       };
     }
 
     try {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      // Add new fields only if they don't exist (backward compatibility)
+      if (parsed.sequence === undefined) {
+        parsed.sequence = [];
+      }
+      if (parsed.cycleCount === undefined) {
+        parsed.cycleCount = 0;
+      }
+      if (parsed.currentStreak === undefined) {
+        parsed.currentStreak = 0;
+      }
+      if (parsed.lastDeloadDate === undefined) {
+        parsed.lastDeloadDate = null;
+      }
+      return parsed;
     } catch (error) {
       console.error('Failed to parse rotation data, returning default:', error);
       return {
         lastWorkout: null,
         lastDate: null,
-        nextSuggested: 'UPPER_A'
+        nextSuggested: 'UPPER_A',
+        sequence: [],
+        cycleCount: 0,
+        currentStreak: 0,
+        lastDeloadDate: null
       };
     }
   }

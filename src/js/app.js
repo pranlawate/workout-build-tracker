@@ -65,6 +65,25 @@ class App {
       }
     }
 
+    // Add cycle progress display
+    const cycleProgressEl = document.getElementById('cycle-progress');
+    if (cycleProgressEl) {
+      const cycleCount = rotation.cycleCount || 0;
+      const streak = rotation.currentStreak || 0;
+      const nextDeload = 8 - (cycleCount % 8); // Deload every 8 cycles
+
+      cycleProgressEl.innerHTML = `
+        <div class="progress-item">
+          <span class="progress-label">Current Streak:</span>
+          <span class="progress-value">${streak} workouts</span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-label">Next Deload:</span>
+          <span class="progress-value">${nextDeload} cycles away</span>
+        </div>
+      `;
+    }
+
     // Update recovery status
     this.updateRecoveryStatus(nextWorkoutName);
   }

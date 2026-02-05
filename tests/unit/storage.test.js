@@ -21,7 +21,16 @@ describe('StorageManager', () => {
     storage.saveRotation(rotation);
     const retrieved = storage.getRotation();
 
-    assert.deepStrictEqual(retrieved, rotation);
+    // Check that original fields are preserved
+    assert.strictEqual(retrieved.lastWorkout, rotation.lastWorkout);
+    assert.strictEqual(retrieved.lastDate, rotation.lastDate);
+    assert.strictEqual(retrieved.nextSuggested, rotation.nextSuggested);
+
+    // Check that new fields have default values for backward compatibility
+    assert.deepStrictEqual(retrieved.sequence, []);
+    assert.strictEqual(retrieved.cycleCount, 0);
+    assert.strictEqual(retrieved.currentStreak, 0);
+    assert.strictEqual(retrieved.lastDeloadDate, null);
   });
 
   test('should return default rotation if none exists', () => {

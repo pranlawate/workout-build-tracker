@@ -27,15 +27,36 @@ export class WorkoutManager {
   }
 
   completeWorkout(workoutName) {
+    const rotation = this.storage.getRotation();
     const currentIndex = ROTATION_ORDER.indexOf(workoutName);
     const nextIndex = (currentIndex + 1) % ROTATION_ORDER.length;
     const nextWorkout = ROTATION_ORDER[nextIndex];
 
-    this.storage.saveRotation({
-      lastWorkout: workoutName,
-      lastDate: new Date().toISOString(),
-      nextSuggested: nextWorkout
-    });
+    // Update rotation sequence
+    rotation.lastWorkout = workoutName;
+    rotation.lastDate = new Date().toISOString();
+    rotation.nextSuggested = nextWorkout;
+    rotation.sequence = [...(rotation.sequence || []), workoutName].slice(-12);
+    rotation.currentStreak = (rotation.currentStreak || 0) + 1;
+
+    // Increment cycle count when completing full rotation
+    const fullCycle = this.detectFullCycle(rotation.sequence);
+    if (fullCycle) {
+      rotation.cycleCount = (rotation.cycleCount || 0) + 1;
+    }
+
+    this.storage.saveRotation(rotation);
+  }
+
+  detectFullCycle(sequence) {
+    // Detect when user completes full A→B→C→D rotation
+    if (sequence.length < 4) return false;
+
+    const recent4 = sequence.slice(-4);
+    const uniqueWorkouts = new Set(recent4);
+
+    // Full cycle = all 4 workouts completed
+    return uniqueWorkouts.size === 4;
   }
 
   checkMuscleRecovery(proposedWorkout, currentTime = new Date()) {
