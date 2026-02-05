@@ -8,6 +8,7 @@ class App {
     this.storage = new StorageManager();
     this.workoutManager = new WorkoutManager(this.storage);
     this.currentWorkout = null;
+    this.currentExerciseIndex = 0;
 
     this.initializeApp();
   }
@@ -114,6 +115,7 @@ class App {
   startWorkout() {
     const nextWorkoutName = this.workoutManager.getNextWorkout();
     this.currentWorkout = getWorkout(nextWorkoutName);
+    this.currentExerciseIndex = 0;
 
     if (!this.currentWorkout) {
       console.error(`Cannot start workout: ${nextWorkoutName} not found`);
@@ -166,6 +168,7 @@ class App {
     // Clean up session data
     this.workoutSession = null;
     this.currentWorkout = null;
+    this.currentExerciseIndex = 0;
 
     const workoutScreen = document.getElementById('workout-screen');
     const homeScreen = document.getElementById('home-screen');
