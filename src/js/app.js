@@ -103,7 +103,7 @@ class App {
     }
 
     // Placeholder buttons (not yet implemented)
-    const placeholderButtons = document.querySelectorAll('.action-btn, #settings-btn');
+    const placeholderButtons = document.querySelectorAll('.action-btn, #settings-btn, #workout-settings-btn');
     placeholderButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         alert('⏳ This feature is coming soon!\n\nCurrently available:\n✅ Workout logging\n✅ Progression tracking\n✅ Offline mode');
