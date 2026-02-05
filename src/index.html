@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/sticky-input.css">
   <link rel="stylesheet" href="css/post-set-feedback.css">
   <link rel="stylesheet" href="css/number-overlay.css">
+  <link rel="stylesheet" href="css/edit-entry-modal.css">
   <link rel="stylesheet" href="css/deload-modal.css">
   <link rel="stylesheet" href="css/history-screen.css">
   <link rel="stylesheet" href="css/progress-chart.css">
@@ -173,6 +174,29 @@
       </div>
 
       <button id="overlay-confirm" class="overlay-confirm">CONFIRM</button>
+    </div>
+  </div>
+
+  <!-- Edit Entry Modal -->
+  <div id="edit-entry-modal">
+    <div class="edit-modal-content">
+      <div class="edit-modal-header">
+        <h2>Edit Workout</h2>
+      </div>
+
+      <div class="edit-date-section">
+        <label for="edit-entry-date">Date</label>
+        <input type="date" id="edit-entry-date" />
+      </div>
+
+      <div id="edit-sets-container">
+        <!-- Populated by EditEntryModal -->
+      </div>
+
+      <div class="edit-modal-actions">
+        <button id="edit-entry-cancel">Cancel</button>
+        <button id="edit-entry-save">Save Changes</button>
+      </div>
     </div>
   </div>
 
