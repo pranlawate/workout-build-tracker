@@ -1095,6 +1095,12 @@ class App {
       return;
     }
 
+    // Check for mobility prompt BEFORE advancing
+    const justCompletedIndex = this.currentExerciseIndex;
+    const justCompletedExercise = this.currentWorkout.exercises[justCompletedIndex];
+    const exerciseKey = `${this.currentWorkout.name} - ${justCompletedExercise.name}`;
+    this.showMobilityCheckIfNeeded(exerciseKey);
+
     // Update state classes without re-rendering (preserves session data)
     const allExercises = document.querySelectorAll('.exercise-item');
 
@@ -1678,6 +1684,85 @@ class App {
       // Reset file input
       event.target.value = '';
     }
+  }
+
+  showMobilityCheckIfNeeded(exerciseKey) {
+    // Configuration for mobility checks
+    const mobilityChecks = {
+      'UPPER_A - DB Shoulder Press': {
+        criteriaKey: 'bench_overhead_mobility',
+        question: 'Could you press overhead without back arching today?',
+        help: 'Ribs should stay down, no excessive lower back arch'
+      },
+      'LOWER_B - DB Goblet Squat': {
+        criteriaKey: 'squat_heel_flat',
+        question: 'Did you keep heels flat during squats today?',
+        help: 'No heel lift off ground during descent'
+      },
+      'LOWER_B - DB Romanian Deadlift': {
+        criteriaKey: 'deadlift_toe_touch',
+        question: 'Could you touch your toes during warm-up today?',
+        help: 'Stand with legs straight, bend forward - can fingertips reach toes?'
+      }
+    };
+
+    const checkConfig = mobilityChecks[exerciseKey];
+    if (!checkConfig) return; // No mobility check for this exercise
+
+    // Check if already prompted today
+    const checks = this.storage.getMobilityChecks(checkConfig.criteriaKey);
+    const today = new Date().toISOString().split('T')[0];
+    if (checks.some(c => c.date === today)) {
+      return; // Already checked today
+    }
+
+    // Show prompt UI
+    this.showMobilityPrompt(checkConfig);
+  }
+
+  showMobilityPrompt(checkConfig) {
+    const modal = document.getElementById('mobility-check-modal');
+    const questionEl = document.getElementById('mobility-question');
+    const helpEl = document.getElementById('mobility-help');
+    const progressEl = document.getElementById('mobility-progress');
+    const recentEl = document.getElementById('mobility-recent');
+
+    // Set content
+    questionEl.textContent = checkConfig.question;
+    helpEl.textContent = checkConfig.help;
+
+    // Show progress
+    const checks = this.storage.getMobilityChecks(checkConfig.criteriaKey);
+    let consecutiveYes = 0;
+    for (let i = checks.length - 1; i >= 0 && i >= checks.length - 5; i--) {
+      if (checks[i].response === 'yes') consecutiveYes++;
+      else break;
+    }
+    progressEl.textContent = `Progress: ${consecutiveYes}/5 confirmations`;
+
+    // Show recent checks
+    const recent = checks.slice(-5);
+    const icons = recent.map(c =>
+      c.response === 'yes' ? '✓' : c.response === 'no' ? '✗' : '?'
+    );
+    recentEl.textContent = `Recent: ${icons.join('')}`;
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Button handlers
+    document.getElementById('mobility-yes').onclick = () => {
+      this.storage.saveMobilityCheck(checkConfig.criteriaKey, 'yes');
+      modal.style.display = 'none';
+    };
+    document.getElementById('mobility-no').onclick = () => {
+      this.storage.saveMobilityCheck(checkConfig.criteriaKey, 'no');
+      modal.style.display = 'none';
+    };
+    document.getElementById('mobility-not-sure').onclick = () => {
+      this.storage.saveMobilityCheck(checkConfig.criteriaKey, 'not_sure');
+      modal.style.display = 'none';
+    };
   }
 
   completeWorkout() {
