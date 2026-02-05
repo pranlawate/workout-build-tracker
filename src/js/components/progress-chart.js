@@ -7,8 +7,16 @@ export class ProgressChart {
       throw new Error(`Canvas element with id "${canvasId}" not found`);
     }
     this.ctx = this.canvas.getContext('2d');
+    this.width = 0;
+    this.height = 0;
+  }
 
-    // Set canvas size for retina displays
+  /**
+   * Update canvas size for retina displays
+   * Called before each draw to handle window resize
+   * @private
+   */
+  _updateCanvasSize() {
     const dpr = window.devicePixelRatio || 1;
     const rect = this.canvas.getBoundingClientRect();
     this.canvas.width = rect.width * dpr;
@@ -20,19 +28,47 @@ export class ProgressChart {
   }
 
   /**
+   * Validate history entry
+   * @param {object} entry - History entry to validate
+   * @returns {boolean} True if entry is valid
+   * @private
+   */
+  _validateEntry(entry) {
+    if (!entry || !entry.date) return false;
+    if (!Array.isArray(entry.sets) || entry.sets.length === 0) return false;
+
+    const firstSet = entry.sets[0];
+    if (!firstSet || typeof firstSet.weight !== 'number') return false;
+    if (firstSet.weight <= 0 || !isFinite(firstSet.weight)) return false;
+
+    return true;
+  }
+
+  /**
    * Draw weight progression chart
    * @param {Array} history - Exercise history array
    */
   draw(history) {
+    // Update canvas size before drawing (handles resize/rotation)
+    this._updateCanvasSize();
+
     if (!history || history.length === 0) {
       this.drawEmptyState();
       return;
     }
 
-    // Extract data points (use first set weight)
-    const data = history.map(entry => ({
+    // Validate and extract data points
+    const validEntries = history.filter(entry => this._validateEntry(entry));
+
+    if (validEntries.length === 0) {
+      console.warn('ProgressChart: No valid entries found in history');
+      this.drawEmptyState();
+      return;
+    }
+
+    const data = validEntries.map(entry => ({
       date: new Date(entry.date),
-      weight: entry.sets[0]?.weight || 0
+      weight: entry.sets[0].weight
     }));
 
     if (data.length === 1) {
@@ -90,6 +126,9 @@ export class ProgressChart {
   }
 
   drawLine(data, padding, width, height, minWeight, weightRange) {
+    // Defensive check: need at least 2 points to draw a line
+    if (data.length < 2) return;
+
     this.ctx.strokeStyle = '#06b6d4'; // --color-primary
     this.ctx.lineWidth = 3;
     this.ctx.beginPath();
@@ -109,6 +148,9 @@ export class ProgressChart {
   }
 
   drawPoints(data, padding, width, height, minWeight, weightRange) {
+    // Defensive check: need at least 2 points for this coordinate calculation
+    if (data.length < 2) return;
+
     this.ctx.fillStyle = '#06b6d4'; // --color-primary
 
     data.forEach((point, index) => {
