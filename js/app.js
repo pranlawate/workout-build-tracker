@@ -126,7 +126,9 @@ class App {
     // Handle browser back/forward buttons
     window.addEventListener('popstate', (event) => {
       if (!event.state) {
-        // No state means we've gone back to initial page load
+        // Trying to go back beyond app's initial state
+        // Push home state to keep user in the app
+        window.history.pushState({ screen: 'home' }, '', '');
         this.navigateToScreen('home');
         return;
       }
