@@ -231,6 +231,93 @@ If any test fails:
 [Add any additional notes about the testing process or app behavior]
 ```
 
+## 13. UX Polish Features (Tasks 19-30)
+
+### 13.1 Warm-Up Protocol
+- [ ] Start workout A
+- [ ] Warm-up section appears at top, collapsed
+- [ ] Click header expands checklist
+- [ ] Check items marks them complete (strikethrough)
+- [ ] All items checked sets workoutSession.warmupCompleted = true
+
+### 13.2 RIR Dropdown
+- [ ] RIR shows as dropdown (not number input)
+- [ ] Options: 0, 1, 2, 3, 4, 5+
+- [ ] Red background for 0-1
+- [ ] Green background for 2-3
+- [ ] Yellow background for 4-5+
+- [ ] Hover ℹ️ shows tooltip
+- [ ] Default is minimum of target range
+
+### 13.3 Machine Badges
+- [ ] Exercises with machineOk: true show "ℹ️ Machine OK" badge
+- [ ] Badge appears in exercise header
+- [ ] Hover shows tooltip "Machine version OK when fatigued"
+
+### 13.4 Cycle Progress
+- [ ] Home screen shows "🎯 Current Streak: N workouts"
+- [ ] Shows "Next Deload: N workouts away"
+- [ ] Streak increments on workout completion
+- [ ] Deload countdown decreases (from 8)
+
+### 13.5 Recovery Warning
+- [ ] Start workout within 48 hours of last session
+- [ ] Orange modal appears
+- [ ] Shows hours since last workout
+- [ ] Lists muscles needing recovery
+- [ ] "Wait Until Tomorrow" closes modal
+- [ ] "Train Anyway" proceeds to workout
+
+### 13.6 Progressive Set Unlocking
+- [ ] Only Set 1 inputs enabled initially
+- [ ] Sets 2-3 show lock icon 🔒 and grayed out
+- [ ] Complete Set 1 (all fields filled)
+- [ ] Set 2 unlocks with animation
+- [ ] Set 2 weight pre-fills from Set 1
+- [ ] Complete Set 2 unlocks Set 3
+
+### 13.7 Sticky LOG SET Button
+- [ ] Current set has sticky positioning (stays at top when scrolling)
+- [ ] Large "LOG SET 1" button appears (60px height)
+- [ ] Button is purple gradient
+- [ ] Click with incomplete fields shows alert
+- [ ] Click with complete fields:
+  - [ ] Button changes to "✓ LOGGED" and turns green
+  - [ ] Next set unlocks
+  - [ ] Post-set feedback shown
+
+### 13.8 Post-Set Feedback
+- [ ] After logging set, toast appears from bottom
+- [ ] Green: Hit max reps with good RIR
+- [ ] Blue: Normal progress
+- [ ] Yellow: RIR too low
+- [ ] Red: Reps below minimum
+- [ ] Toast auto-dismisses after 4 seconds
+
+### 13.9 Number Input Overlay
+- [ ] Click ✎ icon next to weight input
+- [ ] Overlay appears with number pad
+- [ ] 4×4 grid of 70×70px buttons
+- [ ] Tap numbers to build value
+- [ ] Tap +2.5 to add 2.5
+- [ ] Tap ← to delete digit
+- [ ] Tap C to clear to 0
+- [ ] Tap CONFIRM applies value
+- [ ] Tap ✕ closes without saving
+
+### 13.10 Deload System
+- [ ] Manually set lastDeloadDate to 6+ weeks ago
+- [ ] Open home screen
+- [ ] Deload modal appears
+- [ ] Shows trigger reason
+- [ ] 3 deload type options
+- [ ] Click to select type (blue border)
+- [ ] "Start Deload Now" → yellow banner appears
+- [ ] Banner shows type and days remaining
+- [ ] "End Early" → confirms, then ends deload
+- [ ] "Postpone" → dismisses modal
+- [ ] "Dismiss" → resets timer
+
 ---
 
 **Tested by:** ___________

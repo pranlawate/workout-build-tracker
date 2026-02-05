@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Complete UX Polish (Tasks 19-30)
+
+**Missing Features Implementation:**
+- Workout-specific warm-up protocol sections with checklist tracking ✅
+- RIR dropdown with color coding (Red: 0-1, Green: 2-3, Yellow: 4+) and helper tooltip ✅
+- Machine usage info badges ("ℹ️ Machine OK when fatigued") ✅
+- Cycle progress tracking on home screen (current streak, deload countdown) ✅
+- Recovery warning confirmation flow (orange modal, tap to confirm) ✅
+- Progressive set unlocking (Set 1 → Set 2/3 unlock with pre-filled values) ✅
+- Sticky input area with 60px LOG SET button (1-tap logging workflow) ✅
+- Post-set feedback messages (color-coded toast: green/blue/yellow/red) ✅
+- Custom number input overlay (70×70px buttons, quick adjust +2.5/-2.5) ✅
+- Automated deload system:
+  - Time-based trigger (6-8 weeks) ✅
+  - Three deload types (standard, light, active recovery) ✅
+  - Modal with type selection ✅
+  - Yellow banner during active deload ✅
+  - Manual override (start early, end early, postpone, dismiss) ✅
+
+**User Experience:**
+- Zero-friction set logging (1 tap when using defaults)
+- Gym-ready number inputs (large touch targets)
+- Smart feedback system (immediate guidance after each set)
+- Complete recovery management (warnings + deload automation)
+- Progressive disclosure maintained throughout
+
+**Technical:**
+- 12 new commits
+- 7 new CSS files (warm-up, sticky-input, post-set-feedback, number-overlay, deload-modal, recovery-modal, workout-screen enhancements)
+- 1 new JS module (deload.js)
+- Updated storage schema for deload state
+- All features follow zero-dependency philosophy
+
 ### Added - Full MVP Complete (Tasks 7-11)
 
 **UI Integration (Tasks 7-9):**
