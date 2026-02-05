@@ -205,6 +205,116 @@ export class StorageManager {
   }
 
   /**
+   * Save a mobility check response
+   * @param {string} criteriaKey - Mobility criteria identifier (e.g., 'bench_overhead_mobility')
+   * @param {'yes'|'no'|'not_sure'} response - User's response
+   */
+  saveMobilityCheck(criteriaKey, response) {
+    const allChecks = this.getMobilityChecksData();
+    if (!allChecks[criteriaKey]) {
+      allChecks[criteriaKey] = [];
+    }
+    allChecks[criteriaKey].push({
+      date: new Date().toISOString().split('T')[0],
+      response: response
+    });
+
+    try {
+      const serialized = JSON.stringify(allChecks);
+      this.storage.setItem('barbell_mobility_checks', serialized);
+    } catch (error) {
+      console.error('Failed to save mobility check:', error);
+    }
+  }
+
+  /**
+   * Get mobility check history for a criteria
+   * @param {string} criteriaKey - Mobility criteria identifier
+   * @returns {Array<{date: string, response: string}>} Array of check records
+   */
+  getMobilityChecks(criteriaKey) {
+    const allChecks = this.getMobilityChecksData();
+    return allChecks[criteriaKey] || [];
+  }
+
+  /**
+   * Helper method to get all mobility checks data with error handling
+   * @private
+   * @returns {Object} Parsed mobility checks data or empty object
+   */
+  getMobilityChecksData() {
+    const data = this.storage.getItem('barbell_mobility_checks');
+    if (!data) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(data);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (error) {
+      console.error('Failed to parse mobility checks data, returning empty object:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Save a pain report for an exercise
+   * @param {string} exerciseKey - Full exercise key (e.g., 'UPPER_A - DB Bench Press')
+   * @param {boolean} hadPain - Whether user experienced pain
+   * @param {string|null} location - Pain location (e.g., 'shoulder', 'elbow')
+   * @param {'minor'|'significant'|null} severity - Pain severity
+   */
+  savePainReport(exerciseKey, hadPain, location, severity) {
+    const allPain = this.getPainHistoryData();
+    if (!allPain[exerciseKey]) {
+      allPain[exerciseKey] = [];
+    }
+    allPain[exerciseKey].push({
+      date: new Date().toISOString().split('T')[0],
+      hadPain: hadPain,
+      location: location,
+      severity: severity
+    });
+
+    try {
+      const serialized = JSON.stringify(allPain);
+      this.storage.setItem('exercise_pain_history', serialized);
+    } catch (error) {
+      console.error('Failed to save pain report:', error);
+    }
+  }
+
+  /**
+   * Get pain history for an exercise
+   * @param {string} exerciseKey - Full exercise key
+   * @returns {Array<{date: string, hadPain: boolean, location: string|null, severity: string|null}>}
+   */
+  getPainHistory(exerciseKey) {
+    const allPain = this.getPainHistoryData();
+    return allPain[exerciseKey] || [];
+  }
+
+  /**
+   * Helper method to get all pain history data with error handling
+   * @private
+   * @returns {Object} Parsed pain history data or empty object
+   */
+  getPainHistoryData() {
+    const data = this.storage.getItem('exercise_pain_history');
+    if (!data) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(data);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (error) {
+      console.error('Failed to parse pain history data, returning empty object:', error);
+      return {};
+    }
+  }
+
+  /**
    * Clears all BUILD Tracker data from localStorage
    */
   clearAll() {
