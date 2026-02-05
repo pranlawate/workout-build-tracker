@@ -1,3 +1,38 @@
+const WARMUPS = {
+  UPPER_A: [
+    'Cat-Cow: 10 reps',
+    'Band Pull-Aparts: 15 reps',
+    'Goblet Squat (bodyweight): 10 reps',
+    'Hip Hinge Drill: 10 reps',
+    'Ramp-up Set: 50% weight × 10 reps (Goblet Squat)'
+  ],
+  LOWER_A: [
+    'Cat-Cow: 10 reps',
+    'Band Pull-Aparts: 15 reps',
+    'Bodyweight Squats: 10 reps',
+    'Leg Swings: 10 per leg',
+    'Ramp-up Set: 50% weight × 10 reps (first exercise)'
+  ],
+  UPPER_B: [
+    'Dead Hang: 20-30 seconds',
+    'Band Pull-Aparts: 15 reps',
+    'Scapular Pull-Ups: 5 reps',
+    'Arm Circles: 10 each direction',
+    'Ramp-up Set: 50% weight × 10 reps (first exercise)'
+  ],
+  LOWER_B: [
+    'Glute Bridges (bodyweight): 15 reps',
+    'Leg Swings: 10 per leg',
+    'Ankle Mobility: 10 reps per side',
+    'Hip Flexor Stretch: 30s per side',
+    'Ramp-up Set: 50% weight × 10 reps (first exercise)'
+  ]
+};
+
+export function getWarmup(workoutName) {
+  return WARMUPS[workoutName] || [];
+}
+
 export const WORKOUTS = {
   UPPER_A: {
     name: 'UPPER_A',

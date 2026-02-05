@@ -1,6 +1,6 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
-import { getWorkout } from './modules/workouts.js';
+import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 
 class App {
@@ -203,10 +203,14 @@ class App {
     this.workoutSession = {
       workoutName: this.currentWorkout.name,
       startTime: new Date(),
+      warmupCompleted: false,
       exercises: []
     };
 
-    exerciseList.innerHTML = this.currentWorkout.exercises.map((exercise, index) => {
+    // Render warm-up section
+    const warmupHtml = this.renderWarmupSection();
+
+    const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
       const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
       const history = this.storage.getExerciseHistory(exerciseKey);
       const lastWorkout = history.length > 0 ? history[history.length - 1] : null;
@@ -249,8 +253,12 @@ class App {
       `;
     }).join('');
 
+    // Combine warm-up and exercises
+    exerciseList.innerHTML = warmupHtml + exercisesHtml;
+
     // Attach input listeners
     this.attachSetInputListeners();
+    this.attachWarmupListeners();
 
     // Show complete workout button
     const completeBtn = document.getElementById('complete-workout-btn');
@@ -502,6 +510,68 @@ class App {
     if (currentExercise) {
       currentExercise.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }
+
+  renderWarmupSection() {
+    const warmupExercises = getWarmup(this.currentWorkout.name);
+
+    if (warmupExercises.length === 0) {
+      return '';
+    }
+
+    const checklistItems = warmupExercises.map((exercise, index) => `
+      <div class="warmup-item" data-warmup-index="${index}">
+        <div class="warmup-checkbox"></div>
+        <span class="warmup-text">${this.escapeHtml(exercise)}</span>
+      </div>
+    `).join('');
+
+    return `
+      <div class="warmup-section" id="warmup-section">
+        <div class="warmup-header" id="warmup-header">
+          <h3 class="warmup-title">
+            <span>🔥</span>
+            <span>Warm-Up Protocol</span>
+          </h3>
+          <span class="warmup-chevron">▼</span>
+        </div>
+        <div class="warmup-content">
+          <div class="warmup-checklist">
+            ${checklistItems}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  attachWarmupListeners() {
+    const warmupSection = document.getElementById('warmup-section');
+    if (!warmupSection) return;
+
+    // Toggle expand/collapse
+    const warmupHeader = document.getElementById('warmup-header');
+    if (warmupHeader) {
+      warmupHeader.addEventListener('click', () => {
+        warmupSection.classList.toggle('expanded');
+      });
+    }
+
+    // Handle checkbox clicks
+    const warmupItems = warmupSection.querySelectorAll('.warmup-item');
+    warmupItems.forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('completed');
+
+        // Check if all items are completed
+        const allCompleted = Array.from(warmupItems).every(i =>
+          i.classList.contains('completed')
+        );
+
+        if (allCompleted && this.workoutSession) {
+          this.workoutSession.warmupCompleted = true;
+        }
+      });
+    });
   }
 
   completeWorkout() {
