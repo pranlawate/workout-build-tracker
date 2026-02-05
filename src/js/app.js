@@ -932,8 +932,7 @@ class App {
     logButton.dataset.set = nextSetIndex;
     logButton.textContent = `LOG SET ${nextSetIndex + 1}`;
 
-    // Add click handler
-    logButton.addEventListener('click', (e) => this.handleLogSet(e));
+    // No need to add click handler - event delegation in attachSetInputListeners handles it
 
     nextSetRow.appendChild(logButton);
   }
