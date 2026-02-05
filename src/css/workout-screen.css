@@ -92,3 +92,49 @@
   background: rgba(66, 153, 225, 0.1);
   border-radius: 6px;
 }
+
+/* Progression Badges */
+.progression-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-normal {
+  background: rgba(66, 153, 225, 0.2);
+  color: var(--color-info);
+}
+
+.badge-ready {
+  background: rgba(72, 187, 120, 0.2);
+  color: var(--color-success);
+}
+
+.badge-plateau {
+  background: rgba(246, 173, 85, 0.2);
+  color: var(--color-warning);
+}
+
+.badge-regressed {
+  background: rgba(252, 129, 129, 0.2);
+  color: var(--color-danger);
+}
+
+.progression-hint {
+  font-size: var(--font-xs);
+  color: var(--color-text-dim);
+  margin-top: var(--spacing-xs);
+  font-style: italic;
+}
+
+.progression-hint.success {
+  color: var(--color-success);
+}
+
+.progression-hint.warning {
+  color: var(--color-warning);
+}

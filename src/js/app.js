@@ -1,6 +1,7 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
 import { getWorkout } from './modules/workouts.js';
+import { getProgressionStatus, shouldIncreaseWeight } from './modules/progression.js';
 
 class App {
   constructor() {
@@ -114,8 +115,26 @@ class App {
       titleEl.textContent = this.currentWorkout.displayName;
     }
 
-    // Render exercises (will implement in Task 8)
+    // Start timer
+    this.startTimer();
+
+    // Render exercises
     this.renderExercises();
+  }
+
+  startTimer() {
+    const timerEl = document.getElementById('timer');
+    if (!timerEl) return;
+
+    const startTime = Date.now();
+
+    this.timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+
+      timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }, 1000);
   }
 
   showHomeScreen() {
@@ -165,11 +184,14 @@ class App {
         <div class="exercise-item" data-exercise-index="${index}">
           <div class="exercise-header">
             <h3 class="exercise-name">${exercise.name}</h3>
+            ${this.renderProgressionBadge(exercise, history)}
           </div>
 
           <p class="exercise-meta">
             ${exercise.sets} sets × ${exercise.repRange} reps @ RIR ${exercise.rirTarget}
           </p>
+
+          ${this.renderProgressionHint(exercise, history, lastWorkout)}
 
           <div class="sets-container">
             ${this.renderSets(exercise, lastWorkout, index)}
@@ -252,6 +274,52 @@ class App {
     return html;
   }
 
+  renderProgressionBadge(exercise, history) {
+    if (history.length === 0) {
+      return '<span class="progression-badge badge-normal">🔵 First Time</span>';
+    }
+
+    const status = getProgressionStatus(history, exercise);
+
+    const badges = {
+      normal: '<span class="progression-badge badge-normal">🔵 In Progress</span>',
+      ready: '<span class="progression-badge badge-ready">🟢 Ready to Progress</span>',
+      plateau: '<span class="progression-badge badge-plateau">🟡 Plateau</span>',
+      regressed: '<span class="progression-badge badge-regressed">🔴 Regressed</span>'
+    };
+
+    return badges[status] || badges.normal;
+  }
+
+  renderProgressionHint(exercise, history, lastWorkout) {
+    if (history.length === 0) {
+      return `<p class="progression-hint">Start with ${exercise.startingWeight}kg and focus on form</p>`;
+    }
+
+    const status = getProgressionStatus(history, exercise);
+
+    if (status === 'ready' && lastWorkout) {
+      const lastWeight = lastWorkout.sets[0].weight;
+      const nextWeight = lastWeight + exercise.weightIncrement;
+      return `<p class="progression-hint success">✨ Increase to ${nextWeight}kg this session!</p>`;
+    }
+
+    if (status === 'plateau') {
+      return `<p class="progression-hint warning">⚠️ Same weight for 3+ sessions. Consider deload or form check.</p>`;
+    }
+
+    if (status === 'normal' && lastWorkout) {
+      const lastSet = lastWorkout.sets[lastWorkout.sets.length - 1];
+      const [min, max] = exercise.repRange.split('-').map(Number);
+
+      if (lastSet.reps < max) {
+        return `<p class="progression-hint">Keep weight, aim for ${max} reps on all sets</p>`;
+      }
+    }
+
+    return '';
+  }
+
   attachSetInputListeners() {
     const exerciseList = document.getElementById('exercise-list');
     if (!exerciseList) return;
@@ -290,6 +358,39 @@ class App {
 
     // Update the value
     exercise.sets[setIndex][field] = value;
+
+    // Check if this set is complete (has weight, reps, and RIR)
+    const set = exercise.sets[setIndex];
+    if (set.weight > 0 && set.reps > 0 && set.rir >= 0) {
+      this.checkSetProgression(exerciseIndex, setIndex);
+    }
+  }
+
+  checkSetProgression(exerciseIndex, setIndex) {
+    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const set = this.workoutSession.exercises[exerciseIndex].sets[setIndex];
+
+    const [min, max] = exerciseDef.repRange.split('-').map(Number);
+    const [rirMin] = exerciseDef.rirTarget.split('-').map(Number);
+
+    // Visual feedback on the input row
+    const setRow = document.querySelector(
+      `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="reps"]`
+    )?.closest('.set-row');
+
+    if (!setRow) return;
+
+    // Remove any existing feedback
+    setRow.style.borderLeft = 'none';
+
+    // Check if set meets progression criteria
+    if (set.reps >= max && set.rir >= rirMin) {
+      setRow.style.borderLeft = '4px solid var(--color-success)';
+    } else if (set.reps < min) {
+      setRow.style.borderLeft = '4px solid var(--color-danger)';
+    } else {
+      setRow.style.borderLeft = '4px solid var(--color-info)';
+    }
   }
 
   completeWorkout() {
