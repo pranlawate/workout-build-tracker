@@ -32,16 +32,17 @@
 
 .set-row {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 60px 1fr 1fr 1fr;
   gap: var(--spacing-sm);
-  align-items: center;
-  margin-bottom: var(--spacing-sm);
+  align-items: start;
+  margin-bottom: var(--spacing-md);
 }
 
 .set-label {
   font-size: var(--font-sm);
   color: var(--color-text-dim);
   font-weight: 600;
+  padding-top: 20px; /* Align with input fields */
 }
 
 .set-input {
