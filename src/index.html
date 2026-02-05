@@ -94,6 +94,9 @@
           .then((registration) => {
             console.log('Service Worker registered:', registration.scope);
 
+            // Check for updates on every page load (dev mode)
+            registration.update();
+
             // Listen for new Service Worker waiting
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
