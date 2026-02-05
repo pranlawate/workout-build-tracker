@@ -943,20 +943,30 @@ class App {
     nextSetRow.appendChild(logButton);
   }
 
-  checkExerciseCompletion(exerciseIndex) {
-    // Only check current exercise
-    if (exerciseIndex !== this.currentExerciseIndex) return;
+  isExerciseCompleted(exerciseIndex) {
+    // Check if an exercise has all its sets logged
+    if (!this.workoutSession || !this.currentWorkout) return false;
 
     const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
     const exerciseSession = this.workoutSession.exercises[exerciseIndex];
+
+    if (!exerciseDef || !exerciseSession) return false;
 
     // Count completed sets (sets with all three values)
     const completedSets = exerciseSession.sets.filter(set =>
       set && set.weight > 0 && set.reps > 0 && set.rir >= 0
     ).length;
 
+    // Exercise is completed if all required sets are logged
+    return completedSets >= exerciseDef.sets;
+  }
+
+  checkExerciseCompletion(exerciseIndex) {
+    // Only check current exercise
+    if (exerciseIndex !== this.currentExerciseIndex) return;
+
     // If all sets completed, advance to next exercise
-    if (completedSets >= exerciseDef.sets) {
+    if (this.isExerciseCompleted(exerciseIndex)) {
       this.advanceToNextExercise();
     }
   }
@@ -973,7 +983,8 @@ class App {
     allExercises.forEach((exerciseEl, index) => {
       exerciseEl.classList.remove('current', 'completed', 'upcoming');
 
-      if (index < this.currentExerciseIndex + 1) {
+      // Only mark as completed if all sets are actually logged
+      if (index < this.currentExerciseIndex + 1 && this.isExerciseCompleted(index)) {
         exerciseEl.classList.add('completed');
       } else if (index === this.currentExerciseIndex + 1) {
         exerciseEl.classList.add('current');
@@ -1007,7 +1018,8 @@ class App {
     allExercises.forEach((exerciseEl, index) => {
       exerciseEl.classList.remove('current', 'completed', 'upcoming');
 
-      if (index < this.currentExerciseIndex) {
+      // Only mark as completed if all sets are actually logged
+      if (index < this.currentExerciseIndex && this.isExerciseCompleted(index)) {
         exerciseEl.classList.add('completed');
       } else if (index === this.currentExerciseIndex) {
         exerciseEl.classList.add('current');
