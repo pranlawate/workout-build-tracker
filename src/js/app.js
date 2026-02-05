@@ -73,6 +73,42 @@ class App {
     `;
   }
 
+  /**
+   * Update the performance badge for a specific exercise during workout
+   * @param {number} exerciseIndex - Index of exercise in current workout
+   */
+  updatePerformanceBadge(exerciseIndex) {
+    if (!this.currentWorkout || !this.workoutSession) return;
+
+    const exercise = this.currentWorkout.exercises[exerciseIndex];
+    const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+    const exerciseSession = this.workoutSession.exercises[exerciseIndex];
+
+    // Get fresh analysis
+    const badgeHtml = this.getPerformanceBadge(exerciseKey, exerciseSession.sets);
+
+    // Find badge container in DOM
+    const exerciseCard = document.querySelector(`[data-exercise-index="${exerciseIndex}"]`);
+    if (!exerciseCard) return;
+
+    // Find existing badge container
+    let badgeContainer = exerciseCard.querySelector('.performance-badge-container');
+
+    if (!badgeContainer) {
+      // Create container if doesn't exist
+      const exerciseMeta = exerciseCard.querySelector('.exercise-meta');
+      if (exerciseMeta) {
+        badgeContainer = document.createElement('div');
+        badgeContainer.className = 'performance-badge-container';
+        exerciseMeta.after(badgeContainer);
+      }
+    }
+
+    if (badgeContainer) {
+      badgeContainer.innerHTML = badgeHtml;
+    }
+  }
+
   initializeApp() {
     this.updateHomeScreen();
     this.attachEventListeners();
@@ -415,7 +451,9 @@ class App {
             ${exercise.sets} sets × ${exercise.repRange} reps @ RIR ${exercise.rirTarget}
           </p>
 
-          ${performanceBadge}
+          <div class="performance-badge-container">
+            ${performanceBadge}
+          </div>
 
           ${this.renderProgressionHint(exercise, history, lastWorkout)}
 
@@ -733,6 +771,9 @@ class App {
     this.checkSetProgression(exerciseIndex, setIndex);
     this.unlockNextSet(exerciseIndex, setIndex);
     this.checkExerciseCompletion(exerciseIndex);
+
+    // Update performance badge in real-time
+    this.updatePerformanceBadge(exerciseIndex);
 
     // Note: showPostSetFeedback will be implemented in Task 26
     // For now, just call it as a no-op if it doesn't exist
