@@ -144,7 +144,12 @@ class App {
         this.showHomeScreen(false); // false = don't push to history
         break;
       case 'workout':
-        // Workout screen doesn't use history (modal-like behavior)
+        // Going back from workout - exit to home
+        this.showHomeScreen(false);
+        break;
+      case 'modal':
+        // Going back from modal - close it
+        this.closeSettingsModal();
         break;
       case 'history':
         this.showHistoryScreen(false);
@@ -402,6 +407,9 @@ class App {
     if (titleEl) {
       titleEl.textContent = this.currentWorkout.displayName;
     }
+
+    // Push workout state to history
+    window.history.pushState({ screen: 'workout' }, '', '');
 
     // Start timer
     this.startTimer();
@@ -1535,15 +1543,15 @@ class App {
       modal.style.display = 'flex';
     }
 
+    // Push modal state to history
+    window.history.pushState({ screen: 'modal' }, '', '');
+
     // Attach handlers
     const closeBtn = document.getElementById('settings-close-btn');
     if (closeBtn) {
       closeBtn.onclick = () => {
-        modal.style.display = 'none';
-        // Reset file input when closing modal
-        if (fileInput) {
-          fileInput.value = '';
-        }
+        this.closeSettingsModal();
+        window.history.back(); // Go back in history when closing via button
       };
     }
 
@@ -1578,6 +1586,20 @@ class App {
     }
   }
 
+  closeSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    const fileInput = document.getElementById('import-file-input');
+
+    if (modal) {
+      modal.style.display = 'none';
+    }
+
+    // Reset file input when closing modal
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
   handleResetRotation() {
     const confirmed = confirm(
       '🔄 Reset Rotation State?\n\n' +
@@ -1603,8 +1625,8 @@ class App {
     alert('✅ Rotation reset successfully!\n\nYour workout history is preserved.');
 
     // Close modal and refresh home screen
-    const modal = document.getElementById('settings-modal');
-    if (modal) modal.style.display = 'none';
+    this.closeSettingsModal();
+    window.history.back(); // Go back in history
     this.showHomeScreen();
   }
 
@@ -1636,8 +1658,8 @@ class App {
     alert('✅ Exercise history cleared!\n\nYour rotation state is preserved.');
 
     // Close modal and refresh home screen
-    const modal = document.getElementById('settings-modal');
-    if (modal) modal.style.display = 'none';
+    this.closeSettingsModal();
+    window.history.back(); // Go back in history
     this.showHomeScreen();
   }
 
@@ -1744,8 +1766,8 @@ class App {
       alert('✅ Data imported successfully');
 
       // Close modal and refresh home screen
-      const modal = document.getElementById('settings-modal');
-      if (modal) modal.style.display = 'none';
+      this.closeSettingsModal();
+      window.history.back(); // Go back in history
 
       this.showHomeScreen();
 
