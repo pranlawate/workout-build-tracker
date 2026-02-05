@@ -202,8 +202,18 @@ class App {
         sets: []
       });
 
+      // Determine exercise state
+      let stateClass = '';
+      if (index < this.currentExerciseIndex) {
+        stateClass = 'completed';
+      } else if (index === this.currentExerciseIndex) {
+        stateClass = 'current';
+      } else {
+        stateClass = 'upcoming';
+      }
+
       return `
-        <div class="exercise-item" data-exercise-index="${index}">
+        <div class="exercise-item ${stateClass}" data-exercise-index="${index}">
           <div class="exercise-header">
             <h3 class="exercise-name">${this.escapeHtml(exercise.name)}</h3>
             ${this.renderProgressionBadge(exercise, history)}
