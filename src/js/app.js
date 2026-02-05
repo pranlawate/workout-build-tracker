@@ -27,6 +27,7 @@ class App {
   initializeApp() {
     this.updateHomeScreen();
     this.attachEventListeners();
+    this.initializeNumberOverlay();
   }
 
   updateHomeScreen() {
@@ -402,32 +403,58 @@ class App {
 
           <div class="set-inputs">
             <label class="input-label">Weight (kg)</label>
-            <input
-              type="number"
-              class="set-input"
-              data-exercise="${exerciseIndex}"
-              data-set="${setIndex}"
-              data-field="weight"
-              value="${defaultWeight}"
-              step="0.5"
-              min="0"
-              ${disabledAttr}
-            />
+            <div class="input-with-edit">
+              <input
+                type="number"
+                class="set-input"
+                data-exercise="${exerciseIndex}"
+                data-set="${setIndex}"
+                data-field="weight"
+                value="${defaultWeight}"
+                step="0.5"
+                min="0"
+                ${disabledAttr}
+                readonly
+              />
+              <button
+                class="edit-icon"
+                data-exercise="${exerciseIndex}"
+                data-set="${setIndex}"
+                data-field="weight"
+                data-current-value="${defaultWeight}"
+                ${disabledAttr}
+              >
+                ✎
+              </button>
+            </div>
           </div>
 
           <div class="set-inputs">
             <label class="input-label">Reps</label>
-            <input
-              type="number"
-              class="set-input"
-              data-exercise="${exerciseIndex}"
-              data-set="${setIndex}"
-              data-field="reps"
-              value="${defaultReps}"
-              min="0"
-              placeholder="0"
-              ${disabledAttr}
-            />
+            <div class="input-with-edit">
+              <input
+                type="number"
+                class="set-input"
+                data-exercise="${exerciseIndex}"
+                data-set="${setIndex}"
+                data-field="reps"
+                value="${defaultReps}"
+                min="0"
+                placeholder="0"
+                ${disabledAttr}
+                readonly
+              />
+              <button
+                class="edit-icon"
+                data-exercise="${exerciseIndex}"
+                data-set="${setIndex}"
+                data-field="reps"
+                data-current-value="${defaultReps}"
+                ${disabledAttr}
+              >
+                ✎
+              </button>
+            </div>
           </div>
 
           <div class="set-inputs">
@@ -861,6 +888,98 @@ class App {
     });
   }
 
+  initializeNumberOverlay() {
+    const overlay = document.getElementById('number-overlay');
+    const closeBtn = document.getElementById('overlay-close');
+    const confirmBtn = document.getElementById('overlay-confirm');
+    const numPad = document.querySelector('.number-pad');
+
+    let currentValue = '0';
+    let targetInput = null;
+
+    // Close overlay
+    const closeOverlay = () => {
+      overlay.classList.remove('active');
+      currentValue = '0';
+      targetInput = null;
+    };
+
+    closeBtn.addEventListener('click', closeOverlay);
+
+    // Number pad handlers
+    numPad.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('num-btn') &&
+          !e.target.classList.contains('quick-btn')) return;
+
+      const value = e.target.dataset.value;
+
+      if (value === 'clear') {
+        currentValue = '0';
+      } else if (value === 'back') {
+        currentValue = currentValue.length > 1 ?
+          currentValue.slice(0, -1) : '0';
+      } else if (value.startsWith('+') || value.startsWith('-')) {
+        // Quick adjust
+        const adjustment = parseFloat(value);
+        const current = parseFloat(currentValue) || 0;
+        currentValue = Math.max(0, current + adjustment).toString();
+      } else if (value === '.') {
+        if (!currentValue.includes('.')) {
+          currentValue += '.';
+        }
+      } else {
+        // Number
+        currentValue = currentValue === '0' ? value : currentValue + value;
+      }
+
+      document.getElementById('overlay-value').textContent = currentValue;
+    });
+
+    // Confirm button
+    confirmBtn.addEventListener('click', () => {
+      if (targetInput) {
+        targetInput.value = currentValue;
+
+        // Trigger change event
+        const event = new Event('change', { bubbles: true });
+        targetInput.dispatchEvent(event);
+      }
+
+      closeOverlay();
+    });
+
+    // Open overlay when edit icon clicked
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('edit-icon')) {
+        const field = e.target.dataset.field;
+        const exerciseIndex = e.target.dataset.exercise;
+        const setIndex = e.target.dataset.set;
+
+        // Find corresponding input
+        targetInput = document.querySelector(
+          `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="${field}"]`
+        );
+
+        if (!targetInput) return;
+
+        // Set initial value
+        currentValue = targetInput.value || '0';
+        document.getElementById('overlay-value').textContent = currentValue;
+
+        // Set title
+        const title = field === 'weight' ? 'Edit Weight' : 'Edit Reps';
+        document.getElementById('overlay-title').textContent = title;
+
+        // Set unit
+        const unit = field === 'weight' ? 'kg' : 'reps';
+        document.getElementById('overlay-unit').textContent = unit;
+
+        // Show overlay
+        overlay.classList.add('active');
+      }
+    });
+  }
+
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
@@ -886,7 +1005,7 @@ class App {
         }
       });
 
-      // Update workout rotation
+      // Update workflow rotation
       this.workoutManager.completeWorkout(this.currentWorkout.name);
 
       // Show confirmation and return home

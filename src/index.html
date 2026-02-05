@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="css/recovery-modal.css">
   <link rel="stylesheet" href="css/sticky-input.css">
   <link rel="stylesheet" href="css/post-set-feedback.css">
+  <link rel="stylesheet" href="css/number-overlay.css">
 </head>
 <body>
   <div id="app">
@@ -94,6 +95,45 @@
         <button id="wait-recovery-btn" class="btn btn-primary">Wait Until Tomorrow</button>
         <button id="train-anyway-btn" class="btn btn-secondary">Train Anyway - I Feel Great</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Number Input Overlay -->
+  <div id="number-overlay" class="number-overlay" style="display: none;">
+    <div class="overlay-content">
+      <div class="overlay-header">
+        <h3 id="overlay-title">Edit Weight</h3>
+        <button id="overlay-close" class="overlay-close">✕</button>
+      </div>
+
+      <div class="overlay-display">
+        <span id="overlay-value">0</span>
+        <span id="overlay-unit">kg</span>
+      </div>
+
+      <div class="number-pad">
+        <button class="num-btn" data-value="7">7</button>
+        <button class="num-btn" data-value="8">8</button>
+        <button class="num-btn" data-value="9">9</button>
+        <button class="quick-btn" data-value="+2.5">+2.5</button>
+
+        <button class="num-btn" data-value="4">4</button>
+        <button class="num-btn" data-value="5">5</button>
+        <button class="num-btn" data-value="6">6</button>
+        <button class="quick-btn" data-value="+5.0">+5.0</button>
+
+        <button class="num-btn" data-value="1">1</button>
+        <button class="num-btn" data-value="2">2</button>
+        <button class="num-btn" data-value="3">3</button>
+        <button class="quick-btn" data-value="-2.5">-2.5</button>
+
+        <button class="num-btn backspace" data-value="back">←</button>
+        <button class="num-btn" data-value="0">0</button>
+        <button class="num-btn" data-value=".">.</button>
+        <button class="num-btn clear" data-value="clear">C</button>
+      </div>
+
+      <button id="overlay-confirm" class="overlay-confirm">CONFIRM</button>
     </div>
   </div>
 
