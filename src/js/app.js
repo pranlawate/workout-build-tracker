@@ -364,9 +364,17 @@ class App {
         return min;
       })();
 
+      // Only Set 1 is enabled initially
+      const isLocked = setNum > 1;
+      const disabledAttr = isLocked ? 'disabled' : '';
+      const lockedClass = isLocked ? 'locked' : '';
+
       html += `
-        <div class="set-row">
-          <span class="set-label">Set ${setNum}</span>
+        <div class="set-row ${lockedClass}" data-set-number="${setNum}">
+          <span class="set-label">
+            Set ${setNum}
+            ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
+          </span>
 
           <div class="set-inputs">
             <label class="input-label">Weight (kg)</label>
@@ -379,6 +387,7 @@ class App {
               value="${defaultWeight}"
               step="0.5"
               min="0"
+              ${disabledAttr}
             />
           </div>
 
@@ -393,6 +402,7 @@ class App {
               value="${defaultReps}"
               min="0"
               placeholder="0"
+              ${disabledAttr}
             />
           </div>
 
@@ -407,6 +417,7 @@ class App {
               data-set="${setNum - 1}"
               data-field="rir"
               value="${defaultRir}"
+              ${disabledAttr}
             >
               <option value="0" ${defaultRir === 0 ? 'selected' : ''}>0 (Failure)</option>
               <option value="1" ${defaultRir === 1 ? 'selected' : ''}>1</option>
@@ -518,6 +529,9 @@ class App {
     if (set.weight > 0 && set.reps > 0 && set.rir >= 0) {
       this.checkSetProgression(exerciseIndex, setIndex);
 
+      // Unlock next set
+      this.unlockNextSet(exerciseIndex, setIndex);
+
       // Check if all sets completed for current exercise
       this.checkExerciseCompletion(exerciseIndex);
     }
@@ -548,6 +562,52 @@ class App {
     } else {
       setRow.style.borderLeft = '4px solid var(--color-info)';
     }
+  }
+
+  unlockNextSet(exerciseIndex, completedSetIndex) {
+    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const nextSetIndex = completedSetIndex + 1;
+
+    // Don't unlock beyond total sets
+    if (nextSetIndex >= exerciseDef.sets) return;
+
+    // Find next set row
+    const exerciseItem = document.querySelector(
+      `.exercise-item[data-exercise-index="${exerciseIndex}"]`
+    );
+
+    if (!exerciseItem) return;
+
+    const nextSetRow = exerciseItem.querySelector(
+      `.set-row[data-set-number="${nextSetIndex + 1}"]`
+    );
+
+    if (!nextSetRow) return;
+
+    // Remove locked state
+    nextSetRow.classList.remove('locked');
+
+    // Enable inputs
+    const inputs = nextSetRow.querySelectorAll('input, select');
+    inputs.forEach(input => {
+      input.disabled = false;
+    });
+
+    // Remove lock icon
+    const lockIcon = nextSetRow.querySelector('.lock-icon');
+    if (lockIcon) lockIcon.remove();
+
+    // Pre-fill with values from completed set
+    const completedSet = this.workoutSession.exercises[exerciseIndex].sets[completedSetIndex];
+
+    // Weight input
+    const weightInput = nextSetRow.querySelector('[data-field="weight"]');
+    if (weightInput && completedSet.weight) {
+      weightInput.value = completedSet.weight;
+    }
+
+    // Reps input - leave empty for user to fill
+    // RIR select - keep default
   }
 
   checkExerciseCompletion(exerciseIndex) {
