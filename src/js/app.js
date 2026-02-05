@@ -908,14 +908,18 @@ class App {
     // Pre-fill with values from completed set
     const completedSet = this.workoutSession.exercises[exerciseIndex].sets[completedSetIndex];
 
-    // Weight input
+    // Pre-fill weight and reps from completed set
     const weightInput = nextSetRow.querySelector('[data-field="weight"]');
     if (weightInput && completedSet.weight) {
       weightInput.value = completedSet.weight;
     }
 
-    // Reps input - leave empty for user to fill
-    // RIR select - keep default
+    const repsInput = nextSetRow.querySelector('[data-field="reps"]');
+    if (repsInput && completedSet.reps) {
+      repsInput.value = completedSet.reps;
+    }
+
+    // RIR select keeps its default value from initial render
 
     // Remove any existing LOG SET button from next set (prevent duplicates)
     const existingBtn = nextSetRow.querySelector('.log-set-btn');
