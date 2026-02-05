@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/history-screen.css">
   <link rel="stylesheet" href="css/progress-chart.css">
   <link rel="stylesheet" href="css/exercise-detail.css">
+  <link rel="stylesheet" href="css/export-import.css">
 </head>
 <body>
   <div id="app">
@@ -224,6 +225,50 @@
         <span id="banner-details"><!-- type and days remaining --></span>
       </div>
       <button id="end-deload-btn" class="banner-action">End Early</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Settings</h2>
+        <button id="settings-close-btn" class="icon-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <section class="settings-section">
+          <h3>Data Management</h3>
+
+          <div class="export-import-container">
+            <p class="section-description">
+              Backup your workout data or restore from a previous backup.
+            </p>
+
+            <button id="export-data-btn" class="btn-secondary btn-large">
+              📤 Export All Data
+            </button>
+
+            <button id="import-data-btn" class="btn-secondary btn-large">
+              📥 Import Data
+            </button>
+
+            <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+          </div>
+
+          <div id="data-summary" class="data-summary" style="display: none;">
+            <!-- Populated when showing import preview -->
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <h3>About</h3>
+          <p class="about-text">
+            BUILD Workout Tracker v1.0<br>
+            Zero-dependency PWA for progressive overload tracking
+          </p>
+        </section>
+      </div>
     </div>
   </div>
 

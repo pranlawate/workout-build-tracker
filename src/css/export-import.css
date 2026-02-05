@@ -1,0 +1,79 @@
+/* src/css/export-import.css */
+
+.settings-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.settings-section h3 {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+.section-description {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin-bottom: var(--spacing-md);
+}
+
+.export-import-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:active {
+  background: var(--color-surface-light);
+}
+
+.data-summary {
+  background: var(--color-surface);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.data-summary h4 {
+  font-size: var(--font-md);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.data-summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-xs) 0;
+  font-size: var(--font-sm);
+}
+
+.data-summary-label {
+  color: var(--color-text-dim);
+}
+
+.data-summary-value {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.import-warning {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: 8px;
+  padding: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  color: var(--color-danger);
+  font-size: var(--font-sm);
+}
+
+.about-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  line-height: 1.6;
+}
