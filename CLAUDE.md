@@ -25,3 +25,18 @@
 - For state bugs: Create diagnostic scripts in `/tmp/` to inspect localStorage
 - Manual reset: Provide console commands when automatic fixes fail
 - Always use systematic debugging (root cause first, then fix)
+
+## Performance Analyzer Module
+
+- Read-only module pattern: Never modifies localStorage, only reads via `StorageManager`
+- Conservative thresholds: 2+ sessions required, 25% rep drops, 50% variance
+- Null safety critical: Always guard `history?.sets?.length` before accessing
+- Detection methods return `{ status: 'good'|'warning'|'alert', message, pattern }` or `null`
+- Division by zero protection: Check `avgReps === 0` before dividing
+
+## Module Architecture Patterns
+
+- Dependency injection: Pass `StorageManager` to constructors (e.g., `new PerformanceAnalyzer(this.storage)`)
+- ES6 modules: Use `export class` and `import { ClassName }` syntax
+- Initialize in App constructor: Add managers after storage/workoutManager/deloadManager
+- Method naming: camelCase for methods, PascalCase for classes
