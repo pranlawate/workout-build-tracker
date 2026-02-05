@@ -47,7 +47,8 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 2.5,
         tempo: '2 sec down, 1 sec up',
-        notes: 'Primary: Chest, Secondary: Front delts, triceps'
+        notes: 'Primary: Chest, Secondary: Front delts, triceps',
+        machineOk: true
       },
       {
         name: 'Seated Cable Row',
@@ -57,7 +58,8 @@ export const WORKOUTS = {
         startingWeight: 22.5,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Mid back (lats, rhomboids)'
+        notes: 'Primary: Mid back (lats, rhomboids)',
+        machineOk: true
       },
       {
         name: 'DB Chest Fly',
@@ -67,7 +69,8 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 1.25,
         tempo: '3 sec down (stretch), 1 sec up',
-        notes: 'Primary: Chest (horizontal adduction)'
+        notes: 'Primary: Chest (horizontal adduction)',
+        machineOk: true
       },
       {
         name: 'T-Bar Row',
@@ -77,7 +80,8 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Back thickness (lats, traps)'
+        notes: 'Primary: Back thickness (lats, traps)',
+        machineOk: true
       },
       {
         name: 'DB Lateral Raises',
@@ -87,7 +91,8 @@ export const WORKOUTS = {
         startingWeight: 3.5,
         weightIncrement: 1.25,
         tempo: '2 sec up, 3 sec down',
-        notes: 'Primary: Side delts'
+        notes: 'Primary: Side delts',
+        machineOk: false
       },
       {
         name: 'Face Pulls',
@@ -97,7 +102,8 @@ export const WORKOUTS = {
         startingWeight: 12.5,
         weightIncrement: 2.5,
         tempo: 'Controlled, external rotation',
-        notes: 'Rotator cuff health (stiff shoulders)'
+        notes: 'Rotator cuff health (stiff shoulders)',
+        machineOk: true
       },
       {
         name: 'Band Pull-Aparts',
@@ -107,7 +113,8 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: '1 sec apart, 2 sec together',
-        notes: 'Rotator cuff activation'
+        notes: 'Rotator cuff activation',
+        machineOk: false
       }
     ]
   },
@@ -125,7 +132,8 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Quad development (weak legs)'
+        notes: 'Quad development (weak legs)',
+        machineOk: true
       },
       {
         name: 'Leg Curl',
@@ -135,7 +143,8 @@ export const WORKOUTS = {
         startingWeight: 17.5,
         weightIncrement: 2.5,
         tempo: '2 sec curl, 3 sec return',
-        notes: 'Primary: Hamstrings'
+        notes: 'Primary: Hamstrings',
+        machineOk: true
       },
       {
         name: 'Leg Extension',
@@ -145,7 +154,8 @@ export const WORKOUTS = {
         startingWeight: 17.5,
         weightIncrement: 2.5,
         tempo: '2 sec extend, 3 sec return',
-        notes: 'Do AFTER squats (pre-exhaustion safer)'
+        notes: 'Do AFTER squats (pre-exhaustion safer)',
+        machineOk: true
       },
       {
         name: '45° Hyperextension',
@@ -155,7 +165,8 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 2.5,
         tempo: '3-4 sec down, 2 sec up',
-        notes: 'CRITICAL: Lower back weakness - NOT to failure'
+        notes: 'CRITICAL: Lower back weakness - NOT to failure',
+        machineOk: false
       },
       {
         name: 'Standing Calf Raise',
@@ -165,7 +176,8 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: 'Explosive up (1 sec), controlled down (2 sec)',
-        notes: 'Gastrocnemius (fast-twitch)'
+        notes: 'Gastrocnemius (fast-twitch)',
+        machineOk: true
       },
       {
         name: 'Plank',
@@ -175,7 +187,8 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 2.5,
         tempo: 'Hold with proper breathing',
-        notes: 'Core strength for lower back health'
+        notes: 'Core strength for lower back health',
+        machineOk: false
       }
     ]
   },
@@ -193,7 +206,8 @@ export const WORKOUTS = {
         startingWeight: 22.5,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Lats (back width)'
+        notes: 'Primary: Lats (back width)',
+        machineOk: true
       },
       {
         name: 'DB Shoulder Press',
@@ -203,7 +217,8 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 1.25,
         tempo: '2 sec press, 2 sec down',
-        notes: 'Primary: Shoulders (anterior/lateral delts)'
+        notes: 'Primary: Shoulders (anterior/lateral delts)',
+        machineOk: true
       },
       {
         name: 'Chest-Supported Row',
@@ -213,7 +228,8 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Back thickness'
+        notes: 'Primary: Back thickness',
+        machineOk: true
       },
       {
         name: 'Incline DB Press',
@@ -223,7 +239,8 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 2.5,
         tempo: '2 sec down, 1 sec up',
-        notes: 'Upper chest emphasis'
+        notes: 'Upper chest emphasis',
+        machineOk: true
       },
       {
         name: 'Reverse Fly',
@@ -233,7 +250,8 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 1.25,
         tempo: 'Controlled, focus on rear delts',
-        notes: 'Rear delts, rotator cuff'
+        notes: 'Rear delts, rotator cuff',
+        machineOk: true
       },
       {
         name: 'Band Pull-Aparts',
@@ -243,7 +261,8 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: '1 sec apart, 2 sec together',
-        notes: 'Rotator cuff activation'
+        notes: 'Rotator cuff activation',
+        machineOk: false
       },
       {
         name: 'Dead Bug',
@@ -253,7 +272,8 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: 'Controlled alternating',
-        notes: 'Core stability, lower back health'
+        notes: 'Core stability, lower back health',
+        machineOk: false
       }
     ]
   },
@@ -271,7 +291,8 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Full leg compound'
+        notes: 'Full leg compound',
+        machineOk: false
       },
       {
         name: 'DB Romanian Deadlift',
@@ -281,7 +302,8 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Hamstrings, glutes, lower back'
+        notes: 'Hamstrings, glutes, lower back',
+        machineOk: false
       },
       {
         name: 'Leg Abduction',
@@ -291,7 +313,8 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         tempo: '2 sec out, 2 sec in',
-        notes: 'Hip abductors (glute medius)'
+        notes: 'Hip abductors (glute medius)',
+        machineOk: true
       },
       {
         name: 'Hip Thrust',
@@ -301,7 +324,8 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: '1 sec up, 2 sec down, 1 sec squeeze',
-        notes: 'Primary: Glutes'
+        notes: 'Primary: Glutes',
+        machineOk: true
       },
       {
         name: 'Seated Calf Raise',
@@ -311,7 +335,8 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 5,
         tempo: '3-5 sec (slow-twitch focus)',
-        notes: 'Soleus (slow-twitch dominant)'
+        notes: 'Soleus (slow-twitch dominant)',
+        machineOk: true
       },
       {
         name: 'Side Plank',
@@ -321,7 +346,8 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: 'Hold stable',
-        notes: 'Obliques, glute medius'
+        notes: 'Obliques, glute medius',
+        machineOk: false
       }
     ]
   }

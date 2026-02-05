@@ -93,6 +93,13 @@
   border-radius: 6px;
 }
 
+/* Exercise Badges Container */
+.exercise-badges {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
 /* Progression Badges */
 .progression-badge {
   display: inline-block;
@@ -184,4 +191,20 @@
 
 .rir-help:hover {
   opacity: 1;
+}
+
+/* Machine Badge */
+.machine-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 12px;
+  background: rgba(33, 150, 243, 0.2);
+  border: 1px solid rgba(33, 150, 243, 0.5);
+  border-radius: 4px;
+  color: var(--color-info);
+  cursor: help;
+}
+
+.machine-badge:hover {
+  background: rgba(33, 150, 243, 0.3);
 }

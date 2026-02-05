@@ -235,7 +235,10 @@ class App {
         <div class="exercise-item ${stateClass}" data-exercise-index="${index}">
           <div class="exercise-header">
             <h3 class="exercise-name">${this.escapeHtml(exercise.name)}</h3>
-            ${this.renderProgressionBadge(exercise, history)}
+            <div class="exercise-badges">
+              ${this.renderProgressionBadge(exercise, history)}
+              ${exercise.machineOk ? '<span class="machine-badge" title="Machine version OK when fatigued">ℹ️ Machine OK</span>' : ''}
+            </div>
           </div>
 
           <p class="exercise-meta">
