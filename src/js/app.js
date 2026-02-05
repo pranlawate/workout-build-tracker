@@ -1199,13 +1199,15 @@ class App {
     ).length;
 
     // If not all exercises are completed, show warning
-    if (completedCount < totalExercises) {
+    const isPartialWorkout = completedCount < totalExercises;
+
+    if (isPartialWorkout) {
       const incompleteExercises = this.currentWorkout.exercises
         .map((ex, idx) => ({ name: ex.name, completed: this.isExerciseCompleted(idx) }))
         .filter(ex => !ex.completed)
         .map(ex => ex.name);
 
-      const confirmMessage = `⚠️ Incomplete Workout\n\nYou've completed ${completedCount} of ${totalExercises} exercises.\n\nIncomplete exercises:\n${incompleteExercises.map(name => `• ${name}`).join('\n')}\n\nDo you want to finish the workout anyway?\n\n✅ YES - Save partial workout\n❌ NO - Continue training`;
+      const confirmMessage = `⚠️ Incomplete Workout\n\nYou've completed ${completedCount} of ${totalExercises} exercises.\n\nIncomplete exercises:\n${incompleteExercises.map(name => `• ${name}`).join('\n')}\n\nDo you want to save this partial workout?\n\nNote: This will save your progress but won't:\n• Advance to next workout\n• Update recovery tracking\n• Count toward your streak\n\n✅ YES - Save partial workout\n❌ NO - Continue training`;
 
       if (!confirm(confirmMessage)) {
         return; // User chose to continue training
@@ -1234,11 +1236,17 @@ class App {
         }
       });
 
-      // Update workflow rotation
-      this.workoutManager.completeWorkout(this.currentWorkout.name);
+      // Only update rotation and recovery if workout is complete
+      if (!isPartialWorkout) {
+        this.workoutManager.completeWorkout(this.currentWorkout.name);
+      }
 
-      // Show confirmation and return home
-      alert(`✅ ${this.currentWorkout.displayName} completed!`);
+      // Show appropriate confirmation message
+      if (isPartialWorkout) {
+        alert(`💾 Partial workout saved!\n\n${completedCount} of ${totalExercises} exercises completed.\n\nNext time you'll continue with ${this.currentWorkout.displayName}.`);
+      } else {
+        alert(`✅ ${this.currentWorkout.displayName} completed!`);
+      }
 
       this.showHomeScreen();
     } catch (error) {
