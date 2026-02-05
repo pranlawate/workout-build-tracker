@@ -1265,8 +1265,13 @@ class App {
   deleteEntry(exerciseKey, index) {
     const history = this.storage.getExerciseHistory(exerciseKey);
 
-    if (confirm('Delete this workout entry? This cannot be undone.')) {
-      history.splice(index, 1);
+    // Calculate reversed index (index passed is display index, not array index)
+    const reversedIndex = history.length - 1 - index;
+    const entry = history[reversedIndex];
+    const date = new Date(entry.date).toLocaleDateString();
+
+    if (confirm(`Delete workout from ${date}?\n\nThis cannot be undone.`)) {
+      history.splice(reversedIndex, 1);
       this.storage.saveExerciseHistory(exerciseKey, history);
 
       // Re-render detail screen
@@ -1276,6 +1281,8 @@ class App {
 
   showSettingsModal() {
     const modal = document.getElementById('settings-modal');
+    const fileInput = document.getElementById('import-file-input');
+
     if (modal) {
       modal.style.display = 'flex';
     }
@@ -1283,7 +1290,13 @@ class App {
     // Attach handlers
     const closeBtn = document.getElementById('settings-close-btn');
     if (closeBtn) {
-      closeBtn.onclick = () => modal.style.display = 'none';
+      closeBtn.onclick = () => {
+        modal.style.display = 'none';
+        // Reset file input when closing modal
+        if (fileInput) {
+          fileInput.value = '';
+        }
+      };
     }
 
     const exportBtn = document.getElementById('export-data-btn');
@@ -1296,7 +1309,6 @@ class App {
       importBtn.onclick = () => this.handleImportClick();
     }
 
-    const fileInput = document.getElementById('import-file-input');
     if (fileInput) {
       fileInput.onchange = (e) => this.handleImportFile(e);
     }
@@ -1305,20 +1317,32 @@ class App {
   handleExport() {
     try {
       const jsonData = exportWorkoutData(this.storage);
+
+      // Validate JSON before creating blob
+      try {
+        JSON.parse(jsonData);
+      } catch (parseError) {
+        throw new Error('Invalid JSON data generated');
+      }
+
       const blob = new Blob([jsonData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement('a');
       a.href = url;
       a.download = `workout-data-${new Date().toISOString().split('T')[0]}.json`;
+
+      // Append to DOM to ensure click works in all browsers
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
 
       URL.revokeObjectURL(url);
 
       alert('✅ Data exported successfully');
     } catch (error) {
       console.error('Export failed:', error);
-      alert('❌ Export failed. Please try again.');
+      alert(`❌ Export failed: ${error.message}\n\nPlease check the console for details.`);
     }
   }
 
