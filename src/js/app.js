@@ -577,11 +577,9 @@ class App {
     if (set.weight > 0 && set.reps > 0 && set.rir >= 0) {
       this.checkSetProgression(exerciseIndex, setIndex);
 
-      // Unlock next set
-      this.unlockNextSet(exerciseIndex, setIndex);
-
-      // Check if all sets completed for current exercise
-      this.checkExerciseCompletion(exerciseIndex);
+      // Note: We don't unlock next set or check exercise completion here
+      // These should only happen when LOG SET button is clicked
+      // This prevents premature advancement when user is just typing values
     }
   }
 
