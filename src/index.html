@@ -313,6 +313,35 @@
     </div>
   </div>
 
+  <!-- Pain Tracking Modal -->
+  <div id="pain-tracking-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3 id="pain-exercise-title">Exercise Complete</h3>
+      <p class="pain-question">Any pain or discomfort during this exercise?</p>
+
+      <div class="pain-severity-buttons">
+        <button id="pain-no" class="btn btn-success">No</button>
+        <button id="pain-minor" class="btn btn-warning">Yes, minor</button>
+        <button id="pain-significant" class="btn btn-danger">Yes, significant</button>
+      </div>
+
+      <div id="pain-location-section" style="display: none;">
+        <p class="pain-location-label">Where?</p>
+        <div class="pain-location-buttons">
+          <button class="pain-location-btn btn-secondary" data-location="shoulder">Shoulder</button>
+          <button class="pain-location-btn btn-secondary" data-location="elbow">Elbow</button>
+          <button class="pain-location-btn btn-secondary" data-location="wrist">Wrist</button>
+          <button class="pain-location-btn btn-secondary" data-location="lower_back">Lower back</button>
+          <button class="pain-location-btn btn-secondary" data-location="knee">Knee</button>
+          <button class="pain-location-btn btn-secondary" data-location="hip">Hip</button>
+          <button class="pain-location-btn btn-secondary" data-location="other">Other</button>
+        </div>
+      </div>
+
+      <p id="pain-history" class="pain-history"></p>
+    </div>
+  </div>
+
   <script type="module" src="js/app.js"></script>
 
   <!-- Service Worker Registration -->

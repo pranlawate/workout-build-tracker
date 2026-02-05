@@ -289,6 +289,45 @@ body {
   letter-spacing: 0.2em;
 }
 
+/* Pain Tracking Modal */
+.pain-question {
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.pain-severity-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.pain-severity-buttons button {
+  flex: 1;
+}
+
+.pain-location-label {
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.pain-location-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.pain-history {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+  text-align: center;
+}
+
 /* Mobile optimizations */
 @media (max-width: 400px) {
   .screen-content {

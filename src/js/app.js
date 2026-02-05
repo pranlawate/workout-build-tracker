@@ -1090,16 +1090,19 @@ class App {
   }
 
   advanceToNextExercise() {
-    // Don't advance past last exercise
-    if (this.currentExerciseIndex >= this.currentWorkout.exercises.length - 1) {
-      return;
-    }
-
-    // Check for mobility prompt BEFORE advancing
+    // Get completed exercise info FIRST (before early return)
     const justCompletedIndex = this.currentExerciseIndex;
     const justCompletedExercise = this.currentWorkout.exercises[justCompletedIndex];
     const exerciseKey = `${this.currentWorkout.name} - ${justCompletedExercise.name}`;
+
+    // ALWAYS show mobility and pain tracking prompts for completed exercises
     this.showMobilityCheckIfNeeded(exerciseKey);
+    this.showPainTrackingPrompt(exerciseKey, justCompletedExercise.name);
+
+    // Don't advance past last exercise (but prompts still shown above)
+    if (this.currentExerciseIndex >= this.currentWorkout.exercises.length - 1) {
+      return;
+    }
 
     // Update state classes without re-rendering (preserves session data)
     const allExercises = document.querySelectorAll('.exercise-item');
@@ -1763,6 +1766,66 @@ class App {
       this.storage.saveMobilityCheck(checkConfig.criteriaKey, 'not_sure');
       modal.style.display = 'none';
     };
+  }
+
+  showPainTrackingPrompt(exerciseKey, exerciseName) {
+    const modal = document.getElementById('pain-tracking-modal');
+    const titleEl = document.getElementById('pain-exercise-title');
+    const locationSection = document.getElementById('pain-location-section');
+    const historyEl = document.getElementById('pain-history');
+
+    // Set title
+    titleEl.textContent = `${exerciseName} Complete`;
+
+    // Show recent pain history
+    const history = this.storage.getPainHistory(exerciseKey);
+    const recent = history.slice(-5);
+    const icons = recent.map(p => p.hadPain ? '⚠️' : '✓');
+    const painCount = recent.filter(p => p.hadPain).length;
+
+    if (painCount === 0) {
+      historyEl.textContent = `Recent history: ${icons.join('')} (pain-free)`;
+      historyEl.style.color = '#4caf50';
+    } else {
+      historyEl.textContent = `Recent history: ${icons.join('')} (${painCount} painful sessions)`;
+      historyEl.style.color = '#ff9800';
+    }
+
+    // Initially hide location section
+    locationSection.style.display = 'none';
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // "No pain" button
+    document.getElementById('pain-no').onclick = () => {
+      this.storage.savePainReport(exerciseKey, false, null, null);
+      modal.style.display = 'none';
+    };
+
+    // "Yes, minor" button
+    document.getElementById('pain-minor').onclick = () => {
+      locationSection.style.display = 'block';
+      this.setupLocationSelection(exerciseKey, 'minor', modal);
+    };
+
+    // "Yes, significant" button
+    document.getElementById('pain-significant').onclick = () => {
+      locationSection.style.display = 'block';
+      this.setupLocationSelection(exerciseKey, 'significant', modal);
+    };
+  }
+
+  setupLocationSelection(exerciseKey, severity, modal) {
+    const locationButtons = document.querySelectorAll('.pain-location-btn');
+
+    locationButtons.forEach(btn => {
+      btn.onclick = () => {
+        const location = btn.dataset.location;
+        this.storage.savePainReport(exerciseKey, true, location, severity);
+        modal.style.display = 'none';
+      };
+    });
   }
 
   completeWorkout() {
