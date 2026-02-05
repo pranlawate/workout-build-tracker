@@ -1,7 +1,7 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
 import { getWorkout } from './modules/workouts.js';
-import { getProgressionStatus, shouldIncreaseWeight, getNextWeight } from './modules/progression.js';
+import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 
 class App {
   constructor() {
@@ -101,6 +101,14 @@ class App {
     if (completeBtn) {
       completeBtn.addEventListener('click', () => this.completeWorkout());
     }
+
+    // Placeholder buttons (not yet implemented)
+    const placeholderButtons = document.querySelectorAll('.action-btn, #settings-btn');
+    placeholderButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        alert('⏳ This feature is coming soon!\n\nCurrently available:\n✅ Workout logging\n✅ Progression tracking\n✅ Offline mode');
+      });
+    });
   }
 
   startWorkout() {
@@ -321,7 +329,7 @@ class App {
 
     if (status === 'normal' && lastWorkout?.sets?.length > 0) {
       const lastSet = lastWorkout.sets[lastWorkout.sets.length - 1];
-      const [min, max] = exercise.repRange.split('-').map(Number);
+      const [, max] = exercise.repRange.split('-').map(Number);
 
       if (lastSet.reps < max) {
         return `<p class="progression-hint">Keep weight, aim for ${max} reps on all sets</p>`;
