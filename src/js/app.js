@@ -605,9 +605,29 @@ class App {
     const reps = parseInt(repsInput?.value);
     const rir = parseInt(rirInput?.value);
 
-    // Validate all fields are filled
-    if (!weight || weight <= 0 || !reps || reps <= 0 || rir === undefined || isNaN(rir)) {
-      alert('Please fill in all fields (Weight, Reps, RIR) before logging set');
+    // Validate all fields are filled with detailed error messages
+    const missingFields = [];
+    if (!weightInput) missingFields.push('Weight input not found');
+    else if (!weight || weight <= 0) missingFields.push('Weight');
+
+    if (!repsInput) missingFields.push('Reps input not found');
+    else if (!reps || reps <= 0) missingFields.push('Reps');
+
+    if (!rirInput) missingFields.push('RIR input not found');
+    else if (rir === undefined || isNaN(rir)) missingFields.push('RIR');
+
+    if (missingFields.length > 0) {
+      alert(`Please fill in: ${missingFields.join(', ')}`);
+      console.log('Debug - Looking for inputs:', {
+        exerciseIndex,
+        setIndex,
+        weightInput,
+        repsInput,
+        rirInput,
+        weight,
+        reps,
+        rir
+      });
       return;
     }
 
