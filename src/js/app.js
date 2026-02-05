@@ -1268,14 +1268,95 @@ class App {
     // Calculate reversed index (index passed is display index, not array index)
     const reversedIndex = history.length - 1 - index;
     const entry = history[reversedIndex];
-    const date = new Date(entry.date).toLocaleDateString();
+    const deletedDate = entry.date;
+    const date = new Date(deletedDate).toLocaleDateString();
 
     if (confirm(`Delete workout from ${date}?\n\nThis cannot be undone.`)) {
+      // Remove the entry
       history.splice(reversedIndex, 1);
       this.storage.saveExerciseHistory(exerciseKey, history);
 
+      // Check if we need to roll back rotation state
+      this.checkAndRollbackRotation(exerciseKey, deletedDate);
+
       // Re-render detail screen
       this.exerciseDetailScreen.render(exerciseKey);
+    }
+  }
+
+  checkAndRollbackRotation(deletedExerciseKey, deletedDate) {
+    const rotation = this.storage.getRotation();
+
+    // Step 1: Check if deleted entry was from the most recent completed workout
+    if (!rotation.lastDate) return;
+
+    const deletedDateObj = new Date(deletedDate);
+    const lastWorkoutDateObj = new Date(rotation.lastDate);
+
+    // Compare dates (same day)
+    if (deletedDateObj.toDateString() !== lastWorkoutDateObj.toDateString()) {
+      return; // Deleted entry is from an older workout, don't roll back
+    }
+
+    // Step 2: Determine which workout this exercise belonged to
+    const workoutName = deletedExerciseKey.split(' - ')[0]; // e.g., "UPPER_A"
+    const workout = getWorkout(workoutName);
+
+    if (!workout) return;
+
+    // Step 3: Check if ANY exercises from that workout still have history for that date
+    const hasRemainingExercises = workout.exercises.some(exercise => {
+      const key = `${workoutName} - ${exercise.name}`;
+      const history = this.storage.getExerciseHistory(key);
+      return history.some(h =>
+        new Date(h.date).toDateString() === deletedDateObj.toDateString()
+      );
+    });
+
+    if (hasRemainingExercises) {
+      return; // Other exercises from that session still exist, don't roll back
+    }
+
+    // Step 4: All exercises from that workout session are deleted - roll back rotation
+    console.log('Rolling back rotation state - all exercises from last workout deleted');
+
+    // Decrement streak
+    rotation.currentStreak = Math.max(0, rotation.currentStreak - 1);
+
+    // Remove last workout from sequence
+    if (rotation.sequence && rotation.sequence.length > 0) {
+      const removedWorkout = rotation.sequence[rotation.sequence.length - 1];
+      rotation.sequence = rotation.sequence.slice(0, -1);
+
+      // Check if removing this workout affects cycle count
+      // (If the sequence no longer contains a full cycle)
+      const hadFullCycle = this.workoutManager.detectFullCycle([...rotation.sequence, removedWorkout]);
+      const hasFullCycleNow = this.workoutManager.detectFullCycle(rotation.sequence);
+
+      if (hadFullCycle && !hasFullCycleNow && rotation.cycleCount > 0) {
+        rotation.cycleCount--;
+      }
+    }
+
+    // Reverse nextSuggested to the workout that was just deleted
+    // (This becomes the "current" workout again)
+    rotation.nextSuggested = workoutName;
+
+    // Clear lastDate since we're rolling back to before this workout
+    if (rotation.sequence && rotation.sequence.length > 0) {
+      // Find the date of the previous workout if it exists
+      // For now, just clear it - the next workout completion will set it
+      rotation.lastDate = null;
+    } else {
+      rotation.lastDate = null;
+    }
+
+    this.storage.saveRotation(rotation);
+
+    // Refresh home screen if it's visible to show updated state
+    const homeScreen = document.getElementById('home-screen');
+    if (homeScreen && homeScreen.classList.contains('active')) {
+      this.updateHomeScreen();
     }
   }
 
