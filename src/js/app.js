@@ -967,11 +967,23 @@ class App {
       return;
     }
 
-    // Increment index
-    this.currentExerciseIndex++;
+    // Update state classes without re-rendering (preserves session data)
+    const allExercises = document.querySelectorAll('.exercise-item');
 
-    // Re-render to update state classes
-    this.renderExercises();
+    allExercises.forEach((exerciseEl, index) => {
+      exerciseEl.classList.remove('current', 'completed', 'upcoming');
+
+      if (index < this.currentExerciseIndex + 1) {
+        exerciseEl.classList.add('completed');
+      } else if (index === this.currentExerciseIndex + 1) {
+        exerciseEl.classList.add('current');
+      } else {
+        exerciseEl.classList.add('upcoming');
+      }
+    });
+
+    // Increment index after updating classes
+    this.currentExerciseIndex++;
 
     // Scroll to current exercise
     const currentExercise = document.querySelector('.exercise-item.current');
@@ -989,8 +1001,20 @@ class App {
     // Update current exercise index
     this.currentExerciseIndex = exerciseIndex;
 
-    // Re-render to update state classes
-    this.renderExercises();
+    // Update state classes without re-rendering (preserves session data)
+    const allExercises = document.querySelectorAll('.exercise-item');
+
+    allExercises.forEach((exerciseEl, index) => {
+      exerciseEl.classList.remove('current', 'completed', 'upcoming');
+
+      if (index < this.currentExerciseIndex) {
+        exerciseEl.classList.add('completed');
+      } else if (index === this.currentExerciseIndex) {
+        exerciseEl.classList.add('current');
+      } else {
+        exerciseEl.classList.add('upcoming');
+      }
+    });
 
     // Scroll to current exercise
     const currentExercise = document.querySelector('.exercise-item.current');
