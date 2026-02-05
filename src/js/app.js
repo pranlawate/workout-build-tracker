@@ -148,11 +148,72 @@ class App {
 
   startWorkout() {
     const nextWorkoutName = this.workoutManager.getNextWorkout();
-    this.currentWorkout = getWorkout(nextWorkoutName);
+
+    // Check muscle recovery
+    const recoveryCheck = this.workoutManager.checkMuscleRecovery(nextWorkoutName);
+
+    if (recoveryCheck.warn) {
+      this.showRecoveryWarning(nextWorkoutName, recoveryCheck);
+      return; // Don't start workout yet
+    }
+
+    // Proceed with workout start
+    this.proceedWithWorkout(nextWorkoutName);
+  }
+
+  showRecoveryWarning(workoutName, recoveryCheck) {
+    const modal = document.getElementById('recovery-modal');
+    const body = document.getElementById('recovery-modal-body');
+
+    const rotation = this.storage.getRotation();
+    const lastDate = new Date(rotation.lastDate);
+    const hoursAgo = Math.floor((new Date() - lastDate) / (1000 * 60 * 60));
+
+    body.innerHTML = `
+      <p class="recovery-time">Last workout: ${hoursAgo} hours ago</p>
+
+      <div class="muscles-recovering">
+        <p><strong>Muscles still recovering:</strong></p>
+        <ul>
+          ${recoveryCheck.muscles.map(m => `
+            <li>• ${m.name}: Need ${m.hoursNeeded} more hours</li>
+          `).join('')}
+        </ul>
+      </div>
+
+      <div class="recovery-advice">
+        <p>Training too soon may:</p>
+        <ul>
+          <li>• Compromise form quality</li>
+          <li>• Limit performance gains</li>
+          <li>• Increase injury risk</li>
+        </ul>
+      </div>
+
+      <p class="recovery-recommendation">
+        <strong>Recommended:</strong> Wait until tomorrow (48hr mark)
+      </p>
+    `;
+
+    modal.style.display = 'flex';
+
+    // Attach handlers
+    document.getElementById('wait-recovery-btn').onclick = () => {
+      modal.style.display = 'none';
+    };
+
+    document.getElementById('train-anyway-btn').onclick = () => {
+      modal.style.display = 'none';
+      this.proceedWithWorkout(workoutName);
+    };
+  }
+
+  proceedWithWorkout(workoutName) {
+    this.currentWorkout = getWorkout(workoutName);
     this.currentExerciseIndex = 0;
 
     if (!this.currentWorkout) {
-      console.error(`Cannot start workout: ${nextWorkoutName} not found`);
+      console.error(`Cannot start workout: ${workoutName} not found`);
       return;
     }
 

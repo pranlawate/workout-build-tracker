@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/workout-screen.css">
   <link rel="stylesheet" href="css/progressive-disclosure.css">
   <link rel="stylesheet" href="css/warm-up.css">
+  <link rel="stylesheet" href="css/recovery-modal.css">
 </head>
 <body>
   <div id="app">
@@ -77,6 +78,20 @@
           COMPLETE WORKOUT
         </button>
       </main>
+    </div>
+  </div>
+
+  <!-- Recovery Warning Modal -->
+  <div id="recovery-modal" class="modal" style="display: none;">
+    <div class="modal-content recovery-warning">
+      <h2>⚠️ Recovery Check</h2>
+      <div id="recovery-modal-body">
+        <!-- populated by JavaScript -->
+      </div>
+      <div class="modal-actions">
+        <button id="wait-recovery-btn" class="btn btn-primary">Wait Until Tomorrow</button>
+        <button id="train-anyway-btn" class="btn btn-secondary">Train Anyway - I Feel Great</button>
+      </div>
     </div>
   </div>
 
