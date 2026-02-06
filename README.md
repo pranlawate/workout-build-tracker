@@ -1,6 +1,6 @@
 # BUILD Workout Tracker
 
-![Tests](https://img.shields.io/badge/tests-110%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-134%20passing-brightgreen)
 ![Status](https://img.shields.io/badge/status-production-blue)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -37,7 +37,7 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 ✅ **Core Features (100% Complete)**
 - ✅ Backend modules (StorageManager, WorkoutManager, Progression Engine, DeloadManager)
-- ✅ Test infrastructure (110 tests passing - unit + integration)
+- ✅ Test infrastructure (134 tests passing - unit + integration)
 - ✅ Workout definitions (4 workouts, 26 exercises)
 - ✅ Progressive disclosure UI (collapse completed, hide upcoming, expand current)
 - ✅ PWA support (Service Worker, offline-first, installable)
@@ -107,7 +107,7 @@ workout-build-tracker/
 │   ├── modules/       # Core modules
 │   ├── screens/       # Screen components
 │   └── utils/         # Utilities
-├── tests/             # Test suite (110 tests)
+├── tests/             # Test suite (134 tests)
 └── docs/              # Documentation
 ```
 

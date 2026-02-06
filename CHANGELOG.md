@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-06
+
+### Added - Progress Dashboard 🎉
+
+**New Modules:**
+- **BodyWeightManager:** Body weight tracking with 8-week data retention and trend analysis
+- **ProgressAnalyzer:** Workout statistics, session time tracking, and exercise progression analysis
+- **WeightTrendChart:** Canvas-based chart visualization for body weight trends
+
+**Progress Dashboard Features:**
+- Last 4 weeks workout summary (workouts completed, avg session time, exercises progressed, current streak)
+- Top 3 progressing exercises with percentage gains
+- Body weight tracking with weekly weigh-in prompts
+- Body composition status indicator (Healthy Bulk/Fast Bulk/Maintenance/Cut phases)
+- 8-week trend visualization with moving average smoothing
+- Barbell progression readiness tracking (existing feature now integrated)
+
+**UI Components:**
+- Weekly weigh-in modal with validation (30-200 kg range, 0.1 kg precision)
+- Post-workout weigh-in prompts (7-day intervals)
+- Progress dashboard screen with responsive layout
+- Canvas chart rendering with dark theme integration
+- Empty state handling for all dashboard sections
+
+**Data Management:**
+- Automatic 8-week data trimming (prevents localStorage bloat)
+- Same-day weight entry replacement
+- Input validation (type checking, range validation, NaN rejection)
+- Session time tracking (startTime/endTime in exercise history)
+
+### Changed
+- Service worker cache updated to v5 (added 4 new files)
+- Exercise history now includes startTime and endTime fields
+- App.js extended with 4 new render methods for dashboard sections
+
+### Technical
+- 24 new unit tests (134 total tests, all passing)
+- New CSS file: `progress-dashboard.css` (173 lines)
+- Integration test report template created
+- Documentation updated (76% project completion)
+
+**Implementation:** 18 tasks completed via subagent-driven development with two-stage review (spec compliance + code quality)
+
+**Commits:** 19 clean commits following conventional format without AI attribution
+
+---
+
 ## [1.0.1] - 2026-02-05
 
 ### Added
