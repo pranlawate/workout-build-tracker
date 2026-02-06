@@ -107,4 +107,31 @@ describe('BodyWeightManager', () => {
       assert.strictEqual(data.entries.length, 0);
     });
   });
+
+  describe('trimTo8Weeks', () => {
+    test('should keep only last 8 weeks of entries', () => {
+      // Add entries spanning 10 weeks, starting 10 weeks ago
+      const now = new Date();
+      const startDate = new Date(now.getTime() - 10 * 7 * 24 * 60 * 60 * 1000);
+
+      for (let week = 0; week < 10; week++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + week * 7);
+        const isoDate = date.toISOString();
+        const data = bodyWeight.getData();
+        data.entries.push({ date: isoDate, weight_kg: 55.0 + week });
+        localStorage.setItem('build_body_weight', JSON.stringify(data));
+      }
+
+      bodyWeight.addEntry(65.0); // Triggers trim
+      const data = bodyWeight.getData();
+
+      // Should keep only entries from last 8 weeks
+      assert.ok(data.entries.length <= 9); // 8 old + 1 new
+      const oldestDate = new Date(data.entries[0].date);
+      const newestDate = new Date(data.entries[data.entries.length - 1].date);
+      const weeksDiff = (newestDate - oldestDate) / (7 * 24 * 60 * 60 * 1000);
+      assert.ok(weeksDiff <= 8);
+    });
+  });
 });
