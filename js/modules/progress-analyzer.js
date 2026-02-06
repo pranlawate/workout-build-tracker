@@ -137,4 +137,95 @@ export class ProgressAnalyzer {
       currentStreak: 0 // TODO: Calculate streak
     };
   }
+
+  /**
+   * Get top progressing exercises by comparing weights from 4 weeks ago to current
+   * @param {number} count - Number of exercises to return (default: 3)
+   * @returns {Array<Object>} Array of { exerciseName, percentGain }
+   */
+  getTopProgressingExercises(count = 3) {
+    try {
+      const { startDate, endDate } = this.getLast4WeeksRange();
+      const progressions = [];
+
+      // Loop through all exercises in localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith('build_exercise_')) continue;
+
+        const exerciseKey = key.replace('build_exercise_', '');
+        const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length === 0) continue;
+
+        // Get most recent session (must be within last 4 weeks)
+        const recentSession = history
+          .filter(session => {
+            const sessionDate = new Date(session.date);
+            return sessionDate >= startDate && sessionDate <= endDate;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+        if (!recentSession || !recentSession.sets || recentSession.sets.length === 0) continue;
+
+        // Find session from 4 weeks ago (around startDate)
+        const oldSession = history
+          .filter(session => {
+            const sessionDate = new Date(session.date);
+            // Look for sessions around the start date (within a few days)
+            const diffDays = Math.abs((sessionDate - startDate) / (1000 * 60 * 60 * 24));
+            return diffDays <= 3; // Within 3 days of 4 weeks ago
+          })
+          .sort((a, b) => {
+            // Get closest to startDate
+            const diffA = Math.abs(new Date(a.date) - startDate);
+            const diffB = Math.abs(new Date(b.date) - startDate);
+            return diffA - diffB;
+          })[0];
+
+        if (!oldSession || !oldSession.sets || oldSession.sets.length === 0) continue;
+
+        // Calculate average weight from sets
+        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + set.weight, 0) / recentSession.sets.length;
+        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + set.weight, 0) / oldSession.sets.length;
+
+        // Skip if no progression or division by zero
+        if (oldAvgWeight === 0 || recentAvgWeight <= oldAvgWeight) continue;
+
+        // Compute absolute and percentage gain
+        const absoluteGain = recentAvgWeight - oldAvgWeight;
+        const percentGain = Math.round((absoluteGain / oldAvgWeight) * 100);
+
+        // Extract exercise name (remove workout prefix like "UPPER_A - ")
+        const exerciseName = exerciseKey.includes(' - ')
+          ? exerciseKey.split(' - ')[1]
+          : exerciseKey;
+
+        progressions.push({
+          exerciseName,
+          percentGain,
+          absoluteGain // Used for sorting, removed before output
+        });
+      }
+
+      // Sort by: 1) percent gain desc, 2) absolute gain desc, 3) alphabetically
+      progressions.sort((a, b) => {
+        if (b.percentGain !== a.percentGain) {
+          return b.percentGain - a.percentGain;
+        }
+        if (b.absoluteGain !== a.absoluteGain) {
+          return b.absoluteGain - a.absoluteGain;
+        }
+        return a.exerciseName.localeCompare(b.exerciseName);
+      });
+
+      // Return top N, removing absoluteGain from output
+      return progressions.slice(0, count).map(({ exerciseName, percentGain }) => ({
+        exerciseName,
+        percentGain
+      }));
+    } catch (error) {
+      console.error('[ProgressAnalyzer] Error getting top progressing exercises:', error);
+      return [];
+    }
+  }
 }

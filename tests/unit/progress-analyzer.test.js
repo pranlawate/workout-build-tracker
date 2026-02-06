@@ -137,4 +137,122 @@ describe('ProgressAnalyzer', () => {
       assert.strictEqual(avgMinutes, 30);
     });
   });
+
+  describe('getTopProgressingExercises', () => {
+    test('should return empty array when no progression detected', () => {
+      // No exercise history
+      const result = analyzer.getTopProgressingExercises(3);
+      assert.ok(Array.isArray(result));
+      assert.strictEqual(result.length, 0);
+    });
+
+    test('should identify top progressing exercises with percentage gains', () => {
+      const fourWeeksAgo = new Date();
+      fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+      const today = new Date();
+
+      // Exercise 1: 100 lbs -> 120 lbs = 20% gain
+      storage.saveExerciseHistory('UPPER_A - Bench Press', [
+        {
+          date: fourWeeksAgo.toISOString().split('T')[0],
+          sets: [
+            { weight: 100, reps: 10, rir: 2 },
+            { weight: 100, reps: 9, rir: 3 }
+          ]
+        },
+        {
+          date: today.toISOString().split('T')[0],
+          sets: [
+            { weight: 120, reps: 10, rir: 2 },
+            { weight: 120, reps: 9, rir: 3 }
+          ]
+        }
+      ]);
+
+      // Exercise 2: 50 lbs -> 65 lbs = 30% gain
+      storage.saveExerciseHistory('LOWER_A - Squat', [
+        {
+          date: fourWeeksAgo.toISOString().split('T')[0],
+          sets: [
+            { weight: 50, reps: 8, rir: 2 }
+          ]
+        },
+        {
+          date: today.toISOString().split('T')[0],
+          sets: [
+            { weight: 65, reps: 8, rir: 2 }
+          ]
+        }
+      ]);
+
+      // Exercise 3: 80 lbs -> 88 lbs = 10% gain
+      storage.saveExerciseHistory('UPPER_B - Row', [
+        {
+          date: fourWeeksAgo.toISOString().split('T')[0],
+          sets: [
+            { weight: 80, reps: 12, rir: 1 }
+          ]
+        },
+        {
+          date: today.toISOString().split('T')[0],
+          sets: [
+            { weight: 88, reps: 12, rir: 1 }
+          ]
+        }
+      ]);
+
+      const result = analyzer.getTopProgressingExercises(3);
+
+      // Should be sorted by percentage gain: Squat (30%), Bench Press (20%), Row (10%)
+      assert.strictEqual(result.length, 3);
+      assert.strictEqual(result[0].exerciseName, 'Squat');
+      assert.strictEqual(result[0].percentGain, 30);
+      assert.strictEqual(result[1].exerciseName, 'Bench Press');
+      assert.strictEqual(result[1].percentGain, 20);
+      assert.strictEqual(result[2].exerciseName, 'Row');
+      assert.strictEqual(result[2].percentGain, 10);
+
+      // Should not include absoluteGain in output
+      assert.strictEqual(result[0].absoluteGain, undefined);
+    });
+
+    test('should handle ties by sorting by absolute weight gain', () => {
+      const fourWeeksAgo = new Date();
+      fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+      const today = new Date();
+
+      // Exercise 1: 100 lbs -> 120 lbs = 20% gain, +20 lbs
+      storage.saveExerciseHistory('UPPER_A - Bench Press', [
+        {
+          date: fourWeeksAgo.toISOString().split('T')[0],
+          sets: [{ weight: 100, reps: 10, rir: 2 }]
+        },
+        {
+          date: today.toISOString().split('T')[0],
+          sets: [{ weight: 120, reps: 10, rir: 2 }]
+        }
+      ]);
+
+      // Exercise 2: 50 lbs -> 60 lbs = 20% gain, +10 lbs (same % but lower absolute)
+      storage.saveExerciseHistory('LOWER_A - Squat', [
+        {
+          date: fourWeeksAgo.toISOString().split('T')[0],
+          sets: [{ weight: 50, reps: 8, rir: 2 }]
+        },
+        {
+          date: today.toISOString().split('T')[0],
+          sets: [{ weight: 60, reps: 8, rir: 2 }]
+        }
+      ]);
+
+      const result = analyzer.getTopProgressingExercises(3);
+
+      // Should be sorted by absolute gain when percentages are tied
+      assert.strictEqual(result.length, 2);
+      assert.strictEqual(result[0].exerciseName, 'Bench Press'); // +20 lbs
+      assert.strictEqual(result[0].percentGain, 20);
+      assert.strictEqual(result[1].exerciseName, 'Squat'); // +10 lbs
+      assert.strictEqual(result[1].percentGain, 20);
+    });
+  });
 });
