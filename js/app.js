@@ -2031,6 +2031,12 @@ class App {
       progressBackBtn.onclick = () => this.showHomeScreen();
     }
 
+    // Attach Log Weigh-In button (if shown in empty state)
+    const logWeighinBtn = document.getElementById('log-weighin-btn');
+    if (logWeighinBtn) {
+      logWeighinBtn.onclick = () => this.showWeighInModal();
+    }
+
     // Add to browser history
     if (pushHistory && window.history.state?.screen !== 'progress') {
       window.history.pushState({ screen: 'progress' }, '', '');
@@ -2219,7 +2225,17 @@ class App {
    */
   renderWeightChart(weightData) {
     if (!weightData || !weightData.entries || weightData.entries.length === 0) {
-      return ''; // Hide section if no data
+      return `
+        <div class="progress-section">
+          <h3 class="section-title">📈 Body Weight Trend</h3>
+          <div class="empty-state">
+            <p class="empty-state-icon">⚖️</p>
+            <p class="empty-state-text">No weight data yet</p>
+            <p class="empty-state-hint">Click 'Log Weigh-In' to start tracking your body weight.</p>
+            <button id="log-weighin-btn" class="btn btn-primary" style="margin-top: 16px;">Log Weigh-In</button>
+          </div>
+        </div>
+      `;
     }
 
     return `
