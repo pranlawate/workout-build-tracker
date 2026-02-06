@@ -171,4 +171,30 @@ describe('BodyWeightManager', () => {
       assert.strictEqual(summary.status, 'fast_bulk'); // >0.7kg/month
     });
   });
+
+  describe('isWeighInDue', () => {
+    test('should return true when no entries exist', () => {
+      assert.strictEqual(bodyWeight.isWeighInDue(), true);
+    });
+
+    test('should return false when last entry is recent (< 7 days)', () => {
+      const recentDate = new Date();
+      recentDate.setDate(recentDate.getDate() - 3); // 3 days ago
+      const data = bodyWeight.getData();
+      data.entries.push({ date: recentDate.toISOString(), weight_kg: 57.0 });
+      localStorage.setItem('build_body_weight', JSON.stringify(data));
+
+      assert.strictEqual(bodyWeight.isWeighInDue(), false);
+    });
+
+    test('should return true when last entry is old (> 7 days)', () => {
+      const oldDate = new Date();
+      oldDate.setDate(oldDate.getDate() - 10); // 10 days ago
+      const data = bodyWeight.getData();
+      data.entries.push({ date: oldDate.toISOString(), weight_kg: 57.0 });
+      localStorage.setItem('build_body_weight', JSON.stringify(data));
+
+      assert.strictEqual(bodyWeight.isWeighInDue(), true);
+    });
+  });
 });

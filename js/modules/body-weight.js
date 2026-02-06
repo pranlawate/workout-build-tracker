@@ -147,4 +147,17 @@ export class BodyWeightManager {
       entries: data.entries
     };
   }
+
+  /**
+   * Check if weigh-in is due (>7 days since last entry)
+   * @returns {boolean} True if weigh-in needed
+   */
+  isWeighInDue() {
+    const entries = this.getData().entries;
+    if (entries.length === 0) return true;
+
+    const lastEntry = new Date(entries[entries.length - 1].date);
+    const daysSince = (new Date() - lastEntry) / (1000 * 60 * 60 * 24);
+    return daysSince > 7;
+  }
 }
