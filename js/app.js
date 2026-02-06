@@ -1626,7 +1626,7 @@ class App {
       const data = bodyWeight.getData();
       const lastWeight = data.entries.length > 0
         ? data.entries[data.entries.length - 1].weight_kg
-        : 70;
+        : 57.5;
       input.value = lastWeight;
       input.select(); // Select text so user can type to replace
     }
@@ -2251,6 +2251,7 @@ class App {
         <div id="weight-chart-container" class="chart-container">
           <!-- Chart will be inserted here -->
         </div>
+        <button id="log-weighin-btn" class="btn btn-primary" style="margin-top: 16px; width: 100%;">Log Weigh-In</button>
       </div>
     `;
   }
