@@ -2118,6 +2118,12 @@ class App {
         alert(`✅ ${this.currentWorkout.displayName} completed!`);
       }
 
+      // Check if weigh-in is due
+      const bodyWeight = new BodyWeightManager(this.storage);
+      if (bodyWeight.isWeighInDue()) {
+        this.showWeighInModal();
+      }
+
       this.showHomeScreen();
     } catch (error) {
       console.error('Failed to save workout:', error);
