@@ -3,6 +3,7 @@ import { WorkoutManager } from './modules/workout-manager.js';
 import { DeloadManager } from './modules/deload.js';
 import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
 import { BarbellProgressionTracker } from './modules/barbell-progression-tracker.js';
+import { BodyWeightManager } from './modules/body-weight.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { HistoryListScreen } from './screens/history-list.js';
@@ -161,6 +162,9 @@ class App {
         break;
       case 'progress':
         this.showProgressDashboard(false);
+        break;
+      case 'weighin':
+        // Do nothing - modal already closed by closeSettingsModal
         break;
       default:
         this.showHomeScreen(false);
@@ -1599,6 +1603,54 @@ class App {
     // Reset file input when closing modal
     if (fileInput) {
       fileInput.value = '';
+    }
+  }
+
+  /**
+   * Show weigh-in modal
+   */
+  showWeighInModal() {
+    const modal = document.getElementById('weighin-modal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+
+    // Clear previous input
+    const input = document.getElementById('weight-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+
+    // Initialize BodyWeightManager
+    const bodyWeight = new BodyWeightManager(this.storage);
+
+    // Log weight button
+    const logBtn = document.getElementById('log-weight-btn');
+    if (logBtn) {
+      logBtn.onclick = () => {
+        const weight = parseFloat(input.value);
+        if (!weight || weight < 30 || weight > 200) {
+          alert('Please enter a valid weight between 30-200 kg');
+          return;
+        }
+
+        bodyWeight.addEntry(weight);
+        modal.style.display = 'none';
+      };
+    }
+
+    // Skip button
+    const skipBtn = document.getElementById('skip-weighin-btn');
+    if (skipBtn) {
+      skipBtn.onclick = () => {
+        modal.style.display = 'none';
+      };
+    }
+
+    // Add history state for browser back button
+    if (window.history.state?.screen !== 'weighin') {
+      window.history.pushState({ screen: 'weighin' }, '', '');
     }
   }
 
