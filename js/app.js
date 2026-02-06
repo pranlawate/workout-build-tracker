@@ -147,8 +147,9 @@ class App {
         this.showHomeScreen(false); // false = don't push to history
         break;
       case 'workout':
-        // Going back from workout - exit to home
-        this.showHomeScreen(false);
+        // Navigating TO workout screen (e.g., back from modal)
+        // Workout screen is already visible, modal already closed above
+        // Do nothing - just stay on workout screen
         break;
       case 'history':
         this.showHistoryScreen(false);
