@@ -139,6 +139,9 @@ class App {
   }
 
   navigateToScreen(screen, data = {}) {
+    // Always close modal when navigating (modals are overlays, not screens)
+    this.closeSettingsModal();
+
     switch (screen) {
       case 'home':
         this.showHomeScreen(false); // false = don't push to history
@@ -146,10 +149,6 @@ class App {
       case 'workout':
         // Going back from workout - exit to home
         this.showHomeScreen(false);
-        break;
-      case 'modal':
-        // Going back from modal - close it
-        this.closeSettingsModal();
         break;
       case 'history':
         this.showHistoryScreen(false);
@@ -445,10 +444,12 @@ class App {
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
 
-    const workoutScreen = document.getElementById('workout-screen');
+    // Hide all screens first (consistent with other navigation methods)
+    this.hideAllScreens();
+
+    // Show home screen
     const homeScreen = document.getElementById('home-screen');
-    if (workoutScreen && homeScreen) {
-      workoutScreen.classList.remove('active');
+    if (homeScreen) {
       homeScreen.classList.add('active');
     }
 
