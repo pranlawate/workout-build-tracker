@@ -53,7 +53,7 @@ export class BodyWeightManager {
     // Validate input
     if (typeof weight_kg !== 'number' || isNaN(weight_kg) || weight_kg <= 0) {
       console.error('[BodyWeightManager] Invalid weight:', weight_kg);
-      return;
+      return { success: false, replaced: false };
     }
 
     const data = this.getData();
@@ -66,12 +66,16 @@ export class BodyWeightManager {
       return entryDateString === todayDateString;
     });
 
+    let replaced = false;
     if (todayIndex !== -1) {
       // Replace existing entry for today
+      const oldWeight = data.entries[todayIndex].weight_kg;
       data.entries[todayIndex] = {
         date: now.toISOString(),
         weight_kg: weight_kg
       };
+      replaced = true;
+      console.log(`[BodyWeightManager] Replaced today's entry: ${oldWeight} kg → ${weight_kg} kg`);
     } else {
       // Add new entry
       data.entries.push({
@@ -87,6 +91,7 @@ export class BodyWeightManager {
     data.entries = this.trimTo8Weeks(data.entries);
 
     localStorage.setItem('build_body_weight', JSON.stringify(data));
+    return { success: true, replaced };
   }
 
   /**

@@ -1643,9 +1643,16 @@ class App {
           return;
         }
 
-        bodyWeight.addEntry(weight);
+        const result = bodyWeight.addEntry(weight);
         console.log('[WeighIn] Weight saved, data:', bodyWeight.getData());
         modal.style.display = 'none';
+
+        // Show feedback message
+        if (result.replaced) {
+          alert(`✅ Updated today's weight to ${weight} kg\n\n(Only one entry per day is kept)`);
+        } else {
+          alert(`✅ Weight logged: ${weight} kg`);
+        }
 
         // Refresh dashboard to show new data
         this.showProgressDashboard(false);
