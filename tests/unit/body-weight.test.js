@@ -46,14 +46,15 @@ describe('BodyWeightManager', () => {
       assert.ok(data.entries[0].date.includes('T')); // ISO format
     });
 
-    test('should keep entries sorted by date', () => {
+    test('should replace entry when adding on same day', () => {
       bodyWeight.addEntry(57.0);
       bodyWeight.addEntry(57.5);
       bodyWeight.addEntry(58.0);
       const data = bodyWeight.getData();
-      assert.strictEqual(data.entries.length, 3);
-      assert.strictEqual(data.entries[0].weight_kg, 57.0);
-      assert.strictEqual(data.entries[2].weight_kg, 58.0);
+      // Should only have 1 entry (same-day replacement)
+      assert.strictEqual(data.entries.length, 1);
+      // Should keep the last value
+      assert.strictEqual(data.entries[0].weight_kg, 58.0);
     });
 
     test('should sort entries by date when adding out of order', () => {

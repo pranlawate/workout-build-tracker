@@ -57,10 +57,28 @@ export class BodyWeightManager {
     }
 
     const data = this.getData();
-    data.entries.push({
-      date: new Date().toISOString(),
-      weight_kg: weight_kg
+    const now = new Date();
+    const todayDateString = now.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // Check if there's already an entry for today
+    const todayIndex = data.entries.findIndex(entry => {
+      const entryDateString = entry.date.split('T')[0];
+      return entryDateString === todayDateString;
     });
+
+    if (todayIndex !== -1) {
+      // Replace existing entry for today
+      data.entries[todayIndex] = {
+        date: now.toISOString(),
+        weight_kg: weight_kg
+      };
+    } else {
+      // Add new entry
+      data.entries.push({
+        date: now.toISOString(),
+        weight_kg: weight_kg
+      });
+    }
 
     // Sort entries by date to maintain chronological order
     data.entries.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -104,7 +122,9 @@ export class BodyWeightManager {
     const lastDate = new Date(lastEntry.date);
 
     const daysDiff = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
-    if (daysDiff === 0) return 0;
+
+    // Require at least 1 day between entries for meaningful rate calculation
+    if (daysDiff < 1) return 0;
 
     const weightChange = lastEntry.weight_kg - firstEntry.weight_kg;
     const monthlyRate = (weightChange / daysDiff) * 30; // Convert to per-month rate
