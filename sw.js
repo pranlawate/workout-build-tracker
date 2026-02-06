@@ -1,4 +1,4 @@
-const CACHE_NAME = 'build-tracker-v4';
+const CACHE_NAME = 'build-tracker-v5';
 const CACHE_URLS = [
   '/',
   '/index.html',
@@ -6,11 +6,15 @@ const CACHE_URLS = [
   '/css/components.css',
   '/css/screens.css',
   '/css/workout-screen.css',
+  '/css/progress-dashboard.css',
   '/js/app.js',
   '/js/modules/storage.js',
   '/js/modules/workouts.js',
   '/js/modules/progression.js',
   '/js/modules/workout-manager.js',
+  '/js/modules/progress-analyzer.js',
+  '/js/modules/body-weight.js',
+  '/js/components/weight-trend-chart.js',
   '/manifest.json',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png'
