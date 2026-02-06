@@ -4,6 +4,8 @@ import { DeloadManager } from './modules/deload.js';
 import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
 import { BarbellProgressionTracker } from './modules/barbell-progression-tracker.js';
 import { BodyWeightManager } from './modules/body-weight.js';
+import { ProgressAnalyzer } from './modules/progress-analyzer.js';
+import { WeightTrendChart } from './components/weight-trend-chart.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { HistoryListScreen } from './screens/history-list.js';
@@ -1980,13 +1982,18 @@ class App {
       progressScreen.classList.add('active');
     }
 
-    // Initialize tracker
+    // Initialize modules
     const tracker = new BarbellProgressionTracker(this.storage);
+    const progressAnalyzer = new ProgressAnalyzer(this.storage);
+    const bodyWeight = new BodyWeightManager(this.storage);
 
-    // Get readiness data
+    // Get data
     const benchReadiness = tracker.getBarbellBenchReadiness();
     const squatReadiness = tracker.getBarbellSquatReadiness();
     const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
+    const stats = progressAnalyzer.getLast4WeeksStats();
+    const strengthGains = progressAnalyzer.getTopProgressingExercises(3);
+    const weightData = bodyWeight.getWeightSummary();
 
     // Render dashboard
     const progressContent = document.getElementById('progress-content');
@@ -1994,12 +2001,28 @@ class App {
       progressContent.innerHTML = `
         <div class="progress-dashboard">
           <h3 class="dashboard-title">🎯 Equipment Progression Milestones</h3>
-
           ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
           ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
           ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
         </div>
+
+        ${this.renderSummaryStats(stats)}
+        ${this.renderStrengthGains(strengthGains)}
+        ${this.renderBodyComposition(weightData)}
+        ${this.renderWeightChart(weightData)}
       `;
+
+      // Render Canvas chart if weight data exists
+      if (weightData && weightData.entries) {
+        const chartContainer = document.getElementById('weight-chart-container');
+        if (chartContainer) {
+          const chart = new WeightTrendChart(350, 200);
+          const canvas = chart.render(weightData.entries);
+          if (canvas) {
+            chartContainer.appendChild(canvas);
+          }
+        }
+      }
     }
 
     // Attach back button
@@ -2008,8 +2031,8 @@ class App {
       progressBackBtn.onclick = () => this.showHomeScreen();
     }
 
-    // Push to browser history
-    if (pushHistory) {
+    // Add to browser history
+    if (pushHistory && window.history.state?.screen !== 'progress') {
       window.history.pushState({ screen: 'progress' }, '', '');
     }
   }
