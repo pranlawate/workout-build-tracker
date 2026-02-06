@@ -766,7 +766,9 @@ class App {
 
     // Check if this set is complete (has weight, reps, and RIR)
     const set = exercise.sets[setIndex];
-    if (set.weight > 0 && set.reps > 0 && set.rir >= 0) {
+    // For bodyweight exercises, weight can be 0
+    const hasValidWeight = typeof set.weight === 'number' && set.weight >= 0;
+    if (hasValidWeight && set.reps > 0 && set.rir >= 0) {
       this.checkSetProgression(exerciseIndex, setIndex);
 
       // Note: We don't unlock next set or check exercise completion here
@@ -779,6 +781,10 @@ class App {
     const button = event.target;
     const exerciseIndex = parseInt(button.dataset.exercise);
     const setIndex = parseInt(button.dataset.set);
+
+    // Get exercise definition to check if weight=0 is allowed
+    const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
+    const isBodyweightExercise = exerciseDef?.startingWeight === 0 && exerciseDef?.weightIncrement === 0;
 
     // Read values directly from input fields
     const weightInput = document.querySelector(
@@ -798,7 +804,13 @@ class App {
     // Validate all fields are filled with detailed error messages
     const missingFields = [];
     if (!weightInput) missingFields.push('Weight input not found');
-    else if (!weight || weight <= 0) missingFields.push('Weight');
+    else if (isBodyweightExercise) {
+      // Bodyweight/band exercises: weight can be 0, but must be a number
+      if (isNaN(weight) || weight < 0) missingFields.push('Weight');
+    } else {
+      // Weighted exercises: weight must be > 0
+      if (!weight || weight <= 0) missingFields.push('Weight');
+    }
 
     if (!repsInput) missingFields.push('Reps input not found');
     else if (!reps || reps <= 0) missingFields.push('Reps');
@@ -1142,8 +1154,9 @@ class App {
     if (!exerciseDef || !exerciseSession) return false;
 
     // Count completed sets (sets with all three values)
+    // For bodyweight exercises, weight can be 0
     const completedSets = exerciseSession.sets.filter(set =>
-      set && set.weight > 0 && set.reps > 0 && set.rir >= 0
+      set && typeof set.weight === 'number' && set.weight >= 0 && set.reps > 0 && set.rir >= 0
     ).length;
 
     // Exercise is completed if all required sets are logged
