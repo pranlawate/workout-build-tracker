@@ -2057,6 +2057,158 @@ class App {
     `;
   }
 
+  /**
+   * Render 4-week summary statistics card
+   * @param {Object} stats - Stats from ProgressAnalyzer
+   * @returns {string} HTML string
+   */
+  renderSummaryStats(stats) {
+    if (!stats || stats.workoutsCompleted === 0) {
+      return `
+        <div class="progress-section">
+          <h3 class="section-title">📅 Last 4 Weeks Summary</h3>
+          <p class="empty-state">Start training to see progress!</p>
+        </div>
+      `;
+    }
+
+    const weeksTracked = Math.min(4, Math.ceil(stats.workoutsCompleted / 3));
+    const needsMore = weeksTracked < 4
+      ? `<p class="note">${weeksTracked} weeks tracked (need 4 for full analysis)</p>`
+      : '';
+
+    return `
+      <div class="progress-section">
+        <h3 class="section-title">📅 Last 4 Weeks Summary</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-icon">✅</span>
+            <span class="stat-label">Workouts</span>
+            <span class="stat-value">${stats.workoutsCompleted}/${stats.workoutsPlanned}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-label">Avg time</span>
+            <span class="stat-value">${stats.avgSessionMinutes} min</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📊</span>
+            <span class="stat-label">Progressed</span>
+            <span class="stat-value">${stats.exercisesProgressed}/${stats.totalExercises}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">🔥</span>
+            <span class="stat-label">Streak</span>
+            <span class="stat-value">${stats.currentStreak} workouts</span>
+          </div>
+        </div>
+        ${needsMore}
+      </div>
+    `;
+  }
+
+  /**
+   * Render strength gains section
+   * @param {Array} exercises - Top progressing exercises
+   * @returns {string} HTML string
+   */
+  renderStrengthGains(exercises) {
+    if (!exercises || exercises.length === 0) {
+      return `
+        <div class="progress-section">
+          <h3 class="section-title">💪 Strength Gains</h3>
+          <p class="empty-state">No progression detected yet. Keep training!</p>
+        </div>
+      `;
+    }
+
+    const exerciseRows = exercises.map(ex => `
+      <div class="gain-row">
+        <span class="exercise-name">${this.escapeHtml(ex.name)}</span>
+        <span class="gain-value">
+          ${ex.oldWeight}→${ex.newWeight}kg
+          <span class="gain-percent">(+${ex.percentGain}%)</span>
+        </span>
+      </div>
+    `).join('');
+
+    return `
+      <div class="progress-section">
+        <h3 class="section-title">💪 Strength Gains</h3>
+        <div class="gains-list">
+          ${exerciseRows}
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Render body composition section
+   * @param {Object} weightData - Summary from BodyWeightManager
+   * @returns {string} HTML string
+   */
+  renderBodyComposition(weightData) {
+    if (!weightData) {
+      return ''; // Hide section if no data
+    }
+
+    const statusLabels = {
+      'fast_bulk': '🟡 Fast bulk',
+      'healthy_bulk': '🟢 Healthy lean bulk',
+      'maintenance': '🔵 Maintenance',
+      'slow_cut': '🟡 Slow cut',
+      'rapid_cut': '🔴 Rapid cut'
+    };
+
+    const statusLabel = statusLabels[weightData.status] || weightData.status;
+    const trendSign = weightData.trend8Week >= 0 ? '+' : '';
+    const rateSign = weightData.monthlyRate >= 0 ? '+' : '';
+
+    return `
+      <div class="progress-section">
+        <h3 class="section-title">⚖️ Body Composition</h3>
+        <div class="composition-grid">
+          <div class="comp-item">
+            <span class="comp-label">Current</span>
+            <span class="comp-value">${weightData.currentWeight.toFixed(1)} kg</span>
+          </div>
+          <div class="comp-item">
+            <span class="comp-label">8-week</span>
+            <span class="comp-value">${trendSign}${weightData.trend8Week.toFixed(1)} kg</span>
+          </div>
+          <div class="comp-item">
+            <span class="comp-label">Rate</span>
+            <span class="comp-value">${rateSign}${weightData.monthlyRate.toFixed(1)} kg/month</span>
+          </div>
+          <div class="comp-item comp-status">
+            <span class="comp-label">Status</span>
+            <span class="comp-value">${statusLabel}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Render weight trend chart section
+   * @param {Object} weightData - Summary from BodyWeightManager
+   * @returns {string} HTML string
+   */
+  renderWeightChart(weightData) {
+    if (!weightData || !weightData.entries || weightData.entries.length === 0) {
+      return ''; // Hide section if no data
+    }
+
+    return `
+      <div class="progress-section">
+        <h3 class="section-title">📈 Body Weight Trend</h3>
+        <div id="weight-chart-container" class="chart-container">
+          <!-- Chart will be inserted here -->
+        </div>
+      </div>
+    `;
+  }
+
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
