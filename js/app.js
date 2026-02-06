@@ -1643,6 +1643,9 @@ class App {
 
         bodyWeight.addEntry(weight);
         modal.style.display = 'none';
+
+        // Refresh dashboard to show new data
+        this.showProgressDashboard(false);
       };
     }
 
