@@ -1636,12 +1636,15 @@ class App {
     if (logBtn) {
       logBtn.onclick = () => {
         const weight = parseFloat(input.value);
+        console.log('[WeighIn] Attempting to log weight:', weight);
+
         if (!weight || weight < 30 || weight > 200) {
           alert('Please enter a valid weight between 30-200 kg');
           return;
         }
 
         bodyWeight.addEntry(weight);
+        console.log('[WeighIn] Weight saved, data:', bodyWeight.getData());
         modal.style.display = 'none';
 
         // Refresh dashboard to show new data
@@ -2001,6 +2004,7 @@ class App {
     const stats = progressAnalyzer.getLast4WeeksStats();
     const strengthGains = progressAnalyzer.getTopProgressingExercises(3);
     const weightData = bodyWeight.getWeightSummary();
+    console.log('[Dashboard] Rendering with weightData:', weightData);
 
     // Render dashboard
     const progressContent = document.getElementById('progress-content');
@@ -2021,14 +2025,22 @@ class App {
 
       // Render Canvas chart if weight data exists
       if (weightData && weightData.entries) {
+        console.log('[Dashboard] Rendering chart with entries:', weightData.entries);
         const chartContainer = document.getElementById('weight-chart-container');
         if (chartContainer) {
           const chart = new WeightTrendChart(350, 200);
           const canvas = chart.render(weightData.entries);
           if (canvas) {
             chartContainer.appendChild(canvas);
+            console.log('[Dashboard] Chart canvas appended successfully');
+          } else {
+            console.warn('[Dashboard] Chart render returned null canvas');
           }
+        } else {
+          console.warn('[Dashboard] Chart container not found');
         }
+      } else {
+        console.log('[Dashboard] No weightData for chart, showing empty state');
       }
     }
 
