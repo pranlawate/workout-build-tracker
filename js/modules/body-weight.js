@@ -34,6 +34,10 @@ export class BodyWeightManager {
       date: new Date().toISOString(),
       weight_kg: weight_kg
     });
+
+    // Sort entries by date to maintain chronological order
+    data.entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     localStorage.setItem('build_body_weight', JSON.stringify(data));
   }
 }
