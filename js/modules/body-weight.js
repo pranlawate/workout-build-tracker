@@ -174,7 +174,7 @@ export class BodyWeightManager {
   }
 
   /**
-   * Check if weigh-in is due (>7 days since last entry)
+   * Check if weigh-in is due (>1 day since last entry)
    * @returns {boolean} True if weigh-in needed
    */
   isWeighInDue() {
@@ -183,6 +183,6 @@ export class BodyWeightManager {
 
     const lastEntry = new Date(entries[entries.length - 1].date);
     const daysSince = (new Date() - lastEntry) / (1000 * 60 * 60 * 24);
-    return daysSince > 7;
+    return daysSince > 1; // Daily prompt (but calculations still use weekly/monthly aggregation)
   }
 }
