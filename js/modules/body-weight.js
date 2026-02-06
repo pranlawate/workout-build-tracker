@@ -3,6 +3,8 @@
  */
 export class BodyWeightManager {
   constructor(storage) {
+    // Keep storage parameter for future use (testing/mocking)
+    // Currently using localStorage directly since StorageManager doesn't expose raw getItem/setItem
     this.storage = storage;
   }
 
@@ -29,6 +31,12 @@ export class BodyWeightManager {
    * @param {number} weight_kg - Weight in kilograms
    */
   addEntry(weight_kg) {
+    // Validate input
+    if (typeof weight_kg !== 'number' || isNaN(weight_kg) || weight_kg <= 0) {
+      console.error('[BodyWeightManager] Invalid weight:', weight_kg);
+      return;
+    }
+
     const data = this.getData();
     data.entries.push({
       date: new Date().toISOString(),

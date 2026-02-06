@@ -90,5 +90,21 @@ describe('BodyWeightManager', () => {
       assert.strictEqual(data.entries[1].weight_kg, 59.0); // 2026-02-04
       assert.strictEqual(data.entries[2].weight_kg, 60.0); // 2026-02-05
     });
+
+    test('should reject invalid weight values', () => {
+      bodyWeight.addEntry('invalid');
+      bodyWeight.addEntry(null);
+      bodyWeight.addEntry(-5);
+      bodyWeight.addEntry(0);
+
+      const data = bodyWeight.getData();
+      assert.strictEqual(data.entries.length, 0); // No entries added
+    });
+
+    test('should reject NaN weight', () => {
+      bodyWeight.addEntry(NaN);
+      const data = bodyWeight.getData();
+      assert.strictEqual(data.entries.length, 0);
+    });
   });
 });
