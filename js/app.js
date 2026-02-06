@@ -2031,8 +2031,10 @@ class App {
           const chart = new WeightTrendChart(350, 200);
           const canvas = chart.render(weightData.entries);
           if (canvas) {
+            // Clear old canvas before adding new one
+            chartContainer.innerHTML = '';
             chartContainer.appendChild(canvas);
-            console.log('[Dashboard] Chart canvas appended successfully');
+            console.log('[Dashboard] Chart canvas replaced successfully');
           } else {
             console.warn('[Dashboard] Chart render returned null canvas');
           }
