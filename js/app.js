@@ -1617,15 +1617,19 @@ class App {
 
     modal.style.display = 'flex';
 
-    // Clear previous input
-    const input = document.getElementById('weight-input');
-    if (input) {
-      input.value = '';
-      input.focus();
-    }
-
     // Initialize BodyWeightManager
     const bodyWeight = new BodyWeightManager(this.storage);
+
+    // Set smart default value (last entry or reasonable default)
+    const input = document.getElementById('weight-input');
+    if (input) {
+      const data = bodyWeight.getData();
+      const lastWeight = data.entries.length > 0
+        ? data.entries[data.entries.length - 1].weight_kg
+        : 70;
+      input.value = lastWeight;
+      input.select(); // Select text so user can type to replace
+    }
 
     // Log weight button
     const logBtn = document.getElementById('log-weight-btn');
