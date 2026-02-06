@@ -134,4 +134,41 @@ describe('BodyWeightManager', () => {
       assert.ok(weeksDiff <= 8);
     });
   });
+
+  describe('getWeightSummary', () => {
+    test('should return null when no entries exist', () => {
+      const summary = bodyWeight.getWeightSummary();
+      assert.strictEqual(summary, null);
+    });
+
+    test('should calculate summary with single entry', () => {
+      bodyWeight.addEntry(57.5);
+      const summary = bodyWeight.getWeightSummary();
+
+      assert.strictEqual(summary.currentWeight, 57.5);
+      assert.strictEqual(summary.trend8Week, 0);
+      assert.strictEqual(summary.monthlyRate, 0);
+      assert.strictEqual(summary.status, 'maintenance');
+    });
+
+    test('should calculate 8-week trend and monthly rate', () => {
+      // Add entries spanning 8 weeks: 56kg → 58kg
+      const startDate = new Date('2025-12-10');
+      for (let week = 0; week < 8; week++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + week * 7);
+        const weight = 56.0 + (week * 0.25); // +0.25kg/week = +1kg/month
+        const data = bodyWeight.getData();
+        data.entries.push({ date: date.toISOString(), weight_kg: weight });
+        localStorage.setItem('build_body_weight', JSON.stringify(data));
+      }
+
+      const summary = bodyWeight.getWeightSummary();
+
+      assert.strictEqual(summary.currentWeight, 57.75);
+      assert.strictEqual(summary.trend8Week, 1.75); // 8 weeks * 0.25kg
+      assert.ok(Math.abs(summary.monthlyRate - 1.0) < 0.1); // ~1kg/month
+      assert.strictEqual(summary.status, 'fast_bulk'); // >0.7kg/month
+    });
+  });
 });
