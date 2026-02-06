@@ -2042,7 +2042,9 @@ class App {
         // Add new workout entry
         const newEntry = {
           date: this.workoutSession.startTime.toISOString(),
-          sets: exerciseSession.sets.filter(set => set.reps > 0)
+          sets: exerciseSession.sets.filter(set => set.reps > 0),
+          startTime: this.workoutSession.startTime.toISOString(),
+          endTime: new Date().toISOString()
         };
 
         // Only save if there are completed sets
