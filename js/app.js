@@ -123,30 +123,41 @@ class App {
       window.history.replaceState({ screen: 'home' }, '', '');
     }
 
-    // Handle browser back/forward buttons
+      // Handle browser back/forward buttons
     window.addEventListener('popstate', (event) => {
+      console.log('[NAVIGATION] popstate fired:', {
+        eventState: event.state,
+        currentHistoryState: window.history.state
+      });
+
       if (!event.state) {
         // Trying to go back beyond app's initial state
         // Push home state to keep user in the app
+        console.log('[NAVIGATION] No event.state - pushing home to trap user');
         window.history.pushState({ screen: 'home' }, '', '');
         this.navigateToScreen('home');
         return;
       }
 
       // Navigate to the screen in history state
+      console.log(`[NAVIGATION] Navigating to screen: ${event.state.screen}`);
       this.navigateToScreen(event.state.screen, event.state.data);
     });
   }
 
   navigateToScreen(screen, data = {}) {
+    console.log(`[NAVIGATION] navigateToScreen called with screen: ${screen}`);
+
     // Always close modal when navigating (modals are overlays, not screens)
     this.closeSettingsModal();
 
     switch (screen) {
       case 'home':
+        console.log('[NAVIGATION] Case home - calling showHomeScreen(false)');
         this.showHomeScreen(false); // false = don't push to history
         break;
       case 'workout':
+        console.log('[NAVIGATION] Case workout - staying on workout screen');
         // Navigating TO workout screen (e.g., back from modal)
         // Workout screen is already visible, modal already closed above
         // Do nothing - just stay on workout screen
@@ -434,6 +445,8 @@ class App {
   }
 
   showHomeScreen(pushHistory = true) {
+    console.log(`[NAVIGATION] showHomeScreen called with pushHistory: ${pushHistory}`);
+
     // Stop timer (Task 9)
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -446,19 +459,26 @@ class App {
     this.currentExerciseIndex = 0;
 
     // Hide all screens first (consistent with other navigation methods)
+    console.log('[NAVIGATION] Hiding all screens');
     this.hideAllScreens();
 
     // Show home screen
     const homeScreen = document.getElementById('home-screen');
     if (homeScreen) {
+      console.log('[NAVIGATION] Adding active class to home screen');
       homeScreen.classList.add('active');
+    } else {
+      console.error('[NAVIGATION] Home screen element not found!');
     }
 
     this.updateHomeScreen();
 
     // Push to browser history
     if (pushHistory && window.history.state?.screen !== 'home') {
+      console.log('[NAVIGATION] Pushing home state to history');
       window.history.pushState({ screen: 'home' }, '', '');
+    } else {
+      console.log('[NAVIGATION] Not pushing to history:', { pushHistory, currentState: window.history.state });
     }
   }
 
