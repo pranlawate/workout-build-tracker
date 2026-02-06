@@ -162,7 +162,7 @@ workout-build-tracker/
 
 **Cache Management:**
 - Service Worker caches all assets for offline use
-- Version: `build-tracker-v3` (auto-updates on new deployments)
+- Version: `build-tracker-v4` (auto-updates on new deployments)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
 ### Next Features (Planned)
