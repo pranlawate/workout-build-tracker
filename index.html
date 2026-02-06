@@ -309,6 +309,31 @@
     </div>
   </div>
 
+  <!-- Weigh-In Modal -->
+  <div id="weighin-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>📊 Weekly Weigh-In</h2>
+      <p>Track your body composition progress</p>
+
+      <div class="modal-body">
+        <label for="weight-input">Body Weight (kg):</label>
+        <input
+          type="number"
+          id="weight-input"
+          min="30"
+          max="200"
+          step="0.1"
+          placeholder="57.5"
+        >
+      </div>
+
+      <div class="modal-actions">
+        <button id="log-weight-btn" class="primary-btn">Log Weight</button>
+        <button id="skip-weighin-btn" class="secondary-btn">Skip This Week</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Mobility Check Modal -->
   <div id="mobility-check-modal" class="modal" style="display: none;">
     <div class="modal-content mobility-check-modal">
