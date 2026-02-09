@@ -121,6 +121,14 @@ workout-build-tracker/
 - Double progression algorithm (reps → weight)
 - Exercise history tracking (8 workouts retained)
 - Muscle-specific recovery tracking (48hr major muscle groups)
+- **Progress Badges**: Visual indicators on exercise history showing:
+  - 🔴 Performance alerts (weight/rep regression)
+  - 🟡 Form breakdown warnings
+  - ⚡ Deload sessions
+  - 🩹 Pain reported
+  - 🟢 Ready to progress
+  - 🔨 Building reps
+- **Per-Exercise Export**: Download complete exercise history as JSON
 
 ### Data Layer (✅ Implemented)
 - localStorage persistence with error handling
@@ -153,6 +161,8 @@ workout-build-tracker/
 - ✅ Post-workout pain tracking (consolidated modal)
 - ✅ Band exercise color selection (visual resistance tracking)
 - ✅ Post-workout summary screen (stats, PRs, pain tracking, weigh-in)
+- ✅ Progress badges on exercise history (performance alerts, form warnings, deload markers, pain indicators, progression status)
+- ✅ Per-exercise JSON export (complete exercise history download)
 
 ### Deployment
 

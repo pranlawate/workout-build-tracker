@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-02-09
+
+### Added
+- Progress badges on exercise history entries with 6 badge types
+- Priority-based badge display (max 2 per entry)
+- Per-exercise JSON export functionality
+- Badge calculation integrating performance analysis, pain tracking, deload status, and progression
+- Export button in exercise detail screen
+- CSS styling for badge display (mobile-responsive)
+
+### Technical
+- Extended ExerciseDetailScreen with badge calculation logic
+- Integrated PerformanceAnalyzer and DeloadManager dependencies
+- Added getSessionBadges() method with error handling
+- Implemented exportExercise() with file sanitization
+- Service worker cache bumped to v10
+
+---
+
 ## [1.3.0] - 2026-02-09
 
 ### Added - Post-Workout Summary Screen 🎉
