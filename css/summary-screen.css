@@ -7,14 +7,14 @@
 
 .summary-title {
   text-align: center;
-  font-size: var(--font-2xl);
+  font-size: var(--font-xxl);
   margin-bottom: var(--spacing-xl);
   color: var(--color-accent);
 }
 
 .summary-section {
-  background: var(--color-bg-secondary);
-  border-radius: var(--border-radius);
+  background: var(--color-surface);
+  border-radius: 12px;
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
@@ -119,9 +119,9 @@
   height: 50px;
   font-size: var(--font-lg);
   padding: var(--spacing-sm);
-  border: 2px solid var(--color-border);
-  border-radius: var(--border-radius);
-  background: var(--color-bg-primary);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: var(--color-bg);
   color: var(--color-text);
 }
 
