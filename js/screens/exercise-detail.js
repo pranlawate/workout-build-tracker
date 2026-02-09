@@ -366,4 +366,52 @@ export class ExerciseDetailScreen {
       return null;
     }
   }
+
+  /**
+   * Export exercise history as JSON
+   * @param {string} exerciseKey - Exercise key
+   */
+  exportExercise(exerciseKey) {
+    try {
+      const history = this.storage.getExerciseHistory(exerciseKey);
+      const [, exerciseName] = exerciseKey.split(' - ');
+
+      const exportData = {
+        exercise: exerciseKey,
+        exportDate: new Date().toISOString(),
+        totalSessions: history.length,
+        dateRange: {
+          first: history[0]?.date || null,
+          last: history[history.length - 1]?.date || null
+        },
+        history: history
+      };
+
+      // Create blob and download
+      const blob = new Blob([JSON.stringify(exportData, null, 2)],
+        { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+
+      // Sanitize exercise name for filename
+      const sanitizedName = exerciseName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      a.download = `exercise-${sanitizedName}-${dateStr}.json`;
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      this.showToast('✅ Exercise data exported');
+    } catch (error) {
+      console.error('[ExerciseDetail] Export error:', error);
+      this.showToast('❌ Export failed');
+    }
+  }
 }
