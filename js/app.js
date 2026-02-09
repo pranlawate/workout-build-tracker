@@ -3247,6 +3247,67 @@ class App {
     }
   }
 
+  /**
+   * Save recovery metrics to localStorage
+   * @param {Object} metrics - Recovery data
+   */
+  saveRecoveryMetrics(metrics) {
+    try {
+      const entries = this.getRecoveryMetrics();
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+      // Check if entry exists for today
+      const existingIndex = entries.findIndex(e => e.date === today);
+
+      if (existingIndex >= 0) {
+        // Update existing entry
+        entries[existingIndex] = { ...entries[existingIndex], ...metrics, date: today };
+      } else {
+        // Add new entry
+        entries.push({ date: today, ...metrics });
+      }
+
+      // Cleanup: keep only last 90 days
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+      const cutoffDate = ninetyDaysAgo.toISOString().split('T')[0];
+      const filtered = entries.filter(e => e.date >= cutoffDate);
+
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(filtered));
+    } catch (error) {
+      console.error('[Recovery Metrics] Save failed:', error);
+    }
+  }
+
+  /**
+   * Get recovery metrics from localStorage
+   * @returns {Array} Array of recovery entries
+   */
+  getRecoveryMetrics() {
+    try {
+      const data = localStorage.getItem('build_recovery_metrics');
+      return data ? JSON.parse(data) : [];
+    } catch (error) {
+      console.error('[Recovery Metrics] Retrieval failed:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check if recovery check is due (once per day)
+   * @returns {boolean} True if check needed
+   */
+  isRecoveryCheckDue() {
+    const entries = this.getRecoveryMetrics();
+    if (entries.length === 0) return true;
+
+    const lastEntry = entries[entries.length - 1];
+    const today = new Date().toDateString();
+    const lastDate = new Date(lastEntry.date).toDateString();
+
+    return today !== lastDate;
+  }
+
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
@@ -3328,7 +3389,7 @@ class App {
 
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => new App());
+  document.addEventListener('DOMContentLoaded', () => window.app = new App());
 } else {
-  new App();
+  window.app = new App();
 }
