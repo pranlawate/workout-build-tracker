@@ -92,6 +92,9 @@ export class ExerciseDetailScreen {
     // Format sets
     const setsText = this.formatSets(entry.sets);
 
+    // Get badges for this session
+    const badges = this.getSessionBadges(entry, this.currentExerciseKey);
+
     return `
       <div class="history-entry" data-index="${index}">
         <div class="history-entry-header">
@@ -102,6 +105,11 @@ export class ExerciseDetailScreen {
           </div>
         </div>
         <div class="history-sets">${this.escapeHtml(setsText)}</div>
+        ${badges.length > 0 ? `
+          <div class="history-badges">
+            ${badges.map(b => `<span class="badge">${b.icon} ${this.escapeHtml(b.text)}</span>`).join(' ')}
+          </div>
+        ` : ''}
       </div>
     `;
   }
