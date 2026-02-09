@@ -137,4 +137,48 @@ describe('StorageManager', () => {
       }, /Invalid history/);
     });
   });
+
+  test('should get all exercise keys', () => {
+    // Save multiple exercises
+    storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      { date: '2026-02-03', sets: [{ weight: 10, reps: 10, rir: 2 }] }
+    ]);
+    storage.saveExerciseHistory('UPPER_A - DB Row', [
+      { date: '2026-02-03', sets: [{ weight: 10, reps: 10, rir: 2 }] }
+    ]);
+    storage.saveExerciseHistory('LOWER_A - Squat', [
+      { date: '2026-02-03', sets: [{ weight: 10, reps: 10, rir: 2 }] }
+    ]);
+
+    const keys = storage.getAllExerciseKeys();
+
+    assert.strictEqual(keys.length, 3);
+    assert.ok(keys.includes('UPPER_A - DB Bench Press'));
+    assert.ok(keys.includes('UPPER_A - DB Row'));
+    assert.ok(keys.includes('LOWER_A - Squat'));
+  });
+
+  test('should return empty array when no exercise keys exist', () => {
+    const keys = storage.getAllExerciseKeys();
+    assert.deepStrictEqual(keys, []);
+  });
+
+  test('should filter out non-exercise keys', () => {
+    // Save an exercise
+    storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      { date: '2026-02-03', sets: [{ weight: 10, reps: 10, rir: 2 }] }
+    ]);
+
+    // Save other non-exercise data
+    storage.saveRotation({
+      lastWorkout: 'UPPER_A',
+      lastDate: '2026-02-03',
+      nextSuggested: 'LOWER_A'
+    });
+
+    const keys = storage.getAllExerciseKeys();
+
+    assert.strictEqual(keys.length, 1);
+    assert.strictEqual(keys[0], 'UPPER_A - DB Bench Press');
+  });
 });

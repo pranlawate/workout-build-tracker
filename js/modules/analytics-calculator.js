@@ -1,34 +1,64 @@
+/**
+ * Analytics calculation module for workout volume, trends, and performance metrics.
+ * Uses dependency injection to access StorageManager for all data operations.
+ * @module AnalyticsCalculator
+ */
 export class AnalyticsCalculator {
+  /**
+   * Creates an AnalyticsCalculator instance
+   * @param {StorageManager} storage - StorageManager instance for data access
+   */
   constructor(storage) {
     this.storage = storage;
   }
 
+  /**
+   * Calculates total training volume and trends over a specified period
+   * @param {number} [days=7] - Number of days to include in calculation
+   * @returns {Object} Volume analytics with total, byWorkoutType, trend, and daily data
+   * @returns {number} returns.total - Total volume (weight × reps) across all exercises
+   * @returns {Object} returns.byWorkoutType - Volume and session count grouped by workout type
+   * @returns {number} returns.trend - Percentage change vs previous period (positive = increase)
+   * @returns {Array<{date: string, volume: number}>} returns.daily - Daily volume breakdown, sorted by date
+   */
   calculateVolume(days = 7) {
     try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
       const cutoffStr = cutoffDate.toISOString().split('T')[0];
 
-      // Get all exercise keys
-      const storage = globalThis.localStorage;
-      const allKeys = (storage.data ? Object.keys(storage.data) : Object.keys(storage))
-        .filter(key => key.startsWith('build_exercise_'));
+      // Get all exercise keys using StorageManager API
+      const allKeys = this.storage.getAllExerciseKeys();
 
       let total = 0;
       const byWorkoutType = {};
       const dailyMap = new Map();
+      const sessionDates = new Set(); // Track unique workout dates per workout type
 
       // Process each exercise
-      allKeys.forEach(key => {
-        const exerciseKey = key.replace('build_exercise_', '');
+      allKeys.forEach(exerciseKey => {
         const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length === 0) {
+          return; // Skip if no history
+        }
+
         const [workoutType] = exerciseKey.split(' - ');
+        if (!workoutType) {
+          return; // Skip if invalid format
+        }
 
         history.forEach(entry => {
+          if (!entry || !entry.date || !Array.isArray(entry.sets)) {
+            return; // Skip malformed entries
+          }
+
           if (entry.date >= cutoffStr) {
             // Calculate volume for this entry
             const entryVolume = entry.sets.reduce((sum, set) => {
-              return sum + (set.weight * set.reps);
+              if (set && typeof set.weight === 'number' && typeof set.reps === 'number') {
+                return sum + (set.weight * set.reps);
+              }
+              return sum;
             }, 0);
 
             total += entryVolume;
@@ -39,6 +69,13 @@ export class AnalyticsCalculator {
             }
             byWorkoutType[workoutType].volume += entryVolume;
 
+            // Track session dates for counting unique workouts
+            const sessionKey = `${workoutType}_${entry.date}`;
+            if (!sessionDates.has(sessionKey)) {
+              sessionDates.add(sessionKey);
+              byWorkoutType[workoutType].sessions++;
+            }
+
             // Track daily volume
             if (!dailyMap.has(entry.date)) {
               dailyMap.set(entry.date, 0);
@@ -47,19 +84,6 @@ export class AnalyticsCalculator {
           }
         });
       });
-
-      // Count sessions per workout type
-      const rotation = this.storage.getRotation();
-      if (rotation && rotation.sequence) {
-        rotation.sequence.forEach(entry => {
-          if (entry.date >= cutoffStr && entry.completed) {
-            const workoutType = entry.workout;
-            if (byWorkoutType[workoutType]) {
-              byWorkoutType[workoutType].sessions++;
-            }
-          }
-        });
-      }
 
       // Convert daily map to array
       const daily = Array.from(dailyMap.entries())
@@ -79,6 +103,12 @@ export class AnalyticsCalculator {
     }
   }
 
+  /**
+   * Calculates total volume for the previous period (used for trend calculation)
+   * @private
+   * @param {number} days - Number of days in the period
+   * @returns {number} Total volume for the previous period
+   */
   calculatePreviousPeriodVolume(days) {
     try {
       const startDate = new Date();
@@ -89,19 +119,28 @@ export class AnalyticsCalculator {
       const startStr = startDate.toISOString().split('T')[0];
       const endStr = endDate.toISOString().split('T')[0];
 
-      const storage = globalThis.localStorage;
-      const allKeys = (storage.data ? Object.keys(storage.data) : Object.keys(storage))
-        .filter(key => key.startsWith('build_exercise_'));
+      // Get all exercise keys using StorageManager API
+      const allKeys = this.storage.getAllExerciseKeys();
 
       let total = 0;
 
-      allKeys.forEach(key => {
-        const exerciseKey = key.replace('build_exercise_', '');
+      allKeys.forEach(exerciseKey => {
         const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length === 0) {
+          return; // Skip if no history
+        }
+
         history.forEach(entry => {
+          if (!entry || !entry.date || !Array.isArray(entry.sets)) {
+            return; // Skip malformed entries
+          }
+
           if (entry.date >= startStr && entry.date < endStr) {
             const entryVolume = entry.sets.reduce((sum, set) => {
-              return sum + (set.weight * set.reps);
+              if (set && typeof set.weight === 'number' && typeof set.reps === 'number') {
+                return sum + (set.weight * set.reps);
+              }
+              return sum;
             }, 0);
             total += entryVolume;
           }

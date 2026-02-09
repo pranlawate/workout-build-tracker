@@ -140,6 +140,24 @@ export class StorageManager {
   }
 
   /**
+   * Gets all exercise keys from localStorage
+   * @returns {Array<string>} Array of exercise keys (without prefix)
+   */
+  getAllExerciseKeys() {
+    try {
+      const storage = this.storage;
+      // Handle both browser localStorage and test mock (which has .data property)
+      const allKeys = storage.data ? Object.keys(storage.data) : Object.keys(storage);
+      return allKeys
+        .filter(key => key.startsWith(KEYS.EXERCISE_HISTORY_PREFIX))
+        .map(key => key.replace(KEYS.EXERCISE_HISTORY_PREFIX, ''));
+    } catch (error) {
+      console.error('Failed to get exercise keys, returning empty array:', error);
+      return [];
+    }
+  }
+
+  /**
    * Retrieves deload state from localStorage
    * @returns {Object} Deload state object
    */
