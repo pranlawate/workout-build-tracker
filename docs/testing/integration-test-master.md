@@ -1,7 +1,7 @@
 # Build Tracker - Master Integration Test Report
 
 **Last Updated:** 2026-02-09
-**App Version:** v1.1 (Service Worker Cache: v7)
+**App Version:** v1.3 (Service Worker Cache: v8)
 
 ---
 
@@ -442,6 +442,92 @@
 
 ---
 
+## Feature 8: Post-Workout Summary Screen
+
+### Test 8.1: Summary Stats Display
+**Steps:**
+1. Complete a full workout (all exercises, all sets)
+2. Click "Complete Workout"
+3. Check summary screen
+
+**Expected:**
+- [ ] Summary screen appears
+- [ ] Workout name displays correctly
+- [ ] Duration shows (e.g., "32 minutes")
+- [ ] Total volume shows (e.g., "2,450 kg")
+- [ ] Volume comparison shows if >10% difference
+- [ ] Stats section has proper spacing and formatting
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 8.2: New Records Detection
+**Steps:**
+1. Complete workout with weight increase (PR)
+2. Check summary screen
+
+**Expected:**
+- [ ] "🎉 X New Records!" appears
+- [ ] Weight PR shows: "Exercise: 25kg → 27.5kg"
+- [ ] Reps PR shows: "Exercise @ 50kg: 11 → 12 reps"
+- [ ] Max 5 records displayed
+- [ ] If no records: "Keep pushing! 💪"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 8.3: Pain Tracking in Summary
+**Steps:**
+1. Complete workout
+2. On summary screen, click "Yes, I had pain"
+3. Select exercise(s)
+4. Fill in severity and location
+
+**Expected:**
+- [ ] "No pain" pre-selected by default
+- [ ] Exercise list expands on "Yes"
+- [ ] Checkboxes work (multi-select)
+- [ ] Pain details show for each exercise
+- [ ] Progress indicator shows (e.g., "Exercise 1 of 3")
+- [ ] Can save pain data successfully
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 8.4: Weigh-in in Summary
+**Steps:**
+1. Complete workout (ensure weigh-in is due)
+2. Check summary screen
+
+**Expected:**
+- [ ] Weigh-in section appears (if due)
+- [ ] Input pre-filled with last weight
+- [ ] Can enter new weight
+- [ ] Weight saves on "Done" click
+- [ ] Section hidden if weigh-in not due
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 8.5: Done Button and Navigation
+**Steps:**
+1. Fill in pain and weigh-in (if applicable)
+2. Click "Done"
+
+**Expected:**
+- [ ] Pain data saves correctly
+- [ ] Weigh-in data saves correctly
+- [ ] Navigates to home screen
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
 ## Edge Cases & Error Handling
 
 ### Test E1: Corrupted localStorage
@@ -572,8 +658,8 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 
 **Expected:**
 - [ ] Service worker registered
-- [ ] Cache name: `build-tracker-v7`
-- [ ] Old caches deleted (v6 and earlier)
+- [ ] Cache name: `build-tracker-v8`
+- [ ] Old caches deleted (v7 and earlier)
 - [ ] All assets cached correctly
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
