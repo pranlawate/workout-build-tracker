@@ -19,6 +19,8 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 - **Equipment progression**: Tracks readiness for barbell exercises with strength, mobility, and pain criteria
 - **Deload automation**: Smart fatigue detection and recovery weeks
 - **Performance analysis**: Real-time alerts for weight regression and form breakdown
+- **Pain tracking**: Post-workout pain logging with consolidated modal interface
+- **Band exercise tracking**: Visual resistance tracking with color-coded band selection
 - **Offline-first**: Works without internet connection, installable as PWA
 - **Browser navigation**: Full support for browser back button (SPA experience)
 
@@ -148,6 +150,8 @@ workout-build-tracker/
 - ✅ Service Worker for offline functionality
 - ✅ Cache-first strategy with automatic updates
 - ✅ Comprehensive integration test checklist
+- ✅ Post-workout pain tracking (consolidated modal)
+- ✅ Band exercise color selection (visual resistance tracking)
 
 ### Deployment
 
@@ -161,7 +165,7 @@ workout-build-tracker/
 
 **Cache Management:**
 - Service Worker caches all assets for offline use
-- Version: `build-tracker-v5` (auto-updates on new deployments)
+- Version: `build-tracker-v7` (auto-updates on new deployments)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
 ### Next Features (Planned)
