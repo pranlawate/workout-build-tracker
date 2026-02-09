@@ -1179,9 +1179,9 @@ class App {
     const justCompletedExercise = this.currentWorkout.exercises[justCompletedIndex];
     const exerciseKey = `${this.currentWorkout.name} - ${justCompletedExercise.name}`;
 
-    // ALWAYS show mobility and pain tracking prompts for completed exercises
+    // ALWAYS show mobility check for completed exercises
     this.showMobilityCheckIfNeeded(exerciseKey);
-    this.showPainTrackingPrompt(exerciseKey, justCompletedExercise.name);
+    // Pain tracking moved to post-workout modal
 
     // Don't advance past last exercise (but prompts still shown above)
     if (this.currentExerciseIndex >= this.currentWorkout.exercises.length - 1) {
@@ -1945,6 +1945,7 @@ class App {
     };
   }
 
+  /* DEPRECATED: Pain tracking now happens post-workout
   showPainTrackingPrompt(exerciseKey, exerciseName) {
     const modal = document.getElementById('pain-tracking-modal');
     const titleEl = document.getElementById('pain-exercise-title');
@@ -2004,6 +2005,7 @@ class App {
       };
     });
   }
+  */
 
   showProgressDashboard(pushHistory = true) {
     this.hideAllScreens();
