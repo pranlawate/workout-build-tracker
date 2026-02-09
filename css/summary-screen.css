@@ -1,0 +1,156 @@
+/* Post-Workout Summary Screen */
+.summary-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.summary-title {
+  text-align: center;
+  font-size: var(--font-2xl);
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-accent);
+}
+
+.summary-section {
+  background: var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-title {
+  font-size: var(--font-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Stats Display */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
+  font-size: var(--font-md);
+}
+
+.stat-icon {
+  font-size: var(--font-xl);
+}
+
+.stat-value {
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.trend-indicator {
+  font-size: var(--font-sm);
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.trend-indicator.down {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* New Records */
+.records-list {
+  margin-top: var(--spacing-sm);
+  padding-left: var(--spacing-lg);
+}
+
+.record-item {
+  padding: var(--spacing-xs) 0;
+  font-size: var(--font-sm);
+}
+
+.empty-records {
+  text-align: center;
+  font-size: var(--font-md);
+  color: var(--color-text-dim);
+  padding: var(--spacing-md) 0;
+}
+
+/* Pain Tracking */
+.pain-choice-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.pain-choice-buttons .btn {
+  flex: 1;
+  height: 50px;
+  font-size: var(--font-md);
+}
+
+.pain-exercise-checkboxes {
+  margin: var(--spacing-md) 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.pain-severity-buttons-summary,
+.pain-location-buttons-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.pain-severity-buttons-summary .btn,
+.pain-location-buttons-summary .btn {
+  height: 50px;
+}
+
+/* Weigh-in */
+.weighin-input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+#weighin-input-summary {
+  flex: 1;
+  height: 50px;
+  font-size: var(--font-lg);
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-bg-primary);
+  color: var(--color-text);
+}
+
+.unit-label {
+  font-size: var(--font-md);
+  color: var(--color-text-dim);
+  font-weight: 500;
+}
+
+/* Done Button */
+.btn-large {
+  width: 100%;
+  height: 60px;
+  font-size: var(--font-lg);
+  margin-top: var(--spacing-lg);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .summary-container {
+    padding: var(--spacing-md);
+  }
+
+  .summary-title {
+    font-size: var(--font-xl);
+  }
+
+  .pain-severity-buttons-summary,
+  .pain-location-buttons-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
