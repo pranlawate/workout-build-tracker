@@ -196,6 +196,14 @@ export class ExerciseDetailScreen {
         this.handleDelete(index);
       });
     });
+
+    // Export button
+    const exportBtn = document.getElementById('export-exercise-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        this.exportExercise(this.currentExerciseKey);
+      });
+    }
   }
 
   handleDelete(index) {
