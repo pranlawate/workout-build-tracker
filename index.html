@@ -292,6 +292,67 @@
     </div>
   </div>
 
+  <!-- Recovery Metrics Modal -->
+  <div id="recovery-metrics-modal" class="modal">
+    <div class="modal-content recovery-metrics-content">
+      <h2>💪 Recovery Check</h2>
+
+      <div class="recovery-form">
+        <div class="recovery-input-group">
+          <label for="sleep-hours">😴 Sleep Last Night</label>
+          <input
+            type="number"
+            id="sleep-hours"
+            min="0"
+            max="12"
+            step="1"
+            value="7"
+            class="recovery-number-input"
+          >
+          <span class="input-hint">hours (0-12)</span>
+        </div>
+
+        <div class="recovery-input-group">
+          <label>😰 Stress Level</label>
+          <div class="radio-button-group stress-buttons">
+            <button type="button" class="radio-btn selected" data-value="Low">Low</button>
+            <button type="button" class="radio-btn" data-value="Medium">Medium</button>
+            <button type="button" class="radio-btn" data-value="High">High</button>
+          </div>
+          <input type="hidden" id="stress-level" value="Low">
+        </div>
+
+        <div class="recovery-input-group">
+          <label>⚡ Energy Level</label>
+          <div class="radio-button-group energy-buttons">
+            <button type="button" class="radio-btn" data-value="1">1</button>
+            <button type="button" class="radio-btn" data-value="2">2</button>
+            <button type="button" class="radio-btn selected" data-value="3">3</button>
+            <button type="button" class="radio-btn" data-value="4">4</button>
+            <button type="button" class="radio-btn" data-value="5">5</button>
+          </div>
+          <span class="input-hint">1 = very low, 5 = very high</span>
+          <input type="hidden" id="energy-level" value="3">
+        </div>
+
+        <div class="recovery-input-group">
+          <label>💊 Muscle Soreness</label>
+          <div class="radio-button-group soreness-buttons">
+            <button type="button" class="radio-btn selected" data-value="None">None</button>
+            <button type="button" class="radio-btn" data-value="Mild">Mild</button>
+            <button type="button" class="radio-btn" data-value="Moderate">Moderate</button>
+            <button type="button" class="radio-btn" data-value="Severe">Severe</button>
+          </div>
+          <input type="hidden" id="muscle-soreness" value="None">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="submit-recovery-btn" class="btn btn-primary">Continue to Workout</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Deload Modal -->
   <div id="deload-modal" class="modal" style="display: none;">
     <div class="modal-content deload-modal">
