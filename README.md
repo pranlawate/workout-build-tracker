@@ -21,6 +21,7 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 - **Performance analysis**: Real-time alerts for weight regression and form breakdown
 - **Pain tracking**: Post-workout pain logging with consolidated modal interface
 - **Band exercise tracking**: Visual resistance tracking with color-coded band selection
+- **Enhanced Tracking Metrics**: Pre-workout recovery assessment (sleep, stress, energy, soreness) with fatigue scoring and intelligent warnings to prevent overtraining
 - **Offline-first**: Works without internet connection, installable as PWA
 - **Browser navigation**: Full support for browser back button (SPA experience)
 

@@ -528,6 +528,124 @@
 
 ---
 
+## Feature 9: Enhanced Tracking Metrics
+
+### Test 9.1: Recovery Modal Display
+**Steps:**
+1. Complete a full day without workouts
+2. Next day, click "Start Workout"
+3. Recovery modal should appear
+
+**Expected:**
+- [ ] Modal appears on first workout of day
+- [ ] Title: "How are you feeling today?"
+- [ ] All 4 inputs present:
+  - Sleep hours (number input, default: 7)
+  - Stress level (3 buttons: Low/Medium/High, default: Low)
+  - Energy level (5 buttons: 1-5, default: 3)
+  - Soreness (4 buttons: None/Mild/Moderate/Severe, default: None)
+- [ ] Radio buttons selectable
+- [ ] Sleep hours adjustable (0-12)
+- [ ] All inputs have visible labels
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 9.2: Fatigue Score Calculation
+**Steps:**
+1. On recovery modal, select:
+   - Sleep: 5 hours (low sleep: +2 points)
+   - Stress: High (+1 point)
+   - Energy: 2 (low energy: +2 points)
+   - Soreness: None
+2. Click "Continue to Workout"
+
+**Expected:**
+- [ ] Fatigue score calculated: 5 points (2+1+2+0)
+- [ ] Warning banner appears (score ≥4)
+- [ ] Banner shows: "⚠️ High Fatigue Warning (5 points)"
+- [ ] Banner explains score breakdown
+- [ ] Three action buttons visible:
+  - "Dismiss" (returns to home)
+  - "Start Deload" (enables deload mode)
+  - "Continue Anyway" (proceeds to workout)
+
+**Actions:**
+3. Click "Dismiss"
+
+**Expected:**
+- [ ] Returns to home screen
+- [ ] Workout does NOT start
+- [ ] Can retry with different inputs
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 9.3: Warning Button Actions
+**Steps:**
+1. Trigger fatigue warning (score ≥4)
+2. Test "Start Deload" button
+
+**Expected:**
+- [ ] Deload mode enabled in localStorage
+- [ ] Workout starts in deload mode
+- [ ] "DELOAD WEEK" indicator visible on workout screen
+
+**Actions:**
+3. Repeat test, click "Continue Anyway"
+
+**Expected:**
+- [ ] Proceeds to workout screen
+- [ ] Normal mode (not deload)
+- [ ] Recovery entry saved with workoutCompleted: false
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 9.4: Daily Frequency
+**Steps:**
+1. Complete first workout of the day (modal shown)
+2. Immediately complete another workout same day
+3. Next day, start a workout
+
+**Expected:**
+- [ ] First workout: Modal shown
+- [ ] Second workout same day: Modal skipped
+- [ ] Next day: Modal shown again
+- [ ] localStorage shows one entry per day
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 9.5: Workout Completion with Pain
+**Steps:**
+1. Complete recovery modal (low fatigue score <4)
+2. Complete full workout
+3. On post-workout summary, select "Yes, I had pain"
+4. Select severity: "Moderate" (3 points)
+5. Complete pain tracking
+
+**Expected:**
+- [ ] Recovery entry updated when workout finishes
+- [ ] workoutCompleted flag set to true
+- [ ] Pain points (3) added to fatigue calculation
+- [ ] Final fatigue score recalculated (pre-workout + pain)
+- [ ] Data saved to localStorage: `build_recovery_tracking`
+
+**Actions:**
+6. Check console: `JSON.parse(localStorage.getItem('build_recovery_tracking'))`
+
+**Expected:**
+- [ ] Today's entry shows: `{ fatiguePre: X, painPoints: 3, fatigueFinal: X+3, workoutCompleted: true, date: 'YYYY-MM-DD' }`
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
 ## Edge Cases & Error Handling
 
 ### Test E1: Corrupted localStorage

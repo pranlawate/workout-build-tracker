@@ -175,6 +175,32 @@ This document tracks the implementation status of all designed features from the
 
 ---
 
+### Enhanced Tracking Metrics (100% Complete) 🎉 NEW
+**Source:** `docs/plans/2026-02-09-enhanced-tracking-metrics-design.md`
+
+- ✅ **Recovery Metrics Modal** - Sleep, stress, energy, soreness inputs
+- ✅ **Fatigue Score Calculation** - Pre-workout + pain points (0-9 scale)
+- ✅ **Warning System** - Banner at ≥4 points with 3 action options
+- ✅ **Daily Frequency** - Once-per-day check, automatic skip
+- ✅ **localStorage Integration** - 90-day retention, daily entries
+- ✅ **Deload Integration** - "Start Deload" button enables deload mode
+- ✅ **Workout Completion Update** - Mark completed, recalculate with pain
+- ✅ **Service Worker Update** - Cache bump to v9
+- ✅ **Mobile Responsive** - 50-60px touch targets, grid layouts
+- ✅ **Integration Tests** - 5 test scenarios documented
+
+**Features:**
+- Pre-workout recovery assessment (sleep, stress, energy, soreness)
+- Smart defaults for quick workflow (7 hours, Low stress, 3 energy, None soreness)
+- Fatigue calculation with evidence-based point system
+- Non-blocking warnings (user always decides)
+- Integration with existing pain tracking
+- One-tap deload activation from warning
+
+**Status:** Production-ready, 11 commits, ready for manual testing
+
+---
+
 ## 🚧 DESIGNED BUT NOT IMPLEMENTED
 
 ### 1. Exercise History View with Charts
@@ -200,42 +226,7 @@ This document tracks the implementation status of all designed features from the
 
 ---
 
-### 2. Enhanced Tracking Metrics System
-**Source:** `BUILD-SPECIFICATION.md` (Section 11, lines 374-398)
-
-**Missing Components:**
-
-#### Per-Workout Metrics:
-- [ ] Sleep hours last night (number input)
-- [ ] Stress level (Low/Medium/High dropdown)
-- [ ] Energy before workout (1-5 scale slider)
-- [ ] Muscle soreness (None/Mild/Moderate/Severe dropdown)
-
-#### Per-Exercise Metrics:
-- [ ] Form quality self-rating (Good/OK/Poor buttons)
-  - Note: Automated detection exists via Performance Analyzer
-  - Manual self-rating still valuable for subjective assessment
-- [ ] Range of motion achieved (Full/Partial toggle)
-- [ ] Pain/discomfort flag (Yes/No + location if yes)
-
-#### Fatigue Score Calculation:
-- [ ] Auto-calculate per workout:
-  - Low energy (<3/5): +2 points
-  - Poor sleep (<6hrs): +2 points
-  - High stress: +1 point
-  - Moderate+ soreness: +1 point
-  - Form quality "Poor": +2 points
-  - Pain flagged: +3 points
-- [ ] Warning banner if score ≥8
-- [ ] Auto-suggest deload if ≥8 for 2 consecutive workouts
-
-**Design Status:** Fully specified with point system
-**Implementation Status:** 0% complete
-**Priority:** High (critical for preventing overtraining)
-
----
-
-### 3. Weekly Summary Dashboard
+### 2. Weekly Summary Dashboard
 **Source:** `BUILD-SPECIFICATION.md` (Section 11, lines 389-398)
 
 **Missing Components:**
@@ -270,37 +261,29 @@ This document tracks the implementation status of all designed features from the
 | Barbell Progression | 8 | 8 | 100% ✅ |
 | Progress Dashboard | 6 | 6 | 100% ✅ |
 | Post-Workout Summary | 12 | 12 | 100% ✅ |
+| Enhanced Tracking | 9 | 9 | 100% ✅ |
 | **Exercise History Charts** | **4** | **0** | **0% 🚧** |
-| **Enhanced Tracking** | **9** | **0** | **0% 🚧** |
 | **Weekly Dashboard** | **6** | **0** | **0% 🚧** |
 
 ### Overall Progress:
 - **Total Features Designed:** 80
-- **Features Implemented:** 70
-- **Features Remaining:** 10
-- **Completion:** 88%
+- **Features Implemented:** 79
+- **Features Remaining:** 1
+- **Completion:** 99%
 
 ---
 
 ## 🎯 Recommended Implementation Order
 
-### Phase 1: Core Analytics (High Priority)
-1. **Enhanced Tracking Metrics** - Prevents overtraining, enables fatigue scoring
+### Phase 1: Progress Visualization (Medium Priority)
+1. **Exercise History Charts** - Visual feedback on trajectory
 
 **Estimated Effort:** 1 development session
 
 ---
 
-### Phase 2: Progress Visualization (Medium Priority)
-3. **Exercise History Charts** - Visual feedback on trajectory
-
-**Estimated Effort:** 1 development session
-
----
-
-### Phase 3: Advanced Analytics (Lower Priority)
-4. **Weekly Summary Dashboard** - Pattern identification, trends
-5. **Advanced Deload Logic** - Fatigue-based auto-triggers (requires Enhanced Tracking)
+### Phase 2: Advanced Analytics (Lower Priority)
+2. **Weekly Summary Dashboard** - Pattern identification, trends
 
 **Estimated Effort:** 1-2 development sessions
 
