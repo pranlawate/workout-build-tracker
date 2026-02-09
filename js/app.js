@@ -128,6 +128,22 @@ class App {
     if (submitRecoveryBtn) {
       submitRecoveryBtn.addEventListener('click', () => this.handleRecoverySubmit());
     }
+
+    // Fatigue warning buttons
+    const dismissWarningBtn = document.getElementById('dismiss-warning-btn');
+    if (dismissWarningBtn) {
+      dismissWarningBtn.addEventListener('click', () => this.handleWarningDismiss());
+    }
+
+    const deloadWarningBtn = document.getElementById('deload-warning-btn');
+    if (deloadWarningBtn) {
+      deloadWarningBtn.addEventListener('click', () => this.handleWarningDeload());
+    }
+
+    const continueWarningBtn = document.getElementById('continue-warning-btn');
+    if (continueWarningBtn) {
+      continueWarningBtn.addEventListener('click', () => this.handleWarningContinue());
+    }
   }
 
   setupBrowserHistory() {
@@ -3506,6 +3522,92 @@ class App {
       // Proceed to workout selection
       this.showWorkoutSelection();
     }
+  }
+
+  /**
+   * Show fatigue warning banner
+   * @param {Object} scoreData - Fatigue score breakdown
+   */
+  showFatigueWarning(scoreData) {
+    const banner = document.getElementById('fatigue-warning-banner');
+    const scoreText = document.getElementById('fatigue-score-text');
+
+    if (!banner || !scoreText) return;
+
+    // Update score text
+    scoreText.textContent = `Your recovery score is ${scoreData.totalScore}/9. Consider:`;
+
+    // Show banner
+    banner.style.display = 'block';
+
+    // Update recovery entry to mark warning shown
+    const entries = this.getRecoveryMetrics();
+    if (entries.length > 0) {
+      const lastEntry = entries[entries.length - 1];
+      lastEntry.warningShown = true;
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+    }
+  }
+
+  /**
+   * Handle fatigue warning dismiss
+   */
+  handleWarningDismiss() {
+    // Update recovery entry
+    const entries = this.getRecoveryMetrics();
+    if (entries.length > 0) {
+      const lastEntry = entries[entries.length - 1];
+      lastEntry.warningDismissed = true;
+      lastEntry.workoutCompleted = false; // User chose not to work out
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+    }
+
+    // Hide banner
+    document.getElementById('fatigue-warning-banner').style.display = 'none';
+
+    // Return to home screen
+    this.showHomeScreen();
+  }
+
+  /**
+   * Handle fatigue warning deload choice
+   */
+  handleWarningDeload() {
+    // Update recovery entry
+    const entries = this.getRecoveryMetrics();
+    if (entries.length > 0) {
+      const lastEntry = entries[entries.length - 1];
+      lastEntry.deloadChosen = true;
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+    }
+
+    // Enable deload mode
+    this.deloadManager.enableDeload();
+
+    // Hide banner
+    document.getElementById('fatigue-warning-banner').style.display = 'none';
+
+    // Proceed to workout selection
+    this.showWorkoutSelection();
+  }
+
+  /**
+   * Handle fatigue warning continue anyway
+   */
+  handleWarningContinue() {
+    // Update recovery entry
+    const entries = this.getRecoveryMetrics();
+    if (entries.length > 0) {
+      const lastEntry = entries[entries.length - 1];
+      lastEntry.warningDismissed = true;
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+    }
+
+    // Hide banner
+    document.getElementById('fatigue-warning-banner').style.display = 'none';
+
+    // Proceed to workout selection
+    this.showWorkoutSelection();
   }
 
   completeWorkout() {

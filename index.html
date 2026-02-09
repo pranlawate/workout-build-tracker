@@ -353,6 +353,25 @@
     </div>
   </div>
 
+  <!-- Fatigue Warning Banner -->
+  <div id="fatigue-warning-banner" class="fatigue-warning-banner" style="display: none;">
+    <h2>⚠️ Fatigue Warning</h2>
+    <p class="fatigue-score" id="fatigue-score-text">Your recovery score is 0/9.</p>
+    <div class="warning-options">
+      <p><strong>Consider:</strong></p>
+      <ul>
+        <li>Take a rest day (recommended)</li>
+        <li>Do a lighter deload workout</li>
+        <li>Continue if you feel okay</li>
+      </ul>
+    </div>
+    <div class="warning-actions">
+      <button id="dismiss-warning-btn" class="btn btn-secondary">Dismiss</button>
+      <button id="deload-warning-btn" class="btn btn-secondary">Start Deload</button>
+      <button id="continue-warning-btn" class="btn btn-primary">Continue Anyway</button>
+    </div>
+  </div>
+
   <!-- Deload Modal -->
   <div id="deload-modal" class="modal" style="display: none;">
     <div class="modal-content deload-modal">
