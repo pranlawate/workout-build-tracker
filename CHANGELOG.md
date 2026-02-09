@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-09
+
+### Added - Post-Workout Summary Screen 🎉
+
+**Comprehensive Post-Workout Experience:**
+- Single summary screen replaces multiple modals
+- Celebration section: workout duration, total volume, volume comparison
+- New records detection: weight PRs and rep PRs
+- Inline pain tracking (replaces pain modal)
+- Inline weigh-in (conditional, only if due)
+- One "Done" button to complete and return home
+
+**Statistics Display:**
+- Duration formatted as friendly string (32 minutes / 1h 5m)
+- Total volume with comparison to last workout (>10% shows trend)
+- New records with clear before/after (e.g., "25kg → 27.5kg")
+- Empty state for no records: "Keep pushing! 💪"
+
+**User Experience:**
+- Quick completion: <10 seconds if no pain/weight needed
+- Progressive disclosure: pain section expands only if selected
+- Smart defaults: "No pain" pre-selected, weight pre-filled
+- Mobile responsive: large touch targets, scrollable
+
+### Changed
+- Service worker cache updated to v8
+- Pain tracking: inline in summary (not separate modal)
+- Weigh-in: inline in summary (not separate modal)
+- Workout completion flow: Alert → Summary → Home (simplified)
+
+### Technical
+- New CSS: `css/summary-screen.css`
+- New methods: `showWorkoutSummary()`, `calculateWorkoutStats()`, `detectNewRecords()`
+- PR detection: compares current to exercise history (weight + reps)
+- Reuses existing pain/weigh-in logic (no duplication)
+
+**Commits:** 12 clean commits following conventional format
+
+---
+
 ## [1.2.0] - 2026-02-09
 
 ### Added - Pain Tracking & Band Color Features 🎉
