@@ -80,10 +80,10 @@
 }
 
 .history-badges .badge {
-  font-size: 14px;
-  padding: 4px 8px;
+  font-size: var(--font-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--color-surface);
-  border-radius: 4px;
+  border-radius: 6px;
   border: 1px solid var(--color-border);
   color: var(--color-text);
   display: inline-flex;
