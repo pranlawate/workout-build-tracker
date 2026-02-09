@@ -1272,6 +1272,34 @@ class App {
   }
 
   /**
+   * Format set display for history (band-aware)
+   * @param {Object} set - Set object { reps, weight, rir }
+   * @param {Object} exercise - Exercise definition
+   * @returns {string} Formatted string like "15 reps @ 🔴 Medium" or "15 reps @ 20 kg"
+   */
+  formatSetDisplay(set, exercise) {
+    const reps = set.reps;
+    const weight = set.weight;
+    const rir = set.rir;
+
+    let weightDisplay;
+    if (this.isBandExercise(exercise)) {
+      const bandInfo = this.weightToBandColor(weight);
+      if (bandInfo.color === 'custom' && weight > 0) {
+        weightDisplay = `${weight} kg`;
+      } else if (bandInfo.color === 'custom') {
+        weightDisplay = 'Custom';
+      } else {
+        weightDisplay = `${bandInfo.symbol} ${bandInfo.label}`;
+      }
+    } else {
+      weightDisplay = `${weight} kg`;
+    }
+
+    return `${reps} reps @ ${weightDisplay}${rir !== undefined ? ` (RIR ${rir})` : ''}`;
+  }
+
+  /**
    * Set up event delegation for band color button clicks
    */
   setupBandColorButtons() {

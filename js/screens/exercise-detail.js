@@ -103,11 +103,63 @@ export class ExerciseDetailScreen {
   }
 
   formatSets(sets) {
-    const weights = sets.map(s => `${s.weight}kg`).join(', ');
-    const reps = sets.map(s => s.reps).join(',');
-    const rirs = sets.map(s => s.rir).join(',');
+    // Detect band exercise based on weight values (5/10/15/25 pattern suggests bands)
+    const isBandLike = sets.every(s => [0, 5, 10, 15, 25].includes(s.weight));
 
-    return `${sets.length} sets: ${weights} × ${reps} @ RIR ${rirs}`;
+    if (isBandLike && sets.some(s => [5, 10, 15, 25].includes(s.weight))) {
+      // Format as band exercise
+      const formattedSets = sets.map(s => this.formatSetDisplay(s, true)).join(' | ');
+      return formattedSets;
+    } else {
+      // Original format for regular exercises
+      const weights = sets.map(s => `${s.weight}kg`).join(', ');
+      const reps = sets.map(s => s.reps).join(',');
+      const rirs = sets.map(s => s.rir).join(',');
+      return `${sets.length} sets: ${weights} × ${reps} @ RIR ${rirs}`;
+    }
+  }
+
+  /**
+   * Format individual set display (band-aware)
+   * @param {Object} set - Set object { reps, weight, rir }
+   * @param {boolean} isBand - True if band exercise
+   * @returns {string} Formatted string
+   */
+  formatSetDisplay(set, isBand) {
+    const reps = set.reps;
+    const weight = set.weight;
+    const rir = set.rir;
+
+    let weightDisplay;
+    if (isBand) {
+      const bandInfo = this.weightToBandColor(weight);
+      if (bandInfo.color === 'custom' && weight > 0) {
+        weightDisplay = `${weight}kg`;
+      } else if (bandInfo.color === 'custom') {
+        weightDisplay = 'Custom';
+      } else {
+        weightDisplay = `${bandInfo.symbol} ${bandInfo.label}`;
+      }
+    } else {
+      weightDisplay = `${weight}kg`;
+    }
+
+    return `${reps}×${weightDisplay} (RIR ${rir})`;
+  }
+
+  /**
+   * Convert weight to band color info
+   * @param {number} weight - Weight in kg
+   * @returns {Object} { color: string, symbol: string, label: string }
+   */
+  weightToBandColor(weight) {
+    const mapping = {
+      5: { color: 'light', symbol: '🟡', label: 'Light' },
+      10: { color: 'medium', symbol: '🔴', label: 'Medium' },
+      15: { color: 'heavy', symbol: '🔵', label: 'Heavy' },
+      25: { color: 'x-heavy', symbol: '⚫', label: 'X-Heavy' }
+    };
+    return mapping[weight] || { color: 'custom', symbol: '⚪', label: 'Custom' };
   }
 
   attachEventListeners() {
