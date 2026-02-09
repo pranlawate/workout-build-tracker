@@ -2117,6 +2117,172 @@ class App {
     `;
   }
 
+  showPostWorkoutPainModal() {
+    const modal = document.getElementById('post-workout-pain-modal');
+    const initialCheck = document.getElementById('pain-initial-check');
+    const exerciseSelection = document.getElementById('pain-exercise-selection');
+    const painDetails = document.getElementById('pain-details');
+
+    // Reset to initial state
+    initialCheck.style.display = 'block';
+    exerciseSelection.style.display = 'none';
+    painDetails.style.display = 'none';
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // State tracking
+    let painfulExercises = [];
+    let currentPainIndex = 0;
+
+    // "No Pain" button
+    document.getElementById('pain-no-btn').onclick = () => {
+      // Save pain-free status for all exercises
+      this.currentWorkout.exercises.forEach((exercise) => {
+        const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+        this.storage.savePainReport(exerciseKey, false, null, null);
+      });
+
+      modal.style.display = 'none';
+
+      // Proceed to weigh-in
+      this.checkWeighInPrompt();
+    };
+
+    // "Yes, I had pain" button
+    document.getElementById('pain-yes-btn').onclick = () => {
+      initialCheck.style.display = 'none';
+      exerciseSelection.style.display = 'block';
+
+      // Populate exercise checkboxes
+      const exerciseList = document.getElementById('pain-exercise-list');
+      exerciseList.innerHTML = '';
+
+      this.currentWorkout.exercises.forEach((exercise, index) => {
+        const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+        const item = document.createElement('div');
+        item.className = 'pain-exercise-checkbox-item';
+        item.innerHTML = `
+          <input type="checkbox" id="pain-ex-${index}" value="${exerciseKey}">
+          <label for="pain-ex-${index}">${this.escapeHtml(exercise.name)}</label>
+        `;
+
+        // Toggle selected class on click
+        item.onclick = (e) => {
+          if (e.target.tagName !== 'INPUT') {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+          }
+          item.classList.toggle('selected', item.querySelector('input').checked);
+        };
+
+        exerciseList.appendChild(item);
+      });
+    };
+
+    // "Next" button (after selecting exercises)
+    document.getElementById('pain-selection-next-btn').onclick = () => {
+      // Collect checked exercises
+      const checkboxes = document.querySelectorAll('#pain-exercise-list input[type="checkbox"]:checked');
+      painfulExercises = Array.from(checkboxes).map(cb => ({
+        key: cb.value,
+        name: cb.nextElementSibling.textContent
+      }));
+
+      if (painfulExercises.length === 0) {
+        alert('Please select at least one exercise, or click "No Pain" if you had no pain.');
+        return;
+      }
+
+      // Start pain details flow
+      currentPainIndex = 0;
+      this.showPainDetailsForExercise(painfulExercises, currentPainIndex, modal);
+    };
+  }
+
+  showPainDetailsForExercise(painfulExercises, index, modal) {
+    if (index >= painfulExercises.length) {
+      // All done, save pain-free status for non-painful exercises
+      this.currentWorkout.exercises.forEach((exercise) => {
+        const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+        const isPainful = painfulExercises.some(p => p.key === exerciseKey);
+        if (!isPainful) {
+          this.storage.savePainReport(exerciseKey, false, null, null);
+        }
+      });
+
+      modal.style.display = 'none';
+      this.checkWeighInPrompt();
+      return;
+    }
+
+    const exerciseSelection = document.getElementById('pain-exercise-selection');
+    const painDetails = document.getElementById('pain-details');
+    const exerciseName = document.getElementById('pain-detail-exercise-name');
+    const progress = document.getElementById('pain-detail-progress');
+
+    // Hide selection, show details
+    exerciseSelection.style.display = 'none';
+    painDetails.style.display = 'block';
+
+    // Set exercise name and progress
+    exerciseName.textContent = painfulExercises[index].name;
+    progress.textContent = `Exercise ${index + 1} of ${painfulExercises.length}`;
+
+    // Severity buttons
+    const severityBtns = document.querySelectorAll('.pain-severity-btn');
+    let selectedSeverity = null;
+
+    severityBtns.forEach(btn => {
+      btn.onclick = () => {
+        selectedSeverity = btn.dataset.severity;
+        severityBtns.forEach(b => b.classList.remove('btn-primary'));
+        severityBtns.forEach(b => b.classList.add('btn-secondary'));
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-primary');
+      };
+    });
+
+    // Location buttons
+    const locationBtns = document.querySelectorAll('.pain-location-btn');
+    locationBtns.forEach(btn => {
+      btn.onclick = () => {
+        if (!selectedSeverity) {
+          alert('Please select pain severity first');
+          return;
+        }
+
+        const location = btn.dataset.location;
+        const exerciseKey = painfulExercises[index].key;
+
+        // Save pain report
+        this.storage.savePainReport(exerciseKey, true, location, selectedSeverity);
+
+        // Reset severity selection for next exercise
+        severityBtns.forEach(b => b.classList.remove('btn-primary'));
+        severityBtns.forEach(b => b.classList.add('btn-secondary'));
+
+        // Move to next exercise
+        this.showPainDetailsForExercise(painfulExercises, index + 1, modal);
+      };
+    });
+  }
+
+  checkWeighInPrompt() {
+    // Initialize BodyWeightManager if not already done
+    if (!this.bodyWeight) {
+      this.bodyWeight = new BodyWeightManager(this.storage);
+    }
+
+    // Check if weigh-in is due
+    if (this.bodyWeight.isWeighInDue()) {
+      this.showWeighInModal();
+    } else {
+      // Go back to home screen
+      this.showHomeScreen();
+    }
+  }
+
   renderCriterion(name, met, progress) {
     const icon = met ? '✅' : progress > 0 ? '⏳' : '❌';
     const status = met ? 'met' : progress > 0 ? 'progress' : 'not-started';
@@ -2349,17 +2515,13 @@ class App {
       // Show appropriate confirmation message
       if (isPartialWorkout) {
         alert(`💾 Partial workout saved!\n\n${completedCount} of ${totalExercises} exercises completed.\n\nNext time you'll continue with ${this.currentWorkout.displayName}.`);
+        this.showHomeScreen();
       } else {
         alert(`✅ ${this.currentWorkout.displayName} completed!`);
-      }
 
-      // Check if weigh-in is due
-      const bodyWeight = new BodyWeightManager(this.storage);
-      if (bodyWeight.isWeighInDue()) {
-        this.showWeighInModal();
+        // Show post-workout pain modal
+        this.showPostWorkoutPainModal();
       }
-
-      this.showHomeScreen();
     } catch (error) {
       console.error('Failed to save workout:', error);
       alert('⚠️ Failed to save workout. Please try again or check storage.');
