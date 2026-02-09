@@ -119,6 +119,15 @@ class App {
     this.attachEventListeners();
     this.initializeNumberOverlay();
     this.setupBandColorButtons();
+
+    // Initialize recovery modal
+    this.initRecoveryModalRadios();
+
+    // Recovery modal submit
+    const submitRecoveryBtn = document.getElementById('submit-recovery-btn');
+    if (submitRecoveryBtn) {
+      submitRecoveryBtn.addEventListener('click', () => this.handleRecoverySubmit());
+    }
   }
 
   setupBrowserHistory() {
@@ -3398,6 +3407,105 @@ class App {
       warningThreshold: 4,
       showWarning: totalScore >= 4
     };
+  }
+
+  /**
+   * Initialize radio button groups in recovery modal
+   */
+  initRecoveryModalRadios() {
+    const groups = [
+      { containerClass: 'stress-buttons', hiddenInputId: 'stress-level' },
+      { containerClass: 'energy-buttons', hiddenInputId: 'energy-level' },
+      { containerClass: 'soreness-buttons', hiddenInputId: 'muscle-soreness' }
+    ];
+
+    groups.forEach(group => {
+      const container = document.querySelector(`.${group.containerClass}`);
+      const hiddenInput = document.getElementById(group.hiddenInputId);
+
+      if (!container || !hiddenInput) return;
+
+      container.querySelectorAll('.radio-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Remove selected from all buttons in group
+          container.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+
+          // Add selected to clicked button
+          btn.classList.add('selected');
+
+          // Update hidden input value
+          hiddenInput.value = btn.dataset.value;
+        });
+      });
+    });
+  }
+
+  /**
+   * Show recovery metrics modal
+   */
+  showRecoveryMetricsModal() {
+    const modal = document.getElementById('recovery-metrics-modal');
+    if (!modal) return;
+
+    // Reset to defaults
+    document.getElementById('sleep-hours').value = 7;
+
+    // Reset radio buttons to defaults
+    document.querySelectorAll('.stress-buttons .radio-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.value === 'Low');
+    });
+    document.getElementById('stress-level').value = 'Low';
+
+    document.querySelectorAll('.energy-buttons .radio-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.value === '3');
+    });
+    document.getElementById('energy-level').value = '3';
+
+    document.querySelectorAll('.soreness-buttons .radio-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.value === 'None');
+    });
+    document.getElementById('muscle-soreness').value = 'None';
+
+    // Show modal
+    modal.style.display = 'flex';
+  }
+
+  /**
+   * Handle recovery metrics submission
+   */
+  handleRecoverySubmit() {
+    const metrics = {
+      sleepHours: parseInt(document.getElementById('sleep-hours').value, 10),
+      stressLevel: document.getElementById('stress-level').value,
+      energyLevel: parseInt(document.getElementById('energy-level').value, 10),
+      muscleSoreness: document.getElementById('muscle-soreness').value
+    };
+
+    // Calculate fatigue score
+    const scoreData = this.calculateFatigueScore(metrics);
+
+    // Save recovery entry
+    this.saveRecoveryMetrics({
+      ...metrics,
+      preWorkoutScore: scoreData.preWorkoutScore,
+      painScore: scoreData.painScore,
+      fatigueScore: scoreData.totalScore,
+      warningShown: scoreData.showWarning,
+      warningDismissed: false,
+      deloadChosen: false,
+      workoutCompleted: false
+    });
+
+    // Hide modal
+    document.getElementById('recovery-metrics-modal').style.display = 'none';
+
+    // Show warning if threshold met
+    if (scoreData.showWarning) {
+      this.showFatigueWarning(scoreData);
+    } else {
+      // Proceed to workout selection
+      this.showWorkoutSelection();
+    }
   }
 
   completeWorkout() {
