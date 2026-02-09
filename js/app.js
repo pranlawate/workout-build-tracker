@@ -363,7 +363,19 @@ class App {
   }
 
   startWorkout() {
+    // Check if recovery check is due
+    if (this.isRecoveryCheckDue()) {
+      this.showRecoveryMetricsModal();
+      return; // Stop here, modal will handle next steps
+    }
+
+    // Get next workout
     const nextWorkoutName = this.workoutManager.getNextWorkout();
+
+    if (!nextWorkoutName) {
+      alert('No workout scheduled. Please check workout rotation.');
+      return;
+    }
 
     // Check muscle recovery
     const recoveryCheck = this.workoutManager.checkMuscleRecovery(nextWorkoutName);
