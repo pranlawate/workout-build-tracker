@@ -1327,6 +1327,97 @@ class App {
     });
   }
 
+  /**
+   * Calculate workout statistics
+   * @param {Object} workoutData - Completed workout data
+   * @returns {Object} Stats object with duration, volume, comparison
+   */
+  calculateWorkoutStats(workoutData) {
+    const { workoutName, exercises, startTime, endTime } = workoutData;
+
+    // Calculate duration
+    const durationSeconds = Math.floor((endTime - startTime) / 1000);
+    const durationFormatted = this.formatDuration(durationSeconds);
+
+    // Calculate total volume
+    let totalVolume = 0;
+    exercises.forEach(exercise => {
+      if (exercise.sessionData && exercise.sessionData.sets) {
+        exercise.sessionData.sets.forEach(set => {
+          if (set.reps && set.weight) {
+            totalVolume += set.reps * set.weight;
+          }
+        });
+      }
+    });
+
+    // Get volume comparison (compare to last time this workout was done)
+    const volumeComparison = this.getVolumeComparison(workoutName, totalVolume);
+
+    return {
+      workoutName,
+      displayName: workoutData.displayName || workoutName,
+      duration: durationFormatted,
+      durationSeconds,
+      totalVolume: Math.round(totalVolume),
+      volumeComparison
+    };
+  }
+
+  /**
+   * Format duration in seconds to friendly string
+   * @param {number} seconds - Duration in seconds
+   * @returns {string} Formatted duration
+   */
+  formatDuration(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+      return `${minutes} minutes`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMins = minutes % 60;
+    return `${hours}h ${remainingMins}m`;
+  }
+
+  /**
+   * Get volume comparison to last workout
+   * @param {string} workoutName - Name of workout
+   * @param {number} currentVolume - Current total volume
+   * @returns {Object|null} Comparison object or null
+   */
+  getVolumeComparison(workoutName, currentVolume) {
+    const history = this.storage.getWorkoutHistory(workoutName, 2);
+    if (history.length < 2) return null; // Need previous workout for comparison
+
+    // Calculate previous volume (second most recent, since most recent is current)
+    let previousVolume = 0;
+    const previousWorkout = history[1];
+
+    if (previousWorkout && previousWorkout.exercises) {
+      previousWorkout.exercises.forEach(exercise => {
+        if (exercise.sets) {
+          exercise.sets.forEach(set => {
+            if (set.reps && set.weight) {
+              previousVolume += set.reps * set.weight;
+            }
+          });
+        }
+      });
+    }
+
+    if (previousVolume === 0) return null;
+
+    const percentChange = ((currentVolume - previousVolume) / previousVolume) * 100;
+
+    // Only show if >10% difference
+    if (Math.abs(percentChange) < 10) return null;
+
+    return {
+      percent: Math.round(percentChange),
+      direction: percentChange > 0 ? 'up' : 'down'
+    };
+  }
+
   advanceToNextExercise() {
     // Get completed exercise info FIRST (before early return)
     const justCompletedIndex = this.currentExerciseIndex;
