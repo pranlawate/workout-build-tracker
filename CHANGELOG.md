@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-02-09
+
+### Added - Pain Tracking & Band Color Features 🎉
+
+**Post-Workout Pain Tracking:**
+- Consolidated pain tracking modal (replaces annoying per-exercise prompts)
+- Three-step flow: Initial check → Exercise selection → Pain details
+- Multi-select exercise checkboxes for efficient reporting
+- Large touch-friendly buttons (50-60px height) for mobile
+- Severity selection (Minor/Significant) per exercise
+- Location buttons (Shoulder, Elbow, Wrist, Lower back, Knee, Hip, Other)
+- Pain-free workouts: 1 tap to dismiss (vs. N taps before)
+- Integrated with weigh-in flow (pain modal → weigh-in modal)
+
+**Band Exercise Color Selection:**
+- Visual band color buttons replace confusing "0 kg" weight input
+- Color-coded resistance selection: 🟡 Light (5kg), 🔴 Medium (10kg), 🔵 Heavy (15kg), ⚫ X-Heavy (25kg), ⚪ Custom
+- Smart defaults: Pre-selects last used color or defaults to Medium
+- Custom weight option for non-standard bands
+- Exercise history displays color emoji + name (e.g., "15 reps @ 🔴 Medium")
+- Band detection: Automatic identification of band exercises (startingWeight=0, weightIncrement=0)
+
+**Body Weight Tracking Improvements:**
+- Daily weigh-in prompts (changed from 7-day to 1-day frequency)
+- Same-day weight entry replacement with user feedback
+- Smart defaults in weigh-in modal (last weight or 57.5kg)
+- Auto-selected input for quick data entry
+
+### Changed
+- Service worker cache updated to v7
+- Pain tracking UX: Modal-based instead of per-exercise interruptions
+- Band exercises: Color buttons instead of numeric weight input
+- Weigh-in frequency: Daily prompts (calculations still use weekly/monthly aggregation)
+
+### Technical
+- 11 implementation tasks completed via subagent-driven development
+- Two-stage review per task (spec compliance + code quality)
+- New CSS: Post-workout pain modal styling, band color button grid
+- New JS methods: 3 pain flow methods, 3 band detection utilities
+- Updated exercise history display logic for band colors
+- Consolidated integration testing (single master document)
+
+**Files Modified:**
+- index.html: Post-workout pain modal structure
+- css/workout-screen.css: Pain modal + band button styles
+- js/app.js: Pain flow logic, band utilities, conditional rendering
+- js/screens/exercise-detail.js: Band color history display
+- js/modules/body-weight.js: Daily weigh-in threshold
+
+**Testing:**
+- Master integration test document created
+- 50+ test cases covering all features
+- Edge cases and error handling validated
+- Mobile responsiveness verified
+
+**Commits:** 12 clean commits following conventional format without AI attribution
+
+---
+
 ## [1.1.0] - 2026-02-06
 
 ### Added - Progress Dashboard 🎉
