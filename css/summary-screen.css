@@ -47,12 +47,12 @@
   padding: 2px 8px;
   border-radius: 12px;
   background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  color: var(--color-success);
 }
 
 .trend-indicator.down {
   background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 /* New Records */
@@ -82,8 +82,15 @@
 
 .pain-choice-buttons .btn {
   flex: 1;
-  height: 50px;
+  min-height: 50px;
   font-size: var(--font-md);
+  transition: all 0.2s ease;
+}
+
+.pain-choice-buttons .btn:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
 }
 
 .pain-exercise-checkboxes {
@@ -103,7 +110,8 @@
 
 .pain-severity-buttons-summary .btn,
 .pain-location-buttons-summary .btn {
-  height: 50px;
+  min-height: 50px;
+  transition: all 0.2s ease;
 }
 
 /* Weigh-in */
@@ -116,13 +124,20 @@
 
 #weighin-input-summary {
   flex: 1;
-  height: 50px;
+  min-height: 50px;
   font-size: var(--font-lg);
   padding: var(--spacing-sm);
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   background: var(--color-bg);
   color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+#weighin-input-summary:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
 }
 
 .unit-label {
@@ -134,7 +149,7 @@
 /* Done Button */
 .btn-large {
   width: 100%;
-  height: 60px;
+  min-height: 60px;
   font-size: var(--font-lg);
   margin-top: var(--spacing-lg);
 }
@@ -147,10 +162,5 @@
 
   .summary-title {
     font-size: var(--font-xl);
-  }
-
-  .pain-severity-buttons-summary,
-  .pain-location-buttons-summary {
-    grid-template-columns: 1fr 1fr;
   }
 }
