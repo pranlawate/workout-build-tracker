@@ -1173,6 +1173,45 @@ class App {
     }
   }
 
+  /**
+   * Check if exercise is a band/bodyweight exercise (no weight progression)
+   * @param {Object} exercise - Exercise definition from workout
+   * @returns {boolean} True if band exercise
+   */
+  isBandExercise(exercise) {
+    return exercise.startingWeight === 0 && exercise.weightIncrement === 0;
+  }
+
+  /**
+   * Convert band color to weight value
+   * @param {string} color - 'light', 'medium', 'heavy', 'x-heavy'
+   * @returns {number} Weight in kg
+   */
+  bandColorToWeight(color) {
+    const mapping = {
+      'light': 5,
+      'medium': 10,
+      'heavy': 15,
+      'x-heavy': 25
+    };
+    return mapping[color] || 0; // 0 = custom
+  }
+
+  /**
+   * Convert weight to band color
+   * @param {number} weight - Weight in kg
+   * @returns {Object} { color: string, symbol: string, label: string }
+   */
+  weightToBandColor(weight) {
+    const mapping = {
+      5: { color: 'light', symbol: '🟡', label: 'Light' },
+      10: { color: 'medium', symbol: '🔴', label: 'Medium' },
+      15: { color: 'heavy', symbol: '🔵', label: 'Heavy' },
+      25: { color: 'x-heavy', symbol: '⚫', label: 'X-Heavy' }
+    };
+    return mapping[weight] || { color: 'custom', symbol: '⚪', label: 'Custom' };
+  }
+
   advanceToNextExercise() {
     // Get completed exercise info FIRST (before early return)
     const justCompletedIndex = this.currentExerciseIndex;
