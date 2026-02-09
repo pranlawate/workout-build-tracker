@@ -1418,6 +1418,129 @@ class App {
     };
   }
 
+  /**
+   * Detect new personal records (weight PRs and rep PRs)
+   * @param {Object} workoutData - Completed workout data
+   * @returns {Array} Array of PR objects
+   */
+  detectNewRecords(workoutData) {
+    const newRecords = [];
+
+    workoutData.exercises.forEach(exercise => {
+      if (!exercise.sessionData || !exercise.sessionData.sets) return;
+
+      const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+      const history = this.storage.getExerciseHistory(exerciseKey);
+
+      // Get max weight used today
+      const todayWeights = exercise.sessionData.sets
+        .filter(set => set.weight && set.reps)
+        .map(set => set.weight);
+
+      if (todayWeights.length === 0) return;
+
+      const todayMaxWeight = Math.max(...todayWeights);
+
+      // Check for weight PR
+      const weightPR = this.checkWeightPR(history, todayMaxWeight);
+      if (weightPR) {
+        newRecords.push({
+          exercise: exercise.name,
+          type: 'weight',
+          from: weightPR.from,
+          to: weightPR.to
+        });
+      }
+
+      // Check for rep PRs at each weight used today
+      const repPRs = this.checkRepPRs(exercise.sessionData.sets, history);
+      repPRs.forEach(pr => {
+        newRecords.push({
+          exercise: exercise.name,
+          type: 'reps',
+          weight: pr.weight,
+          from: pr.from,
+          to: pr.to
+        });
+      });
+    });
+
+    return newRecords.slice(0, 5); // Max 5 records
+  }
+
+  /**
+   * Check for weight PR
+   * @param {Array} history - Exercise history
+   * @param {number} todayMaxWeight - Max weight used today
+   * @returns {Object|null} PR object or null
+   */
+  checkWeightPR(history, todayMaxWeight) {
+    if (history.length === 0) return null; // No history = can't be a PR
+
+    let maxWeightEver = 0;
+    history.forEach(session => {
+      if (session.sets) {
+        session.sets.forEach(set => {
+          if (set.weight && set.weight > maxWeightEver) {
+            maxWeightEver = set.weight;
+          }
+        });
+      }
+    });
+
+    if (todayMaxWeight > maxWeightEver) {
+      return { from: maxWeightEver, to: todayMaxWeight };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check for rep PRs
+   * @param {Array} todaySets - Today's sets
+   * @param {Array} history - Exercise history
+   * @returns {Array} Array of rep PR objects
+   */
+  checkRepPRs(todaySets, history) {
+    const repPRs = [];
+
+    // Get unique weights used today
+    const weightsUsedToday = [...new Set(todaySets.map(set => set.weight))];
+
+    weightsUsedToday.forEach(weight => {
+      // Get max reps at this weight today
+      const repsAtWeightToday = todaySets
+        .filter(set => set.weight === weight && set.reps)
+        .map(set => set.reps);
+
+      if (repsAtWeightToday.length === 0) return;
+
+      const maxRepsToday = Math.max(...repsAtWeightToday);
+
+      // Get max reps at this weight historically
+      let maxRepsEver = 0;
+      history.forEach(session => {
+        if (session.sets) {
+          session.sets.forEach(set => {
+            if (set.weight === weight && set.reps && set.reps > maxRepsEver) {
+              maxRepsEver = set.reps;
+            }
+          });
+        }
+      });
+
+      if (maxRepsToday > maxRepsEver) {
+        repPRs.push({
+          weight,
+          from: maxRepsEver,
+          to: maxRepsToday
+        });
+      }
+    });
+
+    return repPRs;
+  }
+
   advanceToNextExercise() {
     // Get completed exercise info FIRST (before early return)
     const justCompletedIndex = this.currentExerciseIndex;
