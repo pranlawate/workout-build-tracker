@@ -92,8 +92,14 @@
 
     <!-- Post-Workout Summary Screen -->
     <div id="summary-screen" class="screen" style="display: none;">
-      <div class="summary-container">
-        <h1 class="summary-title">✅ Workout Complete!</h1>
+      <header class="app-header">
+        <button id="summary-back-btn" class="icon-btn" aria-label="Back">←</button>
+        <h1>Workout Summary</h1>
+        <span></span>
+      </header>
+
+      <main class="screen-content">
+        <h2 class="summary-title">✅ Workout Complete!</h2>
 
         <!-- Stats Section -->
         <div id="summary-stats" class="summary-section">
@@ -106,8 +112,8 @@
 
           <!-- Initial selection -->
           <div id="pain-initial-choice" class="pain-choice-buttons">
-            <button id="pain-no-summary" class="btn btn-primary">No pain ✓</button>
-            <button id="pain-yes-summary" class="btn btn-secondary">Yes, I had pain</button>
+            <button id="pain-no-summary" class="btn btn-primary" aria-label="No pain">No pain ✓</button>
+            <button id="pain-yes-summary" class="btn btn-secondary" aria-label="Yes, I had pain">Yes, I had pain</button>
           </div>
 
           <!-- Exercise selection (hidden initially) -->
@@ -121,24 +127,24 @@
 
           <!-- Pain details (hidden initially) -->
           <div id="pain-details-summary" style="display: none;">
-            <h3 id="pain-current-exercise"></h3>
-            <p id="pain-exercise-progress"></p>
+            <h3 id="pain-current-exercise">Exercise Name</h3>
+            <p id="pain-exercise-progress">Progress info</p>
 
             <p>How severe was the pain?</p>
             <div class="pain-severity-buttons-summary">
-              <button class="pain-severity-btn btn btn-secondary" data-severity="minor">Minor</button>
-              <button class="pain-severity-btn btn btn-secondary" data-severity="significant">Significant</button>
+              <button class="pain-severity-btn btn btn-secondary" data-severity="minor" aria-label="Minor pain">Minor</button>
+              <button class="pain-severity-btn btn btn-secondary" data-severity="significant" aria-label="Significant pain">Significant</button>
             </div>
 
             <p>Where was the pain?</p>
             <div class="pain-location-buttons-summary">
-              <button class="pain-location-btn btn btn-secondary" data-location="shoulder">Shoulder</button>
-              <button class="pain-location-btn btn btn-secondary" data-location="elbow">Elbow</button>
-              <button class="pain-location-btn btn btn-secondary" data-location="wrist">Wrist</button>
-              <button class="pain-location-btn btn btn-secondary" data-location="lower_back">Lower back</button>
-              <button class="pain-location-btn btn btn-secondary" data-location="knee">Knee</button>
-              <button class="pain-location-btn btn btn-secondary" data-location="hip">Hip</button>
-              <button class="pain-location-btn btn btn-secondary" data-location="other">Other</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="shoulder" aria-label="Shoulder pain">Shoulder</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="elbow" aria-label="Elbow pain">Elbow</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="wrist" aria-label="Wrist pain">Wrist</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="lower_back" aria-label="Lower back pain">Lower back</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="knee" aria-label="Knee pain">Knee</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="hip" aria-label="Hip pain">Hip</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="other" aria-label="Other location pain">Other</button>
             </div>
           </div>
         </div>
@@ -147,14 +153,15 @@
         <div id="summary-weighin" class="summary-section" style="display: none;">
           <h2 class="section-title">⚖️ Log Today's Weight</h2>
           <div class="weighin-input-group">
-            <input type="number" id="weighin-input-summary" placeholder="75.5" step="0.1" min="30" max="200">
+            <label for="weighin-input-summary" class="visually-hidden">Body weight</label>
+            <input type="number" id="weighin-input-summary" placeholder="75.5" step="0.1" min="30" max="200" inputmode="decimal" autocomplete="off">
             <span class="unit-label">kg</span>
           </div>
         </div>
 
         <!-- Done Button -->
         <button id="summary-done-btn" class="btn btn-primary btn-large">Done ✓</button>
-      </div>
+      </main>
     </div>
 
     <!-- History Screen -->
