@@ -11,6 +11,13 @@
   --color-danger: #ef4444;
   --color-info: #3b82f6;
 
+  /* Semantic aliases for components */
+  --color-bg-primary: var(--color-bg);
+  --color-bg-secondary: var(--color-surface);
+  --color-bg-tertiary: var(--color-surface-light);
+  --color-text-secondary: var(--color-text-dim);
+  --color-border: var(--color-surface-light);
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
