@@ -2,6 +2,7 @@
 
 import { ProgressChart } from '../components/progress-chart.js';
 import { getProgressionStatus } from '../modules/progression.js';
+import { WORKOUTS } from '../modules/workouts.js';
 
 export class ExerciseDetailScreen {
   constructor(storage, performanceAnalyzer, deloadManager, onBack, onEdit, onDelete) {
@@ -335,38 +336,23 @@ export class ExerciseDetailScreen {
    */
   findExerciseDefinition(workoutType, exerciseName) {
     try {
-      // Import workout data
-      const workouts = {
-        'UPPER_A': [
-          { name: 'Goblet Squat', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
-          { name: 'DB Bench Press', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
-          { name: 'DB Shoulder Press', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 6, increment: 2 },
-          { name: 'DB Row', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 8, increment: 2 },
-          { name: 'Bicep Curl', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 6, increment: 2 },
-          { name: 'Plank', sets: 3, repRange: '30-60s', rirTarget: '2-3', weight: 0, increment: 0 }
-        ],
-        'UPPER_B': [
-          { name: 'Goblet Squat', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
-          { name: 'DB Incline Press', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
-          { name: 'Lateral Raise', sets: 3, repRange: '12-15', rirTarget: '2-3', weight: 4, increment: 1 },
-          { name: 'Lat Pulldown', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 20, increment: 2.5 },
-          { name: 'Tricep Extension', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 6, increment: 2 },
-          { name: 'Side Plank', sets: 3, repRange: '30s/side', rirTarget: '2-3', weight: 0, increment: 0 }
-        ],
-        'LOWER': [
-          { name: 'DB RDL', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 10, increment: 2.5 },
-          { name: 'DB Bulgarian Split Squat', sets: 3, repRange: '10-12/side', rirTarget: '2-3', weight: 8, increment: 2 },
-          { name: 'Leg Press', sets: 3, repRange: '12-15', rirTarget: '2-3', weight: 40, increment: 5 },
-          { name: 'Leg Curl', sets: 3, repRange: '12-15', rirTarget: '2-3', weight: 20, increment: 2.5 },
-          { name: 'Calf Raise', sets: 3, repRange: '15-20', rirTarget: '2-3', weight: 15, increment: 2.5 },
-          { name: 'Ab Wheel', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 0, increment: 0 }
-        ]
+      // Get workout from imported WORKOUTS object
+      const workout = WORKOUTS[workoutType];
+      if (!workout || !workout.exercises) return null;
+
+      // Find exercise by name
+      const exercise = workout.exercises.find(ex => ex.name === exerciseName);
+      if (!exercise) return null;
+
+      // Map to expected format (workouts.js uses different property names)
+      return {
+        name: exercise.name,
+        sets: exercise.sets,
+        repRange: exercise.repRange,
+        rirTarget: exercise.rirTarget,
+        weight: exercise.startingWeight,
+        increment: exercise.weightIncrement
       };
-
-      const workout = workouts[workoutType];
-      if (!workout) return null;
-
-      return workout.find(ex => ex.name === exerciseName) || null;
     } catch (error) {
       console.error('[ExerciseDetail] Exercise lookup error:', error);
       return null;
