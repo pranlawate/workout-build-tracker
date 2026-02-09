@@ -3308,6 +3308,98 @@ class App {
     return today !== lastDate;
   }
 
+  /**
+   * Calculate pre-workout fatigue score (0-6 points)
+   * @param {Object} metrics - Recovery metrics
+   * @returns {number} Points from pre-workout data
+   */
+  calculatePreWorkoutScore(metrics) {
+    let score = 0;
+
+    // Sleep scoring
+    if (metrics.sleepHours < 6) {
+      score += 2;
+    } else if (metrics.sleepHours < 7) {
+      score += 1;
+    }
+
+    // Stress scoring
+    if (metrics.stressLevel === 'High') {
+      score += 1;
+    }
+
+    // Energy scoring
+    if (metrics.energyLevel <= 2) {
+      score += 2;
+    } else if (metrics.energyLevel === 3) {
+      score += 1;
+    }
+
+    // Soreness scoring
+    if (metrics.muscleSoreness === 'Severe') {
+      score += 2;
+    } else if (metrics.muscleSoreness === 'Moderate') {
+      score += 1;
+    }
+
+    return score;
+  }
+
+  /**
+   * Calculate pain score from last workout (0-3 points)
+   * @returns {number} Points from pain data
+   */
+  calculatePainScore() {
+    try {
+      // Get all pain report keys
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('build_pain_'));
+
+      if (keys.length === 0) return 0;
+
+      // Find most recent pain reports
+      const reports = keys
+        .map(k => {
+          try {
+            return JSON.parse(localStorage.getItem(k));
+          } catch {
+            return null;
+          }
+        })
+        .filter(r => r !== null && r.date);
+
+      if (reports.length === 0) return 0;
+
+      // Check if any report has severity >= Moderate
+      const hasModerateOrWorse = reports.some(r =>
+        r.severity === 'Moderate' || r.severity === 'Severe'
+      );
+
+      return hasModerateOrWorse ? 3 : 0;
+    } catch (error) {
+      console.error('[Fatigue Score] Pain calculation failed:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate total fatigue score (0-9 points)
+   * @param {Object} metrics - Recovery metrics
+   * @returns {Object} Score breakdown
+   */
+  calculateFatigueScore(metrics) {
+    const preWorkoutScore = this.calculatePreWorkoutScore(metrics);
+    const painScore = this.calculatePainScore();
+    const totalScore = preWorkoutScore + painScore;
+
+    return {
+      preWorkoutScore,
+      painScore,
+      totalScore,
+      warningThreshold: 4,
+      showWarning: totalScore >= 4
+    };
+  }
+
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
