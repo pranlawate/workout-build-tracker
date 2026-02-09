@@ -1,10 +1,13 @@
 // src/js/screens/exercise-detail.js
 
 import { ProgressChart } from '../components/progress-chart.js';
+import { getProgressionStatus } from '../modules/progression.js';
 
 export class ExerciseDetailScreen {
-  constructor(storage, onBack, onEdit, onDelete) {
+  constructor(storage, performanceAnalyzer, deloadManager, onBack, onEdit, onDelete) {
     this.storage = storage;
+    this.performanceAnalyzer = performanceAnalyzer;
+    this.deloadManager = deloadManager;
     this.onBack = onBack;
     this.onEdit = onEdit;
     this.onDelete = onDelete;
