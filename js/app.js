@@ -30,6 +30,8 @@ class App {
 
     this.exerciseDetailScreen = new ExerciseDetailScreen(
       this.storage,
+      this.performanceAnalyzer,
+      this.deloadManager,
       () => this.showHistoryScreen(),
       (exerciseKey, index) => this.editEntry(exerciseKey, index),
       (exerciseKey, index) => this.deleteEntry(exerciseKey, index)
