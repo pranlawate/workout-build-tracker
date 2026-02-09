@@ -90,6 +90,73 @@
       </main>
     </div>
 
+    <!-- Post-Workout Summary Screen -->
+    <div id="summary-screen" class="screen" style="display: none;">
+      <div class="summary-container">
+        <h1 class="summary-title">✅ Workout Complete!</h1>
+
+        <!-- Stats Section -->
+        <div id="summary-stats" class="summary-section">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Pain Tracking Section -->
+        <div id="summary-pain" class="summary-section">
+          <h2 class="section-title">💪 Pain Check</h2>
+
+          <!-- Initial selection -->
+          <div id="pain-initial-choice" class="pain-choice-buttons">
+            <button id="pain-no-summary" class="btn btn-primary">No pain ✓</button>
+            <button id="pain-yes-summary" class="btn btn-secondary">Yes, I had pain</button>
+          </div>
+
+          <!-- Exercise selection (hidden initially) -->
+          <div id="pain-exercise-selection-summary" style="display: none;">
+            <p>Which exercises had pain? (Select all that apply)</p>
+            <div id="pain-exercise-list-summary" class="pain-exercise-checkboxes">
+              <!-- Populated dynamically -->
+            </div>
+            <button id="pain-next-summary" class="btn btn-primary">Next →</button>
+          </div>
+
+          <!-- Pain details (hidden initially) -->
+          <div id="pain-details-summary" style="display: none;">
+            <h3 id="pain-current-exercise"></h3>
+            <p id="pain-exercise-progress"></p>
+
+            <p>How severe was the pain?</p>
+            <div class="pain-severity-buttons-summary">
+              <button class="pain-severity-btn btn btn-secondary" data-severity="minor">Minor</button>
+              <button class="pain-severity-btn btn btn-secondary" data-severity="significant">Significant</button>
+            </div>
+
+            <p>Where was the pain?</p>
+            <div class="pain-location-buttons-summary">
+              <button class="pain-location-btn btn btn-secondary" data-location="shoulder">Shoulder</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="elbow">Elbow</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="wrist">Wrist</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="lower_back">Lower back</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="knee">Knee</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="hip">Hip</button>
+              <button class="pain-location-btn btn btn-secondary" data-location="other">Other</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weigh-in Section (conditional) -->
+        <div id="summary-weighin" class="summary-section" style="display: none;">
+          <h2 class="section-title">⚖️ Log Today's Weight</h2>
+          <div class="weighin-input-group">
+            <input type="number" id="weighin-input-summary" placeholder="75.5" step="0.1" min="30" max="200">
+            <span class="unit-label">kg</span>
+          </div>
+        </div>
+
+        <!-- Done Button -->
+        <button id="summary-done-btn" class="btn btn-primary btn-large">Done ✓</button>
+      </div>
+    </div>
+
     <!-- History Screen -->
     <div id="history-screen" class="screen">
       <header class="app-header">
