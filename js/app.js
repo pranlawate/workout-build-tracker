@@ -312,6 +312,12 @@ class App {
       detailBackBtn.addEventListener('click', () => this.showHistoryScreen());
     }
 
+    // Summary back button
+    const summaryBackBtn = document.getElementById('summary-back-btn');
+    if (summaryBackBtn) {
+      summaryBackBtn.addEventListener('click', () => this.showHomeScreen());
+    }
+
     // Settings button
     const settingsBtn = document.getElementById('settings-btn');
     if (settingsBtn) {
@@ -2826,6 +2832,421 @@ class App {
     `;
   }
 
+  /**
+   * Show post-workout summary screen
+   * @param {Object} workoutData - Completed workout data
+   */
+  showWorkoutSummary(workoutData) {
+    // Calculate stats
+    const stats = this.calculateWorkoutStats(workoutData);
+    const newRecords = this.detectNewRecords(workoutData);
+
+    // Show summary screen
+    this.hideAllScreens();
+    document.getElementById('summary-screen').style.display = 'block';
+    window.history.pushState({ screen: 'summary' }, '', '');
+
+    // Render stats section
+    this.renderSummaryStats(stats, newRecords);
+
+    // Setup pain tracking (reuse logic, inline)
+    this.setupSummaryPainTracking(workoutData);
+
+    // Setup weigh-in (conditional)
+    this.setupSummaryWeighIn();
+
+    // Setup done button
+    this.setupSummaryDoneButton(workoutData);
+  }
+
+  /**
+   * Render summary stats section
+   * @param {Object} stats - Workout stats
+   * @param {Array} newRecords - Array of PRs
+   */
+  renderSummaryStats(stats, newRecords) {
+    const container = document.getElementById('summary-stats');
+
+    // Update title
+    document.querySelector('.summary-title').textContent =
+      `✅ ${stats.displayName} Complete!`;
+
+    // Build stats HTML
+    let html = '';
+
+    // Duration
+    html += `
+      <div class="stat-row">
+        <span class="stat-icon">⏱️</span>
+        <span>${stats.duration}</span>
+      </div>
+    `;
+
+    // Total volume
+    html += `
+      <div class="stat-row">
+        <span class="stat-icon">📊</span>
+        <span>${stats.totalVolume.toLocaleString()} kg total volume</span>
+        ${stats.volumeComparison ? this.renderVolumeComparison(stats.volumeComparison) : ''}
+      </div>
+    `;
+
+    // New records
+    if (newRecords.length > 0) {
+      html += `
+        <div class="stat-row">
+          <span class="stat-icon">🎉</span>
+          <span class="stat-value">${newRecords.length} New Record${newRecords.length > 1 ? 's' : ''}!</span>
+        </div>
+        <ul class="records-list">
+          ${newRecords.map(record => this.renderRecord(record)).join('')}
+        </ul>
+      `;
+    } else {
+      html += `
+        <div class="empty-records">Keep pushing! 💪</div>
+      `;
+    }
+
+    container.innerHTML = html;
+  }
+
+  /**
+   * Render volume comparison indicator
+   * @param {Object} comparison - Comparison object
+   * @returns {string} HTML string
+   */
+  renderVolumeComparison(comparison) {
+    const directionClass = comparison.direction === 'up' ? '' : 'down';
+    const emoji = comparison.direction === 'up' ? '📈' : '📉';
+    const sign = comparison.direction === 'up' ? '+' : '';
+
+    return `
+      <span class="trend-indicator ${directionClass}">
+        ${emoji} ${sign}${comparison.percent}%
+      </span>
+    `;
+  }
+
+  /**
+   * Render individual record
+   * @param {Object} record - Record object
+   * @returns {string} HTML string
+   */
+  renderRecord(record) {
+    if (record.type === 'weight') {
+      return `<li class="record-item">• ${record.exercise}: ${record.from}kg → ${record.to}kg</li>`;
+    } else {
+      return `<li class="record-item">• ${record.exercise} @ ${record.weight}kg: ${record.from} → ${record.to} reps</li>`;
+    }
+  }
+
+  /**
+   * Setup pain tracking section in summary
+   * @param {Object} workoutData - Workout data with exercises
+   */
+  setupSummaryPainTracking(workoutData) {
+    const painNoBtn = document.getElementById('pain-no-summary');
+    const painYesBtn = document.getElementById('pain-yes-summary');
+    const initialChoice = document.getElementById('pain-initial-choice');
+    const exerciseSelection = document.getElementById('pain-exercise-selection-summary');
+    const painDetails = document.getElementById('pain-details-summary');
+
+    // State tracking
+    let painfulExercises = [];
+    let currentPainIndex = 0;
+
+    // Reset to initial state
+    initialChoice.style.display = 'flex';
+    exerciseSelection.style.display = 'none';
+    painDetails.style.display = 'none';
+
+    // Pre-select "No pain"
+    painNoBtn.classList.remove('btn-secondary');
+    painNoBtn.classList.add('btn-primary');
+    painYesBtn.classList.remove('btn-primary');
+    painYesBtn.classList.add('btn-secondary');
+
+    // Store default: no pain
+    this.summaryPainSelection = 'no';
+
+    // "No pain" button
+    painNoBtn.onclick = () => {
+      this.summaryPainSelection = 'no';
+      painNoBtn.classList.remove('btn-secondary');
+      painNoBtn.classList.add('btn-primary');
+      painYesBtn.classList.remove('btn-primary');
+      painYesBtn.classList.add('btn-secondary');
+
+      // Hide expanded sections
+      exerciseSelection.style.display = 'none';
+      painDetails.style.display = 'none';
+    };
+
+    // "Yes, I had pain" button
+    painYesBtn.onclick = () => {
+      this.summaryPainSelection = 'yes';
+      painYesBtn.classList.remove('btn-secondary');
+      painYesBtn.classList.add('btn-primary');
+      painNoBtn.classList.remove('btn-primary');
+      painNoBtn.classList.add('btn-secondary');
+
+      // Show exercise selection
+      initialChoice.style.display = 'flex'; // Keep visible
+      exerciseSelection.style.display = 'block';
+
+      // Populate exercise checkboxes
+      const exerciseList = document.getElementById('pain-exercise-list-summary');
+      exerciseList.innerHTML = '';
+
+      workoutData.exercises.forEach((exercise, index) => {
+        const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+        const item = document.createElement('div');
+        item.className = 'pain-exercise-checkbox-item';
+        item.innerHTML = `
+          <input type="checkbox" id="pain-ex-summary-${index}" value="${exerciseKey}">
+          <label for="pain-ex-summary-${index}">${this.escapeHtml(exercise.name)}</label>
+        `;
+
+        // Toggle selected class on click
+        item.onclick = (e) => {
+          if (e.target.tagName !== 'INPUT') {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+          }
+          item.classList.toggle('selected', item.querySelector('input').checked);
+        };
+
+        exerciseList.appendChild(item);
+      });
+    };
+
+    // "Next" button (after selecting exercises)
+    document.getElementById('pain-next-summary').onclick = () => {
+      // Collect checked exercises
+      const checkboxes = document.querySelectorAll('#pain-exercise-list-summary input[type="checkbox"]:checked');
+      painfulExercises = Array.from(checkboxes).map(cb => ({
+        key: cb.value,
+        name: cb.nextElementSibling.textContent
+      }));
+
+      if (painfulExercises.length === 0) {
+        alert('Please select at least one exercise, or click "No Pain"');
+        return;
+      }
+
+      // Show pain details for first exercise
+      currentPainIndex = 0;
+      this.showSummaryPainDetails(painfulExercises, currentPainIndex, workoutData);
+    };
+
+    // Store reference for later
+    this.summaryPainfulExercises = [];
+  }
+
+  /**
+   * Show pain details for selected exercise in summary
+   * @param {Array} painfulExercises - Array of painful exercises
+   * @param {number} index - Current exercise index
+   * @param {Object} workoutData - Workout data
+   */
+  showSummaryPainDetails(painfulExercises, index, workoutData) {
+    if (index >= painfulExercises.length) {
+      // All done - store for saving later
+      this.summaryPainfulExercises = painfulExercises;
+
+      // Hide pain details, return to summary
+      document.getElementById('pain-details-summary').style.display = 'none';
+      return;
+    }
+
+    const painDetails = document.getElementById('pain-details-summary');
+    const exerciseSelection = document.getElementById('pain-exercise-selection-summary');
+
+    // Hide selection, show details
+    exerciseSelection.style.display = 'none';
+    painDetails.style.display = 'block';
+
+    // Set exercise name and progress
+    document.getElementById('pain-current-exercise').textContent = painfulExercises[index].name;
+    document.getElementById('pain-exercise-progress').textContent =
+      `Exercise ${index + 1} of ${painfulExercises.length}`;
+
+    // Setup severity buttons
+    const severityBtns = document.querySelectorAll('.pain-severity-btn');
+    let selectedSeverity = null;
+
+    severityBtns.forEach(btn => {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+
+      btn.onclick = () => {
+        selectedSeverity = btn.dataset.severity;
+        severityBtns.forEach(b => {
+          b.classList.remove('btn-primary');
+          b.classList.add('btn-secondary');
+        });
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-primary');
+      };
+    });
+
+    // Setup location buttons
+    const locationBtns = document.querySelectorAll('.pain-location-buttons-summary .pain-location-btn');
+    locationBtns.forEach(btn => {
+      btn.onclick = () => {
+        if (!selectedSeverity) {
+          alert('Please select pain severity first');
+          return;
+        }
+
+        const location = btn.dataset.location;
+
+        // Store pain data for this exercise
+        painfulExercises[index].severity = selectedSeverity;
+        painfulExercises[index].location = location;
+
+        // Move to next exercise
+        this.showSummaryPainDetails(painfulExercises, index + 1, workoutData);
+      };
+    });
+  }
+
+  /**
+   * Setup weigh-in section in summary (conditional)
+   */
+  setupSummaryWeighIn() {
+    const weighinSection = document.getElementById('summary-weighin');
+    const weighinInput = document.getElementById('weighin-input-summary');
+
+    // Check if weigh-in is due
+    const weighinDue = this.bodyWeight && this.bodyWeight.isWeighInDue();
+
+    if (!weighinDue) {
+      weighinSection.style.display = 'none';
+      return;
+    }
+
+    // Show weigh-in section
+    weighinSection.style.display = 'block';
+
+    // Pre-fill with last weight or default
+    const data = this.bodyWeight.getData();
+    const lastWeight = data.entries.length > 0
+      ? data.entries[data.entries.length - 1].weight_kg
+      : 57.5;
+
+    weighinInput.value = lastWeight;
+
+    // Auto-select for quick entry
+    setTimeout(() => weighinInput.select(), 100);
+  }
+
+  /**
+   * Setup done button for summary screen
+   * @param {Object} workoutData - Workout data
+   */
+  setupSummaryDoneButton(workoutData) {
+    const doneBtn = document.getElementById('summary-done-btn');
+
+    doneBtn.onclick = () => {
+      // Validate and save pain data
+      if (!this.saveSummaryPainData(workoutData)) {
+        return; // Validation failed
+      }
+
+      // Save weigh-in data (if section visible)
+      this.saveSummaryWeighInData();
+
+      // Navigate to home screen
+      this.showHomeScreen();
+    };
+  }
+
+  /**
+   * Save pain data from summary
+   * @param {Object} workoutData - Workout data
+   * @returns {boolean} True if successful, false if validation failed
+   */
+  saveSummaryPainData(workoutData) {
+    if (this.summaryPainSelection === 'no') {
+      // Save pain-free status for all exercises
+      workoutData.exercises.forEach(exercise => {
+        const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+        this.storage.savePainReport(exerciseKey, false, null, null);
+      });
+      return true;
+    }
+
+    // User selected "Yes, I had pain"
+    if (!this.summaryPainfulExercises || this.summaryPainfulExercises.length === 0) {
+      // Check if they selected exercises
+      const checkboxes = document.querySelectorAll('#pain-exercise-list-summary input[type="checkbox"]:checked');
+      if (checkboxes.length === 0) {
+        alert('Please select exercises with pain, or click "No Pain"');
+        return false;
+      }
+    }
+
+    // Validate pain details completed
+    const incompletePain = this.summaryPainfulExercises.find(ex => !ex.severity || !ex.location);
+    if (incompletePain) {
+      alert('Please complete pain details for all selected exercises');
+      return false;
+    }
+
+    // Save pain data for each exercise
+    this.summaryPainfulExercises.forEach(painfulEx => {
+      this.storage.savePainReport(
+        painfulEx.key,
+        true,
+        painfulEx.location,
+        painfulEx.severity
+      );
+    });
+
+    // Save pain-free for non-painful exercises
+    workoutData.exercises.forEach(exercise => {
+      const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+      const isPainful = this.summaryPainfulExercises.some(p => p.key === exerciseKey);
+      if (!isPainful) {
+        this.storage.savePainReport(exerciseKey, false, null, null);
+      }
+    });
+
+    return true;
+  }
+
+  /**
+   * Save weigh-in data from summary
+   */
+  saveSummaryWeighInData() {
+    const weighinSection = document.getElementById('summary-weighin');
+
+    // Only save if section is visible
+    if (weighinSection.style.display === 'none') {
+      return;
+    }
+
+    const weighinInput = document.getElementById('weighin-input-summary');
+    const weight = parseFloat(weighinInput.value);
+
+    // Validate weight
+    if (isNaN(weight) || weight < 30 || weight > 200) {
+      // Optional field - just skip if invalid
+      return;
+    }
+
+    // Save weight
+    const result = this.bodyWeight.addEntry(weight);
+
+    if (result.replaced) {
+      console.log(`[Summary] Updated today's weight to ${weight} kg`);
+    } else {
+      console.log(`[Summary] Logged weight: ${weight} kg`);
+    }
+  }
+
   completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
@@ -2887,8 +3308,16 @@ class App {
       } else {
         alert(`✅ ${this.currentWorkout.displayName} completed!`);
 
-        // Show post-workout pain modal
-        this.showPostWorkoutPainModal();
+        // Show summary screen instead of pain modal
+        const workoutData = {
+          workoutName: this.currentWorkout.name,
+          displayName: this.currentWorkout.displayName,
+          exercises: this.currentWorkout.exercises,
+          startTime: this.workoutSession.startTime,
+          endTime: Date.now()
+        };
+
+        this.showWorkoutSummary(workoutData);
       }
     } catch (error) {
       console.error('Failed to save workout:', error);
