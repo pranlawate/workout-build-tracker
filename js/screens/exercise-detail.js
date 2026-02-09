@@ -242,4 +242,134 @@ export class ExerciseDetailScreen {
     };
     return text.replace(/[&<>"']/g, m => map[m]);
   }
+
+  /**
+   * Calculate badges for a workout session
+   * @param {Object} entry - Workout entry { date, sets }
+   * @param {string} exerciseKey - Exercise key
+   * @returns {Array} Array of badge objects { icon, text, priority }
+   */
+  getSessionBadges(entry, exerciseKey) {
+    const badges = [];
+
+    try {
+      // 1. Check performance (highest priority)
+      if (this.performanceAnalyzer) {
+        const perf = this.performanceAnalyzer.analyzeExercisePerformance(exerciseKey, entry.sets);
+        if (perf && perf.status === 'alert') {
+          badges.push({ icon: '🔴', text: perf.message, priority: 1 });
+        }
+        if (perf && perf.status === 'warning') {
+          badges.push({ icon: '🟡', text: perf.message, priority: 2 });
+        }
+      }
+
+      // 2. Check deload status
+      if (this.deloadManager && this.wasDeloadActive(entry.date)) {
+        badges.push({ icon: '⚡', text: 'Deload week', priority: 3 });
+      }
+
+      // 3. Check pain reports
+      const painKey = `build_pain_${exerciseKey}`;
+      const painData = JSON.parse(localStorage.getItem(painKey) || '[]');
+      const hadPain = painData.some(p => p.date === entry.date);
+      if (hadPain) {
+        badges.push({ icon: '🩹', text: 'Pain reported', priority: 4 });
+      }
+
+      // 4. Progression status (only if no issues)
+      if (badges.length === 0) {
+        const history = this.storage.getExerciseHistory(exerciseKey);
+        const [workoutType, exerciseName] = exerciseKey.split(' - ');
+
+        // Find exercise definition from workout structure
+        const exercise = this.findExerciseDefinition(workoutType, exerciseName);
+
+        if (exercise && history && history.length > 0) {
+          const status = getProgressionStatus(history, exercise);
+          if (status === 'ready') {
+            badges.push({ icon: '🟢', text: 'Ready to progress', priority: 5 });
+          } else {
+            badges.push({ icon: '🔨', text: 'Building reps', priority: 6 });
+          }
+        }
+      }
+
+      // Return top 2 badges by priority
+      return badges.sort((a, b) => a.priority - b.priority).slice(0, 2);
+    } catch (error) {
+      console.error('[ExerciseDetail] Badge calculation error:', error);
+      return []; // Safe fallback: no badges on error
+    }
+  }
+
+  /**
+   * Check if deload was active on a specific date
+   * @param {string} date - Date string (YYYY-MM-DD)
+   * @returns {boolean} True if deload was active
+   */
+  wasDeloadActive(date) {
+    try {
+      if (!this.deloadManager) return false;
+
+      // Check current deload status
+      const currentDeload = this.deloadManager.isDeloadActive();
+      const today = new Date().toISOString().split('T')[0];
+
+      // Simple check: if date matches today and deload is active
+      // Note: Historical deload tracking is limited in current implementation
+      if (date === today && currentDeload) return true;
+
+      return false;
+    } catch (error) {
+      console.error('[ExerciseDetail] Deload check error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Find exercise definition from workout structure
+   * @param {string} workoutType - Workout type (e.g., 'UPPER_A')
+   * @param {string} exerciseName - Exercise name
+   * @returns {Object|null} Exercise object or null
+   */
+  findExerciseDefinition(workoutType, exerciseName) {
+    try {
+      // Import workout data
+      const workouts = {
+        'UPPER_A': [
+          { name: 'Goblet Squat', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
+          { name: 'DB Bench Press', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
+          { name: 'DB Shoulder Press', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 6, increment: 2 },
+          { name: 'DB Row', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 8, increment: 2 },
+          { name: 'Bicep Curl', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 6, increment: 2 },
+          { name: 'Plank', sets: 3, repRange: '30-60s', rirTarget: '2-3', weight: 0, increment: 0 }
+        ],
+        'UPPER_B': [
+          { name: 'Goblet Squat', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
+          { name: 'DB Incline Press', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 10, increment: 2.5 },
+          { name: 'Lateral Raise', sets: 3, repRange: '12-15', rirTarget: '2-3', weight: 4, increment: 1 },
+          { name: 'Lat Pulldown', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 20, increment: 2.5 },
+          { name: 'Tricep Extension', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 6, increment: 2 },
+          { name: 'Side Plank', sets: 3, repRange: '30s/side', rirTarget: '2-3', weight: 0, increment: 0 }
+        ],
+        'LOWER': [
+          { name: 'DB RDL', sets: 3, repRange: '10-15', rirTarget: '2-3', weight: 10, increment: 2.5 },
+          { name: 'DB Bulgarian Split Squat', sets: 3, repRange: '10-12/side', rirTarget: '2-3', weight: 8, increment: 2 },
+          { name: 'Leg Press', sets: 3, repRange: '12-15', rirTarget: '2-3', weight: 40, increment: 5 },
+          { name: 'Leg Curl', sets: 3, repRange: '12-15', rirTarget: '2-3', weight: 20, increment: 2.5 },
+          { name: 'Calf Raise', sets: 3, repRange: '15-20', rirTarget: '2-3', weight: 15, increment: 2.5 },
+          { name: 'Ab Wheel', sets: 3, repRange: '8-12', rirTarget: '2-3', weight: 0, increment: 0 }
+        ]
+      };
+
+      const workout = workouts[workoutType];
+      if (!workout) return null;
+
+      return workout.find(ex => ex.name === exerciseName) || null;
+    } catch (error) {
+      console.error('[ExerciseDetail] Exercise lookup error:', error);
+      return null;
+    }
+  }
 }
