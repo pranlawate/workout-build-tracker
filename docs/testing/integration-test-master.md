@@ -1,7 +1,7 @@
 # Build Tracker - Master Integration Test Report
 
 **Last Updated:** 2026-02-09
-**App Version:** v1.3 (Service Worker Cache: v8)
+**App Version:** v1.4 (Service Worker Cache: v9)
 
 ---
 
@@ -776,8 +776,8 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 
 **Expected:**
 - [ ] Service worker registered
-- [ ] Cache name: `build-tracker-v8`
-- [ ] Old caches deleted (v7 and earlier)
+- [ ] Cache name: `build-tracker-v9`
+- [ ] Old caches deleted (v8 and earlier)
 - [ ] All assets cached correctly
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail

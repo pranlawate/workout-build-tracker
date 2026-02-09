@@ -327,11 +327,13 @@ Manual testing recommended for:
 - Progress Dashboard: `docs/plans/2026-02-06-progress-dashboard-implementation.md`
 - Pain & Band Features: `docs/plans/2026-02-06-pain-and-band-implementation-plan.md`
 - Post-Workout Summary: `docs/archived/plans/2026-02-09/2026-02-09-post-workout-summary-implementation-plan.md` (archived)
+- Enhanced Tracking Metrics: `docs/archived/plans/2026-02-09/2026-02-09-enhanced-tracking-metrics-implementation-plan.md` (archived)
 
 **Design Documents:**
 - Barbell Progression Design: `docs/plans/2026-02-05-barbell-progression-design.md`
 - Pain & Band Features Design: `docs/plans/2026-02-06-pain-and-band-improvements-design.md`
 - Post-Workout Summary Design: `docs/plans/2026-02-09-post-workout-summary-design.md`
+- Enhanced Tracking Metrics Design: `docs/plans/2026-02-09-enhanced-tracking-metrics-design.md`
 
 **Usage Documentation:**
 - Barbell Progression Usage: `docs/barbell-progression-tracker-usage.md`
@@ -341,5 +343,5 @@ Manual testing recommended for:
 
 ---
 
-**Last Review:** 2026-02-09 (Post-Workout Summary Screen Release)
-**Next Review:** After Phase 1 completion (Enhanced Tracking Metrics)
+**Last Review:** 2026-02-09 (Enhanced Tracking Metrics Release)
+**Next Review:** After Phase 1 completion (Exercise History Charts)
