@@ -70,3 +70,35 @@
     margin-top: var(--spacing-sm);
   }
 }
+
+/* Progress Badges */
+.history-badges {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.history-badges .badge {
+  font-size: 14px;
+  padding: 4px 8px;
+  background: var(--color-surface);
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .history-badges {
+    flex-direction: column;
+  }
+
+  .history-badges .badge {
+    width: 100%;
+    justify-content: center;
+  }
+}
