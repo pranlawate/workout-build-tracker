@@ -3683,6 +3683,24 @@ class App {
       } else {
         alert(`✅ ${this.currentWorkout.displayName} completed!`);
 
+        // Update recovery entry to mark workout completed
+        const recoveryEntries = this.getRecoveryMetrics();
+        if (recoveryEntries.length > 0) {
+          const today = new Date().toISOString().split('T')[0];
+          const todayEntry = recoveryEntries.find(e => e.date === today);
+
+          if (todayEntry) {
+            todayEntry.workoutCompleted = true;
+
+            // Recalculate fatigue score with pain data
+            const painScore = this.calculatePainScore();
+            todayEntry.painScore = painScore;
+            todayEntry.fatigueScore = todayEntry.preWorkoutScore + painScore;
+
+            localStorage.setItem('build_recovery_metrics', JSON.stringify(recoveryEntries));
+          }
+        }
+
         // Show summary screen instead of pain modal
         const workoutData = {
           workoutName: this.currentWorkout.name,
