@@ -470,6 +470,31 @@ class App {
     this.renderExercises();
   }
 
+  /**
+   * Show workout selection after recovery check
+   * This continues the workout start flow after recovery modal is dismissed
+   */
+  showWorkoutSelection() {
+    // Get next workout
+    const nextWorkoutName = this.workoutManager.getNextWorkout();
+
+    if (!nextWorkoutName) {
+      alert('No workout scheduled. Please check workout rotation.');
+      return;
+    }
+
+    // Check muscle recovery
+    const recoveryCheck = this.workoutManager.checkMuscleRecovery(nextWorkoutName);
+
+    if (recoveryCheck.warn) {
+      this.showRecoveryWarning(nextWorkoutName, recoveryCheck);
+      return; // Don't start workout yet
+    }
+
+    // Proceed with workout start
+    this.proceedWithWorkout(nextWorkoutName);
+  }
+
   startTimer() {
     const timerEl = document.getElementById('timer');
     if (!timerEl) return;
