@@ -726,37 +726,32 @@ class App {
       const isBand = this.isBandExercise(exercise);
       let weightInputHtml;
       if (isBand) {
-        // Band color buttons
+        // Band resistance dropdown
+        const isCustomWeight = ![5,10,15,25].includes(defaultWeight);
         weightInputHtml = `
           <div class="set-inputs">
             <label class="input-label">Band Resistance</label>
-            <div class="band-color-buttons">
-              <button type="button" class="band-color-btn ${defaultWeight === 5 ? 'selected' : ''}" data-weight="5" ${disabledAttr}>
-                🟡 Light (5kg)
-              </button>
-              <button type="button" class="band-color-btn ${defaultWeight === 10 ? 'selected' : ''}" data-weight="10" ${disabledAttr}>
-                🔴 Medium (10kg)
-              </button>
-              <button type="button" class="band-color-btn ${defaultWeight === 15 ? 'selected' : ''}" data-weight="15" ${disabledAttr}>
-                🔵 Heavy (15kg)
-              </button>
-              <button type="button" class="band-color-btn ${defaultWeight === 25 ? 'selected' : ''}" data-weight="25" ${disabledAttr}>
-                ⚫ X-Heavy (25kg)
-              </button>
-              <button type="button" class="band-color-btn ${![5,10,15,25].includes(defaultWeight) ? 'selected' : ''}" data-weight="custom" ${disabledAttr}>
-                ⚪ Custom
-              </button>
-            </div>
+            <select class="set-input band-select"
+                    data-exercise="${exerciseIndex}"
+                    data-set="${setIndex}"
+                    data-field="weight"
+                    ${disabledAttr}>
+              <option value="5" ${defaultWeight === 5 ? 'selected' : ''}>🟡 Light (5kg)</option>
+              <option value="10" ${defaultWeight === 10 ? 'selected' : ''}>🔴 Medium (10kg)</option>
+              <option value="15" ${defaultWeight === 15 ? 'selected' : ''}>🔵 Heavy (15kg)</option>
+              <option value="25" ${defaultWeight === 25 ? 'selected' : ''}>⚫ X-Heavy (25kg)</option>
+              <option value="custom" ${isCustomWeight ? 'selected' : ''}>⚪ Custom</option>
+            </select>
             <input type="number"
                    class="band-custom-input set-input"
                    data-exercise="${exerciseIndex}"
                    data-set="${setIndex}"
-                   data-field="weight"
+                   data-field="weight-custom"
                    placeholder="Enter weight (kg)"
                    step="0.5"
                    min="0"
-                   style="display: ${![5,10,15,25].includes(defaultWeight) ? 'block' : 'none'}; margin-top: 12px;"
-                   value="${![5,10,15,25].includes(defaultWeight) ? defaultWeight : ''}"
+                   style="display: ${isCustomWeight ? 'block' : 'none'}; margin-top: 8px;"
+                   value="${isCustomWeight ? defaultWeight : ''}"
                    ${disabledAttr}>
           </div>
         `;
@@ -780,6 +775,10 @@ class App {
         `;
       }
 
+      // Detect time-based exercises (repRange contains 's', 'sec', 'second', or 'side')
+      const isTimeBased = exercise.repRange.toLowerCase().includes('s');
+      const repsLabel = isTimeBased ? 'Duration (s)' : 'Reps';
+
       html += `
         <div class="set-row ${lockedClass} ${stickyClass}" data-set-number="${setNum}">
           <span class="set-label">
@@ -790,7 +789,7 @@ class App {
           ${weightInputHtml}
 
           <div class="set-inputs">
-            <label class="input-label">Reps</label>
+            <label class="input-label">${repsLabel}</label>
             <input
               type="number"
               class="set-input"
@@ -1064,14 +1063,15 @@ class App {
       `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="rir"]`
     );
 
-    // Get weight value (from band buttons OR regular input)
+    // Get weight value (from band dropdown OR regular input)
     let weight;
     if (isBand) {
-      const selectedBtn = document.querySelector('.band-color-btn.selected');
-      if (selectedBtn && selectedBtn.dataset.weight !== 'custom') {
-        weight = parseFloat(selectedBtn.dataset.weight);
+      const bandSelect = document.querySelector(`.band-select[data-exercise="${exerciseIndex}"][data-set="${setIndex}"]`);
+      if (bandSelect && bandSelect.value !== 'custom') {
+        weight = parseFloat(bandSelect.value);
       } else {
-        weight = parseFloat(weightInput?.value);
+        const customInput = document.querySelector(`.band-custom-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"]`);
+        weight = parseFloat(customInput?.value);
       }
     } else {
       weight = parseFloat(weightInput?.value);
@@ -1397,22 +1397,20 @@ class App {
 
     // Pre-fill weight from completed set
     if (isBand) {
-      // For band exercises, select the matching button
-      const bandButtons = nextSetRow.querySelectorAll('.band-color-btn');
-      bandButtons.forEach(btn => {
-        btn.classList.remove('selected');
-        if (parseFloat(btn.dataset.weight) === completedSet.weight) {
-          btn.classList.add('selected');
-        }
-      });
-
-      // Hide custom input if standard weight selected
+      // For band exercises, set dropdown value
+      const bandSelect = nextSetRow.querySelector('.band-select');
       const customInput = nextSetRow.querySelector('.band-custom-input');
-      if (customInput) {
+
+      if (bandSelect && customInput) {
         const isCustomWeight = ![5, 10, 15, 25].includes(completedSet.weight);
-        customInput.style.display = isCustomWeight ? 'block' : 'none';
+
         if (isCustomWeight) {
+          bandSelect.value = 'custom';
+          customInput.style.display = 'block';
           customInput.value = completedSet.weight;
+        } else {
+          bandSelect.value = completedSet.weight.toString();
+          customInput.style.display = 'none';
         }
       }
     } else {
@@ -1546,25 +1544,18 @@ class App {
    * Set up event delegation for band color button clicks
    */
   setupBandColorButtons() {
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('band-color-btn')) {
-        const btn = e.target;
-        const container = btn.closest('.band-color-buttons');
-        const customInput = container.parentElement.querySelector('.band-custom-input');
+    document.addEventListener('change', (e) => {
+      if (e.target.classList.contains('band-select')) {
+        const select = e.target;
+        const container = select.parentElement;
+        const customInput = container.querySelector('.band-custom-input');
 
-        // Remove selected from all buttons in this container
-        container.querySelectorAll('.band-color-btn').forEach(b => b.classList.remove('selected'));
-
-        // Add selected to clicked button
-        btn.classList.add('selected');
-
-        // Show/hide custom input
-        if (btn.dataset.weight === 'custom') {
+        // Show/hide custom input based on selection
+        if (select.value === 'custom') {
           customInput.style.display = 'block';
           customInput.focus();
         } else {
           customInput.style.display = 'none';
-          customInput.value = btn.dataset.weight;
         }
       }
     });

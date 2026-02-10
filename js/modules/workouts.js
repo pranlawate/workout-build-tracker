@@ -163,9 +163,9 @@ export const WORKOUTS = {
         repRange: '10-12',
         rirTarget: '2-3',
         startingWeight: 0,
-        weightIncrement: 2.5,
+        weightIncrement: 0,
         tempo: '3-4 sec down, 2 sec up',
-        notes: 'CRITICAL: Lower back weakness - NOT to failure',
+        notes: 'CRITICAL: Lower back weakness - NOT to failure (bodyweight only)',
         machineOk: false
       },
       {
@@ -185,7 +185,7 @@ export const WORKOUTS = {
         repRange: '30-60s',
         rirTarget: '2-3',
         startingWeight: 0,
-        weightIncrement: 2.5,
+        weightIncrement: 0,
         tempo: 'Hold with proper breathing',
         notes: 'Core strength for lower back health',
         machineOk: false
