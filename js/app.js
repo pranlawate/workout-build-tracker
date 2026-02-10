@@ -2487,6 +2487,12 @@ class App {
       progressBackBtn.onclick = () => this.showHomeScreen();
     }
 
+    // Attach settings button
+    const progressSettingsBtn = document.getElementById('progress-settings-btn');
+    if (progressSettingsBtn) {
+      progressSettingsBtn.onclick = () => this.showSettingsModal();
+    }
+
     // Attach Log Weigh-In button (if shown in empty state)
     const logWeighinBtn = document.getElementById('log-weighin-btn');
     if (logWeighinBtn) {
