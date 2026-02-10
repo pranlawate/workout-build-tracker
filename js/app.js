@@ -2556,6 +2556,9 @@ class App {
     if (pushHistory && window.history.state?.screen !== 'progress') {
       window.history.pushState({ screen: 'progress' }, '', '');
     }
+
+    // Setup tab navigation
+    this.setupProgressTabs();
     } catch (error) {
       console.error('[Dashboard] Error rendering progress dashboard:', error);
       const progressContent = document.getElementById('progress-content');
@@ -2600,6 +2603,49 @@ class App {
         <div class="next-step">${this.escapeHtml(nextStep)}</div>
       </div>
     `;
+  }
+
+  setupProgressTabs() {
+    const tabBtns = document.querySelectorAll('.progress-tabs .tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+
+        // Update active button
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Show correct content
+        tabContents.forEach(content => {
+          content.style.display = 'none';
+        });
+
+        if (tab === 'analytics') {
+          this.showAnalyticsTab();
+        } else if (tab === 'overview') {
+          document.querySelector('.overview-tab')?.setAttribute('style', 'display: block;');
+        } else if (tab === 'body-weight') {
+          document.querySelector('.body-weight-tab')?.setAttribute('style', 'display: block;');
+        } else if (tab === 'barbell') {
+          document.querySelector('.barbell-tab')?.setAttribute('style', 'display: block;');
+        }
+      });
+    });
+  }
+
+  showAnalyticsTab() {
+    const analyticsTab = document.getElementById('analytics-tab');
+    if (analyticsTab) {
+      analyticsTab.style.display = 'block';
+    }
+
+    const analyticsContent = document.getElementById('analytics-content');
+    if (!analyticsContent) return;
+
+    // TODO: Render analytics (Task 7)
+    analyticsContent.innerHTML = '<p>Analytics coming soon...</p>';
   }
 
   showPostWorkoutPainModal() {
