@@ -64,6 +64,27 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for detailed progress tracking.
 
+## Recent Bug Fixes (v1.4.0)
+
+**Normal Usage Bug Fixes:**
+- ✅ Fixed weight validation alert for bodyweight exercises (Plank, Hyperextension)
+  - Changed weightIncrement from 2.5 to 0 for pure bodyweight exercises
+  - Resolves validation error when logging weight=0
+- ✅ Fixed confusing "Reps" label for time-based exercises
+  - Now displays "Duration (s)" for exercises like Plank (30-60s)
+  - Automatically detects time-based repRange formats
+- ✅ Improved band resistance UI from cluttered tiles to dropdown
+  - Replaced 5 color button tiles with clean dropdown selector
+  - Band Pull-Aparts now use dropdown: 🟡 Light / 🔴 Medium / 🔵 Heavy / ⚫ X-Heavy
+- ✅ Fixed NaN appearing in Plank confirmation popup
+  - Root cause: Time format '30-60s' parsed incorrectly
+  - Now strips non-numeric characters before parsing repRange
+- ✅ Fixed empty Progress dashboard tabs
+  - Body Weight and Barbell tabs now properly render content
+  - Added dedicated render functions for each tab
+
+**Cache Version:** v27 (updated for bug fixes)
+
 ## Technology Stack
 
 - **Frontend**: Vanilla JavaScript (ES6+)
