@@ -186,10 +186,42 @@ workout-build-tracker/
 
 **Cache Management:**
 - Service Worker caches all assets for offline use
-- Version: `build-tracker-v8` (auto-updates on new deployments)
+- Version: `build-tracker-v25` (auto-updates on new deployments)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
-### 📊 Analytics Dashboard
+### 📊 Progress Dashboard
+
+**Multi-Tab Organization:**
+Access comprehensive progress tracking via the Progress button on home screen. Four dedicated tabs:
+
+1. **Overview Tab**
+   - Achievement gallery with unlocked badges
+   - Summary statistics (workouts, session time, streak, exercises progressed)
+   - Top progressing exercises with weight gains
+
+2. **Body Weight Tab**
+   - Current weight with 8-week trend analysis
+   - Monthly rate of change (kg/month)
+   - Status indicator (Healthy lean bulk, Fast gain, Maintenance, Rapid cut)
+   - Interactive trend chart with smoothed line
+   - Empty state with quick "Log Weigh-In" button
+
+3. **Barbell Tab**
+   - Equipment progression milestones for barbell exercises
+   - Bench Press readiness (strength, weeks, mobility, pain-free)
+   - Back Squat readiness with progress percentages
+   - Deadlift readiness with next step guidance
+   - Visual progress bars and criteria checklist
+
+4. **Analytics Tab**
+   - Training volume (7-day total with trend comparison)
+   - Performance quality (RIR trends, compliance rate)
+   - Recovery trends (sleep/fatigue averages, high fatigue days)
+   - Pattern detection (sleep-progression, volume-pain correlations)
+
+Access: Home screen → Progress button → Select tab
+
+### 📊 Analytics Dashboard (Tab 4)
 
 **Always-Available Insights:**
 - **Training Volume** - 7-day total with trend comparison
