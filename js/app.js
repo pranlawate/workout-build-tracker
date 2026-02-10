@@ -2643,59 +2643,20 @@ class App {
       }
 
       // Initialize modules
-      const tracker = new BarbellProgressionTracker(this.storage);
       const progressAnalyzer = new ProgressAnalyzer(this.storage);
-      const bodyWeight = new BodyWeightManager(this.storage);
 
-      // Get data
-    const benchReadiness = tracker.getBarbellBenchReadiness();
-    const squatReadiness = tracker.getBarbellSquatReadiness();
-    const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
-    const stats = progressAnalyzer.getLast4WeeksStats();
-    const strengthGains = progressAnalyzer.getTopProgressingExercises(3);
-    const weightData = bodyWeight.getWeightSummary();
-    console.log('[Dashboard] Rendering with weightData:', weightData);
+      // Get data for overview
+      const stats = progressAnalyzer.getLast4WeeksStats();
+      const strengthGains = progressAnalyzer.getTopProgressingExercises(3);
 
-    // Render dashboard
+    // Render overview tab (summary stats and strength gains only)
     const progressContent = document.getElementById('progress-content');
     if (progressContent) {
       progressContent.innerHTML = `
         ${this.renderAchievementsGallery()}
-
-        <div class="progress-dashboard">
-          <h3 class="dashboard-title">🎯 Equipment Progression Milestones</h3>
-          ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
-          ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
-          ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
-        </div>
-
         ${this.renderSummaryStats(stats)}
         ${this.renderStrengthGains(strengthGains)}
-        ${this.renderBodyComposition(weightData)}
-        ${this.renderWeightChart(weightData)}
       `;
-
-      // Render Canvas chart if weight data exists
-      if (weightData && weightData.entries) {
-        console.log('[Dashboard] Rendering chart with entries:', weightData.entries);
-        const chartContainer = document.getElementById('weight-chart-container');
-        if (chartContainer) {
-          const chart = new WeightTrendChart(350, 200);
-          const canvas = chart.render(weightData.entries);
-          if (canvas) {
-            // Clear old canvas before adding new one
-            chartContainer.innerHTML = '';
-            chartContainer.appendChild(canvas);
-            console.log('[Dashboard] Chart canvas replaced successfully');
-          } else {
-            console.warn('[Dashboard] Chart render returned null canvas');
-          }
-        } else {
-          console.warn('[Dashboard] Chart container not found');
-        }
-      } else {
-        console.log('[Dashboard] No weightData for chart, showing empty state');
-      }
     }
 
     // Attach back button
@@ -2802,11 +2763,9 @@ class App {
         const overviewTab = document.querySelector('.overview-tab');
         if (overviewTab) overviewTab.style.display = 'block';
       } else if (tab === 'body-weight') {
-        const bodyWeightTab = document.querySelector('.body-weight-tab');
-        if (bodyWeightTab) bodyWeightTab.style.display = 'block';
+        this.showBodyWeightTab();
       } else if (tab === 'barbell') {
-        const barbellTab = document.querySelector('.barbell-tab');
-        if (barbellTab) barbellTab.style.display = 'block';
+        this.showBarbellTab();
       }
     };
 
@@ -3006,6 +2965,65 @@ class App {
         <div class="analytics-card">
           ${patternCards}
         </div>
+      </div>
+    `;
+  }
+
+  showBodyWeightTab() {
+    const bodyWeightTab = document.querySelector('.body-weight-tab');
+    if (bodyWeightTab) {
+      bodyWeightTab.style.display = 'block';
+    }
+
+    // Get body weight data
+    const bodyWeight = new BodyWeightManager(this.storage);
+    const weightData = bodyWeight.getWeightSummary();
+
+    // Render body weight content
+    bodyWeightTab.innerHTML = `
+      ${this.renderBodyComposition(weightData)}
+      ${this.renderWeightChart(weightData)}
+    `;
+
+    // Render Canvas chart if weight data exists
+    if (weightData && weightData.entries) {
+      const chartContainer = document.getElementById('weight-chart-container');
+      if (chartContainer) {
+        const chart = new WeightTrendChart(350, 200);
+        const canvas = chart.render(weightData.entries);
+        if (canvas) {
+          chartContainer.innerHTML = '';
+          chartContainer.appendChild(canvas);
+        }
+      }
+    }
+
+    // Attach Log Weigh-In button (if shown in empty state)
+    const logWeighinBtn = document.getElementById('log-weighin-btn');
+    if (logWeighinBtn) {
+      logWeighinBtn.onclick = () => this.showWeighInModal();
+    }
+  }
+
+  showBarbellTab() {
+    const barbellTab = document.querySelector('.barbell-tab');
+    if (barbellTab) {
+      barbellTab.style.display = 'block';
+    }
+
+    // Get barbell progression data
+    const tracker = new BarbellProgressionTracker(this.storage);
+    const benchReadiness = tracker.getBarbellBenchReadiness();
+    const squatReadiness = tracker.getBarbellSquatReadiness();
+    const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
+
+    // Render barbell progression content
+    barbellTab.innerHTML = `
+      <div class="progress-dashboard">
+        <h3 class="dashboard-title">🎯 Equipment Progression Milestones</h3>
+        ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
+        ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
+        ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
       </div>
     `;
   }
