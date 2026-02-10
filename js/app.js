@@ -1412,8 +1412,8 @@ class App {
     // Calculate total volume
     let totalVolume = 0;
     exercises.forEach(exercise => {
-      if (exercise.sessionData && exercise.sessionData.sets) {
-        exercise.sessionData.sets.forEach(set => {
+      if (exercise.sets && Array.isArray(exercise.sets)) {
+        exercise.sets.forEach(set => {
           if (set.reps && set.weight) {
             totalVolume += set.reps * set.weight;
           }
@@ -1497,13 +1497,13 @@ class App {
     const newRecords = [];
 
     workoutData.exercises.forEach(exercise => {
-      if (!exercise.sessionData || !exercise.sessionData.sets) return;
+      if (!exercise.sets || !Array.isArray(exercise.sets)) return;
 
       const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
       const history = this.storage.getExerciseHistory(exerciseKey);
 
       // Get max weight used today
-      const todayWeights = exercise.sessionData.sets
+      const todayWeights = exercise.sets
         .filter(set => set.weight && set.reps)
         .map(set => set.weight);
 
@@ -1523,7 +1523,7 @@ class App {
       }
 
       // Check for rep PRs at each weight used today
-      const repPRs = this.checkRepPRs(exercise.sessionData.sets, history);
+      const repPRs = this.checkRepPRs(exercise.sets, history);
       repPRs.forEach(pr => {
         newRecords.push({
           exercise: exercise.name,
@@ -3753,8 +3753,8 @@ class App {
         const workoutData = {
           workoutName: this.currentWorkout.name,
           displayName: this.currentWorkout.displayName,
-          exercises: this.currentWorkout.exercises,
-          startTime: this.workoutSession.startTime,
+          exercises: this.workoutSession.exercises,
+          startTime: this.workoutSession.startTime.getTime(),
           endTime: Date.now()
         };
 
