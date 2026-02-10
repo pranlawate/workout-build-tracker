@@ -2421,18 +2421,20 @@ class App {
   */
 
   showProgressDashboard(pushHistory = true) {
-    this.hideAllScreens();
-    const progressScreen = document.getElementById('progress-screen');
-    if (progressScreen) {
-      progressScreen.classList.add('active');
-    }
+    console.log('[Dashboard] showProgressDashboard called');
+    try {
+      this.hideAllScreens();
+      const progressScreen = document.getElementById('progress-screen');
+      if (progressScreen) {
+        progressScreen.classList.add('active');
+      }
 
-    // Initialize modules
-    const tracker = new BarbellProgressionTracker(this.storage);
-    const progressAnalyzer = new ProgressAnalyzer(this.storage);
-    const bodyWeight = new BodyWeightManager(this.storage);
+      // Initialize modules
+      const tracker = new BarbellProgressionTracker(this.storage);
+      const progressAnalyzer = new ProgressAnalyzer(this.storage);
+      const bodyWeight = new BodyWeightManager(this.storage);
 
-    // Get data
+      // Get data
     const benchReadiness = tracker.getBarbellBenchReadiness();
     const squatReadiness = tracker.getBarbellSquatReadiness();
     const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
@@ -2502,6 +2504,19 @@ class App {
     // Add to browser history
     if (pushHistory && window.history.state?.screen !== 'progress') {
       window.history.pushState({ screen: 'progress' }, '', '');
+    }
+    } catch (error) {
+      console.error('[Dashboard] Error rendering progress dashboard:', error);
+      const progressContent = document.getElementById('progress-content');
+      if (progressContent) {
+        progressContent.innerHTML = `
+          <div style="padding: 20px; text-align: center; color: var(--color-danger);">
+            <h3>Error Loading Dashboard</h3>
+            <p>There was an error loading the progress dashboard. Please check the console for details.</p>
+            <p style="font-size: 14px; margin-top: 10px;">Error: ${error.message}</p>
+          </div>
+        `;
+      }
     }
   }
 
