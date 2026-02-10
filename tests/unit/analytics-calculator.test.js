@@ -655,5 +655,89 @@ describe('AnalyticsCalculator', () => {
       assert.ok(result.length > 0);
       assert.notStrictEqual(result[0].type, 'insufficient-data');
     });
+
+    test('should return empty array when exactly 10 workouts but no patterns found', () => {
+      const rotation = { sequence: [] };
+      for (let i = 0; i < 10; i++) {
+        rotation.sequence.push({
+          workout: 'UPPER_A',
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          completed: true
+        });
+      }
+      localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
+
+      const result = calculator.detectPatterns();
+
+      // Should not return insufficient-data, but may return empty if no patterns detected
+      assert.ok(Array.isArray(result));
+      if (result.length > 0) {
+        assert.notStrictEqual(result[0].type, 'insufficient-data');
+      }
+    });
+
+    test('should return null from detectSleepProgressionPattern when no sleep data', () => {
+      // Create rotation without sleep metrics
+      const rotation = { sequence: [] };
+      for (let i = 0; i < 12; i++) {
+        rotation.sequence.push({
+          workout: 'UPPER_A',
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          completed: true
+        });
+      }
+      localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
+
+      const result = calculator.detectPatterns();
+
+      // Should not detect sleep-progression pattern
+      const sleepPattern = result.find(p => p.type === 'sleep-progression');
+      assert.strictEqual(sleepPattern, undefined);
+    });
+  });
+
+  describe('calculateConfidence', () => {
+    test('should calculate confidence scores correctly', () => {
+      // Test confidence buckets
+      assert.strictEqual(calculator.calculateConfidence(15, 15), 85); // 30 total
+      assert.strictEqual(calculator.calculateConfidence(10, 12), 75); // 22 total
+      assert.strictEqual(calculator.calculateConfidence(8, 8), 65); // 16 total
+      assert.strictEqual(calculator.calculateConfidence(5, 5), 55); // 10 total
+    });
+  });
+
+  describe('didProgressOnDate', () => {
+    test('should track progression correctly with didProgressOnDate', () => {
+      const date = new Date().toISOString().split('T')[0];
+
+      // Add progression data
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], sets: [{ weight: 20, reps: 10, rir: 2 }] },
+        { date, sets: [{ weight: 22.5, reps: 10, rir: 2 }] }
+      ]);
+
+      const progressed = calculator.didProgressOnDate(date);
+
+      assert.strictEqual(progressed, true);
+    });
+  });
+
+  describe('getVolumeForDate', () => {
+    test('should calculate volume for specific date with getVolumeForDate', () => {
+      const date = new Date().toISOString().split('T')[0];
+
+      // Add exercise data
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [{
+        date,
+        sets: [
+          { weight: 20, reps: 10, rir: 2 }, // 200kg
+          { weight: 20, reps: 11, rir: 2 }  // 220kg
+        ]
+      }]);
+
+      const volume = calculator.getVolumeForDate(date);
+
+      assert.strictEqual(volume, 420); // 200+220
+    });
   });
 });

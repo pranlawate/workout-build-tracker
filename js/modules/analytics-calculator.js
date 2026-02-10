@@ -6,6 +6,13 @@
 
 // Constants
 const HIGH_FATIGUE_THRESHOLD = 4;
+const SLEEP_HIGH_THRESHOLD = 7;
+const SLEEP_LOW_THRESHOLD = 6;
+const SLEEP_PROGRESSION_MULTIPLIER = 1.5;
+const VOLUME_PAIN_THRESHOLD = 1.2;
+const MIN_WORKOUTS_FOR_PATTERNS = 10;
+const MIN_SAMPLE_SIZE = 5;
+const MIN_PAIN_DAYS = 3;
 
 export class AnalyticsCalculator {
   /**
@@ -449,8 +456,8 @@ export class AnalyticsCalculator {
       }
 
       const completedWorkouts = rotation.sequence.filter(w => w.completed);
-      if (completedWorkouts.length < 10) {
-        return [{ type: 'insufficient-data', confidence: 0, message: `Not enough data yet (${completedWorkouts.length}/10 workouts)` }];
+      if (completedWorkouts.length < MIN_WORKOUTS_FOR_PATTERNS) {
+        return [{ type: 'insufficient-data', confidence: 0, message: `Not enough data yet (${completedWorkouts.length}/${MIN_WORKOUTS_FOR_PATTERNS} workouts)` }];
       }
 
       // Pattern 1: Sleep vs Progression
@@ -497,27 +504,27 @@ export class AnalyticsCalculator {
         })
         .filter(d => d.sleep > 0); // Only include days with sleep data
 
-      if (workoutSleepData.length < 10) return null;
+      if (workoutSleepData.length < MIN_WORKOUTS_FOR_PATTERNS) return null;
 
       // Split by sleep quality
-      const highSleep = workoutSleepData.filter(d => d.sleep >= 7);
-      const lowSleep = workoutSleepData.filter(d => d.sleep < 6);
+      const highSleep = workoutSleepData.filter(d => d.sleep >= SLEEP_HIGH_THRESHOLD);
+      const lowSleep = workoutSleepData.filter(d => d.sleep < SLEEP_LOW_THRESHOLD);
 
-      if (highSleep.length < 5 || lowSleep.length < 5) return null;
+      if (highSleep.length < MIN_SAMPLE_SIZE || lowSleep.length < MIN_SAMPLE_SIZE) return null;
 
       // Calculate progression rates
       const highSleepProgressRate = highSleep.filter(d => d.progressed).length / highSleep.length;
       const lowSleepProgressRate = lowSleep.filter(d => d.progressed).length / lowSleep.length;
 
-      // Check for significant difference (1.5x threshold)
-      if (highSleepProgressRate > lowSleepProgressRate * 1.5) {
+      // Check for significant difference
+      if (highSleepProgressRate > lowSleepProgressRate * SLEEP_PROGRESSION_MULTIPLIER) {
         const confidence = this.calculateConfidence(highSleep.length, lowSleep.length);
         const multiplier = (highSleepProgressRate / Math.max(lowSleepProgressRate, 0.01)).toFixed(1);
 
         return {
           type: 'sleep-progression',
           confidence,
-          message: `When sleep ≥7hrs, you progress ${multiplier}× faster than when sleep <6hrs`
+          message: `When sleep ≥${SLEEP_HIGH_THRESHOLD}hrs, you progress ${multiplier}× faster than when sleep <${SLEEP_LOW_THRESHOLD}hrs`
         };
       }
 
@@ -552,7 +559,7 @@ export class AnalyticsCalculator {
         });
       });
 
-      if (painDates.size < 3) return null;
+      if (painDates.size < MIN_PAIN_DAYS) return null;
 
       // Calculate average volume on pain days vs pain-free days
       const rotation = this.storage.getRotation();
@@ -570,13 +577,16 @@ export class AnalyticsCalculator {
         }
       });
 
-      if (volumeOnPainDays.length < 3 || volumeOnNormalDays.length < 5) return null;
+      if (volumeOnPainDays.length < MIN_PAIN_DAYS || volumeOnNormalDays.length < MIN_SAMPLE_SIZE) return null;
 
       const avgPainVolume = volumeOnPainDays.reduce((a, b) => a + b, 0) / volumeOnPainDays.length;
       const avgNormalVolume = volumeOnNormalDays.reduce((a, b) => a + b, 0) / volumeOnNormalDays.length;
 
-      // Check if pain days have significantly higher volume (20% threshold)
-      if (avgPainVolume > avgNormalVolume * 1.2) {
+      // Guard against division by zero
+      if (avgNormalVolume === 0) return null;
+
+      // Check if pain days have significantly higher volume
+      if (avgPainVolume > avgNormalVolume * VOLUME_PAIN_THRESHOLD) {
         const confidence = this.calculateConfidence(volumeOnPainDays.length, volumeOnNormalDays.length);
         const threshold = Math.round(avgPainVolume / 100) * 100; // Round to nearest 100
 
