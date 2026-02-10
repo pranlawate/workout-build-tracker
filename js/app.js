@@ -642,9 +642,12 @@ class App {
       const sessionSet = sessionExercise?.sets?.[setIndex];
       const hasSessionData = sessionSet && sessionSet.weight > 0;
 
-      // Use session data if available, otherwise use last workout data
+      // Use session data if available, otherwise check previous set in current session, then last workout data
+      const prevSessionSet = sessionExercise?.sets?.[setIndex - 1]; // Previous set in current workout
       const lastSet = lastWorkout?.sets?.[setIndex];
-      const defaultWeight = hasSessionData ? sessionSet.weight : (lastSet?.weight || exercise.startingWeight);
+      const defaultWeight = hasSessionData
+        ? sessionSet.weight
+        : (prevSessionSet?.weight || lastSet?.weight || exercise.startingWeight);
       const defaultReps = hasSessionData ? sessionSet.reps : (lastSet?.reps || '');
 
       // Default RIR to minimum of target range (per design spec)
@@ -1195,11 +1198,11 @@ class App {
   }
 
   unlockNextSet(exerciseIndex, completedSetIndex) {
-    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const exercise = this.currentWorkout.exercises[exerciseIndex];
     const nextSetIndex = completedSetIndex + 1;
 
     // Don't unlock beyond total sets
-    if (nextSetIndex >= exerciseDef.sets) return;
+    if (nextSetIndex >= exercise.sets) return;
 
     // Find current and next set rows
     const exerciseItem = document.querySelector(
@@ -1231,8 +1234,8 @@ class App {
     // Add sticky class to next set
     nextSetRow.classList.add('sticky-set');
 
-    // Enable inputs
-    const inputs = nextSetRow.querySelectorAll('input, select');
+    // Enable inputs and buttons
+    const inputs = nextSetRow.querySelectorAll('input, select, button');
     inputs.forEach(input => {
       input.disabled = false;
     });
@@ -1243,11 +1246,34 @@ class App {
 
     // Pre-fill with values from completed set
     const completedSet = this.workoutSession.exercises[exerciseIndex].sets[completedSetIndex];
+    const isBand = this.isBandExercise(exercise);
 
-    // Pre-fill weight and reps from completed set
-    const weightInput = nextSetRow.querySelector('[data-field="weight"]');
-    if (weightInput && completedSet.weight) {
-      weightInput.value = completedSet.weight;
+    // Pre-fill weight from completed set
+    if (isBand) {
+      // For band exercises, select the matching button
+      const bandButtons = nextSetRow.querySelectorAll('.band-color-btn');
+      bandButtons.forEach(btn => {
+        btn.classList.remove('selected');
+        if (parseFloat(btn.dataset.weight) === completedSet.weight) {
+          btn.classList.add('selected');
+        }
+      });
+
+      // Hide custom input if standard weight selected
+      const customInput = nextSetRow.querySelector('.band-custom-input');
+      if (customInput) {
+        const isCustomWeight = ![5, 10, 15, 25].includes(completedSet.weight);
+        customInput.style.display = isCustomWeight ? 'block' : 'none';
+        if (isCustomWeight) {
+          customInput.value = completedSet.weight;
+        }
+      }
+    } else {
+      // For regular exercises, set input value
+      const weightInput = nextSetRow.querySelector('[data-field="weight"]');
+      if (weightInput && completedSet.weight) {
+        weightInput.value = completedSet.weight;
+      }
     }
 
     const repsInput = nextSetRow.querySelector('[data-field="reps"]');
