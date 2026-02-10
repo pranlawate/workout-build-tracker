@@ -2606,33 +2606,47 @@ class App {
   }
 
   setupProgressTabs() {
-    const tabBtns = document.querySelectorAll('.progress-tabs .tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    const tabContainer = document.querySelector('.progress-tabs');
+    if (!tabContainer) return;
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
+    // Remove old listener if it exists (cleanup)
+    if (this.progressTabHandler) {
+      tabContainer.removeEventListener('click', this.progressTabHandler);
+    }
 
-        // Update active button
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    // Store handler for cleanup
+    this.progressTabHandler = (e) => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
 
-        // Show correct content
-        tabContents.forEach(content => {
-          content.style.display = 'none';
-        });
+      const tab = btn.dataset.tab;
+      const tabBtns = document.querySelectorAll('.progress-tabs .tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
 
-        if (tab === 'analytics') {
-          this.showAnalyticsTab();
-        } else if (tab === 'overview') {
-          document.querySelector('.overview-tab')?.setAttribute('style', 'display: block;');
-        } else if (tab === 'body-weight') {
-          document.querySelector('.body-weight-tab')?.setAttribute('style', 'display: block;');
-        } else if (tab === 'barbell') {
-          document.querySelector('.barbell-tab')?.setAttribute('style', 'display: block;');
-        }
+      // Update active button
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Show correct content
+      tabContents.forEach(content => {
+        content.style.display = 'none';
       });
-    });
+
+      if (tab === 'analytics') {
+        this.showAnalyticsTab();
+      } else if (tab === 'overview') {
+        const overviewTab = document.querySelector('.overview-tab');
+        if (overviewTab) overviewTab.style.display = 'block';
+      } else if (tab === 'body-weight') {
+        const bodyWeightTab = document.querySelector('.body-weight-tab');
+        if (bodyWeightTab) bodyWeightTab.style.display = 'block';
+      } else if (tab === 'barbell') {
+        const barbellTab = document.querySelector('.barbell-tab');
+        if (barbellTab) barbellTab.style.display = 'block';
+      }
+    };
+
+    tabContainer.addEventListener('click', this.progressTabHandler);
   }
 
   showAnalyticsTab() {
