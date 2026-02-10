@@ -293,5 +293,221 @@ describe('AnalyticsCalculator', () => {
       // 3 workouts in 7 days, expected 3 = 100%
       assert.strictEqual(result.compliance, 100);
     });
+
+    test('should calculate avgRIR from all sets in period', () => {
+      // Add exercise data with known RIR values
+      const today = new Date().toISOString().split('T')[0];
+
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [{
+        date: today,
+        sets: [
+          { weight: 20, reps: 10, rir: 2 },
+          { weight: 20, reps: 11, rir: 3 },
+          { weight: 20, reps: 12, rir: 4 }
+        ]
+      }]);
+
+      const result = calculator.calculatePerformanceMetrics(7);
+
+      // avgRIR should be (2+3+4)/3 = 3
+      assert.strictEqual(result.avgRIR, 3);
+    });
+
+    test('should calculate avgRIR across multiple exercises', () => {
+      const today = new Date().toISOString().split('T')[0];
+
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [{
+        date: today,
+        sets: [
+          { weight: 20, reps: 10, rir: 2 },
+          { weight: 20, reps: 10, rir: 2 }
+        ]
+      }]);
+
+      storage.saveExerciseHistory('UPPER_A - DB Row', [{
+        date: today,
+        sets: [
+          { weight: 20, reps: 10, rir: 4 },
+          { weight: 20, reps: 10, rir: 4 }
+        ]
+      }]);
+
+      const result = calculator.calculatePerformanceMetrics(7);
+
+      // avgRIR should be (2+2+4+4)/4 = 3
+      assert.strictEqual(result.avgRIR, 3);
+    });
+
+    test('should return correct rirTrend data structure', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const day2 = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      // Add rotation data
+      const rotation = {
+        sequence: [
+          { workout: 'UPPER_A', date: today, completed: true },
+          { workout: 'LOWER_A', date: day2, completed: true }
+        ]
+      };
+      localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
+
+      // Add exercise history for these dates
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: today, sets: [{ weight: 20, reps: 10, rir: 2 }] },
+        { date: day2, sets: [{ weight: 20, reps: 10, rir: 3 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(7);
+
+      // rirTrend should be an array with date and rir properties
+      assert.ok(Array.isArray(result.rirTrend));
+      assert.strictEqual(result.rirTrend.length, 2);
+      result.rirTrend.forEach(point => {
+        assert.ok(point.hasOwnProperty('date'));
+        assert.ok(point.hasOwnProperty('rir'));
+        assert.strictEqual(typeof point.date, 'string');
+        assert.strictEqual(typeof point.rir, 'number');
+      });
+    });
+
+    test('should track exercises that progressed in weight', () => {
+      // Add progression data (2 workouts, weight increased)
+      const date1 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const date2 = new Date().toISOString().split('T')[0];
+
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 22.5, reps: 10, rir: 2 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.progressedCount, 1);
+      assert.strictEqual(result.topProgressors.length, 1);
+      assert.strictEqual(result.topProgressors[0].name, 'DB Bench Press');
+      assert.strictEqual(result.topProgressors[0].gain, 2.5);
+    });
+
+    test('should track multiple progressed exercises', () => {
+      const date1 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const date2 = new Date().toISOString().split('T')[0];
+
+      // Exercise 1: progressed 5kg
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 25, reps: 10, rir: 2 }] }
+      ]);
+
+      // Exercise 2: progressed 2.5kg
+      storage.saveExerciseHistory('UPPER_A - DB Row', [
+        { date: date1, sets: [{ weight: 15, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 17.5, reps: 10, rir: 2 }] }
+      ]);
+
+      // Exercise 3: no progression
+      storage.saveExerciseHistory('LOWER_A - Squat', [
+        { date: date1, sets: [{ weight: 40, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 40, reps: 10, rir: 2 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.progressedCount, 2);
+      assert.strictEqual(result.topProgressors.length, 2);
+    });
+
+    test('should sort topProgressors by gain descending', () => {
+      const date1 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const date2 = new Date().toISOString().split('T')[0];
+
+      // Exercise 1: gained 2.5kg
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 22.5, reps: 10, rir: 2 }] }
+      ]);
+
+      // Exercise 2: gained 5kg (should be first)
+      storage.saveExerciseHistory('UPPER_A - DB Row', [
+        { date: date1, sets: [{ weight: 15, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 20, reps: 10, rir: 2 }] }
+      ]);
+
+      // Exercise 3: gained 1kg
+      storage.saveExerciseHistory('LOWER_A - Squat', [
+        { date: date1, sets: [{ weight: 40, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 41, reps: 10, rir: 2 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.topProgressors.length, 3);
+      // Should be sorted by gain descending: 5kg, 2.5kg, 1kg
+      assert.strictEqual(result.topProgressors[0].name, 'DB Row');
+      assert.strictEqual(result.topProgressors[0].gain, 5);
+      assert.strictEqual(result.topProgressors[1].name, 'DB Bench Press');
+      assert.strictEqual(result.topProgressors[1].gain, 2.5);
+      assert.strictEqual(result.topProgressors[2].name, 'Squat');
+      assert.strictEqual(result.topProgressors[2].gain, 1);
+    });
+
+    test('should limit topProgressors to 5 exercises', () => {
+      const date1 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const date2 = new Date().toISOString().split('T')[0];
+
+      // Add 7 exercises that progressed
+      const exercises = [
+        { name: 'Exercise 1', oldWeight: 10, newWeight: 17 }, // 7kg
+        { name: 'Exercise 2', oldWeight: 10, newWeight: 16 }, // 6kg
+        { name: 'Exercise 3', oldWeight: 10, newWeight: 15 }, // 5kg
+        { name: 'Exercise 4', oldWeight: 10, newWeight: 14 }, // 4kg
+        { name: 'Exercise 5', oldWeight: 10, newWeight: 13 }, // 3kg
+        { name: 'Exercise 6', oldWeight: 10, newWeight: 12 }, // 2kg (should be excluded)
+        { name: 'Exercise 7', oldWeight: 10, newWeight: 11 }  // 1kg (should be excluded)
+      ];
+
+      exercises.forEach(ex => {
+        storage.saveExerciseHistory(`UPPER_A - ${ex.name}`, [
+          { date: date1, sets: [{ weight: ex.oldWeight, reps: 10, rir: 2 }] },
+          { date: date2, sets: [{ weight: ex.newWeight, reps: 10, rir: 2 }] }
+        ]);
+      });
+
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.progressedCount, 7);
+      assert.strictEqual(result.topProgressors.length, 5);
+      // Verify the top 5 are the highest gainers
+      assert.strictEqual(result.topProgressors[0].gain, 7);
+      assert.strictEqual(result.topProgressors[4].gain, 3);
+    });
+
+    test('should handle exercises with no progression', () => {
+      const date1 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const date2 = new Date().toISOString().split('T')[0];
+
+      // Exercise stayed at same weight
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
+        { date: date2, sets: [{ weight: 20, reps: 10, rir: 2 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.progressedCount, 0);
+      assert.deepStrictEqual(result.topProgressors, []);
+    });
+
+    test('should ignore exercises with less than 2 workouts', () => {
+      const today = new Date().toISOString().split('T')[0];
+
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: today, sets: [{ weight: 20, reps: 10, rir: 2 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.progressedCount, 0);
+      assert.deepStrictEqual(result.topProgressors, []);
+    });
   });
 });
