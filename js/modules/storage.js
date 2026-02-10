@@ -362,6 +362,65 @@ export class StorageManager {
   }
 
   /**
+   * Get workout history by reconstructing from exercise histories
+   * @param {string} workoutName - Workout name (e.g., 'UPPER_A')
+   * @param {number} limit - Maximum number of workout sessions to return
+   * @returns {Array} Array of workout session objects, sorted by date (most recent first)
+   */
+  getWorkoutHistory(workoutName, limit = 10) {
+    if (!workoutName || typeof workoutName !== 'string') {
+      return [];
+    }
+
+    try {
+      // Get all exercise keys that belong to this workout
+      const allKeys = this.getAllExerciseKeys();
+      const workoutExerciseKeys = allKeys.filter(key => key.startsWith(workoutName + ' - '));
+
+      if (workoutExerciseKeys.length === 0) {
+        return [];
+      }
+
+      // Collect all workout sessions by date
+      const sessionsByDate = new Map();
+
+      workoutExerciseKeys.forEach(exerciseKey => {
+        const history = this.getExerciseHistory(exerciseKey);
+        const exerciseName = exerciseKey.replace(workoutName + ' - ', '');
+
+        history.forEach(entry => {
+          const dateKey = new Date(entry.date).toISOString().split('T')[0];
+
+          if (!sessionsByDate.has(dateKey)) {
+            sessionsByDate.set(dateKey, {
+              date: entry.date,
+              workoutName: workoutName,
+              exercises: []
+            });
+          }
+
+          sessionsByDate.get(dateKey).exercises.push({
+            name: exerciseName,
+            sets: entry.sets,
+            startTime: entry.startTime,
+            endTime: entry.endTime
+          });
+        });
+      });
+
+      // Convert to array and sort by date (most recent first)
+      const sessions = Array.from(sessionsByDate.values())
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, limit);
+
+      return sessions;
+    } catch (error) {
+      console.error('Failed to get workout history:', error);
+      return [];
+    }
+  }
+
+  /**
    * Clears all BUILD Tracker data from localStorage
    */
   clearAll() {
