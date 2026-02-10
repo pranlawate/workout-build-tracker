@@ -1,0 +1,229 @@
+/* Achievement Badges in Post-Workout Summary */
+.achievements-earned {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.achievements-title {
+  font-size: var(--font-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-accent);
+  text-align: center;
+}
+
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.achievement-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(6, 182, 212, 0.1);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.achievement-badge:hover {
+  background: rgba(6, 182, 212, 0.15);
+}
+
+.badge-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.badge-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-type {
+  display: block;
+  font-size: var(--font-md);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.badge-description {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Achievement Gallery in Progress Screen */
+.achievements-gallery {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.achievements-summary {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.achievement-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: rgba(6, 182, 212, 0.1);
+  border-radius: 12px;
+  min-width: 120px;
+}
+
+.count-number {
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.count-label {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin-top: var(--spacing-xs);
+}
+
+.achievements-list-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.achievement-type-group {
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.achievement-type-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.achievement-type-title {
+  font-size: var(--font-md);
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+}
+
+.achievement-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.achievement-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.achievement-desc {
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: 1.4;
+}
+
+.achievement-date {
+  font-size: var(--font-xs);
+  color: var(--color-text-dim);
+}
+
+.more-achievements {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  text-align: center;
+  margin-top: var(--spacing-sm);
+  font-style: italic;
+}
+
+/* Empty State */
+.achievements-empty {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-dim);
+}
+
+.achievements-empty-icon {
+  font-size: 48px;
+  margin-bottom: var(--spacing-md);
+}
+
+.achievements-empty-text {
+  font-size: var(--font-md);
+  margin: 0;
+}
+
+/* Special Achievement Types */
+.achievement-badge.pr {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.achievement-badge.tempo {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.achievement-badge.recovery {
+  border-left-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.achievement-badge.streak {
+  border-left-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .achievement-badge {
+    padding: var(--spacing-sm);
+  }
+
+  .badge-icon {
+    font-size: 28px;
+  }
+
+  .badge-type {
+    font-size: var(--font-sm);
+  }
+
+  .badge-description {
+    font-size: var(--font-xs);
+  }
+
+  .achievements-gallery {
+    padding: var(--spacing-md);
+  }
+
+  .count-number {
+    font-size: 28px;
+  }
+
+  .achievement-icon {
+    font-size: 20px;
+  }
+
+  .achievement-desc {
+    font-size: var(--font-xs);
+  }
+}

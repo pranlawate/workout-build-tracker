@@ -15,6 +15,7 @@ import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
 import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/export-import.js';
+import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
 
 class App {
   constructor() {
@@ -2659,6 +2660,8 @@ class App {
     const progressContent = document.getElementById('progress-content');
     if (progressContent) {
       progressContent.innerHTML = `
+        ${this.renderAchievementsGallery()}
+
         <div class="progress-dashboard">
           <h3 class="dashboard-title">🎯 Equipment Progression Milestones</h3>
           ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
@@ -3190,6 +3193,80 @@ class App {
    * @param {Object} stats - Stats from ProgressAnalyzer
    * @returns {string} HTML string
    */
+  renderAchievementsGallery() {
+    const achievements = getAllAchievements(this.storage);
+
+    if (!achievements || achievements.length === 0) {
+      return '';
+    }
+
+    // Sort by date (most recent first)
+    const sorted = [...achievements].sort((a, b) => {
+      const dateA = new Date(a.dateAchieved || 0);
+      const dateB = new Date(b.dateAchieved || 0);
+      return dateB - dateA;
+    });
+
+    // Group by type
+    const grouped = {};
+    for (const achievement of sorted) {
+      const type = achievement.type;
+      if (!grouped[type]) {
+        grouped[type] = [];
+      }
+      grouped[type].push(achievement);
+    }
+
+    return `
+      <div class="achievements-gallery">
+        <h3 class="dashboard-title">🏆 Achievements</h3>
+        <div class="achievements-summary">
+          <div class="achievement-count">
+            <span class="count-number">${achievements.length}</span>
+            <span class="count-label">Total Achievements</span>
+          </div>
+        </div>
+        <div class="achievements-list-gallery">
+          ${Object.entries(grouped).map(([type, items]) => `
+            <div class="achievement-type-group">
+              <h4 class="achievement-type-title">${this.escapeHtml(formatAchievementType(type))} (${items.length})</h4>
+              ${items.slice(0, 5).map(a => `
+                <div class="achievement-item">
+                  <span class="achievement-icon">${this.escapeHtml(a.badge)}</span>
+                  <div class="achievement-info">
+                    <p class="achievement-desc">${this.escapeHtml(a.description)}</p>
+                    <span class="achievement-date">${this.formatAchievementDate(a.dateAchieved)}</span>
+                  </div>
+                </div>
+              `).join('')}
+              ${items.length > 5 ? `<p class="more-achievements">+ ${items.length - 5} more</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  formatAchievementDate(dateStr) {
+    if (!dateStr) return '';
+
+    try {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (error) {
+      return '';
+    }
+  }
+
   renderSummaryStats(stats) {
     if (!stats || stats.workoutsCompleted === 0) {
       return `
@@ -3357,6 +3434,9 @@ class App {
     const stats = this.calculateWorkoutStats(workoutData);
     const newRecords = this.detectNewRecords(workoutData);
 
+    // Detect achievements
+    const achievements = detectAchievements(workoutData, this.storage);
+
     // Show summary screen
     this.hideAllScreens();
     const summaryScreen = document.getElementById('summary-screen');
@@ -3366,7 +3446,7 @@ class App {
     window.history.pushState({ screen: 'summary' }, '', '');
 
     // Render stats section
-    this.renderPostWorkoutSummaryStats(stats, newRecords);
+    this.renderPostWorkoutSummaryStats(stats, newRecords, achievements);
 
     // Setup pain tracking (reuse logic, inline)
     this.setupSummaryPainTracking(workoutData);
@@ -3382,8 +3462,9 @@ class App {
    * Render post-workout summary stats section
    * @param {Object} stats - Workout stats
    * @param {Array} newRecords - Array of PRs
+   * @param {Array} achievements - Array of newly earned achievements
    */
-  renderPostWorkoutSummaryStats(stats, newRecords) {
+  renderPostWorkoutSummaryStats(stats, newRecords, achievements = []) {
     const container = document.getElementById('summary-stats');
 
     // Update title
@@ -3427,6 +3508,11 @@ class App {
       `;
     }
 
+    // Achievements
+    if (achievements && achievements.length > 0) {
+      html += this.renderAchievementsEarned(achievements);
+    }
+
     container.innerHTML = html;
   }
 
@@ -3458,6 +3544,32 @@ class App {
     } else {
       return `<li class="record-item">• ${record.exercise} @ ${record.weight}kg: ${record.from} → ${record.to} reps</li>`;
     }
+  }
+
+  /**
+   * Render achievements earned display
+   * @param {Array} achievements - Array of achievement objects
+   * @returns {string} HTML string
+   */
+  renderAchievementsEarned(achievements) {
+    if (!achievements || achievements.length === 0) return '';
+
+    return `
+      <div class="achievements-earned">
+        <h3 class="achievements-title">🎉 Achievements Earned Today</h3>
+        <div class="achievements-list">
+          ${achievements.map(a => `
+            <div class="achievement-badge">
+              <span class="badge-icon">${this.escapeHtml(a.badge)}</span>
+              <div class="badge-details">
+                <strong class="badge-type">${this.escapeHtml(formatAchievementType(a.type))}</strong>
+                <p class="badge-description">${this.escapeHtml(a.description)}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
   }
 
   /**
@@ -4193,6 +4305,7 @@ class App {
           workoutName: this.currentWorkout.name,
           displayName: this.currentWorkout.displayName,
           exercises: this.workoutSession.exercises,
+          exerciseDefinitions: this.currentWorkout.exercises,
           startTime: this.workoutSession.startTime.getTime(),
           endTime: Date.now()
         };
