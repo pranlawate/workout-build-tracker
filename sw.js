@@ -1,25 +1,25 @@
-const CACHE_NAME = 'build-tracker-v11';
+const CACHE_NAME = 'build-tracker-v12';
 const CACHE_URLS = [
-  '/',
-  '/index.html',
-  '/css/main.css',
-  '/css/components.css',
-  '/css/screens.css',
-  '/css/workout-screen.css',
-  '/css/progress-dashboard.css',
-  '/css/summary-screen.css',
-  '/css/recovery-modal.css',
-  '/js/app.js',
-  '/js/modules/storage.js',
-  '/js/modules/workouts.js',
-  '/js/modules/progression.js',
-  '/js/modules/workout-manager.js',
-  '/js/modules/progress-analyzer.js',
-  '/js/modules/body-weight.js',
-  '/js/components/weight-trend-chart.js',
-  '/manifest.json',
-  '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png'
+  './',
+  './index.html',
+  './css/main.css',
+  './css/components.css',
+  './css/screens.css',
+  './css/workout-screen.css',
+  './css/progress-dashboard.css',
+  './css/summary-screen.css',
+  './css/recovery-modal.css',
+  './js/app.js',
+  './js/modules/storage.js',
+  './js/modules/workouts.js',
+  './js/modules/progression.js',
+  './js/modules/workout-manager.js',
+  './js/modules/progress-analyzer.js',
+  './js/modules/body-weight.js',
+  './js/components/weight-trend-chart.js',
+  './manifest.json',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png'
 ];
 
 // Install event - cache static assets

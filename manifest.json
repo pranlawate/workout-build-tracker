@@ -2,7 +2,7 @@
   "name": "BUILD Workout Tracker",
   "short_name": "BUILD",
   "description": "Upper/Lower Split workout tracker for beginners",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#667eea",
