@@ -1,5 +1,36 @@
-// Exercise Metadata Database
-// Provides exercise information and alternatives for the progression system
+/**
+ * Exercise Metadata Database
+ *
+ * Provides metadata and alternative exercises for all 26 BUILD exercises.
+ * Used by smart progression system to suggest exercise swaps for pain/plateau.
+ *
+ * @module exercise-metadata
+ */
+
+/** Pain intensity levels */
+export const PAIN_LEVELS = {
+  MILD: 'mild',
+  MODERATE: 'moderate',
+  SEVERE: 'severe'
+};
+
+/** Reasons for suggesting exercise alternatives */
+export const SWAP_REASONS = {
+  PAIN: 'pain',
+  PLATEAU: 'plateau'
+};
+
+/**
+ * Exercise difficulty scale
+ * 1 = beginner-friendly exercises (e.g., planks, bodyweight movements)
+ * 2 = intermediate exercises (most dumbbell/cable/machine work)
+ * 3 = advanced exercises (barbells, split squats, technical lifts)
+ */
+export const DIFFICULTY_SCALE = {
+  BEGINNER: 1,
+  INTERMEDIATE: 2,
+  ADVANCED: 3
+};
 
 export const EXERCISE_METADATA = {
   // UPPER_A exercises
@@ -332,7 +363,18 @@ export const EXERCISE_METADATA = {
   }
 };
 
-// Helper function to find alternatives by reason
+/**
+ * Find an alternative exercise based on reason and pain intensity
+ *
+ * @param {string} exerciseName - Name of current exercise
+ * @param {string} reason - Reason for alternative (SWAP_REASONS.PAIN or SWAP_REASONS.PLATEAU)
+ * @param {string|null} painIntensity - Pain level (PAIN_LEVELS.MILD/MODERATE/SEVERE)
+ * @returns {string|null} Alternative exercise name, or null if none suitable
+ *
+ * @example
+ * findAlternative('DB Flat Bench Press', SWAP_REASONS.PAIN, PAIN_LEVELS.MODERATE)
+ * // Returns: 'Floor Press'
+ */
 export function findAlternative(exerciseName, reason, painIntensity = null) {
   const metadata = EXERCISE_METADATA[exerciseName];
   if (!metadata) {
@@ -340,26 +382,37 @@ export function findAlternative(exerciseName, reason, painIntensity = null) {
     return null;
   }
 
-  if (reason === 'pain') {
-    if (painIntensity === 'severe' || painIntensity === 'moderate') {
-      return metadata.alternatives.easier[0];
+  if (reason === SWAP_REASONS.PAIN) {
+    if (painIntensity === PAIN_LEVELS.SEVERE || painIntensity === PAIN_LEVELS.MODERATE) {
+      // Check array has alternatives before accessing [0]
+      return metadata.alternatives.easier?.length ? metadata.alternatives.easier[0] : null;
     }
     // Mild pain - return null (just warning, no alternative yet)
     return null;
   }
 
-  if (reason === 'plateau') {
-    // Different equipment for new stimulus
-    return metadata.alternatives.different[0];
+  if (reason === SWAP_REASONS.PLATEAU) {
+    // Check array has alternatives before accessing [0]
+    return metadata.alternatives.different?.length ? metadata.alternatives.different[0] : null;
   }
 
   return null;
 }
 
-// Helper function to get all alternatives for an exercise
+/**
+ * Get all alternative exercises for a given exercise
+ *
+ * @param {string} exerciseName - Name of current exercise
+ * @returns {{easier: string[], harder: string[], different: string[]}} Alternative exercises by category
+ *
+ * @example
+ * getAllAlternatives('DB Flat Bench Press')
+ * // Returns: { easier: ['Floor Press', 'Incline Push-Ups'], harder: [...], different: [...] }
+ */
 export function getAllAlternatives(exerciseName) {
   const metadata = EXERCISE_METADATA[exerciseName];
   if (!metadata) {
+    console.warn(`[ExerciseMetadata] No metadata found for: ${exerciseName}`);
     return { easier: [], harder: [], different: [] };
   }
   return metadata.alternatives;
