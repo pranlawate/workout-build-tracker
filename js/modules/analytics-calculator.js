@@ -207,8 +207,13 @@ export class AnalyticsCalculator {
       const rirTrend = this.calculateRIRTrend(days);
 
       // Calculate compliance (3 workouts/week expected)
+      // Get actual workouts from rotation sequence
+      const rotation = this.storage.getRotation();
+      const actualWorkouts = rotation?.sequence?.filter(entry =>
+        entry?.completed && entry?.date && entry.date >= cutoffStr
+      ).length || 0;
+
       const expectedWorkouts = Math.floor(days / 7) * 3;
-      const actualWorkouts = workoutDates.size;
       const compliance = expectedWorkouts > 0
         ? (actualWorkouts / expectedWorkouts) * 100
         : 0;
@@ -319,7 +324,8 @@ export class AnalyticsCalculator {
         const newWeight = newEntry.sets[0]?.weight || 0;
 
         if (newWeight > oldWeight) {
-          const exerciseName = key.replace('build_exercise_', '').split(' - ')[1];
+          const parts = key.replace('build_exercise_', '').split(' - ');
+          const exerciseName = parts.length > 1 ? parts[1] : parts[0] || 'Unknown';
           const gain = newWeight - oldWeight;
           progressed.push({ name: exerciseName, gain });
         }
