@@ -3,6 +3,10 @@
  * Uses dependency injection to access StorageManager for all data operations.
  * @module AnalyticsCalculator
  */
+
+// Constants
+const HIGH_FATIGUE_THRESHOLD = 4;
+
 export class AnalyticsCalculator {
   /**
    * Creates an AnalyticsCalculator instance
@@ -377,7 +381,7 @@ export class AnalyticsCalculator {
       const avgFatigue = recentMetrics.reduce((sum, m) => sum + (m.fatigueScore || 0), 0) / recentMetrics.length;
 
       // Count high fatigue days (≥4 points)
-      const highFatigueDays = recentMetrics.filter(m => (m.fatigueScore || 0) >= 4).length;
+      const highFatigueDays = recentMetrics.filter(m => (m.fatigueScore || 0) >= HIGH_FATIGUE_THRESHOLD).length;
 
       // Calculate weekly trend (4 weeks)
       const weeklyTrend = this.calculateWeeklyRecoveryTrend(recentMetrics);

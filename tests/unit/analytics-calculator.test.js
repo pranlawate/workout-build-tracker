@@ -536,5 +536,67 @@ describe('AnalyticsCalculator', () => {
       assert.strictEqual(Math.round(result.avgFatigue * 10) / 10, 2.7); // (2+1+5)/3
       assert.strictEqual(result.highFatigueDays, 1); // Only 5 ≥ 4
     });
+
+    test('should return correct weeklyTrend structure', () => {
+      // Add data for 2 weeks (same week, 2 days each)
+      // Week 1: 10 and 9 days ago (Sunday-based week grouping)
+      const week1Day1 = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const week1Day2 = new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      // Week 2: 3 and 2 days ago
+      const week2Day1 = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const week2Day2 = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const metrics = [
+        { date: week1Day1, sleep: 7, fatigueScore: 2 },
+        { date: week1Day2, sleep: 8, fatigueScore: 3 },
+        { date: week2Day1, sleep: 6, fatigueScore: 4 },
+        { date: week2Day2, sleep: 7, fatigueScore: 5 }
+      ];
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
+
+      const result = calculator.calculateRecoveryTrends(28);
+
+      // Should have at least 2 weeks of data
+      assert.ok(result.weeklyTrend.length >= 2);
+
+      // Each week should have correct structure
+      result.weeklyTrend.forEach(week => {
+        assert.ok(week.week);
+        assert.ok(typeof week.avgSleep === 'number');
+        assert.ok(typeof week.avgFatigue === 'number');
+      });
+    });
+
+    test('should filter metrics by date cutoff', () => {
+      const oldDate = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const recentDate = new Date().toISOString().split('T')[0];
+
+      const metrics = [
+        { date: oldDate, sleep: 9, fatigueScore: 1 },  // Should be excluded
+        { date: recentDate, sleep: 6, fatigueScore: 5 }  // Should be included
+      ];
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
+
+      const result = calculator.calculateRecoveryTrends(28);
+
+      // Should only include recent data
+      assert.strictEqual(result.avgSleep, 6);
+      assert.strictEqual(result.avgFatigue, 5);
+      assert.strictEqual(result.highFatigueDays, 1);
+    });
+
+    test('should handle null sleep and fatigue values', () => {
+      const metrics = [
+        { date: new Date().toISOString().split('T')[0], sleep: null, fatigueScore: null },
+        { date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], sleep: 7, fatigueScore: 2 }
+      ];
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
+
+      const result = calculator.calculateRecoveryTrends(7);
+
+      // Null values should be treated as 0
+      assert.strictEqual(result.avgSleep, 3.5); // (0+7)/2
+      assert.strictEqual(result.avgFatigue, 1); // (0+2)/2
+    });
   });
 });
