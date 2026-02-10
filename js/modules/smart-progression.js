@@ -525,3 +525,78 @@ export function detectAdaptiveWeightPattern(history) {
     description
   };
 }
+
+/**
+ * Suggest tempo progression for weight gap
+ *
+ * @param {string} exerciseKey - Full exercise key (e.g., 'UPPER_A - DB Lateral Raises')
+ * @param {Array} history - Exercise history
+ * @returns {{type: string, weight: number, tempoGuidance: object, message: string, reason: string}|null}
+ *
+ * @example
+ * suggestTempoProgression('UPPER_A - DB Lateral Raises', [{
+ *   date: '2026-02-10',
+ *   sets: [{weight: 12.5, reps: 6, rir: 0}]  // Failed weight increase
+ * }, {
+ *   date: '2026-02-07',
+ *   sets: [{weight: 10, reps: 12, rir: 2}]   // Was successful
+ * }])
+ * // Returns: {
+ * //   type: 'TRY_TEMPO',
+ * //   weight: 10,
+ * //   tempoGuidance: { phase: 'eccentric', instruction: '...', why: '...', cue: '...' },
+ * //   message: 'Try slow tempo at 10kg today',
+ * //   reason: 'Build strength for 12.5kg - weight gap detected'
+ * // }
+ */
+export function suggestTempoProgression(exerciseKey, history) {
+  if (!exerciseKey || typeof exerciseKey !== 'string') {
+    console.warn('[SmartProgression] suggestTempoProgression: Invalid exercise key');
+    return null;
+  }
+
+  if (!history || history.length < 2) {
+    console.warn('[SmartProgression] suggestTempoProgression: Insufficient history');
+    return null;
+  }
+
+  // Extract exercise name from key (remove workout prefix)
+  const exerciseName = exerciseKey.includes(' - ')
+    ? exerciseKey.split(' - ')[1]
+    : exerciseKey;
+
+  // Detect weight gap failure
+  const failed = detectWeightGapFailure(history, exerciseName);
+  if (!failed) {
+    return null;  // No weight gap issue
+  }
+
+  // Get the weight before the failed attempt
+  const previousWorkout = history[1];
+  const previousBestSet = getBestSet(previousWorkout?.sets);
+
+  if (!previousBestSet) {
+    console.warn('[SmartProgression] suggestTempoProgression: Could not determine previous weight');
+    return null;
+  }
+
+  // Get tempo guidance for this exercise
+  const tempoGuidance = getTempoGuidance(exerciseName);
+
+  if (!tempoGuidance) {
+    console.warn(`[SmartProgression] suggestTempoProgression: No tempo guidance for ${exerciseName}`);
+    return null;
+  }
+
+  const currentWorkout = history[0];
+  const currentBestSet = getBestSet(currentWorkout?.sets);
+  const weightGap = currentBestSet?.weight - previousBestSet.weight;
+
+  return {
+    type: 'TRY_TEMPO',
+    weight: previousBestSet.weight,
+    tempoGuidance: tempoGuidance,
+    message: `Try slow tempo at ${previousBestSet.weight}kg today`,
+    reason: `Build strength for ${currentBestSet?.weight}kg - weight gap of ${weightGap}kg detected`
+  };
+}
