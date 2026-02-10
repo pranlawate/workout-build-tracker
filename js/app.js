@@ -2954,7 +2954,10 @@ class App {
 
     // Show summary screen
     this.hideAllScreens();
-    document.getElementById('summary-screen').style.display = 'block';
+    const summaryScreen = document.getElementById('summary-screen');
+    if (summaryScreen) {
+      summaryScreen.classList.add('active');
+    }
     window.history.pushState({ screen: 'summary' }, '', '');
 
     // Render stats section
