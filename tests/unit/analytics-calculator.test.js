@@ -599,4 +599,61 @@ describe('AnalyticsCalculator', () => {
       assert.strictEqual(result.avgFatigue, 1); // (0+2)/2
     });
   });
+
+  describe('detectPatterns', () => {
+    test('should return insufficient data message when <10 workouts', () => {
+      const result = calculator.detectPatterns();
+
+      assert.strictEqual(result.length, 1);
+      assert.strictEqual(result[0].type, 'insufficient-data');
+      assert.ok(result[0].message.includes('Not enough data'));
+    });
+
+    test('should detect sleep-progression pattern with sufficient data', () => {
+      // Create 12 workouts where progression happens mostly on high sleep days
+      const rotation = { sequence: [] };
+      const metrics = [];
+      const exerciseHistory = [];
+
+      // Pattern: Progress on 5 out of 6 high-sleep days, but only 1 out of 6 low-sleep days
+      const progressionPattern = [
+        { sleep: 8, progress: true },  // 0
+        { sleep: 5, progress: false }, // 1
+        { sleep: 8, progress: true },  // 2
+        { sleep: 5, progress: false }, // 3
+        { sleep: 8, progress: true },  // 4
+        { sleep: 5, progress: true },  // 5 - only low sleep progression
+        { sleep: 8, progress: true },  // 6
+        { sleep: 5, progress: false }, // 7
+        { sleep: 8, progress: true },  // 8
+        { sleep: 5, progress: false }, // 9
+        { sleep: 8, progress: false }, // 10 - one high sleep without progression
+        { sleep: 5, progress: false }  // 11
+      ];
+
+      let currentWeight = 20;
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(Date.now() - i * 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const pattern = progressionPattern[11 - i];
+
+        rotation.sequence.push({ workout: 'UPPER_A', date, completed: true });
+        metrics.push({ date, sleep: pattern.sleep, fatigueScore: 2 });
+
+        // Increase weight if this is a progression day
+        if (pattern.progress) {
+          currentWeight += 2.5;
+        }
+        exerciseHistory.push({ date, sets: [{ weight: currentWeight, reps: 10, rir: 2 }] });
+      }
+
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', exerciseHistory);
+      localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
+
+      const result = calculator.detectPatterns();
+
+      assert.ok(result.length > 0);
+      assert.notStrictEqual(result[0].type, 'insufficient-data');
+    });
+  });
 });

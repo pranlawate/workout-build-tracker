@@ -433,4 +433,245 @@ export class AnalyticsCalculator {
       return [];
     }
   }
+
+  /**
+   * Detects patterns correlating recovery metrics with performance
+   * @returns {Array<{type: string, confidence: number, message: string}>} Detected patterns sorted by confidence
+   */
+  detectPatterns() {
+    try {
+      const patterns = [];
+
+      // Get all workout dates
+      const rotation = this.storage.getRotation();
+      if (!rotation || !rotation.sequence) {
+        return [{ type: 'insufficient-data', confidence: 0, message: 'Not enough data yet (0/10 workouts)' }];
+      }
+
+      const completedWorkouts = rotation.sequence.filter(w => w.completed);
+      if (completedWorkouts.length < 10) {
+        return [{ type: 'insufficient-data', confidence: 0, message: `Not enough data yet (${completedWorkouts.length}/10 workouts)` }];
+      }
+
+      // Pattern 1: Sleep vs Progression
+      const sleepPattern = this.detectSleepProgressionPattern();
+      if (sleepPattern) patterns.push(sleepPattern);
+
+      // Pattern 2: Volume vs Pain
+      const volumePainPattern = this.detectVolumePainPattern();
+      if (volumePainPattern) patterns.push(volumePainPattern);
+
+      // Sort by confidence
+      return patterns.sort((a, b) => b.confidence - a.confidence);
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Pattern detection error:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Detects correlation between sleep and progression
+   * @private
+   * @returns {Object|null} Pattern object or null if no pattern found
+   */
+  detectSleepProgressionPattern() {
+    try {
+      const metricsData = localStorage.getItem('build_recovery_metrics');
+      if (!metricsData) return null;
+
+      const allMetrics = JSON.parse(metricsData);
+      const rotation = this.storage.getRotation();
+      if (!rotation || !rotation.sequence) return null;
+
+      // Map workouts to sleep data
+      const workoutSleepData = rotation.sequence
+        .filter(w => w.completed)
+        .map(w => {
+          const metrics = allMetrics.find(m => m.date === w.date);
+          const progressed = this.didProgressOnDate(w.date);
+          return {
+            date: w.date,
+            sleep: metrics?.sleep || 0,
+            progressed
+          };
+        })
+        .filter(d => d.sleep > 0); // Only include days with sleep data
+
+      if (workoutSleepData.length < 10) return null;
+
+      // Split by sleep quality
+      const highSleep = workoutSleepData.filter(d => d.sleep >= 7);
+      const lowSleep = workoutSleepData.filter(d => d.sleep < 6);
+
+      if (highSleep.length < 5 || lowSleep.length < 5) return null;
+
+      // Calculate progression rates
+      const highSleepProgressRate = highSleep.filter(d => d.progressed).length / highSleep.length;
+      const lowSleepProgressRate = lowSleep.filter(d => d.progressed).length / lowSleep.length;
+
+      // Check for significant difference (1.5x threshold)
+      if (highSleepProgressRate > lowSleepProgressRate * 1.5) {
+        const confidence = this.calculateConfidence(highSleep.length, lowSleep.length);
+        const multiplier = (highSleepProgressRate / Math.max(lowSleepProgressRate, 0.01)).toFixed(1);
+
+        return {
+          type: 'sleep-progression',
+          confidence,
+          message: `When sleep ≥7hrs, you progress ${multiplier}× faster than when sleep <6hrs`
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Sleep pattern error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Detects correlation between volume and pain
+   * @private
+   * @returns {Object|null} Pattern object or null if no pattern found
+   */
+  detectVolumePainPattern() {
+    try {
+      // Get all pain reports
+      const painKeys = Object.keys(localStorage)
+        .filter(key => key.startsWith('build_pain_'));
+
+      if (painKeys.length === 0) return null;
+
+      // Analyze volume when pain occurred
+      const painDates = new Set();
+      painKeys.forEach(key => {
+        const painData = JSON.parse(localStorage.getItem(key) || '[]');
+        painData.forEach(p => {
+          if (p.severity && p.severity !== 'none') {
+            painDates.add(p.date);
+          }
+        });
+      });
+
+      if (painDates.size < 3) return null;
+
+      // Calculate average volume on pain days vs pain-free days
+      const rotation = this.storage.getRotation();
+      if (!rotation || !rotation.sequence) return null;
+
+      const volumeOnPainDays = [];
+      const volumeOnNormalDays = [];
+
+      rotation.sequence.filter(w => w.completed).forEach(w => {
+        const volume = this.getVolumeForDate(w.date);
+        if (painDates.has(w.date)) {
+          volumeOnPainDays.push(volume);
+        } else {
+          volumeOnNormalDays.push(volume);
+        }
+      });
+
+      if (volumeOnPainDays.length < 3 || volumeOnNormalDays.length < 5) return null;
+
+      const avgPainVolume = volumeOnPainDays.reduce((a, b) => a + b, 0) / volumeOnPainDays.length;
+      const avgNormalVolume = volumeOnNormalDays.reduce((a, b) => a + b, 0) / volumeOnNormalDays.length;
+
+      // Check if pain days have significantly higher volume (20% threshold)
+      if (avgPainVolume > avgNormalVolume * 1.2) {
+        const confidence = this.calculateConfidence(volumeOnPainDays.length, volumeOnNormalDays.length);
+        const threshold = Math.round(avgPainVolume / 100) * 100; // Round to nearest 100
+
+        return {
+          type: 'volume-pain',
+          confidence,
+          message: `Pain appears when weekly volume exceeds ${threshold}kg`
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Volume-pain pattern error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Checks if any exercise progressed on a specific date
+   * @private
+   * @param {string} date - Date to check
+   * @returns {boolean} True if progression occurred
+   */
+  didProgressOnDate(date) {
+    try {
+      const allKeys = this.storage.getAllExerciseKeys();
+
+      let progressed = false;
+
+      allKeys.forEach(key => {
+        const history = this.storage.getExerciseHistory(key);
+        const entryIndex = history.findIndex(e => e.date === date);
+        if (entryIndex > 0) {
+          const currentEntry = history[entryIndex];
+          const previousEntry = history[entryIndex - 1];
+
+          const currentWeight = currentEntry.sets[0]?.weight || 0;
+          const previousWeight = previousEntry.sets[0]?.weight || 0;
+
+          if (currentWeight > previousWeight) {
+            progressed = true;
+          }
+        }
+      });
+
+      return progressed;
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Progression check error:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Gets total volume for a specific date
+   * @private
+   * @param {string} date - Date to get volume for
+   * @returns {number} Total volume for the date
+   */
+  getVolumeForDate(date) {
+    try {
+      const allKeys = this.storage.getAllExerciseKeys();
+
+      let totalVolume = 0;
+
+      allKeys.forEach(key => {
+        const history = this.storage.getExerciseHistory(key);
+        const entry = history.find(e => e.date === date);
+        if (entry) {
+          const volume = entry.sets.reduce((sum, set) => {
+            return sum + (set.weight * set.reps);
+          }, 0);
+          totalVolume += volume;
+        }
+      });
+
+      return totalVolume;
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Volume for date error:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculates confidence score based on sample sizes
+   * @private
+   * @param {number} sampleSize1 - First sample size
+   * @param {number} sampleSize2 - Second sample size
+   * @returns {number} Confidence percentage (55-85)
+   */
+  calculateConfidence(sampleSize1, sampleSize2) {
+    // Confidence based on sample sizes
+    const totalSamples = sampleSize1 + sampleSize2;
+    if (totalSamples >= 30) return 85;
+    if (totalSamples >= 20) return 75;
+    if (totalSamples >= 15) return 65;
+    return 55;
+  }
 }
