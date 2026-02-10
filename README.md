@@ -1,6 +1,6 @@
 # BUILD Workout Tracker
 
-![Tests](https://img.shields.io/badge/tests-134%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-137%20passing-brightgreen)
 ![Status](https://img.shields.io/badge/status-production-blue)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -40,7 +40,7 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 ✅ **Core Features (100% Complete)**
 - ✅ Backend modules (StorageManager, WorkoutManager, Progression Engine, DeloadManager)
-- ✅ Test infrastructure (134 tests passing - unit + integration)
+- ✅ Test infrastructure (137 tests passing - unit + integration)
 - ✅ Workout definitions (4 workouts, 26 exercises)
 - ✅ Progressive disclosure UI (collapse completed, hide upcoming, expand current)
 - ✅ PWA support (Service Worker, offline-first, installable)
@@ -109,7 +109,7 @@ workout-build-tracker/
 │   ├── modules/       # Core modules
 │   ├── screens/       # Screen components
 │   └── utils/         # Utilities
-├── tests/             # Test suite (134 tests)
+├── tests/             # Test suite (137 tests)
 └── docs/              # Documentation
 ```
 
@@ -179,11 +179,19 @@ workout-build-tracker/
 - Version: `build-tracker-v8` (auto-updates on new deployments)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
+### 📊 Analytics Dashboard
+
+**Always-Available Insights:**
+- **Training Volume** - 7-day total with trend comparison
+- **Performance Quality** - RIR trends, compliance, progression tracking
+- **Recovery Trends** - Sleep/fatigue analysis with weekly charts
+- **Pattern Detection** - Automatic correlation discovery (sleep vs progression, volume vs pain)
+
+Access via Progress screen > Analytics tab
+
 ### Next Features (Planned)
 - Enhanced tracking metrics (sleep, stress, energy)
-- Post-workout summary screen
 - Exercise history charts (Canvas-based)
-- Weekly summary analytics
 
 ## License
 

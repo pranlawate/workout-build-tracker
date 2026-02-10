@@ -1,6 +1,6 @@
 {
   "name": "build-tracker",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Mobile-first PWA for tracking Upper/Lower Split workouts with smart progression",
   "type": "module",
   "scripts": {

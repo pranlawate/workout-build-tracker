@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-02-09
+
+### Added
+- Analytics dashboard with 4 insight sections
+- Training volume calculation (7-day rolling with trend)
+- Performance quality metrics (RIR trends, compliance, progression)
+- Recovery trends visualization (sleep/fatigue averages)
+- Automatic pattern detection (sleep-progression, volume-pain correlations)
+- Tab-based navigation in Progress screen (Overview, Body Weight, Barbell, Analytics)
+- Minimum 10 workouts required for pattern detection
+- Empty states for new users and insufficient data
+- Mobile-responsive analytics with 44px touch targets
+
+### Changed
+- Progress screen now has 4 tabs instead of single scrolling view
+- Service worker cache updated to v24
+
+### Technical
+- New AnalyticsCalculator module with read-only pattern
+- 9 new unit tests for analytics calculations (137 total tests)
+- Pattern detection with confidence scoring (55-85% range)
+- 12 integration test scenarios documented
+
 ## [1.4.0] - 2026-02-09
 
 ### Added
