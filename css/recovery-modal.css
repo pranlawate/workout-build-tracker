@@ -3,6 +3,8 @@
 .recovery-metrics-content {
   max-width: 500px;
   width: 90%;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .recovery-metrics-content h2 {
@@ -10,6 +12,7 @@
   font-size: 24px;
   color: var(--color-text);
   margin-bottom: var(--spacing-lg);
+  text-align: center;
 }
 
 .recovery-form {
@@ -28,11 +31,15 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--color-text);
+  text-align: center;
+  display: block;
 }
 
 .input-hint {
   font-size: 14px;
   color: var(--color-text-secondary);
+  text-align: center;
+  display: block;
 }
 
 /* Number input styling */
@@ -45,6 +52,8 @@
   border-radius: 8px;
   background: var(--color-bg-secondary);
   color: var(--color-text);
+  margin: 0 auto;
+  display: block;
 }
 
 .recovery-number-input:focus {
