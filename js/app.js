@@ -3233,8 +3233,13 @@ class App {
     const weighinSection = document.getElementById('summary-weighin');
     const weighinInput = document.getElementById('weighin-input-summary');
 
+    // Initialize BodyWeightManager if not already done
+    if (!this.bodyWeight) {
+      this.bodyWeight = new BodyWeightManager(this.storage);
+    }
+
     // Check if weigh-in is due
-    const weighinDue = this.bodyWeight && this.bodyWeight.isWeighInDue();
+    const weighinDue = this.bodyWeight.isWeighInDue();
 
     if (!weighinDue) {
       weighinSection.style.display = 'none';
