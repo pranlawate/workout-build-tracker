@@ -9,6 +9,7 @@ import { AnalyticsCalculator } from './modules/analytics-calculator.js';
 import { WeightTrendChart } from './components/weight-trend-chart.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
+import { getSuggestion } from './modules/smart-progression.js';
 import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
@@ -559,6 +560,7 @@ class App {
     const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
       const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
       const history = this.storage.getExerciseHistory(exerciseKey);
+      const painHistory = this.storage.getPainHistory(exerciseKey);
       const lastWorkout = history.length > 0 ? history[history.length - 1] : null;
 
       // Initialize session data for this exercise
@@ -570,6 +572,10 @@ class App {
       // Get performance badge for this exercise
       const exerciseSession = this.workoutSession.exercises[index];
       const performanceBadge = this.getPerformanceBadge(exerciseKey, exerciseSession.sets);
+
+      // Get smart progression suggestion
+      const suggestion = getSuggestion(exerciseKey, history, painHistory);
+      const suggestionBanner = this.generateSuggestionBanner(suggestion);
 
       // Determine exercise state
       let stateClass = '';
@@ -598,6 +604,8 @@ class App {
           <div class="performance-badge-container">
             ${performanceBadge}
           </div>
+
+          ${suggestionBanner}
 
           ${this.renderProgressionHint(exercise, history, lastWorkout)}
 
@@ -832,6 +840,90 @@ class App {
     }
 
     return '';
+  }
+
+  /**
+   * Generate smart suggestion banner HTML
+   *
+   * @param {object|null} suggestion - Suggestion from getSuggestion()
+   * @returns {string} HTML for suggestion banner
+   */
+  generateSuggestionBanner(suggestion) {
+    if (!suggestion) return '';
+
+    const urgencyClass = this.getSuggestionUrgencyClass(suggestion.urgency || 'normal');
+    const icon = this.getSuggestionIcon(suggestion.type);
+    const typeLabel = this.getSuggestionTypeLabel(suggestion.type);
+
+    return `
+      <div class="smart-suggestion ${urgencyClass}">
+        <div class="suggestion-icon">${icon}</div>
+        <div class="suggestion-content">
+          <strong class="suggestion-type">${typeLabel}</strong>
+          <p class="suggestion-message">${this.escapeHtml(suggestion.message)}</p>
+          <small class="suggestion-reason">${this.escapeHtml(suggestion.reason)}</small>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Get CSS urgency class for suggestion
+   *
+   * @param {string} urgency - Urgency level
+   * @returns {string} CSS class
+   */
+  getSuggestionUrgencyClass(urgency) {
+    const urgencyMap = {
+      'critical': 'urgent',
+      'high': 'warning',
+      'medium': 'warning',
+      'low': 'info',
+      'normal': ''
+    };
+    return urgencyMap[urgency] || '';
+  }
+
+  /**
+   * Get icon for suggestion type
+   *
+   * @param {string} type - Suggestion type
+   * @returns {string} Icon emoji
+   */
+  getSuggestionIcon(type) {
+    const iconMap = {
+      'INCREASE_WEIGHT': '💪',
+      'TRY_TEMPO': '⏱️',
+      'TRY_ALTERNATIVE': '🔄',
+      'IMMEDIATE_ALTERNATIVE': '⚠️',
+      'REDUCE_WEIGHT': '⬇️',
+      'PAIN_WARNING': '🚨',
+      'PLATEAU_WARNING': '📊',
+      'RECOVERY_WARNING': '💤',
+      'CONTINUE': '✅'
+    };
+    return iconMap[type] || '💡';
+  }
+
+  /**
+   * Get label for suggestion type
+   *
+   * @param {string} type - Suggestion type
+   * @returns {string} Type label
+   */
+  getSuggestionTypeLabel(type) {
+    const labelMap = {
+      'INCREASE_WEIGHT': 'SMART SUGGESTION',
+      'TRY_TEMPO': 'TEMPO PROGRESSION',
+      'TRY_ALTERNATIVE': 'TRY ALTERNATIVE',
+      'IMMEDIATE_ALTERNATIVE': 'SAFETY ALERT',
+      'REDUCE_WEIGHT': 'WEIGHT ADJUSTMENT',
+      'PAIN_WARNING': 'PAIN DETECTED',
+      'PLATEAU_WARNING': 'PLATEAU DETECTED',
+      'RECOVERY_WARNING': 'RECOVERY CHECK',
+      'CONTINUE': 'ON TRACK'
+    };
+    return labelMap[type] || 'SUGGESTION';
   }
 
   attachSetInputListeners() {
