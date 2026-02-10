@@ -10,6 +10,7 @@ import { WeightTrendChart } from './components/weight-trend-chart.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { getSuggestion } from './modules/smart-progression.js';
+import { getFormCues } from './modules/form-cues.js';
 import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
@@ -577,6 +578,40 @@ class App {
       const suggestion = getSuggestion(exerciseKey, history, painHistory);
       const suggestionBanner = this.generateSuggestionBanner(suggestion);
 
+      // Get form cues
+      const formCues = getFormCues(exercise.name);
+      let formCuesHTML = '';
+
+      if (formCues) {
+        formCuesHTML = `
+          <div class="form-guide-section">
+            <button class="form-guide-toggle" onclick="app.toggleFormGuide(${index})" id="form-toggle-${index}">
+              📋 Form Guide ▼
+            </button>
+            <div class="form-guide-content" id="form-guide-${index}" style="display: none;">
+              <div class="form-cue-category">
+                <strong>Setup:</strong>
+                <ul>
+                  ${formCues.setup.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+                </ul>
+              </div>
+              <div class="form-cue-category">
+                <strong>Execution:</strong>
+                <ul>
+                  ${formCues.execution.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+                </ul>
+              </div>
+              <div class="form-cue-category">
+                <strong>⚠️ Avoid:</strong>
+                <ul>
+                  ${formCues.mistakes.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
       // Determine exercise state
       let stateClass = '';
       if (index < this.currentExerciseIndex) {
@@ -606,6 +641,8 @@ class App {
           </div>
 
           ${suggestionBanner}
+
+          ${formCuesHTML}
 
           ${this.renderProgressionHint(exercise, history, lastWorkout)}
 
@@ -855,7 +892,7 @@ class App {
     const icon = this.getSuggestionIcon(suggestion.type);
     const typeLabel = this.getSuggestionTypeLabel(suggestion.type);
 
-    return `
+    let bannerHTML = `
       <div class="smart-suggestion ${urgencyClass}">
         <div class="suggestion-icon">${icon}</div>
         <div class="suggestion-content">
@@ -865,6 +902,21 @@ class App {
         </div>
       </div>
     `;
+
+    // Add tempo guidance if present
+    if (suggestion.type === 'TRY_TEMPO' && suggestion.tempoGuidance) {
+      const tempo = suggestion.tempoGuidance;
+      bannerHTML += `
+      <div class="tempo-guidance">
+        <strong>📖 How to do it:</strong>
+        <p>${this.escapeHtml(tempo.instruction)}</p>
+        <div class="tempo-visual">${this.escapeHtml(tempo.cue)}</div>
+        <small>Why? ${this.escapeHtml(tempo.why)}</small>
+      </div>
+    `;
+    }
+
+    return bannerHTML;
   }
 
   /**
@@ -1801,6 +1853,21 @@ class App {
     const currentExercise = document.querySelector('.exercise-item.current');
     if (currentExercise) {
       currentExercise.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  toggleFormGuide(exerciseIndex) {
+    const content = document.getElementById(`form-guide-${exerciseIndex}`);
+    const toggle = document.getElementById(`form-toggle-${exerciseIndex}`);
+
+    if (content && toggle) {
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggle.textContent = '📋 Form Guide ▲';
+      } else {
+        content.style.display = 'none';
+        toggle.textContent = '📋 Form Guide ▼';
+      }
     }
   }
 
