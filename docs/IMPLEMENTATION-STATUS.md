@@ -272,6 +272,76 @@ All designed features have been successfully implemented! The BUILD Tracker now 
 
 ---
 
+## 🚀 Next Major Feature: Smart Auto-Progression System
+
+**Status:** Designed - Ready for Implementation
+**Design Document:** [Smart Auto-Progression System](plans/2026-02-10-smart-auto-progression-design.md)
+**Goal:** THE BEST auto-progression app with zero extra user input
+
+### Planned Components (Not Yet Implemented)
+
+#### 1. Smart Progression Suggester
+**Purpose:** Adaptive weight/tempo/alternative suggestions
+**Features:**
+- ⏳ Pattern detection (plateau/regression/success)
+- ⏳ Next step suggestions based on user patterns
+- ⏳ Adaptive weight detection (works with any gym equipment)
+- ⏳ Automatic tempo progression for weight gaps
+- ⏳ Display suggestion banner before exercise
+
+**Effort:** ~200 lines, 1 week
+
+#### 2. Tempo Guidance System
+**Purpose:** Exercise-specific tempo instructions
+**Features:**
+- ⏳ Tempo guidance database (26 exercises)
+- ⏳ Exercise-specific instructions (eccentric/concentric/paused)
+- ⏳ Visual guides and explanations
+- ⏳ "Why?" explanations for each exercise
+
+**Effort:** ~150 lines, 1 week
+
+#### 3. Pattern-Based Alternatives
+**Purpose:** Smart alternative suggestions
+**Features:**
+- ⏳ Exercise metadata database (muscle group, movement type, difficulty)
+- ⏳ Auto-suggest alternatives for pain
+- ⏳ Auto-suggest alternatives for plateaus
+- ⏳ No manual selection required
+
+**Effort:** ~100 lines, 3 days
+
+#### 4. Optional Tempo Tracking
+**Purpose:** Allow users to track tempo if desired
+**Features:**
+- ⏳ Collapsible tempo selector (hidden by default)
+- ⏳ Optional tracking (not required)
+- ⏳ Backward compatible data structure
+
+**Effort:** ~50 lines, 2 days
+
+### Total Implementation Estimate
+- **Total Lines:** ~500 lines of code
+- **Total Time:** 3-4 weeks
+- **Impact:** Solves #1 beginner progression problem
+
+### Key Differentiators
+✅ **Zero extra input** - Just log weight/reps/RIR as normal
+✅ **Adaptive** - Works with actual gym equipment (20kg→25kg jumps OK)
+✅ **Exercise-specific** - Each exercise gets optimal tempo strategy
+✅ **Pattern-based** - Learns from what user actually does
+✅ **Safety-first** - Auto-switches exercises when pain detected
+
+### Example Flow
+```
+Week 1: Log 10kg × 12 reps → System: "Try 12.5kg next time"
+Week 2: Log 12.5kg × 6 reps (failed) → System: "Build reps at 10kg, try slow tempo"
+Week 3-4: Log 10kg × 12 reps → System: "Continue slow tempo to build strength"
+Week 5: System: "Ready for 12.5kg now - you've built the strength!"
+```
+
+---
+
 ## 📝 Notes
 
 ### Design Quality

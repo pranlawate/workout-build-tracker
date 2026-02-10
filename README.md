@@ -14,14 +14,15 @@ A Progressive Web App for tracking strength training workouts, designed for begi
 BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 
 - **Smart defaults**: 85% of sets logged in 1 tap
-- **Auto-progression tracking**: Intelligent weight/rep suggestions
+- **Adaptive auto-progression**: Intelligent weight/rep suggestions that adapt to gym equipment
+- **Smart progression strategies**: Automatic tempo/pause recommendations when weight gaps exist
 - **Recovery monitoring**: Prevents overtraining with muscle-specific rest periods
 - **Equipment progression**: Tracks readiness for barbell exercises with strength, mobility, and pain criteria
 - **Deload automation**: Smart fatigue detection and recovery weeks
 - **Performance analysis**: Real-time alerts for weight regression and form breakdown
 - **Pain tracking**: Post-workout pain logging with consolidated modal interface
 - **Band exercise tracking**: Visual resistance tracking with color-coded band selection
-- **Enhanced Tracking Metrics**: Pre-workout recovery assessment (sleep, stress, energy, soreness) with fatigue scoring and intelligent warnings to prevent overtraining
+- **Analytics dashboard**: 7-day volume trends, performance quality, recovery patterns, correlation detection
 - **Offline-first**: Works without internet connection, installable as PWA
 - **Browser navigation**: Full support for browser back button (SPA experience)
 
@@ -50,10 +51,13 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 - ✅ Progress dashboard (statistics, body weight tracking, milestone progress)
 - ✅ Browser navigation (full back button support, SPA experience)
 
-🚧 **Designed But Not Implemented** (17 features remaining)
-- Enhanced tracking metrics (sleep, stress, energy, fatigue scoring)
-- Exercise history charts (Canvas-based)
-- Weekly summary analytics
+🚧 **Planned Features**
+- **Smart Auto-Progression System** (Next major feature)
+  - Adaptive weight suggestions based on actual gym equipment
+  - Automatic tempo progression for weight gaps (2.5kg→5kg)
+  - Exercise-specific tempo guidance (eccentric/concentric/paused)
+  - Pattern-based exercise alternatives for pain/plateau
+  - Zero extra user input required
 
 See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for detailed progress tracking.
 
@@ -189,9 +193,47 @@ workout-build-tracker/
 
 Access via Progress screen > Analytics tab
 
-### Next Features (Planned)
-- Enhanced tracking metrics (sleep, stress, energy)
-- Exercise history charts (Canvas-based)
+### 🎯 Next Major Feature: Smart Auto-Progression System
+
+**The Goal:** THE BEST auto-progression app that requires zero extra user input.
+
+**What makes it smart:**
+1. **Adaptive Weight Suggestions**
+   - Detects actual gym equipment (works with 20→25kg jumps, not just 2.5kg increments)
+   - Adjusts expectations based on your actual performance
+   - Learns when you're stronger/weaker than theoretical progression
+
+2. **Automatic Tempo Progression**
+   - Solves beginner weight gap problem (2.5kg→5kg = 100% increase)
+   - Suggests tempo strategies when stuck (eccentric/paused/normal)
+   - Exercise-specific guidance (press movements = slow lowering, rows = slow pull + pause)
+   - No tempo tracking required - just suggestions
+
+3. **Smart Pattern Detection**
+   - Auto-detects plateaus (same weight 3+ workouts)
+   - Auto-detects regression (weight/rep drops)
+   - Auto-suggests alternatives when pain detected
+   - Works with existing data only (weight/reps/RIR)
+
+4. **Zero Extra Input**
+   - No dropdown menus for tempo selection
+   - No manual alternative switching
+   - System adapts to what you actually log
+   - Suggestions based on patterns, not rules
+
+**Example Flow:**
+```
+Week 1: Log 10kg × 12 reps → System: "Try 12.5kg next time"
+Week 2: Log 12.5kg × 6 reps (failed) → System: "Build reps at 10kg, try slow tempo"
+Week 3-4: Log 10kg × 12 reps → System: "Continue slow tempo to build strength"
+Week 5: System: "Ready for 12.5kg now - you've built the strength!"
+```
+
+**Status:** Design complete, implementation scheduled
+**Timeline:** 3-4 weeks (3 phases)
+**Impact:** Solves the #1 beginner progression problem automatically
+
+See design document: [Smart Auto-Progression System](docs/plans/2026-02-10-smart-auto-progression-design.md)
 
 ## License
 
