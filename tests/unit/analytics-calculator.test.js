@@ -250,4 +250,48 @@ describe('AnalyticsCalculator', () => {
       assert.strictEqual(result.total, 400);
     });
   });
+
+  describe('calculatePerformanceMetrics', () => {
+    test('should return zeros when no workout history exists', () => {
+      const result = calculator.calculatePerformanceMetrics(28);
+
+      assert.strictEqual(result.avgRIR, 0);
+      assert.deepStrictEqual(result.rirTrend, []);
+      assert.strictEqual(result.compliance, 0);
+      assert.strictEqual(result.progressedCount, 0);
+      assert.deepStrictEqual(result.topProgressors, []);
+    });
+
+    test('should calculate compliance rate correctly', () => {
+      // Add rotation data
+      const today = new Date().toISOString().split('T')[0];
+      const day2 = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const day3 = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const rotation = {
+        sequence: [
+          { workout: 'UPPER_A', date: today, completed: true },
+          { workout: 'LOWER_A', date: day2, completed: true },
+          { workout: 'UPPER_B', date: day3, completed: true }
+        ]
+      };
+      localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
+
+      // Add exercise history for these dates
+      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+        { date: today, sets: [{ weight: 20, reps: 10, rir: 2 }] }
+      ]);
+      storage.saveExerciseHistory('LOWER_A - Squat', [
+        { date: day2, sets: [{ weight: 40, reps: 10, rir: 2 }] }
+      ]);
+      storage.saveExerciseHistory('UPPER_B - DB Incline Press', [
+        { date: day3, sets: [{ weight: 20, reps: 10, rir: 2 }] }
+      ]);
+
+      const result = calculator.calculatePerformanceMetrics(7);
+
+      // 3 workouts in 7 days, expected 3 = 100%
+      assert.strictEqual(result.compliance, 100);
+    });
+  });
 });
