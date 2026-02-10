@@ -600,3 +600,113 @@ export function suggestTempoProgression(exerciseKey, history) {
     reason: `Build strength for ${currentBestSet?.weight}kg - weight gap of ${weightGap}kg detected`
   };
 }
+
+/**
+ * Suggest exercise alternative for pain
+ *
+ * @param {string} exerciseKey - Full exercise key
+ * @param {object} painHistory - Pain history for exercise
+ * @param {Array} workoutHistory - Exercise workout history
+ * @returns {{type: string, alternative: string, originalWeight: number, suggestedWeight: number, message: string, reason: string, autoApply: boolean, urgency: string}|null}
+ *
+ * @example
+ * handlePainBasedSuggestion('UPPER_A - DB Flat Bench Press', {
+ *   latestPain: {intensity: 'moderate', date: '2026-02-10'},
+ *   count: 2
+ * }, workoutHistory)
+ * // Returns: {
+ * //   type: 'TRY_ALTERNATIVE',
+ * //   alternative: 'Floor Press',
+ * //   originalWeight: 20,
+ * //   suggestedWeight: 16,
+ * //   message: 'Switch to Floor Press at 16kg (was 20kg)',
+ * //   reason: 'Moderate pain persists - safer variation',
+ * //   autoApply: true,
+ * //   urgency: 'high'
+ * // }
+ */
+export function handlePainBasedSuggestion(exerciseKey, painHistory, workoutHistory) {
+  if (!exerciseKey || !painHistory) {
+    console.warn('[SmartProgression] handlePainBasedSuggestion: Missing required data');
+    return null;
+  }
+
+  const exerciseName = exerciseKey.includes(' - ')
+    ? exerciseKey.split(' - ')[1]
+    : exerciseKey;
+
+  const latestPain = painHistory.latestPain;
+  if (!latestPain || !latestPain.intensity) {
+    return null;
+  }
+
+  const intensity = latestPain.intensity;
+
+  // Get current weight
+  let currentWeight = null;
+  if (workoutHistory && workoutHistory.length > 0) {
+    const latestWorkout = workoutHistory[0];
+    const bestSet = getBestSet(latestWorkout?.sets);
+    currentWeight = bestSet?.weight || null;
+  }
+
+  // Mild pain: Warning only
+  if (intensity === PAIN_LEVELS.MILD || intensity === 'mild') {
+    return {
+      type: 'PAIN_WARNING',
+      message: `Mild ${latestPain.location || 'discomfort'} reported last workout`,
+      reason: 'Monitor form, reduce weight if pain increases',
+      urgency: 'low',
+      autoApply: false
+    };
+  }
+
+  // Moderate pain (first occurrence): Reduce weight
+  const painCount = painHistory.count || 1;
+  if ((intensity === PAIN_LEVELS.MODERATE || intensity === 'moderate') && painCount === 1) {
+    const reducedWeight = currentWeight ? currentWeight * 0.8 : null;
+    return {
+      type: 'REDUCE_WEIGHT',
+      suggestedWeight: reducedWeight,
+      originalWeight: currentWeight,
+      message: reducedWeight
+        ? `Try ${reducedWeight}kg (was ${currentWeight}kg) - moderate pain detected`
+        : 'Reduce weight by 20% - moderate pain detected',
+      reason: 'Lighter weight may resolve issue',
+      urgency: 'medium',
+      autoApply: false
+    };
+  }
+
+  // Moderate pain (persistent) OR Severe pain: Switch to alternative
+  const alternative = findAlternative(exerciseName, SWAP_REASONS.PAIN, intensity);
+
+  if (!alternative) {
+    console.warn(`[SmartProgression] handlePainBasedSuggestion: No alternative found for ${exerciseName}`);
+    return {
+      type: 'PAIN_WARNING',
+      message: `${intensity} pain detected - consider consulting trainer`,
+      reason: 'No suitable alternative exercise available',
+      urgency: intensity === PAIN_LEVELS.SEVERE || intensity === 'severe' ? 'critical' : 'high',
+      autoApply: false
+    };
+  }
+
+  const suggestedWeight = currentWeight ? currentWeight * 0.8 : null;
+  const isSevere = intensity === PAIN_LEVELS.SEVERE || intensity === 'severe';
+
+  return {
+    type: isSevere ? 'IMMEDIATE_ALTERNATIVE' : 'TRY_ALTERNATIVE',
+    alternative: alternative,
+    originalWeight: currentWeight,
+    suggestedWeight: suggestedWeight,
+    message: isSevere
+      ? `Severe pain - switching to ${alternative} immediately`
+      : `Moderate pain persists - switch to ${alternative}`,
+    reason: isSevere
+      ? 'Consider rest day or medical consultation'
+      : 'Safer variation for recovery',
+    autoApply: true,
+    urgency: isSevere ? 'critical' : 'high'
+  };
+}
