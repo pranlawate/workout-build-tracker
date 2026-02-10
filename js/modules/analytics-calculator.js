@@ -343,4 +343,90 @@ export class AnalyticsCalculator {
       return { progressedCount: 0, topProgressors: [] };
     }
   }
+
+  /**
+   * Calculates recovery trends including sleep, fatigue, and weekly trends
+   * @param {number} [days=28] - Number of days to include in calculation
+   * @returns {Object} Recovery trends with avgSleep, avgFatigue, highFatigueDays, and weeklyTrend
+   * @returns {number} returns.avgSleep - Average sleep hours in the period
+   * @returns {number} returns.avgFatigue - Average fatigue score in the period
+   * @returns {number} returns.highFatigueDays - Count of days with fatigue score ≥ 4
+   * @returns {Array<{week: string, avgSleep: number, avgFatigue: number}>} returns.weeklyTrend - Weekly averages sorted by week
+   */
+  calculateRecoveryTrends(days = 28) {
+    try {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      const cutoffStr = cutoffDate.toISOString().split('T')[0];
+
+      // Get recovery metrics from localStorage
+      const metricsData = localStorage.getItem('build_recovery_metrics');
+      if (!metricsData) {
+        return { avgSleep: 0, avgFatigue: 0, highFatigueDays: 0, weeklyTrend: [] };
+      }
+
+      const allMetrics = JSON.parse(metricsData);
+      const recentMetrics = allMetrics.filter(m => m.date >= cutoffStr);
+
+      if (recentMetrics.length === 0) {
+        return { avgSleep: 0, avgFatigue: 0, highFatigueDays: 0, weeklyTrend: [] };
+      }
+
+      // Calculate averages
+      const avgSleep = recentMetrics.reduce((sum, m) => sum + (m.sleep || 0), 0) / recentMetrics.length;
+      const avgFatigue = recentMetrics.reduce((sum, m) => sum + (m.fatigueScore || 0), 0) / recentMetrics.length;
+
+      // Count high fatigue days (≥4 points)
+      const highFatigueDays = recentMetrics.filter(m => (m.fatigueScore || 0) >= 4).length;
+
+      // Calculate weekly trend (4 weeks)
+      const weeklyTrend = this.calculateWeeklyRecoveryTrend(recentMetrics);
+
+      return { avgSleep, avgFatigue, highFatigueDays, weeklyTrend };
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Recovery trends error:', error);
+      return { avgSleep: 0, avgFatigue: 0, highFatigueDays: 0, weeklyTrend: [] };
+    }
+  }
+
+  /**
+   * Calculates weekly recovery trends from metrics data
+   * @private
+   * @param {Array<{date: string, sleep: number, fatigueScore: number}>} metrics - Recovery metrics to analyze
+   * @returns {Array<{week: string, avgSleep: number, avgFatigue: number}>} Weekly averages sorted by week
+   */
+  calculateWeeklyRecoveryTrend(metrics) {
+    try {
+      // Group by week
+      const weekMap = new Map();
+
+      metrics.forEach(m => {
+        const date = new Date(m.date);
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay()); // Sunday
+        const weekKey = weekStart.toISOString().split('T')[0];
+
+        if (!weekMap.has(weekKey)) {
+          weekMap.set(weekKey, { sleep: [], fatigue: [] });
+        }
+
+        weekMap.get(weekKey).sleep.push(m.sleep || 0);
+        weekMap.get(weekKey).fatigue.push(m.fatigueScore || 0);
+      });
+
+      // Calculate weekly averages
+      const trend = Array.from(weekMap.entries())
+        .map(([week, data]) => ({
+          week,
+          avgSleep: data.sleep.reduce((a, b) => a + b, 0) / data.sleep.length,
+          avgFatigue: data.fatigue.reduce((a, b) => a + b, 0) / data.fatigue.length
+        }))
+        .sort((a, b) => a.week.localeCompare(b.week));
+
+      return trend;
+    } catch (error) {
+      console.error('[AnalyticsCalculator] Weekly trend error:', error);
+      return [];
+    }
+  }
 }

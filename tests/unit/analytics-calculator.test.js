@@ -510,4 +510,31 @@ describe('AnalyticsCalculator', () => {
       assert.deepStrictEqual(result.topProgressors, []);
     });
   });
+
+  describe('calculateRecoveryTrends', () => {
+    test('should return zeros when no recovery data exists', () => {
+      const result = calculator.calculateRecoveryTrends(28);
+
+      assert.strictEqual(result.avgSleep, 0);
+      assert.strictEqual(result.avgFatigue, 0);
+      assert.strictEqual(result.highFatigueDays, 0);
+      assert.deepStrictEqual(result.weeklyTrend, []);
+    });
+
+    test('should calculate recovery averages from metrics data', () => {
+      // Add recovery metrics
+      const metrics = [
+        { date: new Date().toISOString().split('T')[0], sleep: 7, fatigueScore: 2 },
+        { date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], sleep: 8, fatigueScore: 1 },
+        { date: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString().split('T')[0], sleep: 6, fatigueScore: 5 }
+      ];
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
+
+      const result = calculator.calculateRecoveryTrends(7);
+
+      assert.strictEqual(result.avgSleep, 7); // (7+8+6)/3
+      assert.strictEqual(Math.round(result.avgFatigue * 10) / 10, 2.7); // (2+1+5)/3
+      assert.strictEqual(result.highFatigueDays, 1); // Only 5 ≥ 4
+    });
+  });
 });
