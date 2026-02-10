@@ -62,14 +62,14 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'DB Chest Fly',
+        name: 'Cable Chest Fly',
         sets: 3,
         repRange: '10-12',
         rirTarget: '2-3',
-        startingWeight: 5,
-        weightIncrement: 1.25,
-        tempo: '3 sec down (stretch), 1 sec up',
-        notes: 'Primary: Chest (horizontal adduction)',
+        startingWeight: 10,
+        weightIncrement: 2.5,
+        tempo: '2 sec down, 1 sec up',
+        notes: 'Primary: Chest (horizontal adduction). Safer shoulder position than DB fly.',
         machineOk: true
       },
       {
