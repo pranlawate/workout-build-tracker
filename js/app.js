@@ -1148,8 +1148,9 @@ class App {
     const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
     const sessionExercise = this.workoutSession.exercises[exerciseIndex];
 
-    // Parse rep range
-    const [minReps, maxReps] = exerciseDef.repRange.split('-').map(Number);
+    // Parse rep range (strip non-numeric characters like 's', 'sec', '/side')
+    const cleanRepRange = exerciseDef.repRange.replace(/[^\d-]/g, '');
+    const [minReps, maxReps] = cleanRepRange.split('-').map(Number);
     const [minRir, maxRir] = exerciseDef.rirTarget.split('-').map(Number);
 
     // Determine feedback message and color
