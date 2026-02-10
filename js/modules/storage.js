@@ -421,6 +421,245 @@ export class StorageManager {
   }
 
   /**
+   * Get exercise alternates storage
+   * @returns {Object} Map of exercise keys to alternate info
+   */
+  getExerciseAlternates() {
+    const stored = this.storage.getItem('build_exercise_alternates');
+    if (!stored) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (error) {
+      console.error('Failed to parse exercise alternates, returning empty object:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Set exercise alternate
+   * @param {string} exerciseKey - Full exercise key
+   * @param {Object} alternateInfo - {current, original, reason, dateChanged, painFreeWorkouts}
+   */
+  setExerciseAlternate(exerciseKey, alternateInfo) {
+    if (!exerciseKey || typeof exerciseKey !== 'string') {
+      throw new Error('Invalid exerciseKey: must be a non-empty string');
+    }
+    if (!alternateInfo || typeof alternateInfo !== 'object') {
+      throw new Error('Invalid alternateInfo: must be an object');
+    }
+
+    try {
+      const alternates = this.getExerciseAlternates();
+      alternates[exerciseKey] = {
+        ...alternateInfo,
+        dateChanged: new Date().toISOString()
+      };
+      const serialized = JSON.stringify(alternates);
+      this.storage.setItem('build_exercise_alternates', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to set exercise alternate: ${error.message}`);
+    }
+  }
+
+  /**
+   * Remove exercise alternate (revert to original)
+   * @param {string} exerciseKey - Full exercise key
+   */
+  removeExerciseAlternate(exerciseKey) {
+    if (!exerciseKey || typeof exerciseKey !== 'string') {
+      throw new Error('Invalid exerciseKey: must be a non-empty string');
+    }
+
+    try {
+      const alternates = this.getExerciseAlternates();
+      delete alternates[exerciseKey];
+      const serialized = JSON.stringify(alternates);
+      this.storage.setItem('build_exercise_alternates', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to remove exercise alternate: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get achievements
+   * @returns {Object} {achievements: [], streaks: {}}
+   */
+  getAchievements() {
+    const stored = this.storage.getItem('build_achievements');
+    if (!stored) {
+      return { achievements: [], streaks: {} };
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+      // Ensure structure is valid
+      if (typeof parsed !== 'object' || parsed === null) {
+        return { achievements: [], streaks: {} };
+      }
+      return {
+        achievements: Array.isArray(parsed.achievements) ? parsed.achievements : [],
+        streaks: typeof parsed.streaks === 'object' && parsed.streaks !== null ? parsed.streaks : {}
+      };
+    } catch (error) {
+      console.error('Failed to parse achievements, returning default:', error);
+      return { achievements: [], streaks: {} };
+    }
+  }
+
+  /**
+   * Add achievement
+   * @param {Object} achievement - Achievement data
+   */
+  addAchievement(achievement) {
+    if (!achievement || typeof achievement !== 'object') {
+      throw new Error('Invalid achievement: must be an object');
+    }
+
+    try {
+      const data = this.getAchievements();
+      data.achievements.push({
+        ...achievement,
+        dateAchieved: new Date().toISOString(),
+        seen: false
+      });
+      const serialized = JSON.stringify(data);
+      this.storage.setItem('build_achievements', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to add achievement: ${error.message}`);
+    }
+  }
+
+  /**
+   * Mark achievements as seen
+   * @param {string[]} achievementIds - IDs to mark as seen
+   */
+  markAchievementsSeen(achievementIds) {
+    if (!Array.isArray(achievementIds)) {
+      throw new Error('Invalid achievementIds: must be an array');
+    }
+
+    try {
+      const data = this.getAchievements();
+      data.achievements = data.achievements.map(a =>
+        achievementIds.includes(a.id) ? { ...a, seen: true } : a
+      );
+      const serialized = JSON.stringify(data);
+      this.storage.setItem('build_achievements', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to mark achievements as seen: ${error.message}`);
+    }
+  }
+
+  /**
+   * Update achievement streak
+   * @param {string} exerciseKey - Full exercise key
+   * @param {Object} streakData - {current, best, pattern, lastDate}
+   */
+  updateAchievementStreak(exerciseKey, streakData) {
+    if (!exerciseKey || typeof exerciseKey !== 'string') {
+      throw new Error('Invalid exerciseKey: must be a non-empty string');
+    }
+    if (!streakData || typeof streakData !== 'object') {
+      throw new Error('Invalid streakData: must be an object');
+    }
+
+    try {
+      const data = this.getAchievements();
+      data.streaks[exerciseKey] = streakData;
+      const serialized = JSON.stringify(data);
+      this.storage.setItem('build_achievements', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to update achievement streak: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get tempo state (optional tracking)
+   * @returns {Object} Map of exercise keys to tempo state
+   */
+  getTempoState() {
+    const stored = this.storage.getItem('build_tempo_state');
+    if (!stored) {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(stored);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (error) {
+      console.error('Failed to parse tempo state, returning empty object:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Set tempo state for exercise
+   * @param {string} exerciseKey - Full exercise key
+   * @param {Object} state - {weight, tempoStartDate, weekCount, status, targetWeight}
+   */
+  setTempoState(exerciseKey, state) {
+    if (!exerciseKey || typeof exerciseKey !== 'string') {
+      throw new Error('Invalid exerciseKey: must be a non-empty string');
+    }
+    if (!state || typeof state !== 'object') {
+      throw new Error('Invalid state: must be an object');
+    }
+
+    try {
+      const tempoState = this.getTempoState();
+      tempoState[exerciseKey] = state;
+      const serialized = JSON.stringify(tempoState);
+      this.storage.setItem('build_tempo_state', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to set tempo state: ${error.message}`);
+    }
+  }
+
+  /**
+   * Clear tempo state for exercise
+   * @param {string} exerciseKey - Full exercise key
+   */
+  clearTempoState(exerciseKey) {
+    if (!exerciseKey || typeof exerciseKey !== 'string') {
+      throw new Error('Invalid exerciseKey: must be a non-empty string');
+    }
+
+    try {
+      const tempoState = this.getTempoState();
+      delete tempoState[exerciseKey];
+      const serialized = JSON.stringify(tempoState);
+      this.storage.setItem('build_tempo_state', serialized);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to clear tempo state: ${error.message}`);
+    }
+  }
+
+  /**
    * Clears all BUILD Tracker data from localStorage
    */
   clearAll() {
