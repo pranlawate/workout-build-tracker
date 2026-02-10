@@ -791,3 +791,118 @@ export function suggestRecoveryCheck(history) {
     ]
   };
 }
+
+/**
+ * Get smart progression suggestion for an exercise
+ * Main decision engine using priority-based system
+ *
+ * Priority order:
+ * 1. Safety (pain handling)
+ * 2. Progression (weight increase)
+ * 3. Weight gap (tempo progression)
+ * 4. Plateau detection
+ * 5. Regression warning
+ * 6. Default (continue current approach)
+ *
+ * @param {string} exerciseKey - Full exercise key (e.g., 'UPPER_A - DB Bench Press')
+ * @param {Array} history - Exercise workout history
+ * @param {object} painHistory - Pain history for exercise (optional)
+ * @returns {object|null} Suggestion object or null
+ *
+ * @example
+ * getSuggestion('UPPER_A - DB Bench Press', workoutHistory, painHistory)
+ * // Returns one of: pain suggestion, weight increase, tempo progression,
+ * // plateau alternative, regression warning, or continue message
+ */
+export function getSuggestion(exerciseKey, history, painHistory = null) {
+  // Validate inputs
+  if (!exerciseKey || typeof exerciseKey !== 'string') {
+    console.warn('[SmartProgression] getSuggestion: Invalid exercise key');
+    return null;
+  }
+
+  if (!history || !Array.isArray(history) || history.length === 0) {
+    console.warn('[SmartProgression] getSuggestion: No history data');
+    return {
+      type: 'CONTINUE',
+      message: 'Start tracking this exercise',
+      reason: 'No workout history available yet'
+    };
+  }
+
+  // Extract exercise name from key
+  const exerciseName = exerciseKey.includes(' - ')
+    ? exerciseKey.split(' - ')[1]
+    : exerciseKey;
+
+  // PRIORITY 1: Safety (pain handling)
+  if (painHistory && painHistory.latestPain) {
+    const painSuggestion = handlePainBasedSuggestion(exerciseKey, painHistory, history);
+    if (painSuggestion) {
+      return painSuggestion;
+    }
+  }
+
+  // PRIORITY 2: Progression (weight increase)
+  if (detectSuccessfulProgression(history, exerciseName)) {
+    const weightSuggestion = suggestWeightIncrease(history, exerciseName);
+    if (weightSuggestion) {
+      return weightSuggestion;
+    }
+  }
+
+  // PRIORITY 3: Weight gap (tempo progression)
+  if (detectWeightGapFailure(history, exerciseName)) {
+    const tempoSuggestion = suggestTempoProgression(exerciseKey, history);
+    if (tempoSuggestion) {
+      return tempoSuggestion;
+    }
+  }
+
+  // PRIORITY 4: Plateau detection
+  if (detectPlateau(history)) {
+    const plateauSuggestion = suggestPlateauAlternative(exerciseKey, history);
+    if (plateauSuggestion) {
+      return plateauSuggestion;
+    }
+  }
+
+  // PRIORITY 5: Regression warning
+  if (detectRegression(history)) {
+    const regressionWarning = suggestRecoveryCheck(history);
+    if (regressionWarning) {
+      return regressionWarning;
+    }
+  }
+
+  // PRIORITY 6: Default (continue current approach)
+  const latestWorkout = history[0];
+  const bestSet = getBestSet(latestWorkout?.sets);
+
+  if (!bestSet) {
+    return {
+      type: 'CONTINUE',
+      message: 'Continue with current weight',
+      reason: 'Keep building reps and improving form'
+    };
+  }
+
+  const range = getRepRange(exerciseName);
+  const repsInRange = bestSet.reps >= range.min && bestSet.reps <= range.max;
+
+  if (repsInRange) {
+    return {
+      type: 'CONTINUE',
+      weight: bestSet.weight,
+      message: `Continue with ${bestSet.weight}kg`,
+      reason: 'Build reps toward top of range (aim for 12 reps)'
+    };
+  }
+
+  return {
+    type: 'CONTINUE',
+    weight: bestSet.weight,
+    message: `Continue with ${bestSet.weight}kg`,
+    reason: 'Keep improving form and consistency'
+  };
+}
