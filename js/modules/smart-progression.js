@@ -710,3 +710,84 @@ export function handlePainBasedSuggestion(exerciseKey, painHistory, workoutHisto
     urgency: isSevere ? 'critical' : 'high'
   };
 }
+
+/**
+ * Suggest alternative for plateau
+ *
+ * @param {string} exerciseKey - Full exercise key
+ * @param {Array} history - Exercise history
+ * @returns {{type: string, alternative: string, message: string, reason: string}|null}
+ *
+ * @example
+ * suggestPlateauAlternative('UPPER_A - DB Bench Press', history)
+ * // Returns: {
+ * //   type: 'TRY_ALTERNATIVE',
+ * //   alternative: 'Cable Chest Press',
+ * //   message: 'Try Cable Chest Press for new stimulus',
+ * //   reason: 'Same weight for 3+ workouts - different equipment may help'
+ * // }
+ */
+export function suggestPlateauAlternative(exerciseKey, history) {
+  if (!exerciseKey || typeof exerciseKey !== 'string') {
+    console.warn('[SmartProgression] suggestPlateauAlternative: Invalid exercise key');
+    return null;
+  }
+
+  if (!detectPlateau(history)) {
+    return null;  // No plateau detected
+  }
+
+  const exerciseName = exerciseKey.includes(' - ')
+    ? exerciseKey.split(' - ')[1]
+    : exerciseKey;
+
+  const alternative = findAlternative(exerciseName, SWAP_REASONS.PLATEAU);
+
+  if (!alternative) {
+    console.warn(`[SmartProgression] suggestPlateauAlternative: No alternative found for ${exerciseName}`);
+    return {
+      type: 'PLATEAU_WARNING',
+      message: 'Plateau detected (same weight 3+ workouts)',
+      reason: 'Consider deload week or different rep scheme'
+    };
+  }
+
+  return {
+    type: 'TRY_ALTERNATIVE',
+    alternative: alternative,
+    message: `Try ${alternative} for new stimulus`,
+    reason: 'Same weight for 3+ workouts - different equipment may help'
+  };
+}
+
+/**
+ * Suggest recovery check for regression
+ *
+ * @param {Array} history - Exercise history
+ * @returns {{type: string, message: string, reason: string, suggestions: string[]}|null}
+ *
+ * @example
+ * suggestRecoveryCheck(history)
+ * // Returns: {
+ * //   type: 'RECOVERY_WARNING',
+ * //   message: 'Performance dropped from previous workout',
+ * //   reason: 'Weight or reps decreased - check recovery',
+ * //   suggestions: ['Ensure adequate sleep', 'Check nutrition', 'Consider deload']
+ * // }
+ */
+export function suggestRecoveryCheck(history) {
+  if (!detectRegression(history)) {
+    return null;  // No regression detected
+  }
+
+  return {
+    type: 'RECOVERY_WARNING',
+    message: 'Performance dropped from previous workout',
+    reason: 'Weight or reps decreased - check recovery',
+    suggestions: [
+      'Ensure adequate sleep (7-9 hours)',
+      'Check nutrition and hydration',
+      'Consider deload week if persists'
+    ]
+  };
+}
