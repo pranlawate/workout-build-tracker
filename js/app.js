@@ -5,6 +5,7 @@ import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
 import { BarbellProgressionTracker } from './modules/barbell-progression-tracker.js';
 import { BodyWeightManager } from './modules/body-weight.js';
 import { ProgressAnalyzer } from './modules/progress-analyzer.js';
+import { AnalyticsCalculator } from './modules/analytics-calculator.js';
 import { WeightTrendChart } from './components/weight-trend-chart.js';
 import { getWorkout, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
@@ -19,6 +20,7 @@ class App {
     this.workoutManager = new WorkoutManager(this.storage);
     this.deloadManager = new DeloadManager(this.storage);
     this.performanceAnalyzer = new PerformanceAnalyzer(this.storage);
+    this.analyticsCalculator = new AnalyticsCalculator(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
 
@@ -2658,8 +2660,192 @@ class App {
     const analyticsContent = document.getElementById('analytics-content');
     if (!analyticsContent) return;
 
-    // TODO: Render analytics (Task 7)
-    analyticsContent.innerHTML = '<p>Analytics coming soon...</p>';
+    // Check for minimum data requirement
+    const rotation = this.storage.getRotation();
+    const workoutCount = rotation?.sequence?.filter(w => w.completed).length || 0;
+
+    if (workoutCount < 4) {
+      analyticsContent.innerHTML = `
+        <div class="empty-state">
+          <h3>📊 Analytics</h3>
+          <p>Complete 4+ workouts to unlock analytics and pattern detection.</p>
+          <p><strong>Current progress:</strong> ${workoutCount}/4 workouts</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Calculate analytics
+    const volume = this.analyticsCalculator.calculateVolume(7);
+    const performance = this.analyticsCalculator.calculatePerformanceMetrics(28);
+    const recovery = this.analyticsCalculator.calculateRecoveryTrends(28);
+    const patterns = this.analyticsCalculator.detectPatterns();
+
+    // Render sections
+    analyticsContent.innerHTML = `
+      ${this.renderVolumeSection(volume)}
+      ${this.renderPerformanceSection(performance)}
+      ${this.renderRecoverySection(recovery)}
+      ${this.renderPatternsSection(patterns)}
+    `;
+  }
+
+  renderVolumeSection(volume) {
+    const trendIcon = volume.trend > 10 ? '↑' :
+                      volume.trend < -10 ? '↓' : '↔';
+    const trendClass = volume.trend > 10 ? 'trend-up' :
+                       volume.trend < -10 ? 'trend-down' : 'trend-stable';
+
+    const workoutTypeRows = Object.entries(volume.byWorkoutType)
+      .map(([type, data]) => `
+        <div class="volume-row">
+          <span>${this.escapeHtml(type)}:</span>
+          <span>${data.volume.toLocaleString()} kg (${data.sessions} sessions)</span>
+        </div>
+      `).join('');
+
+    return `
+      <div class="analytics-section">
+        <h3>📊 Training Volume (Last 7 Days)</h3>
+        <div class="analytics-card">
+          <div class="metric-primary">
+            <span class="metric-label">Total:</span>
+            <span class="metric-value">${volume.total.toLocaleString()} kg</span>
+            <span class="metric-trend ${trendClass}">
+              ${trendIcon} ${Math.abs(volume.trend).toFixed(0)}% vs last week
+            </span>
+          </div>
+          ${workoutTypeRows.length > 0 ? `
+            <div class="volume-breakdown">
+              <strong>By Workout Type:</strong>
+              ${workoutTypeRows}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  renderPerformanceSection(performance) {
+    const rirTrend = performance.avgRIR > 2.5 ? '(easier)' :
+                     performance.avgRIR < 2 ? '(harder)' : '(stable)';
+
+    const topProgressorsList = performance.topProgressors
+      .map(p => `<li>${this.escapeHtml(p.name)} (+${p.gain}kg)</li>`)
+      .join('');
+
+    return `
+      <div class="analytics-section">
+        <h3>🎯 Performance Quality (4 Weeks)</h3>
+        <div class="analytics-card">
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="metric-label">Avg RIR:</span>
+              <span class="metric-value">${performance.avgRIR.toFixed(1)} ${rirTrend}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Compliance:</span>
+              <span class="metric-value">${performance.compliance.toFixed(0)}%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Exercises Progressed:</span>
+              <span class="metric-value">${performance.progressedCount}</span>
+            </div>
+          </div>
+          ${performance.topProgressors.length > 0 ? `
+            <div class="top-progressors">
+              <strong>Top Progressors:</strong>
+              <ul>${topProgressorsList}</ul>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  renderRecoverySection(recovery) {
+    if (recovery.avgSleep === 0 && recovery.avgFatigue === 0) {
+      return `
+        <div class="analytics-section">
+          <h3>💤 Recovery Trends (4 Weeks)</h3>
+          <div class="analytics-card">
+            <p class="empty-state-text">No recovery data available. Start tracking sleep and fatigue before workouts.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="analytics-section">
+        <h3>💤 Recovery Trends (4 Weeks)</h3>
+        <div class="analytics-card">
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="metric-label">Avg Sleep:</span>
+              <span class="metric-value">${recovery.avgSleep.toFixed(1)} hrs</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Avg Fatigue:</span>
+              <span class="metric-value">${recovery.avgFatigue.toFixed(1)}/9</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">High Fatigue Days:</span>
+              <span class="metric-value">${recovery.highFatigueDays} (≥4 points)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderPatternsSection(patterns) {
+    if (patterns.length === 0) {
+      return `
+        <div class="analytics-section">
+          <h3>🔍 Discovered Patterns</h3>
+          <div class="analytics-card">
+            <p class="empty-state-text">Not enough data to detect patterns yet. Keep training!</p>
+          </div>
+        </div>
+      `;
+    }
+
+    if (patterns[0].type === 'insufficient-data') {
+      return `
+        <div class="analytics-section">
+          <h3>🔍 Discovered Patterns</h3>
+          <div class="analytics-card">
+            <p class="empty-state-text">${this.escapeHtml(patterns[0].message)}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    const patternCards = patterns.map(pattern => {
+      const confidenceIcon = pattern.confidence >= 80 ? '🟢' :
+                            pattern.confidence >= 60 ? '🟡' : '🔵';
+      const confidenceLabel = pattern.confidence >= 80 ? 'Strong' :
+                             pattern.confidence >= 60 ? 'Moderate' : 'Weak';
+
+      return `
+        <div class="pattern-card">
+          <div class="pattern-header">
+            ${confidenceIcon} <strong>${confidenceLabel} pattern</strong>
+            <span class="confidence-score">(confidence: ${pattern.confidence}%)</span>
+          </div>
+          <p class="pattern-message">${this.escapeHtml(pattern.message)}</p>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="analytics-section">
+        <h3>🔍 Discovered Patterns</h3>
+        <div class="analytics-card">
+          ${patternCards}
+        </div>
+      </div>
+    `;
   }
 
   showPostWorkoutPainModal() {
