@@ -417,3 +417,111 @@ export function detectSuccessfulProgression(history, exerciseName) {
 
   return hitTop && goodRIR;
 }
+
+/**
+ * Suggest next weight increase
+ *
+ * @param {Array} history - Exercise history
+ * @param {string} exerciseName - Name of exercise
+ * @returns {{type: string, suggestedWeight: number, message: string, reason: string}|null}
+ *
+ * @example
+ * suggestWeightIncrease([{
+ *   date: '2026-02-10',
+ *   sets: [{weight: 10, reps: 12, rir: 2}]
+ * }], 'DB Lateral Raises')
+ * // Returns: {
+ * //   type: 'INCREASE_WEIGHT',
+ * //   suggestedWeight: 12.5,
+ * //   message: 'Try 12.5kg today (+2.5kg)',
+ * //   reason: 'You hit top of rep range with good RIR'
+ * // }
+ */
+export function suggestWeightIncrease(history, exerciseName) {
+  if (!history || history.length === 0) {
+    console.warn('[SmartProgression] suggestWeightIncrease: No history data');
+    return null;
+  }
+
+  const latestWorkout = history[0];
+  if (!latestWorkout || !latestWorkout.sets || latestWorkout.sets.length === 0) {
+    console.warn('[SmartProgression] suggestWeightIncrease: No sets in latest workout');
+    return null;
+  }
+
+  const bestSet = getBestSet(latestWorkout.sets);
+  if (!bestSet || bestSet.weight === null || bestSet.weight === undefined) {
+    console.warn('[SmartProgression] suggestWeightIncrease: Could not determine weight');
+    return null;
+  }
+
+  // Standard increment: 2.5kg for dumbbells
+  const increment = 2.5;
+  const suggestedWeight = bestSet.weight + increment;
+
+  return {
+    type: 'INCREASE_WEIGHT',
+    suggestedWeight: suggestedWeight,
+    message: `Try ${suggestedWeight}kg today (+${increment}kg)`,
+    reason: 'You hit top of rep range with good RIR'
+  };
+}
+
+/**
+ * Detect adaptive weight pattern (user's actual weight progression)
+ * Learns from what user actually logs vs what system suggested
+ *
+ * @param {Array} history - Exercise history (minimum 3 workouts)
+ * @returns {{pattern: string, averageIncrement: number, description: string}|null}
+ *
+ * @example
+ * detectAdaptiveWeightPattern([
+ *   {date: '2026-02-10', sets: [{weight: 25}]},  // User jumped 5kg
+ *   {date: '2026-02-07', sets: [{weight: 20}]},  // User jumped 5kg
+ *   {date: '2026-02-04', sets: [{weight: 15}]}   // User's pattern: 5kg jumps
+ * ])
+ * // Returns: {
+ * //   pattern: 'large_jumps',
+ * //   averageIncrement: 5,
+ * //   description: 'User typically increases by 5kg (stronger than standard)'
+ * // }
+ */
+export function detectAdaptiveWeightPattern(history) {
+  if (!history || history.length < 3) {
+    return null;
+  }
+
+  const increments = [];
+
+  for (let i = 0; i < history.length - 1 && i < 5; i++) {
+    const currentWeight = getBestSet(history[i]?.sets)?.weight;
+    const previousWeight = getBestSet(history[i + 1]?.sets)?.weight;
+
+    if (currentWeight && previousWeight && currentWeight > previousWeight) {
+      increments.push(currentWeight - previousWeight);
+    }
+  }
+
+  if (increments.length === 0) {
+    return null;
+  }
+
+  const averageIncrement = increments.reduce((a, b) => a + b, 0) / increments.length;
+
+  let pattern = 'standard';
+  let description = 'User follows standard progression';
+
+  if (averageIncrement > 3.5) {
+    pattern = 'large_jumps';
+    description = `User typically increases by ${averageIncrement.toFixed(1)}kg (stronger than standard)`;
+  } else if (averageIncrement < 1.5) {
+    pattern = 'small_steps';
+    description = `User prefers ${averageIncrement.toFixed(1)}kg increments (conservative)`;
+  }
+
+  return {
+    pattern,
+    averageIncrement: parseFloat(averageIncrement.toFixed(1)),
+    description
+  };
+}
