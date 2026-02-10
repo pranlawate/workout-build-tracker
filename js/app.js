@@ -2907,7 +2907,7 @@ class App {
     window.history.pushState({ screen: 'summary' }, '', '');
 
     // Render stats section
-    this.renderSummaryStats(stats, newRecords);
+    this.renderPostWorkoutSummaryStats(stats, newRecords);
 
     // Setup pain tracking (reuse logic, inline)
     this.setupSummaryPainTracking(workoutData);
@@ -2920,11 +2920,11 @@ class App {
   }
 
   /**
-   * Render summary stats section
+   * Render post-workout summary stats section
    * @param {Object} stats - Workout stats
    * @param {Array} newRecords - Array of PRs
    */
-  renderSummaryStats(stats, newRecords) {
+  renderPostWorkoutSummaryStats(stats, newRecords) {
     const container = document.getElementById('summary-stats');
 
     // Update title
