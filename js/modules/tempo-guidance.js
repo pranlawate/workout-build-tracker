@@ -7,6 +7,14 @@
  * @module tempo-guidance
  */
 
+/** Tempo phases for progression */
+export const TEMPO_PHASES = {
+  ECCENTRIC: 'eccentric',    // Lowering/lengthening phase
+  CONCENTRIC: 'concentric',   // Lifting/shortening phase
+  BOTH: 'both',              // Both phases equally important
+  ISOMETRIC: 'isometric'     // Static hold
+};
+
 /**
  * Tempo guidance for each exercise
  *
@@ -212,10 +220,18 @@ export const TEMPO_GUIDANCE = {
 };
 
 /**
+ * @typedef {Object} TempoGuidanceData
+ * @property {string} phase - Which movement phase to focus on (eccentric/concentric/both/isometric)
+ * @property {string} instruction - How to perform the tempo variation
+ * @property {string} why - Reason this tempo helps progression
+ * @property {string} cue - Visual/verbal cue for execution
+ */
+
+/**
  * Get tempo guidance for an exercise
  *
  * @param {string} exerciseName - Name of exercise
- * @returns {{phase: string, instruction: string, why: string, cue: string}|null} Tempo guidance or null if not found
+ * @returns {TempoGuidanceData|null} Tempo guidance or null if not found
  *
  * @example
  * getTempoGuidance('DB Flat Bench Press')
@@ -233,15 +249,22 @@ export function getTempoGuidance(exerciseName) {
 /**
  * Get exercises by tempo phase
  *
- * @param {string} phase - Tempo phase (eccentric, concentric, both, isometric)
+ * @param {string} phase - Tempo phase (use TEMPO_PHASES constants)
  * @returns {string[]} Exercise names using this phase
  *
  * @example
- * getExercisesByPhase('eccentric')
+ * getExercisesByPhase(TEMPO_PHASES.ECCENTRIC)
  * // Returns: ['DB Flat Bench Press', 'DB Lateral Raises', ...]
  */
 export function getExercisesByPhase(phase) {
+  // Validate input
+  if (!phase || typeof phase !== 'string') {
+    console.warn(`[TempoGuidance] Invalid phase parameter: ${phase}`);
+    return [];
+  }
+
+  // Use descriptive parameter names instead of underscores
   return Object.entries(TEMPO_GUIDANCE)
-    .filter(([_, guidance]) => guidance.phase === phase)
-    .map(([exerciseName, _]) => exerciseName);
+    .filter(([exerciseName, guidance]) => guidance.phase === phase)
+    .map(([exerciseName, guidance]) => exerciseName);
 }
