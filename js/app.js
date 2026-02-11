@@ -29,8 +29,9 @@ class App {
     this.currentExerciseIndex = 0;
 
     // Workout reference expanded state (0-3 = workout index, null = none)
-    this.expandedWorkout = sessionStorage.getItem('expandedWorkout')
-      ? parseInt(sessionStorage.getItem('expandedWorkout'))
+    const stored = sessionStorage.getItem('expandedWorkout');
+    this.expandedWorkout = stored && !isNaN(parseInt(stored, 10))
+      ? parseInt(stored, 10)
       : null;
 
     // History and detail screens
