@@ -15,8 +15,14 @@
   --color-bg-primary: var(--color-bg);
   --color-bg-secondary: var(--color-surface);
   --color-bg-tertiary: var(--color-surface-light);
+  --color-bg-quaternary: #475569;
   --color-text-secondary: var(--color-text-dim);
+  --color-text-muted: #64748b;
   --color-border: var(--color-surface-light);
+  --color-border-subtle: rgba(148, 163, 184, 0.2);
+
+  --radius-md: 8px;
+  --radius-sm: 4px;
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
