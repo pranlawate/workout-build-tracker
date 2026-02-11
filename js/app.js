@@ -775,8 +775,8 @@ class App {
         `;
       }
 
-      // Detect time-based exercises (repRange contains 's', 'sec', 'second', or 'side')
-      const isTimeBased = exercise.repRange.toLowerCase().includes('s');
+      // Detect time-based exercises (e.g., "30-60s" holds vs "10-12/side" reps)
+      const isTimeBased = this.isTimeBasedExercise(exercise);
       const repsLabel = isTimeBased ? 'Duration (s)' : 'Reps';
 
       html += `
@@ -1034,7 +1034,7 @@ class App {
     // Check if this set is complete (has weight, reps, and RIR)
     const set = exercise.sets[setIndex];
     const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
-    const isTimeBased = exerciseDef?.repRange.toLowerCase().includes('s');
+    const isTimeBased = this.isTimeBasedExercise(exerciseDef);
     // For bodyweight exercises, weight can be 0
     const hasValidWeight = typeof set.weight === 'number' && set.weight >= 0;
     // Time-based exercises don't have RIR
@@ -1053,11 +1053,11 @@ class App {
     const exerciseIndex = parseInt(button.dataset.exercise);
     const setIndex = parseInt(button.dataset.set);
 
-    // Get exercise definition to check if weight=0 is allowed
+    // Get exercise definition to check exercise type
     const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
-    const isBodyweightExercise = exerciseDef?.startingWeight === 0 && exerciseDef?.weightIncrement === 0;
+    const isBodyweightExercise = this.isBodyweightExercise(exerciseDef);
     const isBand = this.isBandExercise(exerciseDef);
-    const isTimeBased = exerciseDef?.repRange.toLowerCase().includes('s');
+    const isTimeBased = this.isTimeBasedExercise(exerciseDef);
 
     // Read values directly from input fields
     const weightInput = document.querySelector(
@@ -1160,7 +1160,7 @@ class App {
   showPostSetFeedback(exerciseIndex, setIndex, set) {
     const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
     const sessionExercise = this.workoutSession.exercises[exerciseIndex];
-    const isTimeBased = exerciseDef.repRange.toLowerCase().includes('s');
+    const isTimeBased = this.isTimeBasedExercise(exerciseDef);
 
     // Time-based exercises: Simple duration feedback
     if (isTimeBased) {
@@ -1533,12 +1533,33 @@ class App {
   }
 
   /**
-   * Check if exercise is a band/bodyweight exercise (no weight progression)
+   * Check if exercise uses resistance bands (for band color selector)
    * @param {Object} exercise - Exercise definition from workout
    * @returns {boolean} True if band exercise
    */
   isBandExercise(exercise) {
-    return exercise.startingWeight === 0 && exercise.weightIncrement === 0;
+    return exercise?.name?.includes('Band');
+  }
+
+  /**
+   * Check if exercise is bodyweight/no weight progression (Plank, Hyperextension, Dead Bug, etc.)
+   * @param {Object} exercise - Exercise definition from workout
+   * @returns {boolean} True if bodyweight exercise
+   */
+  isBodyweightExercise(exercise) {
+    return exercise?.startingWeight === 0 && exercise?.weightIncrement === 0;
+  }
+
+  /**
+   * Check if exercise is time-based (holds) vs rep-based (counted reps)
+   * @param {Object} exercise - Exercise definition from workout
+   * @returns {boolean} True if time-based (e.g., "30-60s", "30s/side")
+   */
+  isTimeBasedExercise(exercise) {
+    if (!exercise?.repRange) return false;
+    // Match patterns like "30-60s" or "30s/side" (number followed by 's')
+    // Avoid matching "10-12/side" (reps per side, not time-based)
+    return /\d+s\b/.test(exercise.repRange);
   }
 
   /**
