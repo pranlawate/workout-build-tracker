@@ -10,6 +10,7 @@ const CACHE_URLS = [
   './css/summary-screen.css',
   './css/recovery-modal.css',
   './css/analytics.css',
+  './css/workout-reference.css',
   './js/app.js',
   './js/modules/storage.js',
   './js/modules/workouts.js',
