@@ -28,6 +28,11 @@ class App {
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
 
+    // Workout reference expanded state (0-3 = workout index, null = none)
+    this.expandedWorkout = sessionStorage.getItem('expandedWorkout')
+      ? parseInt(sessionStorage.getItem('expandedWorkout'))
+      : null;
+
     // History and detail screens
     this.historyListScreen = new HistoryListScreen(
       this.storage,
@@ -3472,6 +3477,46 @@ class App {
         </div>
       </div>
     `;
+  }
+
+  /**
+   * Render workout reference section with all workouts
+   * @returns {string} HTML string
+   */
+  renderWorkoutReference() {
+    try {
+      const workouts = getAllWorkouts();
+
+      if (!workouts || workouts.length === 0) {
+        return `
+          <section class="workout-reference">
+            <h3>📋 Workout Reference</h3>
+            <p style="color: var(--color-text-muted); text-align: center; padding: 20px;">
+              No workouts defined.
+            </p>
+          </section>
+        `;
+      }
+
+      return `
+        <section class="workout-reference">
+          <h3>📋 Workout Reference</h3>
+          ${workouts.map((workout, index) =>
+            this.renderWorkoutCard(workout, index)
+          ).join('')}
+        </section>
+      `;
+    } catch (error) {
+      console.error('[renderWorkoutReference] Error:', error);
+      return `
+        <section class="workout-reference">
+          <h3>📋 Workout Reference</h3>
+          <p style="color: var(--color-danger); text-align: center; padding: 20px;">
+            Error loading workouts. Check console for details.
+          </p>
+        </section>
+      `;
+    }
   }
 
   /**
