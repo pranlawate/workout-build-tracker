@@ -1,0 +1,116 @@
+/* Workout Reference Section */
+.workout-reference {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+}
+
+.workout-reference h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-primary);
+}
+
+/* Workout Card */
+.workout-ref-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-sm);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.workout-ref-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Workout Header (clickable) */
+.workout-ref-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.workout-ref-header:hover {
+  background: var(--bg-tertiary);
+}
+
+.workout-ref-header:active {
+  background: var(--bg-quaternary);
+}
+
+.workout-ref-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.expand-icon {
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.workout-ref-card.expanded .expand-icon {
+  transform: rotate(90deg);
+}
+
+/* Exercise List */
+.exercise-list {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.exercise-item {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.exercise-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.exercise-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.exercise-meta {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.exercise-note {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .workout-reference {
+    padding: var(--spacing-sm);
+  }
+
+  .workout-ref-header {
+    padding: 10px 12px;
+  }
+
+  .exercise-list {
+    padding: var(--spacing-sm);
+  }
+}
