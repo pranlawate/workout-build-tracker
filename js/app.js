@@ -2771,6 +2771,7 @@ class App {
         ${this.renderAchievementsGallery()}
         ${this.renderSummaryStats(stats)}
         ${this.renderStrengthGains(strengthGains)}
+        ${this.renderWorkoutReference()}
       `;
     }
 
