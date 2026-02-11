@@ -803,6 +803,7 @@ class App {
             />
           </div>
 
+          ${!isTimeBased ? `
           <div class="set-inputs">
             <label class="input-label">
               RIR
@@ -824,6 +825,7 @@ class App {
               <option value="5" ${defaultRir >= 5 ? 'selected' : ''}>5+</option>
             </select>
           </div>
+          ` : ''}
 
           ${logButtonHtml}
         </div>
@@ -1031,9 +1033,13 @@ class App {
 
     // Check if this set is complete (has weight, reps, and RIR)
     const set = exercise.sets[setIndex];
+    const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
+    const isTimeBased = exerciseDef?.repRange.toLowerCase().includes('s');
     // For bodyweight exercises, weight can be 0
     const hasValidWeight = typeof set.weight === 'number' && set.weight >= 0;
-    if (hasValidWeight && set.reps > 0 && set.rir >= 0) {
+    // Time-based exercises don't have RIR
+    const hasValidRir = isTimeBased || (set.rir >= 0);
+    if (hasValidWeight && set.reps > 0 && hasValidRir) {
       this.checkSetProgression(exerciseIndex, setIndex);
 
       // Note: We don't unlock next set or check exercise completion here
@@ -1051,6 +1057,7 @@ class App {
     const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
     const isBodyweightExercise = exerciseDef?.startingWeight === 0 && exerciseDef?.weightIncrement === 0;
     const isBand = this.isBandExercise(exerciseDef);
+    const isTimeBased = exerciseDef?.repRange.toLowerCase().includes('s');
 
     // Read values directly from input fields
     const weightInput = document.querySelector(
@@ -1094,8 +1101,11 @@ class App {
     if (!repsInput) missingFields.push('Reps input not found');
     else if (!reps || reps <= 0) missingFields.push('Reps');
 
-    if (!rirInput) missingFields.push('RIR input not found');
-    else if (rir === undefined || isNaN(rir)) missingFields.push('RIR');
+    // Skip RIR validation for time-based exercises (Plank, Side Plank)
+    if (!isTimeBased) {
+      if (!rirInput) missingFields.push('RIR input not found');
+      else if (rir === undefined || isNaN(rir)) missingFields.push('RIR');
+    }
 
     if (missingFields.length > 0) {
       alert(`Please fill in: ${missingFields.join(', ')}`);
@@ -1122,7 +1132,10 @@ class App {
     const set = exercise.sets[setIndex];
     set.weight = weight;
     set.reps = reps;
-    set.rir = rir;
+    // Only store RIR for rep-based exercises (time-based exercises don't have RIR)
+    if (!isTimeBased) {
+      set.rir = rir;
+    }
 
     // Visual feedback
     button.textContent = '✓ LOGGED';
@@ -1147,8 +1160,32 @@ class App {
   showPostSetFeedback(exerciseIndex, setIndex, set) {
     const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
     const sessionExercise = this.workoutSession.exercises[exerciseIndex];
+    const isTimeBased = exerciseDef.repRange.toLowerCase().includes('s');
 
-    // Parse rep range (strip non-numeric characters like 's', 'sec', '/side')
+    // Time-based exercises: Simple duration feedback
+    if (isTimeBased) {
+      const cleanRepRange = exerciseDef.repRange.replace(/[^\d-]/g, '');
+      const [minDuration, maxDuration] = cleanRepRange.split('-').map(Number);
+
+      let message = '';
+      let colorClass = 'info';
+
+      if (set.reps >= maxDuration) {
+        message = `🟢 Great hold! ${set.reps}s completed.`;
+        colorClass = 'success';
+      } else if (set.reps < minDuration) {
+        message = `🔴 Hold longer - aim for ${minDuration}-${maxDuration}s.`;
+        colorClass = 'danger';
+      } else {
+        message = `🔵 Good hold - ${set.reps}s completed.`;
+        colorClass = 'info';
+      }
+
+      this.displayFeedbackToast(message, colorClass);
+      return;
+    }
+
+    // Rep-based exercises: Full RIR feedback
     const cleanRepRange = exerciseDef.repRange.replace(/[^\d-]/g, '');
     const [minReps, maxReps] = cleanRepRange.split('-').map(Number);
     const [minRir, maxRir] = exerciseDef.rirTarget.split('-').map(Number);
@@ -1321,9 +1358,11 @@ class App {
   checkSetProgression(exerciseIndex, setIndex) {
     const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
     const set = this.workoutSession.exercises[exerciseIndex].sets[setIndex];
+    const isTimeBased = exerciseDef.repRange.toLowerCase().includes('s');
 
-    const [min, max] = exerciseDef.repRange.split('-').map(Number);
-    const [rirMin] = exerciseDef.rirTarget.split('-').map(Number);
+    // Parse rep/duration range
+    const cleanRepRange = exerciseDef.repRange.replace(/[^\d-]/g, '');
+    const [min, max] = cleanRepRange.split('-').map(Number);
 
     // Visual feedback on the input row
     const setRow = document.querySelector(
@@ -1336,12 +1375,25 @@ class App {
     setRow.style.borderLeft = 'none';
 
     // Check if set meets progression criteria
-    if (set.reps >= max && set.rir >= rirMin) {
-      setRow.style.borderLeft = '4px solid var(--color-success)';
-    } else if (set.reps < min) {
-      setRow.style.borderLeft = '4px solid var(--color-danger)';
+    if (isTimeBased) {
+      // Time-based: just check duration
+      if (set.reps >= max) {
+        setRow.style.borderLeft = '4px solid var(--color-success)';
+      } else if (set.reps < min) {
+        setRow.style.borderLeft = '4px solid var(--color-danger)';
+      } else {
+        setRow.style.borderLeft = '4px solid var(--color-info)';
+      }
     } else {
-      setRow.style.borderLeft = '4px solid var(--color-info)';
+      // Rep-based: check reps AND RIR
+      const [rirMin] = exerciseDef.rirTarget.split('-').map(Number);
+      if (set.reps >= max && set.rir >= rirMin) {
+        setRow.style.borderLeft = '4px solid var(--color-success)';
+      } else if (set.reps < min) {
+        setRow.style.borderLeft = '4px solid var(--color-danger)';
+      } else {
+        setRow.style.borderLeft = '4px solid var(--color-info)';
+      }
     }
   }
 
@@ -1454,11 +1506,17 @@ class App {
 
     if (!exerciseDef || !exerciseSession) return false;
 
-    // Count completed sets (sets with all three values)
+    const isTimeBased = exerciseDef.repRange.toLowerCase().includes('s');
+
+    // Count completed sets
     // For bodyweight exercises, weight can be 0
-    const completedSets = exerciseSession.sets.filter(set =>
-      set && typeof set.weight === 'number' && set.weight >= 0 && set.reps > 0 && set.rir >= 0
-    ).length;
+    // For time-based exercises, RIR is optional
+    const completedSets = exerciseSession.sets.filter(set => {
+      const hasValidWeight = set && typeof set.weight === 'number' && set.weight >= 0;
+      const hasValidReps = set.reps > 0;
+      const hasValidRir = isTimeBased || (set.rir >= 0);
+      return hasValidWeight && hasValidReps && hasValidRir;
+    }).length;
 
     // Exercise is completed if all required sets are logged
     return completedSets >= exerciseDef.sets;
