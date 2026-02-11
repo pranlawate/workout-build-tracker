@@ -3575,6 +3575,38 @@ class App {
   }
 
   /**
+   * Toggle workout accordion expand/collapse
+   * @param {number} index - Workout index (0-3)
+   */
+  toggleWorkout(index) {
+    // Toggle: if already expanded, collapse; otherwise expand
+    this.expandedWorkout = this.expandedWorkout === index ? null : index;
+
+    // Persist to session storage
+    if (this.expandedWorkout !== null) {
+      sessionStorage.setItem('expandedWorkout', this.expandedWorkout.toString());
+    } else {
+      sessionStorage.removeItem('expandedWorkout');
+    }
+
+    // Re-render Overview tab
+    const progressContent = document.getElementById('progress-content');
+    if (!progressContent) return;
+
+    // Re-fetch data (lightweight, no API calls)
+    const progressAnalyzer = new ProgressAnalyzer(this.storage);
+    const stats = progressAnalyzer.getLast4WeeksStats();
+    const strengthGains = progressAnalyzer.getTopProgressingExercises(3);
+
+    progressContent.innerHTML = `
+      ${this.renderAchievementsGallery()}
+      ${this.renderSummaryStats(stats)}
+      ${this.renderStrengthGains(strengthGains)}
+      ${this.renderWorkoutReference()}
+    `;
+  }
+
+  /**
    * Render body composition section
    * @param {Object} weightData - Summary from BodyWeightManager
    * @returns {string} HTML string
