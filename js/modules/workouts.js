@@ -2,9 +2,9 @@ const WARMUPS = {
   UPPER_A: [
     'Cat-Cow: 10 reps',
     'Band Pull-Aparts: 15 reps',
-    'Goblet Squat (bodyweight): 10 reps',
-    'Hip Hinge Drill: 10 reps',
-    'Ramp-up Set: 50% weight × 10 reps (Goblet Squat)'
+    'Arm Circles: 10 each direction',
+    'Scapular Retractions: 10 reps',
+    'Ramp-up Set: 50% weight × 10 reps (DB Flat Bench Press)'
   ],
   LOWER_A: [
     'Cat-Cow: 10 reps',
