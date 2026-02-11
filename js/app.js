@@ -3541,6 +3541,40 @@ class App {
   }
 
   /**
+   * Render exercise list for expanded workout
+   * @param {Object} workout - Workout definition
+   * @returns {string} HTML string
+   */
+  renderExerciseList(workout) {
+    if (!workout.exercises || workout.exercises.length === 0) {
+      return `
+        <div class="exercise-list">
+          <p style="color: var(--color-text-muted); text-align: center;">
+            No exercises defined.
+          </p>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="exercise-list">
+        ${workout.exercises.map((exercise, index) => {
+          const isTimeBased = this.isTimeBasedExercise(exercise);
+          const repsUnit = isTimeBased ? '' : ' reps';
+
+          return `
+            <div class="exercise-item">
+              <div class="exercise-name">${index + 1}. ${this.escapeHtml(exercise.name)}</div>
+              <div class="exercise-meta">${exercise.sets} sets × ${exercise.repRange}${repsUnit}</div>
+              ${exercise.notes ? `<div class="exercise-note">${this.escapeHtml(exercise.notes)}</div>` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  /**
    * Render body composition section
    * @param {Object} weightData - Summary from BodyWeightManager
    * @returns {string} HTML string
