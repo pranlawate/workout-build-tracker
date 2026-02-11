@@ -81,11 +81,19 @@ export function shouldIncreaseWeight(sets, exercise) {
     throw new Error('Invalid exercise: must be an object');
   }
 
-  if (!exercise.repRange || !exercise.rirTarget) {
-    throw new Error('Exercise must have repRange and rirTarget properties');
+  if (!exercise.repRange) {
+    throw new Error('Exercise must have repRange property');
   }
 
   const { max } = parseRepRange(exercise.repRange);
+
+  // Time-based exercises (no rirTarget): just check if all sets hit max duration
+  const isTimeBased = /\d+s\b/.test(exercise.repRange);
+  if (isTimeBased || !exercise.rirTarget) {
+    return sets.every(set => set.reps >= max);
+  }
+
+  // Rep-based exercises: check reps AND RIR
   const { min: rirMin } = parseRIRTarget(exercise.rirTarget);
 
   // All sets must hit max reps

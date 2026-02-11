@@ -634,7 +634,7 @@ class App {
           </div>
 
           <p class="exercise-meta">
-            ${exercise.sets} sets × ${exercise.repRange} reps @ RIR ${exercise.rirTarget}
+            ${this.formatExerciseMeta(exercise)}
           </p>
 
           <div class="performance-badge-container">
@@ -699,7 +699,9 @@ class App {
       const defaultReps = hasSessionData ? sessionSet.reps : (lastSet?.reps || '');
 
       // Default RIR to minimum of target range (per design spec)
+      // Time-based exercises don't have RIR
       const defaultRir = hasSessionData ? sessionSet.rir : (lastSet?.rir ?? (() => {
+        if (!exercise.rirTarget) return 0; // Time-based exercises
         const [min] = exercise.rirTarget.split('-').map(Number);
         return min;
       })());
@@ -1188,6 +1190,12 @@ class App {
     // Rep-based exercises: Full RIR feedback
     const cleanRepRange = exerciseDef.repRange.replace(/[^\d-]/g, '');
     const [minReps, maxReps] = cleanRepRange.split('-').map(Number);
+
+    // Defensive: should always have rirTarget for rep-based exercises
+    if (!exerciseDef.rirTarget) {
+      console.error('[showPostSetFeedback] Rep-based exercise missing rirTarget:', exerciseDef.name);
+      return;
+    }
     const [minRir, maxRir] = exerciseDef.rirTarget.split('-').map(Number);
 
     // Determine feedback message and color
@@ -1386,6 +1394,11 @@ class App {
       }
     } else {
       // Rep-based: check reps AND RIR
+      // Defensive: should always have rirTarget for rep-based exercises
+      if (!exerciseDef.rirTarget) {
+        console.error('[checkSetProgression] Rep-based exercise missing rirTarget:', exerciseDef.name);
+        return;
+      }
       const [rirMin] = exerciseDef.rirTarget.split('-').map(Number);
       if (set.reps >= max && set.rir >= rirMin) {
         setRow.style.borderLeft = '4px solid var(--color-success)';
@@ -1533,6 +1546,24 @@ class App {
   }
 
   /**
+   * Format exercise metadata for card header
+   * @param {Object} exercise - Exercise definition
+   * @returns {string} Formatted string like "3 sets × 8-12 reps @ RIR 2-3" or "3 sets × 30-60s"
+   */
+  formatExerciseMeta(exercise) {
+    const isTimeBased = this.isTimeBasedExercise(exercise);
+
+    if (isTimeBased) {
+      // Time-based: "3 sets × 30-60s"
+      return `${exercise.sets} sets × ${exercise.repRange}`;
+    } else {
+      // Rep-based: "3 sets × 8-12 reps @ RIR 2-3"
+      const rirText = exercise.rirTarget ? ` @ RIR ${exercise.rirTarget}` : '';
+      return `${exercise.sets} sets × ${exercise.repRange} reps${rirText}`;
+    }
+  }
+
+  /**
    * Check if exercise uses resistance bands (for band color selector)
    * @param {Object} exercise - Exercise definition from workout
    * @returns {boolean} True if band exercise
@@ -1593,16 +1624,22 @@ class App {
   }
 
   /**
-   * Format set display for history (band-aware)
+   * Format set display for history (band-aware, time-aware)
    * @param {Object} set - Set object { reps, weight, rir }
    * @param {Object} exercise - Exercise definition
-   * @returns {string} Formatted string like "15 reps @ 🔴 Medium" or "15 reps @ 20 kg"
+   * @returns {string} Formatted string like "15 reps @ 🔴 Medium", "15 reps @ 20 kg", or "45s"
    */
   formatSetDisplay(set, exercise) {
     const reps = set.reps;
     const weight = set.weight;
     const rir = set.rir;
 
+    // Time-based exercises: just show duration
+    if (this.isTimeBasedExercise(exercise)) {
+      return `${reps}s`;
+    }
+
+    // Rep-based exercises: show reps, weight, and RIR
     let weightDisplay;
     if (this.isBandExercise(exercise)) {
       const bandInfo = this.weightToBandColor(weight);
