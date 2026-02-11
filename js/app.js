@@ -15,6 +15,7 @@ import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
 import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/export-import.js';
+import { getAllWorkouts } from './modules/workouts.js';
 import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
 
 class App {
