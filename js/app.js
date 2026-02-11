@@ -3521,6 +3521,26 @@ class App {
   }
 
   /**
+   * Render individual workout card (accordion item)
+   * @param {Object} workout - Workout definition
+   * @param {number} index - Workout index (0-3)
+   * @returns {string} HTML string
+   */
+  renderWorkoutCard(workout, index) {
+    const isExpanded = this.expandedWorkout === index;
+
+    return `
+      <div class="workout-ref-card ${isExpanded ? 'expanded' : ''}" data-workout-index="${index}">
+        <div class="workout-ref-header" onclick="app.toggleWorkout(${index})">
+          <h4>${this.escapeHtml(workout.displayName)}</h4>
+          <span class="expand-icon">▶</span>
+        </div>
+        ${isExpanded ? this.renderExerciseList(workout) : ''}
+      </div>
+    `;
+  }
+
+  /**
    * Render body composition section
    * @param {Object} weightData - Summary from BodyWeightManager
    * @returns {string} HTML string
