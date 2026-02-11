@@ -3589,6 +3589,11 @@ class App {
       sessionStorage.removeItem('expandedWorkout');
     }
 
+    // TODO: Performance optimization - consider surgical DOM updates instead of full re-render
+    // Current approach re-renders entire Overview tab (simple but creates DOM churn).
+    // For only 4 workout cards, impact is minimal. If UX issues arise, refactor to:
+    // - Toggle .expanded class on specific card
+    // - Insert/remove exercise list HTML only for changed card
     // Re-render Overview tab
     const progressContent = document.getElementById('progress-content');
     if (!progressContent) return;
