@@ -12,6 +12,10 @@
   color: var(--color-text);
 }
 
+.optional-training-card .btn-secondary {
+  border: none;
+}
+
 /* Fifth Day Screen */
 #fifth-day-screen .screen-content {
   padding-bottom: var(--spacing-xl);
