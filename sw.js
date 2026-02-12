@@ -1,4 +1,4 @@
-const CACHE_NAME = 'build-tracker-v35';
+const CACHE_NAME = 'build-tracker-v36';
 const CACHE_URLS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const CACHE_URLS = [
   './css/analytics.css',
   './css/workout-reference.css',
   './css/unlock-notifications.css',
+  './css/exercise-progressions.css',
   './css/warm-up-protocols.css',
   './css/optional-fifth-day.css',
   './js/app.js',
@@ -22,6 +23,11 @@ const CACHE_URLS = [
   './js/modules/progress-analyzer.js',
   './js/modules/body-weight.js',
   './js/modules/analytics-calculator.js',
+  './js/modules/progression-pathways.js',
+  './js/modules/complexity-tiers.js',
+  './js/modules/equipment-profiles.js',
+  './js/modules/unlock-evaluator.js',
+  './js/modules/warm-up-protocols.js',
   './js/modules/optional-fifth-day.js',
   './js/components/weight-trend-chart.js',
   './manifest.json',
