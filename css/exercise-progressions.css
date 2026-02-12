@@ -177,3 +177,60 @@
   font-size: 0.9rem;
   margin-top: 1rem;
 }
+
+/* ========== Equipment Profile Toggles ========== */
+
+.equipment-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.equipment-toggle {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.equipment-toggle:hover {
+  background: var(--color-surface);
+}
+
+.equipment-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.equipment-toggle input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.equipment-toggle .toggle-label {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  user-select: none;
+}
+
+.equipment-toggle input[type="checkbox"]:disabled + .toggle-label {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .equipment-toggle {
+    padding: 0.875rem;
+  }
+
+  .equipment-toggle .toggle-label {
+    font-size: 0.9rem;
+  }
+}

@@ -668,14 +668,14 @@ export class StorageManager {
     try {
       const stored = localStorage.getItem('build_equipment_profile');
       if (!stored) {
-        // Default: gym + dumbbells + bodyweight (most common setup)
+        // Default: all equipment available
         return {
           gym: true,
           dumbbells: true,
-          barbells: false,
-          mudgal: false,
+          barbells: true,
+          mudgal: true,
           bodyweight: true,
-          bands: false
+          bands: true
         };
       }
       return JSON.parse(stored);
@@ -684,10 +684,10 @@ export class StorageManager {
       return {
         gym: true,
         dumbbells: true,
-        barbells: false,
-        mudgal: false,
+        barbells: true,
+        mudgal: true,
         bodyweight: true,
-        bands: false
+        bands: true
       };
     }
   }

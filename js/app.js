@@ -2402,6 +2402,9 @@ class App {
     if (resetAllBtn) {
       resetAllBtn.onclick = () => this.handleResetAll();
     }
+
+    // Load and initialize equipment profile
+    this.initializeEquipmentProfile();
   }
 
   closeSettingsModal() {
@@ -2415,6 +2418,39 @@ class App {
     // Reset file input when closing modal
     if (fileInput) {
       fileInput.value = '';
+    }
+  }
+
+  /**
+   * Initialize equipment profile checkboxes and attach event handlers
+   */
+  initializeEquipmentProfile() {
+    const profile = this.storage.getEquipmentProfile();
+
+    // Equipment types (excluding bodyweight - always enabled)
+    const equipmentTypes = ['gym', 'dumbbells', 'barbells', 'mudgal', 'bands'];
+
+    equipmentTypes.forEach(type => {
+      const checkbox = document.getElementById(`equipment-${type}`);
+      if (checkbox) {
+        // Set initial state
+        checkbox.checked = profile[type] === true;
+
+        // Attach change handler
+        checkbox.addEventListener('change', (e) => {
+          profile[type] = e.target.checked;
+          // Ensure bodyweight is always true
+          profile.bodyweight = true;
+          this.storage.saveEquipmentProfile(profile);
+        });
+      }
+    });
+
+    // Bodyweight is always checked and disabled
+    const bodyweightCheckbox = document.getElementById('equipment-bodyweight');
+    if (bodyweightCheckbox) {
+      bodyweightCheckbox.checked = true;
+      bodyweightCheckbox.disabled = true;
     }
   }
 
