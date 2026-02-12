@@ -21,7 +21,7 @@ export const COMPLEXITY_TIERS = {
  * Complex: Multi-joint + unstable base + multi-plane
  */
 export const EXERCISE_COMPLEXITY = {
-  // SIMPLE tier (7 exercises)
+  // SIMPLE tier (12 exercises)
   'Cable Chest Fly': COMPLEXITY_TIERS.SIMPLE,
   'DB Lateral Raises': COMPLEXITY_TIERS.SIMPLE,
   'Face Pulls': COMPLEXITY_TIERS.SIMPLE,
@@ -35,7 +35,7 @@ export const EXERCISE_COMPLEXITY = {
   'Dead Bug': COMPLEXITY_TIERS.SIMPLE,
   'Side Plank': COMPLEXITY_TIERS.SIMPLE,
 
-  // MODERATE tier (10 exercises)
+  // MODERATE tier (12 exercises)
   'DB Flat Bench Press': COMPLEXITY_TIERS.MODERATE,
   'Seated Cable Row': COMPLEXITY_TIERS.MODERATE,
   'T-Bar Row': COMPLEXITY_TIERS.MODERATE,
@@ -49,7 +49,7 @@ export const EXERCISE_COMPLEXITY = {
   'DB Romanian Deadlift': COMPLEXITY_TIERS.MODERATE,
   'Hip Thrust': COMPLEXITY_TIERS.MODERATE,
 
-  // COMPLEX tier (4 exercises + progressions)
+  // COMPLEX tier (8 exercises: 4 barbell + 4 Vedic progressions)
   'Barbell Bench Press': COMPLEXITY_TIERS.COMPLEX,
   'Barbell Back Squat': COMPLEXITY_TIERS.COMPLEX,
   'Barbell Deadlift': COMPLEXITY_TIERS.COMPLEX,
