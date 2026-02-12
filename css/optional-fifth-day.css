@@ -14,19 +14,15 @@
 }
 
 /* Fifth Day Screen */
-.fifth-day-screen {
-  display: none;
+#fifth-day-screen {
+  /* Styles inherited from .screen class */
 }
 
-.fifth-day-screen.active {
-  display: block;
-}
-
-.fifth-day-content {
+#fifth-day-content {
   padding: var(--spacing-md);
 }
 
-.fifth-day-content h2 {
+#fifth-day-content h2 {
   margin: 0 0 var(--spacing-sm) 0;
   color: var(--color-primary);
 }
