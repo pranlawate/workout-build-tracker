@@ -21,6 +21,7 @@ import { UnlockEvaluator } from './modules/unlock-evaluator.js';
 import { PROGRESSION_PATHS, getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
 import { COMPLEXITY_TIERS, getComplexityTier } from './modules/complexity-tiers.js';
 import { getWarmupProtocol } from './modules/warm-up-protocols.js';
+import { getOptionalFifthDay } from './modules/optional-fifth-day.js';
 
 class App {
   constructor() {
@@ -372,6 +373,18 @@ class App {
     const progressBtn = document.getElementById('progress-btn');
     if (progressBtn) {
       progressBtn.addEventListener('click', () => this.showProgressDashboard());
+    }
+
+    // Optional fifth day button
+    const optionalFifthDayBtn = document.getElementById('optional-fifth-day-btn');
+    if (optionalFifthDayBtn) {
+      optionalFifthDayBtn.addEventListener('click', () => this.showOptionalFifthDay());
+    }
+
+    // Fifth day back button
+    const fifthDayBackBtn = document.getElementById('fifth-day-back-btn');
+    if (fifthDayBackBtn) {
+      fifthDayBackBtn.addEventListener('click', () => this.showHomeScreen());
     }
 
     // Workout settings button
@@ -3045,6 +3058,162 @@ class App {
         `;
       }
     }
+  }
+
+  /**
+   * Show optional 5th day workout screen
+   */
+  showOptionalFifthDay() {
+    const rotation = this.storage.getRotation();
+    const lastWorkout = rotation.sequence.length > 0
+      ? rotation.sequence[rotation.sequence.length - 1]
+      : null;
+    const nextWorkout = rotation.nextSuggested;
+
+    const fifthDay = getOptionalFifthDay(lastWorkout, nextWorkout);
+
+    const fifthDayContent = document.getElementById('fifth-day-content');
+    if (!fifthDayContent) return;
+
+    fifthDayContent.innerHTML = `
+      <h2>${this.escapeHtml(fifthDay.displayName)}</h2>
+      <p class="duration">Total Duration: ${this.escapeHtml(fifthDay.duration)}</p>
+
+      ${fifthDay.fatigueWarning ? `
+        <div class="fatigue-warning ${fifthDay.fatigueWarning.level}">
+          ${this.escapeHtml(fifthDay.fatigueWarning.message)}
+        </div>
+      ` : ''}
+
+      ${this.renderFifthDayBlocks(fifthDay.blocks)}
+
+      <div class="cooldown-section">
+        <h3>Cool-down (${this.escapeHtml(fifthDay.cooldown.duration)})</h3>
+        <ul>
+          ${fifthDay.cooldown.activities.map(a => `<li>${this.escapeHtml(a)}</li>`).join('')}
+        </ul>
+      </div>
+
+      <button id="complete-fifth-day-btn" class="btn-primary">
+        Complete Workout
+      </button>
+    `;
+
+    // Event listener for complete button
+    const completeBtn = document.getElementById('complete-fifth-day-btn');
+    if (completeBtn) {
+      completeBtn.addEventListener('click', () => {
+        // Optional 5th day does not affect rotation - just return to home
+        this.showHomeScreen();
+      });
+    }
+
+    // Switch to fifth day screen
+    this.switchScreen('fifth-day-screen');
+  }
+
+  /**
+   * Render blocks for 5th day workout
+   *
+   * @param {Array} blocks - Array of block objects
+   * @returns {string} HTML for blocks
+   */
+  renderFifthDayBlocks(blocks) {
+    return blocks.map((block, index) => {
+      if (index === 2) {
+        // Block 3: User Choice (array of options)
+        return `
+          <div class="fifth-day-block">
+            <div class="block-header">
+              <h3>Block 3: User Choice</h3>
+              <span class="block-duration">10-15 min</span>
+            </div>
+            <div class="user-choice-options">
+              ${block.map(choice => `
+                <div class="choice-option" data-choice-id="${choice.id}">
+                  <h4>${this.escapeHtml(choice.name)}</h4>
+                  <p>${this.escapeHtml(choice.duration)}</p>
+                  ${choice.options ? `
+                    <ul style="margin-top: 8px; font-size: 0.85rem;">
+                      ${choice.options.map(opt => `
+                        <li>${this.escapeHtml(opt.name)}: ${this.escapeHtml(opt.format)}</li>
+                      `).join('')}
+                    </ul>
+                  ` : ''}
+                  ${choice.exercises ? `
+                    <ul style="margin-top: 8px; font-size: 0.85rem;">
+                      ${choice.exercises.map(ex => `
+                        <li>${this.escapeHtml(ex.name)}: ${ex.sets ? this.escapeHtml(ex.sets + ' sets × ') : ''}${ex.reps ? this.escapeHtml(ex.reps) : this.escapeHtml(ex.duration || '')}${ex.note ? ` (${this.escapeHtml(ex.note)})` : ''}</li>
+                      `).join('')}
+                    </ul>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (index === 1) {
+        // Block 2: Mobility (sections)
+        return `
+          <div class="fifth-day-block">
+            <div class="block-header">
+              <h3>${this.escapeHtml(block.name)}</h3>
+              <span class="block-duration">${this.escapeHtml(block.duration)}</span>
+            </div>
+            ${block.sections.map(section => `
+              <div class="mobility-section">
+                <div class="section-name">${this.escapeHtml(section.name)}</div>
+                <div class="block-exercises">
+                  ${section.exercises.map(ex => `
+                    <div class="block-exercise">
+                      <div class="exercise-info">
+                        <h4>${this.escapeHtml(ex.name)}</h4>
+                        <div class="exercise-meta">${this.escapeHtml(ex.sets + ' sets × ' + ex.reps)}</div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        // Block 1: Core Intensive (regular exercises)
+        return `
+          <div class="fifth-day-block">
+            <div class="block-header">
+              <h3>${this.escapeHtml(block.name)}</h3>
+              <span class="block-duration">${this.escapeHtml(block.duration)}</span>
+            </div>
+            <div class="block-exercises">
+              ${block.exercises.map(ex => `
+                <div class="block-exercise">
+                  <div class="exercise-info">
+                    <h4>${this.escapeHtml(ex.name)}</h4>
+                    <div class="exercise-meta">${this.escapeHtml(ex.sets + ' sets × ' + ex.reps)} • Rest: ${this.escapeHtml(ex.rest)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            ${block.advancedOptions ? `
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border);">
+                <div class="section-name">Advanced Options</div>
+                <div class="block-exercises">
+                  ${block.advancedOptions.map(ex => `
+                    <div class="block-exercise">
+                      <div class="exercise-info">
+                        <h4>${this.escapeHtml(ex.name)}</h4>
+                        <div class="exercise-meta">${this.escapeHtml(ex.sets + ' sets × ' + ex.reps)} • ${this.escapeHtml(ex.note)}</div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    }).join('');
   }
 
   renderProgressionCard(name, readiness) {

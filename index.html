@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="css/unlock-notifications.css">
   <link rel="stylesheet" href="css/exercise-progressions.css">
   <link rel="stylesheet" href="css/warm-up-protocols.css">
+  <link rel="stylesheet" href="css/optional-fifth-day.css">
 </head>
 <body>
   <div id="app">
@@ -63,6 +64,13 @@
             <button id="progress-btn" class="action-btn">📈 Progress</button>
           </div>
         </section>
+
+        <div class="optional-training-card">
+          <h3>Optional Training</h3>
+          <button id="optional-fifth-day-btn" class="btn-secondary">
+            💪 Injury Prevention + Core Day
+          </button>
+        </div>
 
         <div id="cycle-progress" class="cycle-progress">
           <!-- populated by JavaScript -->
@@ -245,6 +253,19 @@
             <!-- Analytics will be rendered here -->
           </div>
         </div>
+      </main>
+    </div>
+
+    <!-- Fifth Day Screen -->
+    <div id="fifth-day-screen" class="screen">
+      <header class="app-header">
+        <button id="fifth-day-back-btn" class="icon-btn">←</button>
+        <h1>Optional Training</h1>
+        <span></span>
+      </header>
+
+      <main class="screen-content">
+        <div id="fifth-day-content"></div>
       </main>
     </div>
   </div>

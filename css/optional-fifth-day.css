@@ -1,0 +1,206 @@
+/* Optional Training Card (Home Screen) */
+.optional-training-card {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--color-border);
+}
+
+.optional-training-card h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+}
+
+/* Fifth Day Screen */
+.fifth-day-screen {
+  display: none;
+}
+
+.fifth-day-screen.active {
+  display: block;
+}
+
+.fifth-day-content {
+  padding: var(--spacing-md);
+}
+
+.fifth-day-content h2 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-primary);
+}
+
+.duration {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Fatigue Warning */
+.fatigue-warning {
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+  font-size: 0.95rem;
+}
+
+.fatigue-warning.warning {
+  background: rgba(245, 158, 11, 0.15);
+  border-left: 4px solid var(--color-warning);
+  color: var(--color-warning);
+}
+
+.fatigue-warning.info {
+  background: rgba(59, 130, 246, 0.15);
+  border-left: 4px solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Block Styling */
+.fifth-day-block {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.block-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.block-duration {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.block-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.block-exercise {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs);
+  background: var(--color-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.exercise-info {
+  flex: 1;
+}
+
+.exercise-info h4 {
+  margin: 0 0 2px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.exercise-meta {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* Block 2 Sections */
+.mobility-section {
+  margin-bottom: var(--spacing-md);
+}
+
+.mobility-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Block 3 User Choice */
+.user-choice-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.choice-option {
+  padding: var(--spacing-sm);
+  background: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.choice-option:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-background);
+}
+
+.choice-option.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-background);
+}
+
+.choice-option h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.choice-option p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* Cooldown Section */
+.cooldown-section {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.cooldown-section h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.cooldown-section ul {
+  margin: 0;
+  padding-left: var(--spacing-md);
+  color: var(--color-text);
+}
+
+.cooldown-section li {
+  margin-bottom: 4px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .optional-training-card,
+  .fifth-day-block,
+  .cooldown-section {
+    padding: var(--spacing-sm);
+  }
+}
