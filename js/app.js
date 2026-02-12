@@ -2610,7 +2610,7 @@ class App {
   showMobilityCheckIfNeeded(exerciseKey) {
     // Configuration for mobility checks
     const mobilityChecks = {
-      'UPPER_A - DB Shoulder Press': {
+      'UPPER_B - DB Shoulder Press': {
         criteriaKey: 'bench_overhead_mobility',
         question: 'Could you press overhead without back arching today?',
         help: 'Ribs should stay down, no excessive lower back arch'
