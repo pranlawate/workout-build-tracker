@@ -18,7 +18,8 @@ import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/ex
 import { getAllWorkouts } from './modules/workouts.js';
 import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
 import { UnlockEvaluator } from './modules/unlock-evaluator.js';
-import { getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
+import { PROGRESSION_PATHS, getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
+import { COMPLEXITY_TIERS, getComplexityTier } from './modules/complexity-tiers.js';
 
 class App {
   constructor() {
@@ -376,6 +377,41 @@ class App {
     const workoutSettingsBtn = document.getElementById('workout-settings-btn');
     if (workoutSettingsBtn) {
       workoutSettingsBtn.addEventListener('click', () => this.showSettingsModal());
+    }
+
+    // Exercise progressions browser
+    const browseBtn = document.getElementById('browse-progressions-btn');
+    if (browseBtn) {
+      browseBtn.addEventListener('click', () => this.showProgressionsBrowser());
+    }
+
+    // Training phase toggle
+    const buildingBtn = document.getElementById('phase-building-btn');
+    const maintenanceBtn = document.getElementById('phase-maintenance-btn');
+    const phaseInfo = document.getElementById('phase-info-text');
+
+    if (buildingBtn && maintenanceBtn) {
+      buildingBtn.addEventListener('click', () => {
+        this.storage.saveTrainingPhase('building');
+        buildingBtn.classList.add('active');
+        maintenanceBtn.classList.remove('active');
+        phaseInfo.textContent = 'Building: Focus on progressive overload and strength gains';
+      });
+
+      maintenanceBtn.addEventListener('click', () => {
+        this.storage.saveTrainingPhase('maintenance');
+        maintenanceBtn.classList.add('active');
+        buildingBtn.classList.remove('active');
+        phaseInfo.textContent = 'Maintenance: Sustain strength with varied accessories';
+      });
+
+      // Set initial state
+      const currentPhase = this.storage.getTrainingPhase();
+      if (currentPhase === 'maintenance') {
+        maintenanceBtn.classList.add('active');
+        buildingBtn.classList.remove('active');
+        phaseInfo.textContent = 'Maintenance: Sustain strength with varied accessories';
+      }
     }
   }
 
@@ -2372,6 +2408,148 @@ class App {
     if (fileInput) {
       fileInput.value = '';
     }
+  }
+
+  /**
+   * Show exercise progressions browser
+   */
+  showProgressionsBrowser() {
+    const modal = document.getElementById('progressions-modal');
+    const closeBtn = document.getElementById('close-progressions-modal');
+    const tabs = document.querySelectorAll('.prog-tab');
+    const listContainer = document.getElementById('progressions-list');
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Close handler
+    closeBtn.onclick = () => {
+      modal.style.display = 'none';
+    };
+
+    // Tab click handlers
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Render progression list for selected workout
+        const workout = tab.dataset.workout;
+        this.renderProgressionsList(workout, listContainer);
+      });
+    });
+
+    // Render initial list (Upper A)
+    this.renderProgressionsList('UPPER_A', listContainer);
+  }
+
+  /**
+   * Render progressions list for a workout
+   *
+   * @param {string} workoutKey - Workout key (e.g., 'UPPER_A')
+   * @param {HTMLElement} container - Container element
+   */
+  renderProgressionsList(workoutKey, container) {
+    container.innerHTML = '';
+
+    // Get all slots for this workout
+    const slots = Object.keys(PROGRESSION_PATHS).filter(key => key.startsWith(workoutKey));
+    const currentSelections = this.storage.getExerciseSelections();
+
+    slots.forEach(slotKey => {
+      const path = getProgressionPath(slotKey);
+      if (!path) return;
+
+      // Create slot container
+      const slotDiv = document.createElement('div');
+      slotDiv.className = 'progression-slot';
+
+      // Slot header
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'slot-header';
+      headerDiv.innerHTML = `
+        <span class="slot-name">${path.slotName}</span>
+        <span class="current-badge">Current: ${currentSelections[slotKey] || path.current}</span>
+      `;
+      slotDiv.appendChild(headerDiv);
+
+      // Progression options
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'progression-options';
+
+      // Easier options
+      if (path.easier && path.easier.length > 0) {
+        const category = this.renderProgressionCategory('Easier', path.easier, slotKey);
+        optionsDiv.appendChild(category);
+      }
+
+      // Harder options
+      if (path.harder && path.harder.length > 0) {
+        const category = this.renderProgressionCategory('Harder', path.harder, slotKey);
+        optionsDiv.appendChild(category);
+      }
+
+      // Alternate options
+      if (path.alternate && path.alternate.length > 0) {
+        const category = this.renderProgressionCategory('Alternate', path.alternate, slotKey);
+        optionsDiv.appendChild(category);
+      }
+
+      slotDiv.appendChild(optionsDiv);
+      container.appendChild(slotDiv);
+    });
+  }
+
+  /**
+   * Render progression category
+   *
+   * @param {string} categoryName - Category name (Easier/Harder/Alternate)
+   * @param {string[]} exercises - Exercise names
+   * @param {string} slotKey - Slot key
+   * @returns {HTMLElement} Category element
+   */
+  renderProgressionCategory(categoryName, exercises, slotKey) {
+    const categoryDiv = document.createElement('div');
+    categoryDiv.className = 'progression-category';
+
+    const label = document.createElement('div');
+    label.className = 'category-label';
+    label.textContent = categoryName;
+    categoryDiv.appendChild(label);
+
+    exercises.forEach(exerciseName => {
+      const optionDiv = document.createElement('div');
+      const unlocked = this.storage.isExerciseUnlocked(exerciseName) ||
+                       getComplexityTier(exerciseName) === COMPLEXITY_TIERS.SIMPLE;
+
+      optionDiv.className = `exercise-option ${unlocked ? '' : 'locked'}`;
+      optionDiv.innerHTML = `
+        <span class="exercise-name">${exerciseName}</span>
+        <div class="exercise-status">
+          <span class="status-badge ${unlocked ? 'unlocked' : 'locked'}">
+            ${unlocked ? '✓ Unlocked' : '🔒 Locked'}
+          </span>
+          <button class="select-exercise-btn" ${unlocked ? '' : 'disabled'}>
+            Select
+          </button>
+        </div>
+      `;
+
+      // Select button handler
+      const selectBtn = optionDiv.querySelector('.select-exercise-btn');
+      if (selectBtn && unlocked) {
+        selectBtn.onclick = () => {
+          this.storage.saveExerciseSelection(slotKey, exerciseName);
+          document.getElementById('progressions-modal').style.display = 'none';
+          this.showHomeScreen(); // Refresh
+        };
+      }
+
+      categoryDiv.appendChild(optionDiv);
+    });
+
+    return categoryDiv;
   }
 
   /**

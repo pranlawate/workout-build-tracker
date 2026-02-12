@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="css/achievements.css">
   <link rel="stylesheet" href="css/workout-reference.css">
   <link rel="stylesheet" href="css/unlock-notifications.css">
+  <link rel="stylesheet" href="css/exercise-progressions.css">
 </head>
 <body>
   <div id="app">
@@ -439,6 +440,28 @@
       </div>
 
       <div class="modal-body">
+        <!-- Exercise Progressions Section -->
+        <section class="settings-section">
+          <h3>Exercise Progressions</h3>
+          <p class="settings-description">Browse and switch to unlocked exercise variations</p>
+          <button id="browse-progressions-btn" class="action-btn">
+            Browse Available Progressions
+          </button>
+        </section>
+
+        <!-- Training Phase Toggle -->
+        <section class="settings-section">
+          <h3>Training Phase</h3>
+          <p class="settings-description">Switch between Building and Maintenance modes</p>
+          <div class="phase-toggle">
+            <button id="phase-building-btn" class="phase-btn active">Building</button>
+            <button id="phase-maintenance-btn" class="phase-btn">Maintenance</button>
+          </div>
+          <p class="phase-info" id="phase-info-text">
+            Building: Focus on progressive overload and strength gains
+          </p>
+        </section>
+
         <section class="settings-section">
           <h3>Data Management</h3>
 
@@ -639,6 +662,29 @@
         <div class="unlock-actions">
           <button id="unlock-try-btn" class="btn-primary">Switch to This Exercise</button>
           <button id="unlock-later-btn" class="btn-secondary">Maybe Later</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise Progressions Browse Modal -->
+  <div id="progressions-modal" class="modal" style="display: none;">
+    <div class="modal-content progressions-modal-content">
+      <div class="modal-header">
+        <h2>Exercise Progressions</h2>
+        <button class="close-modal" id="close-progressions-modal">&times;</button>
+      </div>
+
+      <div class="progressions-body">
+        <div class="progressions-tabs">
+          <button class="prog-tab active" data-workout="UPPER_A">Upper A</button>
+          <button class="prog-tab" data-workout="LOWER_A">Lower A</button>
+          <button class="prog-tab" data-workout="UPPER_B">Upper B</button>
+          <button class="prog-tab" data-workout="LOWER_B">Lower B</button>
+        </div>
+
+        <div id="progressions-list" class="progressions-list">
+          <!-- Populated dynamically -->
         </div>
       </div>
     </div>
