@@ -2138,7 +2138,654 @@ git commit -m "feat: add exercise progressions settings UI
 
 ## Phase 5: Warm-ups & Optional Day (Features)
 
-Due to message length constraints, I'll save the plan now and continue with Phase 5-6 in the implementation execution phase.
+### Task 5.1: Warm-Up Protocols Module
+
+**Files:**
+- Create: `js/modules/warm-up-protocols.js`
+- Modify: `js/app.js` (display warm-up before workout)
+- Modify: `index.html` (warm-up UI container)
+
+**Step 1: Create warm-up protocols module**
+
+Create `js/modules/warm-up-protocols.js`:
+
+```javascript
+/**
+ * Warm-Up Protocols Module
+ *
+ * Built with Science research-backed warm-up sequences.
+ * Equipment-aware with smart substitutions.
+ *
+ * @module warm-up-protocols
+ */
+
+/**
+ * Upper body warm-up protocol (5-7 min)
+ * For Upper A and Upper B workouts
+ *
+ * @param {Object} equipmentProfile - User's equipment profile
+ * @returns {Array} Warm-up exercises with reps/duration
+ */
+export function getUpperBodyWarmup(equipmentProfile) {
+  const hasBands = equipmentProfile?.bands !== false;
+
+  return [
+    { name: 'Wrist Circles', reps: '10 each direction', duration: null },
+    { name: 'Arm Circles', reps: '10 forward, 10 back', duration: null },
+    {
+      name: hasBands ? 'Band Over-and-Backs' : 'Arm Circles Extended',
+      reps: hasBands ? '5 reps' : '15 reps',
+      duration: null,
+      note: hasBands ? null : 'Equipment substitution: no bands available'
+    },
+    {
+      name: hasBands ? 'Band Pull-Aparts' : 'Scapular Wall Slides',
+      reps: hasBands ? '10 reps' : '10 reps',
+      duration: null,
+      note: hasBands ? null : 'Equipment substitution: no bands available'
+    },
+    {
+      name: hasBands ? 'Band External Rotation' : 'Floor Angels',
+      reps: hasBands ? '10-15 per side' : '10 reps',
+      duration: null,
+      note: hasBands ? null : 'Equipment substitution: no bands available'
+    },
+    { name: 'DB Shoulder Extensions', reps: '10-15 per side', duration: null }
+  ];
+}
+
+/**
+ * Lower body warm-up protocol (5-8 min)
+ * For Lower A and Lower B workouts
+ *
+ * @returns {Array} Warm-up exercises with reps/duration
+ */
+export function getLowerBodyWarmup() {
+  return [
+    { name: 'Light Cycling', reps: null, duration: '3-5 minutes' },
+    { name: 'Forward & Back Leg Swings', reps: '10-15 per side', duration: null },
+    { name: 'Side-to-Side Leg Swings', reps: '10-15 per side', duration: null },
+    { name: 'Spiderman Lunge w/ Thoracic Extension', reps: '5 per side', duration: null },
+    { name: 'Wall Ankle Mobilization', reps: '5 per side w/ 2 sec hold', duration: null }
+  ];
+}
+
+/**
+ * Get warm-up sets for first exercise
+ *
+ * @param {number} workingWeight - Working weight for first exercise
+ * @returns {Array} Warm-up set protocol
+ */
+export function getWarmupSets(workingWeight) {
+  return [
+    { weight: Math.round(workingWeight * 0.5), reps: 8, rest: '45-60 sec' },
+    { weight: Math.round(workingWeight * 0.7), reps: '3-4', rest: '45-60 sec' },
+    { weight: Math.round(workingWeight * 0.9), reps: 1, rest: '2 min' }
+  ];
+}
+
+/**
+ * Get warm-up protocol for workout type
+ *
+ * @param {string} workoutKey - Workout key (e.g., 'UPPER_A')
+ * @param {Object} equipmentProfile - User's equipment profile
+ * @returns {Object} Warm-up protocol
+ */
+export function getWarmupProtocol(workoutKey, equipmentProfile) {
+  const isUpper = workoutKey.startsWith('UPPER');
+
+  return {
+    exercises: isUpper
+      ? getUpperBodyWarmup(equipmentProfile)
+      : getLowerBodyWarmup(),
+    warmupSets: true, // Always include warm-up sets for first exercise
+    estimatedDuration: isUpper ? '5-7 min' : '5-8 min'
+  };
+}
+```
+
+**Step 2: Add warm-up display to workout screen**
+
+In `js/app.js`, add method to render warm-up section:
+
+```javascript
+  /**
+   * Render warm-up protocol section
+   *
+   * @param {string} workoutKey - Workout key
+   * @returns {string} HTML for warm-up section
+   */
+  renderWarmupProtocol(workoutKey) {
+    const equipmentProfile = this.storage.getEquipmentProfile();
+    const protocol = getWarmupProtocol(workoutKey, equipmentProfile);
+
+    return `
+      <div class="warmup-section">
+        <h3>🔥 Warm-Up (${protocol.estimatedDuration})</h3>
+        <div class="warmup-exercises">
+          ${protocol.exercises.map((ex, index) => `
+            <div class="warmup-exercise">
+              <span class="warmup-number">${index + 1}.</span>
+              <div class="warmup-details">
+                <div class="warmup-name">${ex.name}</div>
+                <div class="warmup-meta">
+                  ${ex.duration || ex.reps}
+                  ${ex.note ? `<span class="warmup-note">(${ex.note})</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="warmup-sets-info">
+          <h4>Warm-up Sets (First Exercise Only)</h4>
+          <p>Complete 3 progressive sets before working sets:</p>
+          <ul>
+            <li>Set 1: 50% weight × 8 reps (45-60s rest)</li>
+            <li>Set 2: 70% weight × 3-4 reps (45-60s rest)</li>
+            <li>Set 3: 90% weight × 1 rep (2 min rest)</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+```
+
+**Step 3: Integrate warm-up into showWorkoutScreen**
+
+In `showWorkoutScreen()`, add warm-up section before exercise list:
+
+```javascript
+  showWorkoutScreen(workoutKey) {
+    // ... existing code ...
+
+    workoutContent.innerHTML = `
+      ${this.renderWarmupProtocol(workoutKey)}
+      ${this.renderExerciseList(workout)}
+    `;
+  }
+```
+
+**Step 4: Add CSS for warm-up styling**
+
+Create `css/warm-up-protocols.css`:
+
+```css
+/* Warm-up Section */
+.warmup-section {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  border-left: 4px solid var(--color-warning);
+}
+
+.warmup-section h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-warning);
+}
+
+.warmup-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.warmup-exercise {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs);
+  background: var(--color-background);
+  border-radius: var(--border-radius-sm);
+}
+
+.warmup-number {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  min-width: 24px;
+}
+
+.warmup-details {
+  flex: 1;
+}
+
+.warmup-name {
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.warmup-meta {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.warmup-note {
+  font-size: 0.85rem;
+  color: var(--color-warning);
+  font-style: italic;
+}
+
+.warmup-sets-info {
+  background: var(--color-primary-background);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.warmup-sets-info h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 0.95rem;
+  color: var(--color-primary);
+}
+
+.warmup-sets-info p {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.warmup-sets-info ul {
+  margin: 0;
+  padding-left: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+```
+
+**Step 5: Commit**
+
+```bash
+git add js/modules/warm-up-protocols.js css/warm-up-protocols.css js/app.js index.html
+git commit -m "feat: add warm-up protocols system
+
+- BWS research-backed warm-up sequences
+- Upper body (5-7 min) and lower body (5-8 min) protocols
+- Equipment-aware substitutions (bands → bodyweight alternatives)
+- Warm-up sets guidance for first exercise
+- Integrated into workout screen"
+```
+
+---
+
+### Task 5.2: Optional 5th Day Workout
+
+**Files:**
+- Create: `js/modules/optional-fifth-day.js`
+- Modify: `js/app.js` (Home screen integration)
+- Create: `css/optional-fifth-day.css`
+
+**Step 1: Create optional 5th day module**
+
+Create `js/modules/optional-fifth-day.js`:
+
+```javascript
+/**
+ * Optional 5th Day: Injury Prevention + GPP
+ *
+ * Supplemental workout for extra training days.
+ * Focus: Core intensive, mobility, injury prevention.
+ *
+ * @module optional-fifth-day
+ */
+
+/**
+ * Block 1: Core Intensive (12-15 min)
+ */
+export const CORE_INTENSIVE_BLOCK = {
+  name: 'Core Intensive',
+  duration: '12-15 min',
+  exercises: [
+    { name: 'RKC Plank', sets: 3, reps: '20-30 sec', rest: '45 sec' },
+    { name: 'Side Plank', sets: 3, reps: '30 sec each side', rest: '45 sec' },
+    { name: 'Dead Bug', sets: 3, reps: '10 reps', rest: '45 sec' },
+    { name: 'Pallof Press', sets: 3, reps: '12 each side', rest: '45 sec' },
+    { name: 'Bird Dog', sets: 3, reps: '10 each side', rest: '45 sec' }
+  ],
+  advancedOptions: [
+    { name: 'L-Sit Holds', sets: 3, reps: 'max time', note: 'If unlocked' },
+    { name: 'Ab Wheel Rollouts', sets: 3, reps: '8-10 reps', note: 'If unlocked' }
+  ]
+};
+
+/**
+ * Block 2: Mobility + Injury Prevention (10-12 min)
+ */
+export const MOBILITY_BLOCK = {
+  name: 'Mobility + Injury Prevention',
+  duration: '10-12 min',
+  sections: [
+    {
+      name: 'Rotator Cuff Circuit',
+      exercises: [
+        { name: 'Band External Rotations', sets: 2, reps: '15 each side' },
+        { name: 'YTWLs', sets: 2, reps: '10 each position' },
+        { name: 'Face Pull Variations', sets: 2, reps: '15 reps' }
+      ]
+    },
+    {
+      name: 'Hip Mobility',
+      exercises: [
+        { name: '90/90 Hip Stretch', sets: 2, reps: '30 sec each side' },
+        { name: 'Cossack Squats', sets: 2, reps: '8 each side' },
+        { name: 'Hip Flexor Stretch', sets: 2, reps: '30 sec each side' }
+      ]
+    },
+    {
+      name: 'Ankle Mobility',
+      exercises: [
+        { name: 'Wall Ankle Mobilization', sets: 2, reps: '10 each side' },
+        { name: 'Calf Stretch', sets: 2, reps: '30 sec each side' }
+      ]
+    }
+  ]
+};
+
+/**
+ * Block 3: User Choice (10-15 min)
+ */
+export const USER_CHOICE_BLOCKS = [
+  {
+    id: 'cardio-hiit',
+    name: 'Cardio HIIT',
+    duration: '10-15 min',
+    options: [
+      { name: 'Jump Rope Intervals', format: '8 rounds × 30 sec on / 30 sec off' },
+      { name: 'Hill Sprints', format: '6 × 30 sec' },
+      { name: 'Rowing Intervals', format: '10 × 1 min moderate pace' }
+    ]
+  },
+  {
+    id: 'mudgal-gada',
+    name: 'Mudgal/Gada Flow',
+    duration: '10-15 min',
+    exercises: [
+      { name: '10-to-2 Pendulum Swings', sets: 3, reps: '12 each side' },
+      { name: '360° Swings', sets: 3, reps: '8 each side', note: 'When unlocked' },
+      { name: 'Gada Flow Sequences', duration: '10 min continuous' }
+    ]
+  },
+  {
+    id: 'bodyweight-high-rep',
+    name: 'High-Rep Bodyweight',
+    duration: '10-15 min',
+    exercises: [
+      { name: 'Hindu Danda', sets: 3, reps: '15 reps' },
+      { name: 'Baithak', sets: 3, reps: '20 reps' },
+      { name: 'Surya Namaskar', sets: '5-8 rounds', reps: null }
+    ]
+  }
+];
+
+/**
+ * Get fatigue warning based on last workout and upcoming workout
+ *
+ * @param {string} lastWorkout - Last completed workout
+ * @param {string} nextWorkout - Next suggested workout
+ * @returns {Object|null} Warning object or null
+ */
+export function getFatigueWarning(lastWorkout, nextWorkout) {
+  // After Lower B, if Upper A is within 48 hours
+  if (lastWorkout === 'LOWER_B' && nextWorkout === 'UPPER_A') {
+    const hoursUntilNext = 48; // Simplified - would calculate from last workout date
+    if (hoursUntilNext < 48) {
+      return {
+        level: 'warning',
+        message: '⚠️ Consider skipping Block 2 (shoulders) and Block 3 (Mudgal) to prevent fatigue',
+        recommendSkip: ['mobility', 'user-choice']
+      };
+    }
+    return {
+      level: 'info',
+      message: '✅ Best day: Tomorrow (2 days until Upper A)',
+      recommendSkip: []
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Get optional 5th day workout structure
+ *
+ * @param {string} lastWorkout - Last completed workout
+ * @param {string} nextWorkout - Next suggested workout
+ * @returns {Object} Complete 5th day workout
+ */
+export function getOptionalFifthDay(lastWorkout, nextWorkout) {
+  return {
+    displayName: 'Injury Prevention + Core Day',
+    duration: '30-40 minutes',
+    blocks: [
+      CORE_INTENSIVE_BLOCK,
+      MOBILITY_BLOCK,
+      USER_CHOICE_BLOCKS
+    ],
+    cooldown: {
+      duration: '3-5 min',
+      activities: ['Foam rolling', 'Static stretching', 'Breathing work']
+    },
+    fatigueWarning: getFatigueWarning(lastWorkout, nextWorkout)
+  };
+}
+```
+
+**Step 2: Add optional 5th day button to Home screen**
+
+In `js/app.js`, modify `showHomeScreen()`:
+
+```javascript
+  showHomeScreen(pushHistory = true) {
+    // ... existing code ...
+
+    homeContent.innerHTML = `
+      <div class="next-workout-card">
+        <h2>Next Workout: ${nextWorkout.displayName}</h2>
+        <button id="start-workout-btn" class="btn-primary">
+          START WORKOUT
+        </button>
+      </div>
+
+      <div class="optional-training-card">
+        <h3>Optional Training</h3>
+        <button id="optional-fifth-day-btn" class="btn-secondary">
+          💪 Injury Prevention + Core Day
+        </button>
+      </div>
+
+      ${this.renderCurrentStreak()}
+      ${this.renderLastWorkoutSummary()}
+    `;
+
+    // Event listener for optional 5th day
+    document.getElementById('optional-fifth-day-btn')?.addEventListener('click', () => {
+      this.showOptionalFifthDay();
+    });
+  }
+```
+
+**Step 3: Add showOptionalFifthDay method**
+
+```javascript
+  /**
+   * Show optional 5th day workout screen
+   */
+  showOptionalFifthDay() {
+    const rotation = this.storage.getRotationState();
+    const lastWorkout = rotation.sequence[rotation.sequence.length - 1];
+    const nextWorkout = rotation.nextSuggested;
+
+    const fifthDay = getOptionalFifthDay(lastWorkout, nextWorkout);
+
+    const fifthDayContent = document.getElementById('fifth-day-content');
+    if (!fifthDayContent) return;
+
+    fifthDayContent.innerHTML = `
+      <h2>${fifthDay.displayName}</h2>
+      <p class="duration">Total Duration: ${fifthDay.duration}</p>
+
+      ${fifthDay.fatigueWarning ? `
+        <div class="fatigue-warning ${fifthDay.fatigueWarning.level}">
+          ${fifthDay.fatigueWarning.message}
+        </div>
+      ` : ''}
+
+      ${this.renderFifthDayBlocks(fifthDay.blocks)}
+
+      <div class="cooldown-section">
+        <h3>Cool-down (${fifthDay.cooldown.duration})</h3>
+        <ul>
+          ${fifthDay.cooldown.activities.map(a => `<li>${a}</li>`).join('')}
+        </ul>
+      </div>
+
+      <button id="complete-fifth-day-btn" class="btn-primary">
+        Complete Workout
+      </button>
+    `;
+
+    // Switch to fifth day screen
+    this.switchScreen('fifth-day-screen');
+  }
+```
+
+**Step 4: Commit**
+
+```bash
+git add js/modules/optional-fifth-day.js css/optional-fifth-day.css js/app.js index.html
+git commit -m "feat: add optional 5th day workout
+
+- 3-block structure: Core, Mobility, User Choice
+- Fatigue management warnings
+- Always accessible from Home screen
+- Does not affect rotation or streak
+- 30-40 min supplemental training"
+```
+
+---
+
+## Phase 6: Integration Testing & Documentation
+
+### Task 6.1: Comprehensive Integration Testing
+
+**Files:**
+- Create: `docs/testing/progression-pathways-integration-test.md`
+
+**Test Scenarios:**
+
+**1. Unlock Flow End-to-End**
+- Start with clean localStorage
+- Complete sets until unlock criteria met
+- Verify unlock notification appears
+- Test "Switch" and "Maybe Later" actions
+- Verify unlock persists in Settings → Browse Progressions
+
+**2. Equipment Profile Filtering**
+- Toggle equipment profiles in Settings
+- Verify progression paths update correctly
+- Test bodyweight substitutions
+
+**3. Training Phase Toggle**
+- Switch Building → Maintenance
+- Verify phase info updates
+- Switch back to Building
+- Verify persistence
+
+**4. Warm-Up Display**
+- Start workout
+- Verify warm-up section appears
+- Test equipment substitutions (disable bands)
+- Verify substitution notes display
+
+**5. Optional 5th Day**
+- Complete 4-workout cycle
+- Verify optional day button appears
+- Test fatigue warnings
+- Complete optional day
+- Verify rotation not affected
+
+**Step 1: Create test report template**
+
+Create `docs/testing/progression-pathways-integration-test.md`:
+
+```markdown
+# Progression Pathways Integration Test Report
+
+**Date:** [Test Date]
+**Tester:** [Name]
+**Build:** [Cache Version]
+
+## Test 1: Unlock Flow
+- [ ] Clean localStorage start
+- [ ] Met unlock criteria for Hindu Danda
+- [ ] Unlock notification appeared
+- [ ] "Switch to This Exercise" works
+- [ ] Exercise selection persisted
+- [ ] Visible in Browse Progressions modal
+
+## Test 2: Equipment Profiles
+- [ ] Disabled Barbells profile
+- [ ] Barbell exercises hidden in progressions
+- [ ] Enabled Bodyweight profile
+- [ ] Hindu Danda/Baithak variations visible
+
+## Test 3: Training Phase
+- [ ] Toggled to Maintenance mode
+- [ ] Phase info updated correctly
+- [ ] Toggled back to Building
+- [ ] State persisted on page reload
+
+## Test 4: Warm-Up Protocols
+- [ ] Started Upper A workout
+- [ ] Upper body warm-up displayed
+- [ ] Disabled Bands in equipment
+- [ ] Substitutions shown with notes
+- [ ] Warm-up sets guidance displayed
+
+## Test 5: Optional 5th Day
+- [ ] Button visible on Home screen
+- [ ] Clicked optional 5th day
+- [ ] All 3 blocks displayed
+- [ ] Fatigue warning appeared (if applicable)
+- [ ] Completed workout
+- [ ] Rotation unchanged
+
+## Issues Found
+[List any bugs or unexpected behavior]
+
+## Performance Notes
+[Loading times, responsiveness, etc.]
+
+## Browser Compatibility
+- [ ] Chrome/Edge (Chromium)
+- [ ] Firefox
+- [ ] Safari (if available)
+- [ ] Mobile browser
+
+## Status
+[ ] PASS - Ready for production
+[ ] FAIL - Issues found (see above)
+```
+
+**Step 2: Execute manual tests**
+
+Follow test report checklist systematically.
+
+**Step 3: Fix any issues found**
+
+Create bug fix commits as needed.
+
+**Step 4: Update CLAUDE.md with learnings**
+
+Document any patterns learned during implementation.
+
+**Step 5: Commit test report**
+
+```bash
+git add docs/testing/progression-pathways-integration-test.md
+git commit -m "docs: add progression pathways integration test report"
+```
 
 ---
 
@@ -2151,9 +2798,9 @@ This implementation plan follows TDD principles with bite-sized steps. Each task
 - Phase 2: Storage Layer ✅ (1 task)
 - Phase 3: Unlock Logic ✅ (1 task)
 - Phase 4: UI Integration ✅ (2 tasks)
-- Phase 5: Warm-ups & Optional Day (2 tasks) - *To be continued in execution*
-- Phase 6: Testing & Polish (1 task) - *To be continued in execution*
+- Phase 5: Warm-ups & Optional Day (2 tasks)
+- Phase 6: Testing & Polish (1 task)
 
-**Estimated Completion:** 43 hours across 6 phases
+**Estimated Completion:** 50 hours across 6 phases
 
-**Next:** Execute Phase 1-4 tasks sequentially, then continue with Phase 5-6 implementation.
+**Next:** Phase 5-6 implementation using subagent-driven development.
