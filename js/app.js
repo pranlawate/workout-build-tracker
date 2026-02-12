@@ -20,6 +20,7 @@ import { detectAchievements, formatAchievementType, getAllAchievements } from '.
 import { UnlockEvaluator } from './modules/unlock-evaluator.js';
 import { PROGRESSION_PATHS, getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
 import { COMPLEXITY_TIERS, getComplexityTier } from './modules/complexity-tiers.js';
+import { getWarmupProtocol } from './modules/warm-up-protocols.js';
 
 class App {
   constructor() {
@@ -603,7 +604,7 @@ class App {
     };
 
     // Render warm-up section
-    const warmupHtml = this.renderWarmupSection();
+    const warmupHtml = this.renderWarmupProtocol(this.currentWorkout.name);
 
     const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
       const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
@@ -2937,6 +2938,47 @@ class App {
     });
   }
   */
+
+  /**
+   * Render warm-up protocol section
+   *
+   * @param {string} workoutKey - Workout key
+   * @returns {string} HTML for warm-up section
+   */
+  renderWarmupProtocol(workoutKey) {
+    const equipmentProfile = this.storage.getEquipmentProfile();
+    const protocol = getWarmupProtocol(workoutKey, equipmentProfile);
+
+    return `
+      <div class="warmup-section">
+        <h3>🔥 Warm-Up (${protocol.estimatedDuration})</h3>
+        <div class="warmup-exercises">
+          ${protocol.exercises.map((ex, index) => `
+            <div class="warmup-exercise">
+              <span class="warmup-number">${index + 1}.</span>
+              <div class="warmup-details">
+                <div class="warmup-name">${this.escapeHtml(ex.name)}</div>
+                <div class="warmup-meta">
+                  ${this.escapeHtml(ex.duration || ex.reps)}
+                  ${ex.note ? `<span class="warmup-note">(${this.escapeHtml(ex.note)})</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="warmup-sets-info">
+          <h4>Warm-up Sets (First Exercise Only)</h4>
+          <p>Complete 3 progressive sets before working sets:</p>
+          <ul>
+            <li>Set 1: 50% weight × 8 reps (45-60s rest)</li>
+            <li>Set 2: 70% weight × 3-4 reps (45-60s rest)</li>
+            <li>Set 3: 90% weight × 1 rep (2 min rest)</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
 
   showProgressDashboard(pushHistory = true) {
     console.log('[Dashboard] showProgressDashboard called');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'build-tracker-v33';
+const CACHE_NAME = 'build-tracker-v34';
 const CACHE_URLS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const CACHE_URLS = [
   './css/analytics.css',
   './css/workout-reference.css',
   './css/unlock-notifications.css',
+  './css/warm-up-protocols.css',
   './js/app.js',
   './js/modules/storage.js',
   './js/modules/workouts.js',
