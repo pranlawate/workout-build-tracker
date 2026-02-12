@@ -214,6 +214,9 @@ class App {
       case 'weighin':
         // Do nothing - modal already closed by closeSettingsModal
         break;
+      case 'fifth-day':
+        this.showOptionalFifthDay(false);
+        break;
       default:
         this.showHomeScreen(false);
     }
@@ -3063,7 +3066,7 @@ class App {
   /**
    * Show optional 5th day workout screen
    */
-  showOptionalFifthDay() {
+  showOptionalFifthDay(pushHistory = true) {
     const rotation = this.storage.getRotation();
     const lastWorkout = rotation.sequence.length > 0
       ? rotation.sequence[rotation.sequence.length - 1]
@@ -3109,7 +3112,16 @@ class App {
     }
 
     // Switch to fifth day screen
-    this.switchScreen('fifth-day-screen');
+    this.hideAllScreens();
+    const fifthDayScreen = document.getElementById('fifth-day-screen');
+    if (fifthDayScreen) {
+      fifthDayScreen.classList.add('active');
+    }
+
+    // Push to browser history
+    if (pushHistory && window.history.state?.screen !== 'fifth-day') {
+      window.history.pushState({ screen: 'fifth-day' }, '', '');
+    }
   }
 
   /**
