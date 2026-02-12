@@ -660,6 +660,194 @@ export class StorageManager {
   }
 
   /**
+   * Get equipment profile
+   *
+   * @returns {Object} Equipment profile {gym, dumbbells, barbells, mudgal, bodyweight}
+   */
+  getEquipmentProfile() {
+    try {
+      const stored = localStorage.getItem('build_equipment_profile');
+      if (!stored) {
+        // Default: gym + dumbbells + bodyweight (most common setup)
+        return {
+          gym: true,
+          dumbbells: true,
+          barbells: false,
+          mudgal: false,
+          bodyweight: true,
+          bands: false
+        };
+      }
+      return JSON.parse(stored);
+    } catch (error) {
+      console.error('[Storage] Error getting equipment profile:', error);
+      return {
+        gym: true,
+        dumbbells: true,
+        barbells: false,
+        mudgal: false,
+        bodyweight: true,
+        bands: false
+      };
+    }
+  }
+
+  /**
+   * Save equipment profile
+   *
+   * @param {Object} profile - Equipment profile object
+   */
+  saveEquipmentProfile(profile) {
+    try {
+      if (!profile || typeof profile !== 'object') {
+        console.error('[Storage] Invalid equipment profile');
+        return;
+      }
+      localStorage.setItem('build_equipment_profile', JSON.stringify(profile));
+    } catch (error) {
+      console.error('[Storage] Error saving equipment profile:', error);
+    }
+  }
+
+  /**
+   * Get exercise selections (current exercise per slot)
+   *
+   * @returns {Object} Slot → exercise name mapping
+   */
+  getExerciseSelections() {
+    try {
+      const stored = localStorage.getItem('build_exercise_selections');
+      if (!stored) {
+        // Default: all current exercises from progression paths
+        return {
+          'UPPER_A_SLOT_1': 'DB Flat Bench Press',
+          'UPPER_A_SLOT_2': 'Seated Cable Row',
+          'UPPER_A_SLOT_3': 'Cable Chest Fly',
+          'UPPER_A_SLOT_4': 'T-Bar Row',
+          'UPPER_A_SLOT_5': 'DB Lateral Raises',
+          'UPPER_A_SLOT_6': 'Face Pulls',
+          'UPPER_A_SLOT_7': 'Reverse Fly',
+          'LOWER_A_SLOT_1': 'Hack Squat',
+          'LOWER_A_SLOT_2': 'Leg Curl',
+          'LOWER_A_SLOT_3': 'Leg Extension',
+          'LOWER_A_SLOT_4': '45° Hyperextension',
+          'LOWER_A_SLOT_5': 'Standing Calf Raise',
+          'LOWER_A_SLOT_6': 'Plank',
+          'UPPER_B_SLOT_1': 'Lat Pulldown',
+          'UPPER_B_SLOT_2': 'DB Shoulder Press',
+          'UPPER_B_SLOT_3': 'Chest-Supported Row',
+          'UPPER_B_SLOT_4': 'Incline DB Press',
+          'UPPER_B_SLOT_5': 'Reverse Fly',
+          'UPPER_B_SLOT_6': 'Dead Bug',
+          'LOWER_B_SLOT_1': 'DB Goblet Squat',
+          'LOWER_B_SLOT_2': 'DB Romanian Deadlift',
+          'LOWER_B_SLOT_3': 'Leg Abduction',
+          'LOWER_B_SLOT_4': 'Hip Thrust',
+          'LOWER_B_SLOT_5': 'Seated Calf Raise',
+          'LOWER_B_SLOT_6': 'Side Plank'
+        };
+      }
+      return JSON.parse(stored);
+    } catch (error) {
+      console.error('[Storage] Error getting exercise selections:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Save exercise selection for a slot
+   *
+   * @param {string} slotKey - Slot identifier
+   * @param {string} exerciseName - Exercise name
+   */
+  saveExerciseSelection(slotKey, exerciseName) {
+    try {
+      const selections = this.getExerciseSelections();
+      selections[slotKey] = exerciseName;
+      localStorage.setItem('build_exercise_selections', JSON.stringify(selections));
+    } catch (error) {
+      console.error('[Storage] Error saving exercise selection:', error);
+    }
+  }
+
+  /**
+   * Get unlock achievements
+   *
+   * @returns {Object} Exercise name → unlock data mapping
+   */
+  getUnlocks() {
+    try {
+      const stored = localStorage.getItem('build_unlocks');
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error('[Storage] Error getting unlocks:', error);
+      return {};
+    }
+  }
+
+  /**
+   * Save unlock achievement
+   *
+   * @param {string} exerciseName - Exercise that was unlocked
+   * @param {Object} criteria - Unlock criteria met {strength, mobility, painFree, weeks}
+   */
+  saveUnlock(exerciseName, criteria) {
+    try {
+      const unlocks = this.getUnlocks();
+      unlocks[exerciseName] = {
+        unlockedDate: new Date().toISOString(),
+        criteria: criteria
+      };
+      localStorage.setItem('build_unlocks', JSON.stringify(unlocks));
+    } catch (error) {
+      console.error('[Storage] Error saving unlock:', error);
+    }
+  }
+
+  /**
+   * Check if exercise is unlocked
+   *
+   * @param {string} exerciseName - Exercise name
+   * @returns {boolean} True if unlocked
+   */
+  isExerciseUnlocked(exerciseName) {
+    const unlocks = this.getUnlocks();
+    return !!unlocks[exerciseName];
+  }
+
+  /**
+   * Get training phase
+   *
+   * @returns {string} 'building' or 'maintenance'
+   */
+  getTrainingPhase() {
+    try {
+      const stored = localStorage.getItem('build_training_phase');
+      return stored || 'building'; // Default to building phase
+    } catch (error) {
+      console.error('[Storage] Error getting training phase:', error);
+      return 'building';
+    }
+  }
+
+  /**
+   * Save training phase
+   *
+   * @param {string} phase - 'building' or 'maintenance'
+   */
+  saveTrainingPhase(phase) {
+    try {
+      if (phase !== 'building' && phase !== 'maintenance') {
+        console.error('[Storage] Invalid training phase:', phase);
+        return;
+      }
+      localStorage.setItem('build_training_phase', phase);
+    } catch (error) {
+      console.error('[Storage] Error saving training phase:', error);
+    }
+  }
+
+  /**
    * Clears all BUILD Tracker data from localStorage
    */
   clearAll() {
