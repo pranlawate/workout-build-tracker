@@ -8,8 +8,10 @@
  */
 
 /**
- * Equipment requirements per exercise
+ * Equipment requirements mapping
+ * Maps exercise names to required equipment types
  * Multiple equipment types = user needs ANY of them
+ * @type {Object.<string, string[]>}
  */
 export const EQUIPMENT_REQUIREMENTS = {
   // Gym equipment (cables, machines)
@@ -66,6 +68,7 @@ export const EQUIPMENT_REQUIREMENTS = {
 /**
  * Bodyweight regression scaling
  * Maps DB weight ranges to appropriate bodyweight variations
+ * @type {Object.<string, Object.<string, string>>}
  */
 export const BODYWEIGHT_REGRESSIONS = {
   'DB Flat Bench Press': {
@@ -117,13 +120,22 @@ export function filterExercisesByProfile(exercises, profile) {
  *
  * @param {string} exerciseName - DB exercise name
  * @param {number} userWeight - Current DB weight user is using (kg)
- * @returns {string|null} Bodyweight substitute or null if none
+ * @returns {string|null} Bodyweight substitute or null if none available
+ * @example
+ * getBodyweightSubstitute('DB Flat Bench Press', 12) // Returns 'Hindu Danda'
+ * getBodyweightSubstitute('Seated Cable Row', 20) // Returns null (no bodyweight substitute)
  */
 export function getBodyweightSubstitute(exerciseName, userWeight) {
   const regressionMap = BODYWEIGHT_REGRESSIONS[exerciseName];
 
   if (!regressionMap) {
     return null; // No bodyweight substitute for this exercise
+  }
+
+  // Validate userWeight input
+  if (typeof userWeight !== 'number' || isNaN(userWeight) || userWeight < 0) {
+    console.warn('[EquipmentProfiles] Invalid userWeight:', userWeight);
+    return null;
   }
 
   // Determine weight bracket
