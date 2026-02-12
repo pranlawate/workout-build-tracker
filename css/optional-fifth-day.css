@@ -14,17 +14,14 @@
 }
 
 /* Fifth Day Screen */
-#fifth-day-screen {
-  /* Styles inherited from .screen class */
-}
-
-#fifth-day-content {
-  padding: var(--spacing-md);
+#fifth-day-screen .screen-content {
+  padding-bottom: var(--spacing-xl);
 }
 
 #fifth-day-content h2 {
   margin: 0 0 var(--spacing-sm) 0;
   color: var(--color-primary);
+  font-size: 1.5rem;
 }
 
 .duration {
