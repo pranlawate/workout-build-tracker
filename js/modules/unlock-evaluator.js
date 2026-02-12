@@ -1,0 +1,240 @@
+/**
+ * Unlock Evaluator Module
+ *
+ * Evaluates whether user meets criteria to unlock new exercises.
+ * Checks strength milestones, mobility checks, pain-free status, and training weeks.
+ *
+ * Read-only analyzer pattern (like PerformanceAnalyzer).
+ *
+ * @module unlock-evaluator
+ */
+
+import { getComplexityTier, getUnlockCriteria, COMPLEXITY_TIERS } from './complexity-tiers.js';
+
+export class UnlockEvaluator {
+  /**
+   * @param {Object} storageManager - Storage manager instance
+   */
+  constructor(storageManager) {
+    this.storage = storageManager;
+  }
+
+  /**
+   * Check if user meets unlock criteria for an exercise
+   *
+   * @param {string} targetExercise - Exercise to unlock
+   * @param {string} prerequisiteExercise - Current exercise (progression source)
+   * @returns {Object} { unlocked: boolean, criteria: {strength, mobility, painFree, weeks}, missing: string[] }
+   */
+  evaluateUnlock(targetExercise, prerequisiteExercise) {
+    try {
+      // SIMPLE tier always unlocked
+      const tier = getComplexityTier(targetExercise);
+      if (tier === COMPLEXITY_TIERS.SIMPLE) {
+        return {
+          unlocked: true,
+          criteria: { strength: true, mobility: true, painFree: true, weeks: 0 },
+          missing: []
+        };
+      }
+
+      // Check if already unlocked
+      if (this.storage.isExerciseUnlocked(targetExercise)) {
+        return {
+          unlocked: true,
+          criteria: { strength: true, mobility: true, painFree: true, weeks: 999 },
+          missing: []
+        };
+      }
+
+      const requirements = getUnlockCriteria(targetExercise);
+      const met = {
+        strength: false,
+        mobility: false,
+        painFree: false,
+        weeks: 0
+      };
+      const missing = [];
+
+      // Check strength milestone
+      if (requirements.strengthMilestone) {
+        met.strength = this._checkStrengthMilestone(prerequisiteExercise, targetExercise);
+        if (!met.strength) missing.push('strength milestone');
+      } else {
+        met.strength = true; // Not required
+      }
+
+      // Check mobility
+      if (requirements.mobilityCheck) {
+        met.mobility = this._checkMobilityRequirement(targetExercise);
+        if (!met.mobility) missing.push('mobility check');
+      } else {
+        met.mobility = true; // Not required
+      }
+
+      // Check pain-free status
+      if (requirements.painFreeWeeks > 0) {
+        met.painFree = this._checkPainFree(prerequisiteExercise, requirements.painFreeWeeks);
+        if (!met.painFree) missing.push(`${requirements.painFreeWeeks}+ pain-free workouts`);
+      } else {
+        met.painFree = true; // Not required
+      }
+
+      // Check training weeks
+      met.weeks = this._calculateTrainingWeeks(prerequisiteExercise);
+      if (met.weeks < requirements.trainingWeeks) {
+        missing.push(`${requirements.trainingWeeks}+ weeks training`);
+      }
+
+      const unlocked = met.strength && met.mobility && met.painFree && (met.weeks >= requirements.trainingWeeks);
+
+      return {
+        unlocked,
+        criteria: met,
+        missing
+      };
+
+    } catch (error) {
+      console.error('[UnlockEvaluator] Error evaluating unlock:', error);
+      return {
+        unlocked: false,
+        criteria: { strength: false, mobility: false, painFree: false, weeks: 0 },
+        missing: ['evaluation error']
+      };
+    }
+  }
+
+  /**
+   * Check strength milestone (internal)
+   *
+   * @param {string} exerciseName - Current exercise
+   * @param {string} targetExercise - Target exercise
+   * @returns {boolean} True if milestone met
+   * @private
+   */
+  _checkStrengthMilestone(exerciseName, targetExercise) {
+    // Define milestones per progression
+    const MILESTONES = {
+      'DB Flat Bench Press': {
+        'Barbell Bench Press': { weight: 15, reps: 12, sets: 3 },
+        'Hindu Danda': { weight: 15, reps: 12, sets: 3 }
+      },
+      'Hack Squat': {
+        'Barbell Back Squat': { weight: 60, reps: 10, sets: 3 } // Total machine weight
+      },
+      'Lat Pulldown': {
+        'Pull-ups': { weight: 50, reps: 10, sets: 3 } // Pulldown weight
+      }
+      // Add more as needed
+    };
+
+    const exerciseMilestones = MILESTONES[exerciseName];
+    if (!exerciseMilestones) return false;
+
+    const milestone = exerciseMilestones[targetExercise];
+    if (!milestone) return false;
+
+    // Get exercise history
+    const history = this.storage.getExerciseHistory(exerciseName);
+    if (!history || history.length === 0) return false;
+
+    // Check recent sessions (last 3) for milestone achievement
+    const recentSessions = history.slice(-3);
+
+    return recentSessions.some(session => {
+      if (!session.sets || session.sets.length === 0) return false;
+
+      // Check if achieved target weight × reps for required sets
+      const qualifyingSets = session.sets.filter(set =>
+        set.weight >= milestone.weight && set.reps >= milestone.reps
+      );
+
+      return qualifyingSets.length >= milestone.sets;
+    });
+  }
+
+  /**
+   * Check mobility requirement (internal)
+   *
+   * @param {string} exerciseName - Exercise requiring mobility
+   * @returns {boolean} True if mobility confirmed
+   * @private
+   */
+  _checkMobilityRequirement(exerciseName) {
+    // Map exercises to mobility check criteria
+    const MOBILITY_CHECKS = {
+      'Barbell Bench Press': 'scapular_retraction',
+      'Hindu Danda': 'thoracic_mobility',
+      'Barbell Overhead Press': 'shoulder_overhead_mobility',
+      'Barbell Deadlift': 'hip_hinge_mobility'
+    };
+
+    const criteriaKey = MOBILITY_CHECKS[exerciseName];
+    if (!criteriaKey) return true; // No specific check required
+
+    // Check if user has 3+ "yes" responses for this mobility check
+    const checkHistory = this._getMobilityCheckHistory(criteriaKey);
+    if (!checkHistory || checkHistory.length < 3) return false;
+
+    const recentChecks = checkHistory.slice(-3);
+    return recentChecks.every(check => check.response === 'yes');
+  }
+
+  /**
+   * Get mobility check history (internal)
+   *
+   * @param {string} criteriaKey - Mobility check criteria key
+   * @returns {Array} Check history
+   * @private
+   */
+  _getMobilityCheckHistory(criteriaKey) {
+    try {
+      const stored = localStorage.getItem(`build_mobility_checks_${criteriaKey}`);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('[UnlockEvaluator] Error getting mobility checks:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check pain-free status (internal)
+   *
+   * @param {string} exerciseName - Exercise to check
+   * @param {number} requiredWorkouts - Number of pain-free workouts needed
+   * @returns {boolean} True if pain-free requirement met
+   * @private
+   */
+  _checkPainFree(exerciseName, requiredWorkouts) {
+    const history = this.storage.getExerciseHistory(exerciseName);
+    if (!history || history.length < requiredWorkouts) return false;
+
+    // Get last N workouts
+    const recentWorkouts = history.slice(-requiredWorkouts);
+
+    // Check pain tracking for each workout
+    return recentWorkouts.every(workout => {
+      // Pain is tracked in workout object or post-workout modal
+      // Assuming pain level 0 = no pain
+      return !workout.painLevel || workout.painLevel === 0;
+    });
+  }
+
+  /**
+   * Calculate training weeks for exercise (internal)
+   *
+   * @param {string} exerciseName - Exercise name
+   * @returns {number} Weeks since first workout
+   * @private
+   */
+  _calculateTrainingWeeks(exerciseName) {
+    const history = this.storage.getExerciseHistory(exerciseName);
+    if (!history || history.length === 0) return 0;
+
+    const firstDate = new Date(history[0].date);
+    const now = new Date();
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+
+    return Math.floor((now - firstDate) / msPerWeek);
+  }
+}
