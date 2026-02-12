@@ -1220,15 +1220,6 @@ class App {
     if (this.showPostSetFeedback) {
       this.showPostSetFeedback(exerciseIndex, setIndex, set);
     }
-
-    // Check for unlocks after logging set
-    const exerciseName = exerciseDef?.name;
-    if (exerciseName) {
-      const slotKey = getSlotForExercise(exerciseName);
-      if (slotKey) {
-        this.checkAndShowUnlockNotification(exerciseName, slotKey);
-      }
-    }
   }
 
   showPostSetFeedback(exerciseIndex, setIndex, set) {
@@ -4899,7 +4890,7 @@ class App {
     this.showWorkoutSelection();
   }
 
-  completeWorkout() {
+  async completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
 
     // Check how many exercises are completed
@@ -4978,6 +4969,9 @@ class App {
           }
         }
 
+        // Check for unlocks after completing workout
+        await this.checkWorkoutUnlocks();
+
         // Show summary screen instead of pain modal
         const workoutData = {
           workoutName: this.currentWorkout.name,
@@ -4993,6 +4987,23 @@ class App {
     } catch (error) {
       console.error('Failed to save workout:', error);
       alert('⚠️ Failed to save workout. Please try again or check storage.');
+    }
+  }
+
+  /**
+   * Check all exercises in completed workout for unlocks
+   */
+  async checkWorkoutUnlocks() {
+    if (!this.currentWorkout) return;
+
+    // Check each exercise in the workout for potential unlocks
+    for (const exerciseDef of this.currentWorkout.exercises) {
+      const exerciseName = exerciseDef.name;
+      const slotKey = getSlotForExercise(exerciseName);
+
+      if (slotKey) {
+        await this.checkAndShowUnlockNotification(exerciseName, slotKey);
+      }
     }
   }
 
