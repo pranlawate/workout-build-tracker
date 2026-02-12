@@ -24,7 +24,7 @@
 }
 
 .duration {
-  color: var(--color-text-secondary);
+  color: var(--color-text-dim);
   font-size: 0.95rem;
   margin-bottom: var(--spacing-md);
 }
@@ -105,7 +105,7 @@
 
 .exercise-meta {
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  color: var(--color-text-dim);
 }
 
 /* Block 2 Sections */
@@ -120,7 +120,7 @@
 .section-name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-text-dim);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: var(--spacing-xs);
