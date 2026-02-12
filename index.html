@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="css/analytics.css">
   <link rel="stylesheet" href="css/achievements.css">
   <link rel="stylesheet" href="css/workout-reference.css">
+  <link rel="stylesheet" href="css/unlock-notifications.css">
 </head>
 <body>
   <div id="app">
@@ -609,6 +610,35 @@
           <button class="pain-location-btn btn btn-secondary" data-location="knee">Knee</button>
           <button class="pain-location-btn btn btn-secondary" data-location="hip">Hip</button>
           <button class="pain-location-btn btn btn-secondary" data-location="other">Other</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise Unlock Notification Modal -->
+  <div id="unlock-notification-modal" class="modal" style="display: none;">
+    <div class="modal-content unlock-modal">
+      <div class="unlock-header">
+        <span class="unlock-icon">🎉</span>
+        <h2 id="unlock-title">New Exercise Unlocked!</h2>
+      </div>
+      <div class="unlock-body">
+        <h3 id="unlock-exercise-name">Hindu Danda</h3>
+        <p id="unlock-description">You've met the criteria to unlock this exercise!</p>
+
+        <div class="unlock-criteria">
+          <h4>Requirements Met:</h4>
+          <ul id="unlock-criteria-list">
+            <li class="met">✓ Strength: 15kg × 3×12</li>
+            <li class="met">✓ Mobility: Thoracic mobility confirmed</li>
+            <li class="met">✓ Pain-free: 5+ workouts</li>
+            <li class="met">✓ Training: 8+ weeks</li>
+          </ul>
+        </div>
+
+        <div class="unlock-actions">
+          <button id="unlock-try-btn" class="btn-primary">Switch to This Exercise</button>
+          <button id="unlock-later-btn" class="btn-secondary">Maybe Later</button>
         </div>
       </div>
     </div>

@@ -17,6 +17,8 @@ import { EditEntryModal } from './modals/edit-entry-modal.js';
 import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/export-import.js';
 import { getAllWorkouts } from './modules/workouts.js';
 import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
+import { UnlockEvaluator } from './modules/unlock-evaluator.js';
+import { getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
 
 class App {
   constructor() {
@@ -24,6 +26,7 @@ class App {
     this.workoutManager = new WorkoutManager(this.storage);
     this.deloadManager = new DeloadManager(this.storage);
     this.performanceAnalyzer = new PerformanceAnalyzer(this.storage);
+    this.unlockEvaluator = new UnlockEvaluator(this.storage);
     this.analyticsCalculator = new AnalyticsCalculator(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
@@ -1163,6 +1166,15 @@ class App {
     // For now, just call it as a no-op if it doesn't exist
     if (this.showPostSetFeedback) {
       this.showPostSetFeedback(exerciseIndex, setIndex, set);
+    }
+
+    // Check for unlocks after logging set
+    const exerciseName = exerciseDef?.name;
+    if (exerciseName) {
+      const slotKey = getSlotForExercise(exerciseName);
+      if (slotKey) {
+        this.checkAndShowUnlockNotification(exerciseName, slotKey);
+      }
     }
   }
 
@@ -4581,6 +4593,127 @@ class App {
       console.error('Failed to save workout:', error);
       alert('⚠️ Failed to save workout. Please try again or check storage.');
     }
+  }
+
+  /**
+   * Show unlock notification after completing a set
+   *
+   * @param {string} currentExercise - Current exercise
+   * @param {string} slotKey - Workout slot
+   */
+  async checkAndShowUnlockNotification(currentExercise, slotKey) {
+    try {
+      // Get progression path for this slot
+      const path = getProgressionPath(slotKey);
+      if (!path || !path.harder || path.harder.length === 0) return;
+
+      // Check each harder progression
+      for (const targetExercise of path.harder) {
+        // Skip if already unlocked
+        if (this.storage.isExerciseUnlocked(targetExercise)) continue;
+
+        // Evaluate unlock criteria
+        const evaluation = this.unlockEvaluator.evaluateUnlock(targetExercise, currentExercise);
+
+        if (evaluation.unlocked) {
+          // Show unlock notification
+          await this.showUnlockModal(targetExercise, currentExercise, slotKey, evaluation);
+
+          // Only show one unlock per workout (priority system: Complex > Moderate > Simple)
+          break;
+        }
+      }
+    } catch (error) {
+      console.error('[App] Error checking unlock notification:', error);
+    }
+  }
+
+  /**
+   * Show unlock modal
+   *
+   * @param {string} exerciseName - Unlocked exercise
+   * @param {string} currentExercise - Current exercise
+   * @param {string} slotKey - Slot key
+   * @param {Object} evaluation - Evaluation results
+   */
+  showUnlockModal(exerciseName, currentExercise, slotKey, evaluation) {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('unlock-notification-modal');
+      const exerciseNameEl = document.getElementById('unlock-exercise-name');
+      const criteriaList = document.getElementById('unlock-criteria-list');
+      const tryBtn = document.getElementById('unlock-try-btn');
+      const laterBtn = document.getElementById('unlock-later-btn');
+
+      // Set exercise name
+      exerciseNameEl.textContent = exerciseName;
+
+      // Render criteria
+      criteriaList.innerHTML = '';
+      const { criteria } = evaluation;
+
+      if (criteria.strength) {
+        const li = document.createElement('li');
+        li.className = 'met';
+        li.textContent = '✓ Strength milestone achieved';
+        criteriaList.appendChild(li);
+      }
+
+      if (criteria.mobility) {
+        const li = document.createElement('li');
+        li.className = 'met';
+        li.textContent = '✓ Mobility confirmed';
+        criteriaList.appendChild(li);
+      }
+
+      if (criteria.painFree) {
+        const li = document.createElement('li');
+        li.className = 'met';
+        li.textContent = '✓ Pain-free status';
+        criteriaList.appendChild(li);
+      }
+
+      if (criteria.weeks > 0) {
+        const li = document.createElement('li');
+        li.className = 'met';
+        li.textContent = `✓ Training: ${criteria.weeks} weeks`;
+        criteriaList.appendChild(li);
+      }
+
+      // Show modal
+      modal.style.display = 'flex';
+
+      // Handle "Switch to This Exercise"
+      tryBtn.onclick = () => {
+        // Save unlock achievement
+        this.storage.saveUnlock(exerciseName, criteria);
+
+        // Switch exercise in slot
+        this.storage.saveExerciseSelection(slotKey, exerciseName);
+
+        // Close modal
+        modal.style.display = 'none';
+
+        // Refresh workout screen
+        const workoutKey = slotKey.split('_')[0] + '_' + slotKey.split('_')[1]; // e.g., "UPPER_A"
+        if (this.currentWorkout) {
+          // Re-render current workout to show new exercise
+          this.renderExerciseList();
+        }
+
+        resolve('switched');
+      };
+
+      // Handle "Maybe Later"
+      laterBtn.onclick = () => {
+        // Save unlock achievement (but don't switch)
+        this.storage.saveUnlock(exerciseName, criteria);
+
+        // Close modal
+        modal.style.display = 'none';
+
+        resolve('later');
+      };
+    });
   }
 }
 
