@@ -13,7 +13,19 @@
 }
 
 .optional-training-card .btn-secondary {
+  width: 100%;
+  padding: var(--spacing-md);
+  background: var(--color-primary);
+  color: white;
   border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.optional-training-card .btn-secondary:active {
+  background: #0891b2;
 }
 
 /* Fifth Day Screen */
