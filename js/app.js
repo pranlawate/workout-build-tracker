@@ -3129,6 +3129,17 @@ class App {
       </button>
     `;
 
+    // Event listeners for user choice options
+    const choiceOptions = document.querySelectorAll('.choice-option');
+    choiceOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        // Remove selected class from all options
+        choiceOptions.forEach(opt => opt.classList.remove('selected'));
+        // Add selected class to clicked option
+        option.classList.add('selected');
+      });
+    });
+
     // Event listener for complete button
     const completeBtn = document.getElementById('complete-fifth-day-btn');
     if (completeBtn) {
