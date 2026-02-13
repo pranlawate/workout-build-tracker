@@ -48,11 +48,10 @@ export const EQUIPMENT_REQUIREMENTS = {
   'Mudgal Pendulum': ['mudgal'],
 
   // Bodyweight (always available)
-  'Hindu Danda': ['bodyweight'],
-  'Vruschik Danda': ['bodyweight'],
-  'Standard Baithak': ['bodyweight'],
-  'Full-sole Baithak': ['bodyweight'],
-  'Jumping Baithak': ['bodyweight'],
+  'Sadharan Dand': ['bodyweight'],
+  'Vrushchik Dand': ['bodyweight'],
+  'Sadharan Baithak': ['bodyweight'],
+  'Ardha Baithak': ['bodyweight'],
   'Plank': ['bodyweight'],
   'Dead Bug': ['bodyweight'],
   'Side Plank': ['bodyweight'],
@@ -72,14 +71,14 @@ export const EQUIPMENT_REQUIREMENTS = {
  */
 export const BODYWEIGHT_REGRESSIONS = {
   'DB Flat Bench Press': {
-    '0-10kg': 'Incline Hindu Danda',  // Hands elevated on bench
-    '10-15kg': 'Hindu Danda',         // Standard
-    '15kg+': 'Hindu Danda'            // Standard (user ready)
+    '0-10kg': 'Incline Push-ups',     // Hands elevated on bench
+    '10-15kg': 'Sadharan Dand',       // Basic traditional push-up
+    '15kg+': 'Sadharan Dand'          // Standard (user ready)
   },
   'DB Goblet Squat': {
-    '0-10kg': 'Standard Baithak',
-    '10-15kg': 'Full-sole Baithak',
-    '15kg+': 'Full-sole Baithak'
+    '0-10kg': 'Ardha Baithak',        // Half squat (partial ROM)
+    '10-15kg': 'Sadharan Baithak',    // Full traditional squat
+    '15kg+': 'Sadharan Baithak'       // Standard (user ready)
   }
   // Add more as needed during implementation
 };
@@ -122,7 +121,7 @@ export function filterExercisesByProfile(exercises, profile) {
  * @param {number} userWeight - Current DB weight user is using (kg)
  * @returns {string|null} Bodyweight substitute or null if none available
  * @example
- * getBodyweightSubstitute('DB Flat Bench Press', 12) // Returns 'Hindu Danda'
+ * getBodyweightSubstitute('DB Flat Bench Press', 12) // Returns 'Sadharan Dand'
  * getBodyweightSubstitute('Seated Cable Row', 20) // Returns null (no bodyweight substitute)
  */
 export function getBodyweightSubstitute(exerciseName, userWeight) {

@@ -88,8 +88,8 @@ export const USER_CHOICE_BLOCKS = [
     name: 'High-Rep Bodyweight',
     duration: '10-15 min',
     exercises: [
-      { name: 'Hindu Danda', sets: 3, reps: '15 reps' },
-      { name: 'Baithak', sets: 3, reps: '20 reps' },
+      { name: 'Sadharan Dand', sets: 3, reps: '15 reps' },
+      { name: 'Sadharan Baithak', sets: 3, reps: '20 reps' },
       { name: 'Surya Namaskar', sets: '5-8 rounds', reps: null }
     ]
   }

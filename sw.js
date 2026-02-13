@@ -1,4 +1,4 @@
-const CACHE_NAME = 'build-tracker-v45';
+const CACHE_NAME = 'build-tracker-v58';
 const CACHE_URLS = [
   './',
   './index.html',

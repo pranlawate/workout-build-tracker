@@ -5075,7 +5075,15 @@ class App {
         const evaluation = this.unlockEvaluator.evaluateUnlock(targetExercise, currentExercise);
 
         if (evaluation.unlocked) {
-          // Show unlock notification
+          // SIMPLE tier exercises are auto-unlocked from the start
+          // Save them silently without showing achievement notification
+          const tier = getComplexityTier(targetExercise);
+          if (tier === COMPLEXITY_TIERS.SIMPLE) {
+            this.storage.saveUnlock(targetExercise, evaluation.criteria);
+            continue;
+          }
+
+          // Show unlock notification for MODERATE/COMPLEX tier
           await this.showUnlockModal(targetExercise, currentExercise, slotKey, evaluation);
 
           // Only show one unlock per workout (priority system: Complex > Moderate > Simple)

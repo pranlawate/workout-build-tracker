@@ -117,7 +117,7 @@ export class UnlockEvaluator {
     const MILESTONES = {
       'DB Flat Bench Press': {
         'Barbell Bench Press': { weight: 15, reps: 12, sets: 3 },
-        'Hindu Danda': { weight: 15, reps: 12, sets: 3 }
+        'Sadharan Dand': { weight: 15, reps: 12, sets: 3 }
       },
       'Hack Squat': {
         'Barbell Back Squat': { weight: 60, reps: 10, sets: 3 } // Total machine weight
@@ -162,10 +162,36 @@ export class UnlockEvaluator {
    */
   _checkMobilityRequirement(exerciseName) {
     // Map exercises to mobility check criteria
+    // All COMPLEX tier exercises require mobility validation
     const MOBILITY_CHECKS = {
+      // Upper body pressing (barbell)
       'Barbell Bench Press': 'scapular_retraction',
-      'Hindu Danda': 'thoracic_mobility',
       'Barbell Overhead Press': 'shoulder_overhead_mobility',
+
+      // Traditional Indian Dand (push-up) variations - all require thoracic mobility
+      'Sadharan Dand': 'thoracic_mobility',           // Basic push-up with hip bridge
+      'Rammurti Dand': 'thoracic_mobility',           // Flowing sweep movement
+      'Hanuman Dand': 'thoracic_mobility',            // Dips with leg lunge
+      'Vrushchik Dand': 'thoracic_mobility',          // Scorpion leg crossing
+      'Vrushchik Dand 2': 'thoracic_mobility',        // Forearm stand scorpion
+      'Parshava Dand': 'thoracic_mobility',           // Lateral leg crossing
+      'Chakra Dand': 'thoracic_mobility',             // Circular leg movements
+      'Advance Hanuman Dand': 'thoracic_mobility',    // Explosive leg thrust
+      'Vaksh vikasak Dand': 'thoracic_mobility',      // Chest expansion with inward palms
+      'Palat Dand': 'thoracic_mobility',              // Rotation to side plank
+      'Sher Dand': 'thoracic_mobility',               // Handstand push-up
+      'Sarp Dand': 'thoracic_mobility',               // Snake pulsing or dog↔cobra
+      'Mishr Dand': 'thoracic_mobility',              // Plyometric jumping
+
+      // Squatting movements (traditional Indian)
+      'Barbell Back Squat': 'hip_ankle_squat_mobility',
+      'Sadharan Baithak': 'hip_ankle_squat_mobility',
+      'Pehalwani Baithak': 'hip_ankle_squat_mobility',
+      'Pehalwani Baithak 2': 'hip_ankle_squat_mobility',
+      'Rammurti Baithak': 'hip_ankle_squat_mobility',
+      'Hanuman Baithak': 'hip_ankle_squat_mobility',  // Side lunge - lateral plane
+
+      // Hip hinge / Deadlift
       'Barbell Deadlift': 'hip_hinge_mobility'
     };
 

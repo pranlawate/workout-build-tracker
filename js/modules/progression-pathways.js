@@ -21,14 +21,24 @@ export const PROGRESSION_PATHS = {
   'UPPER_A_SLOT_1': {
     slotName: 'Compound Horizontal Push',
     easier: [
-      'Machine Chest Press',
-      'Incline Hindu Danda'  // Hands elevated on bench
+      'Machine Chest Press'
     ],
     current: 'DB Flat Bench Press',
     harder: [
-      'Barbell Bench Press',  // Load progression
-      'Hindu Danda',          // Movement progression
-      'Vruschik Danda'        // Advanced (requires Hindu Danda mastery)
+      'Barbell Bench Press',    // Load progression
+      'Sadharan Dand',          // Basic traditional push-up with hip bridge
+      'Rammurti Dand',          // Flowing sweep - down-forward, reverse through hands, push up
+      'Hanuman Dand',           // Dips position with leg forward lunge
+      'Vrushchik Dand',         // Scorpion - leg crossing over in plank
+      'Vrushchik Dand 2',       // Scorpion - forearm stand with backbend
+      'Parshava Dand',          // Lateral - leg crossing under in plank
+      'Chakra Dand',            // Circular leg movements in plank
+      'Advance Hanuman Dand',   // Explosive variation with leg thrust
+      'Vaksh vikasak Dand',     // Chest expansion - elbows flared, palms inward
+      'Palat Dand',             // Rotation to side plank
+      'Sher Dand',              // Lion - handstand push-up
+      'Sarp Dand',              // Snake - pulsing torso or flowing dog↔cobra
+      'Mishr Dand'              // Mixed - plyometric jumping variation
     ],
     alternate: ['Cable Chest Press']
   },
@@ -104,7 +114,7 @@ export const PROGRESSION_PATHS = {
     easier: ['Leg Press'],
     current: 'Hack Squat',
     harder: ['Barbell Back Squat'],
-    alternate: ['Standard Baithak']
+    alternate: ['Sadharan Baithak']
   },
 
   'LOWER_A_SLOT_2': {
@@ -202,7 +212,7 @@ export const PROGRESSION_PATHS = {
     current: 'Incline DB Press',
     harder: [
       'Barbell Incline Press',
-      'Vruschik Danda'
+      'Vrushchik Dand'
     ],
     alternate: ['Incline Push-ups']
   },
@@ -233,9 +243,12 @@ export const PROGRESSION_PATHS = {
     easier: ['Bodyweight Squat'],
     current: 'DB Goblet Squat',
     harder: [
-      'Standard Baithak',
-      'Full-sole Baithak',
-      'Jumping Baithak',
+      'Ardha Baithak',        // Half squat (partial ROM)
+      'Sadharan Baithak',     // Regular full Hindu squat with arm swing
+      'Pehalwani Baithak',    // Wrestler's squat with forward jump
+      'Pehalwani Baithak 2',  // Wrestler's squat with triple jump
+      'Rammurti Baithak',     // Named variant
+      'Hanuman Baithak',      // Side lunge squat (lateral plane)
       'Bulgarian Split Squat',
       'Pistol Squat'
     ],
