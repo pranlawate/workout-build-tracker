@@ -20,6 +20,7 @@ BUILD Tracker is a mobile-first PWA optimized for in-gym usage. It features:
 - **Form guidance**: Exercise-specific cues for setup, execution, and common mistakes
 - **Recovery monitoring**: Prevents overtraining with muscle-specific rest periods
 - **Equipment progression**: Tracks readiness for barbell exercises with strength, mobility, and pain criteria
+- **Exercise progressions**: 19 traditional Indian exercises (Dand/Baithak variations) with biomechanically-sound progression pathways
 - **Deload automation**: Smart fatigue detection and recovery weeks
 - **Performance analysis**: Real-time alerts for weight regression and form breakdown
 - **Pain tracking**: Post-workout pain logging with consolidated modal interface
@@ -95,12 +96,9 @@ See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for detailed progr
 ## Documentation
 
 - [BUILD Training Specification](BUILD-SPECIFICATION.md) - Complete training program definition
-- [UI/UX Design](docs/design/2026-02-03-ui-ux-design.md)
-- [Training Structure](docs/design/2026-02-03-workout-structure.md)
-- [Data Model Design](docs/design/2026-02-02-data-model-design.md)
-- [MVP Implementation Plan](docs/plans/2026-02-03-mvp-implementation-plan.md) - ✅ Complete
+- [Implementation Status](docs/IMPLEMENTATION-STATUS.md) - Feature completion tracking
 - [Development Guidelines](CONTRIBUTING.md)
-
+- [Archived Plans](docs/archived/plans/) - Historical design and implementation documents
 ## Development
 
 ```bash
@@ -207,7 +205,7 @@ workout-build-tracker/
 
 **Cache Management:**
 - Service Worker caches all assets for offline use
-- Version: `build-tracker-v25` (auto-updates on new deployments)
+- Version: `build-tracker-v58` (auto-updates on new deployments)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
 ### 📊 Progress Dashboard
