@@ -31,3 +31,13 @@ temp/
 node_modules/
 package-lock.json
 yarn.lock
+
+# Reference PDFs and source materials
+pdfs/
+
+# Debug and testing scripts
+analyze-complex-exercises.js
+check-version.js
+diagnose-unlock.js
+disable-sw.html
+force-cache-clear.js
