@@ -61,7 +61,7 @@ export class DeloadManager {
    * @returns {number} Number of weeks since last deload
    */
   calculateWeeksSinceDeload(lastDeloadDate) {
-    if (!lastDeloadDate) return Infinity; // Never had a deload = infinite time
+    if (!lastDeloadDate) return 0; // Never had a deload = 0 weeks (don't trigger immediately)
 
     const lastDate = new Date(lastDeloadDate);
     const now = new Date();
