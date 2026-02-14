@@ -20,7 +20,9 @@ export class PhaseManager {
    * @returns {string} 'building' | 'maintenance' | 'recovery'
    */
   getPhase() {
-    return this.storage.getTrainingPhase();
+    const phase = this.storage.getTrainingPhase();
+    const validPhases = ['building', 'maintenance', 'recovery'];
+    return validPhases.includes(phase) ? phase : 'building';
   }
 
   /**
