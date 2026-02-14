@@ -907,7 +907,7 @@ class App {
       return '<span class="progression-badge badge-normal">🔵 First Time</span>';
     }
 
-    const status = getProgressionStatus(history, exercise);
+    const status = getProgressionStatus(history, exercise, this.phaseManager);
 
     const badges = {
       normal: '<span class="progression-badge badge-normal">🔵 In Progress</span>',
@@ -924,7 +924,7 @@ class App {
       return `<p class="progression-hint">Start with ${exercise.startingWeight}kg and focus on form</p>`;
     }
 
-    const status = getProgressionStatus(history, exercise);
+    const status = getProgressionStatus(history, exercise, this.phaseManager);
 
     if (status === 'ready' && lastWorkout?.sets?.length > 0) {
       const lastWeight = lastWorkout.sets[0].weight;
