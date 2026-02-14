@@ -1,6 +1,7 @@
 import { StorageManager } from './modules/storage.js';
 import { WorkoutManager } from './modules/workout-manager.js';
 import { DeloadManager } from './modules/deload.js';
+import { PhaseManager } from './modules/phase-manager.js';
 import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
 import { BarbellProgressionTracker } from './modules/barbell-progression-tracker.js';
 import { BodyWeightManager } from './modules/body-weight.js';
@@ -26,10 +27,11 @@ import { getOptionalFifthDay } from './modules/optional-fifth-day.js';
 class App {
   constructor() {
     this.storage = new StorageManager();
+    this.phaseManager = new PhaseManager(this.storage);
     this.workoutManager = new WorkoutManager(this.storage);
-    this.deloadManager = new DeloadManager(this.storage);
+    this.deloadManager = new DeloadManager(this.storage, this.phaseManager);
     this.performanceAnalyzer = new PerformanceAnalyzer(this.storage);
-    this.unlockEvaluator = new UnlockEvaluator(this.storage);
+    this.unlockEvaluator = new UnlockEvaluator(this.storage, this.phaseManager);
     this.analyticsCalculator = new AnalyticsCalculator(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
@@ -3578,19 +3580,51 @@ class App {
       barbellTab.style.display = 'block';
     }
 
-    // Get barbell progression data
+    // Get progression data
     const tracker = new BarbellProgressionTracker(this.storage);
+
+    // Barbell exercises
     const benchReadiness = tracker.getBarbellBenchReadiness();
     const squatReadiness = tracker.getBarbellSquatReadiness();
     const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
 
-    // Render barbell progression content
+    // Traditional exercises
+    const dandReadiness = tracker.getSadharanDandReadiness();
+    const baithakReadiness = tracker.getSadharanBaithakReadiness();
+
+    // Pull-up progression
+    const pullUpReadiness = tracker.getPullUpReadiness();
+
+    // Mudgal/Club progression
+    const mudgalReadiness = tracker.getMudgalReadiness();
+
+    // Render advanced exercise progression content
     barbellTab.innerHTML = `
       <div class="progress-dashboard">
-        <h3 class="dashboard-title">🎯 Equipment Progression Milestones</h3>
-        ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
-        ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
-        ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
+        <h3 class="dashboard-title">🎯 Advanced Exercise Milestones</h3>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Barbell Exercises</h4>
+          ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
+          ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
+          ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Traditional Exercises</h4>
+          ${this.renderProgressionCard('Sadharan Dand', dandReadiness)}
+          ${this.renderProgressionCard('Sadharan Baithak', baithakReadiness)}
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Pull-Up Progressions</h4>
+          ${this.renderProgressionCard('Pull-ups', pullUpReadiness)}
+        </div>
+
+        <div>
+          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Mudgal/Club Exercises</h4>
+          ${this.renderProgressionCard('Mudgal Training', mudgalReadiness)}
+        </div>
       </div>
     `;
   }
