@@ -927,9 +927,25 @@ class App {
     const status = getProgressionStatus(history, exercise, this.phaseManager);
 
     if (status === 'ready' && lastWorkout?.sets?.length > 0) {
-      const lastWeight = lastWorkout.sets[0].weight;
-      const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
-      return `<p class="progression-hint success">✨ Increase to ${nextWeight}kg this session!</p>`;
+      try {
+        const progressionBehavior = this.phaseManager.getProgressionBehavior();
+
+        if (progressionBehavior.tempoFocus) {
+          // Maintenance phase: Suggest tempo variation
+          return `<p class="progression-hint success">💪 Maintenance: Try 3-1-2 tempo (pause at bottom)</p>`;
+        } else {
+          // Building phase: Suggest weight increase
+          const lastWeight = lastWorkout.sets[0].weight;
+          const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
+          return `<p class="progression-hint success">🎯 Ready to progress! Add ${nextWeight}kg next session</p>`;
+        }
+      } catch (error) {
+        console.error('[App] Error getting phase behavior:', error);
+        // Fallback to building phase message
+        const lastWeight = lastWorkout.sets[0].weight;
+        const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
+        return `<p class="progression-hint success">🎯 Ready to progress! Add ${nextWeight}kg next session</p>`;
+      }
     }
 
     if (status === 'plateau') {
