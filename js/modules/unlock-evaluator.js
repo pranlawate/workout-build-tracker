@@ -14,9 +14,14 @@ import { getComplexityTier, getUnlockCriteria, COMPLEXITY_TIERS } from './comple
 export class UnlockEvaluator {
   /**
    * @param {Object} storageManager - Storage manager instance
+   * @param {Object} phaseManager - Phase manager instance
    */
-  constructor(storageManager) {
+  constructor(storageManager, phaseManager) {
+    if (!phaseManager) {
+      throw new Error('UnlockEvaluator requires a PhaseManager instance');
+    }
     this.storage = storageManager;
+    this.phaseManager = phaseManager;
   }
 
   /**
@@ -102,6 +107,89 @@ export class UnlockEvaluator {
         missing: ['evaluation error']
       };
     }
+  }
+
+  /**
+   * Evaluate unlock with phase-aware priority
+   *
+   * @param {string} targetExercise - Exercise to unlock
+   * @param {string} prerequisiteExercise - Current exercise (progression source)
+   * @returns {Object} { unlocked, criteria, missing, priority, phaseRecommended }
+   */
+  evaluateUnlockWithPhasePriority(targetExercise, prerequisiteExercise) {
+    try {
+      // Get base unlock evaluation (criteria met?)
+      const baseEvaluation = this.evaluateUnlock(targetExercise, prerequisiteExercise);
+
+      if (!baseEvaluation.unlocked) {
+        return { ...baseEvaluation, priority: 999, phaseRecommended: false };
+      }
+
+      // Add phase-aware priority
+      const unlockPriority = this.phaseManager.getUnlockPriority();
+      const exerciseType = this._getExerciseType(targetExercise);
+
+      return {
+        ...baseEvaluation,
+        priority: this._calculatePriority(exerciseType, unlockPriority),
+        phaseRecommended: this._isPhaseRecommended(exerciseType, unlockPriority)
+      };
+    } catch (error) {
+      console.error('[UnlockEvaluator] Error evaluating unlock with phase priority:', error);
+      // Safe fallback: return base evaluation without priority
+      const baseEvaluation = this.evaluateUnlock(targetExercise, prerequisiteExercise);
+      return { ...baseEvaluation, priority: 1, phaseRecommended: true };
+    }
+  }
+
+  /**
+   * Determine exercise type for prioritization
+   * @private
+   */
+  _getExerciseType(exerciseName) {
+    if (exerciseName.includes('Barbell')) return 'barbell';
+    if (exerciseName.includes('Sadharan') || exerciseName.includes('Baithak')) return 'bodyweight';
+    if (exerciseName.includes('Mudgal')) return 'traditional';
+    if (exerciseName.includes('Pull-up')) return 'bodyweight';
+    return 'equipment';
+  }
+
+  /**
+   * Calculate priority based on phase and exercise type
+   * Lower number = higher priority (shown first)
+   * @private
+   */
+  _calculatePriority(exerciseType, unlockPriority) {
+    if (unlockPriority === 'all') {
+      return 1; // Building: all exercises equal priority
+    }
+
+    if (unlockPriority === 'bodyweight_priority') {
+      // Maintenance: bodyweight/traditional first, equipment second
+      return (exerciseType === 'bodyweight' || exerciseType === 'traditional') ? 1 : 2;
+    }
+
+    if (unlockPriority === 'safety_first') {
+      // Recovery: only bodyweight allowed (future)
+      return exerciseType === 'bodyweight' ? 1 : 999;
+    }
+
+    return 1;
+  }
+
+  /**
+   * Check if exercise is recommended for current phase
+   * @private
+   */
+  _isPhaseRecommended(exerciseType, unlockPriority) {
+    if (unlockPriority === 'all') return true;
+    if (unlockPriority === 'bodyweight_priority') {
+      return exerciseType === 'bodyweight' || exerciseType === 'traditional';
+    }
+    if (unlockPriority === 'safety_first') {
+      return exerciseType === 'bodyweight';
+    }
+    return true;
   }
 
   /**
