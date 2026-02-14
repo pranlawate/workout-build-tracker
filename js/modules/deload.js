@@ -3,6 +3,9 @@
  */
 export class DeloadManager {
   constructor(storage, phaseManager) {
+    if (!phaseManager) {
+      throw new Error('DeloadManager requires a PhaseManager instance');
+    }
     this.storage = storage;
     this.phaseManager = phaseManager;
   }
@@ -13,38 +16,43 @@ export class DeloadManager {
    * @returns {Object} Object with trigger status and reason
    */
   shouldTriggerDeload() {
-    const deloadState = this.storage.getDeloadState();
+    try {
+      const deloadState = this.storage.getDeloadState();
 
-    // Don't trigger if already in deload
-    if (deloadState.active) return { trigger: false };
+      // Don't trigger if already in deload
+      if (deloadState.active) return { trigger: false };
 
-    // Get phase-aware base threshold
-    const sensitivity = this.phaseManager.getDeloadSensitivity();
-    const baseWeeks = {
-      normal: 6,      // Building: 6-8 weeks
-      high: 4,        // Maintenance: 4-6 weeks
-      very_high: 2    // Recovery: 2-3 weeks (future)
-    }[sensitivity];
+      // Get phase-aware base threshold
+      const sensitivity = this.phaseManager.getDeloadSensitivity();
+      const baseWeeks = {
+        normal: 6,      // Building: 6-8 weeks
+        high: 4,        // Maintenance: 4-6 weeks
+        very_high: 2    // Recovery: 2-3 weeks (future)
+      }[sensitivity] || 6; // Fallback to 6 if sensitivity is undefined
 
-    // Check time-based trigger (dynamic threshold)
-    const weeksSinceDeload = this.calculateWeeksSinceDeload(deloadState.lastDeloadDate);
-    if (weeksSinceDeload >= baseWeeks) {
-      return { trigger: true, reason: 'time', weeks: weeksSinceDeload };
+      // Check time-based trigger (dynamic threshold)
+      const weeksSinceDeload = this.calculateWeeksSinceDeload(deloadState.lastDeloadDate);
+      if (weeksSinceDeload >= baseWeeks) {
+        return { trigger: true, reason: 'time', weeks: weeksSinceDeload };
+      }
+
+      // Check performance-based trigger (regression on 2+ exercises)
+      const regressionCount = this.detectRegressions();
+      if (regressionCount >= 2) {
+        return { trigger: true, reason: 'performance', regressions: regressionCount };
+      }
+
+      // Check fatigue-based trigger (score ≥8 for 2 consecutive workouts)
+      const fatigueAlert = this.checkFatigueScore();
+      if (fatigueAlert) {
+        return { trigger: true, reason: 'fatigue', score: fatigueAlert.score };
+      }
+
+      return { trigger: false };
+    } catch (error) {
+      console.error('[DeloadManager] Error checking deload trigger:', error);
+      return { trigger: false }; // Safe default: don't trigger on error
     }
-
-    // Check performance-based trigger (regression on 2+ exercises)
-    const regressionCount = this.detectRegressions();
-    if (regressionCount >= 2) {
-      return { trigger: true, reason: 'performance', regressions: regressionCount };
-    }
-
-    // Check fatigue-based trigger (score ≥8 for 2 consecutive workouts)
-    const fatigueAlert = this.checkFatigueScore();
-    if (fatigueAlert) {
-      return { trigger: true, reason: 'fatigue', score: fatigueAlert.score };
-    }
-
-    return { trigger: false };
   }
 
   /**
@@ -53,7 +61,7 @@ export class DeloadManager {
    * @returns {number} Number of weeks since last deload
    */
   calculateWeeksSinceDeload(lastDeloadDate) {
-    if (!lastDeloadDate) return 0;
+    if (!lastDeloadDate) return Infinity; // Never had a deload = infinite time
 
     const lastDate = new Date(lastDeloadDate);
     const now = new Date();
@@ -92,40 +100,55 @@ export class DeloadManager {
    * @param {string} deloadType - Type of deload ('standard' | 'light' | 'active_recovery')
    */
   startDeload(deloadType = 'standard') {
-    const deloadState = this.storage.getDeloadState();
-    const now = new Date();
-    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+    try {
+      const deloadState = this.storage.getDeloadState();
+      const now = new Date();
+      const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
 
-    deloadState.active = true;
-    deloadState.deloadType = deloadType;
-    deloadState.startDate = now.toISOString();
-    deloadState.endDate = endDate.toISOString();
+      deloadState.active = true;
+      deloadState.deloadType = deloadType;
+      deloadState.startDate = now.toISOString();
+      deloadState.endDate = endDate.toISOString();
 
-    this.storage.saveDeloadState(deloadState);
+      this.storage.saveDeloadState(deloadState);
+    } catch (error) {
+      console.error('[DeloadManager] Error starting deload:', error);
+      // Don't throw - fail silently but log the error
+    }
   }
 
   /**
    * Ends the current deload period
    */
   endDeload() {
-    const deloadState = this.storage.getDeloadState();
+    try {
+      const deloadState = this.storage.getDeloadState();
 
-    deloadState.active = false;
-    deloadState.lastDeloadDate = deloadState.startDate;
-    deloadState.deloadType = null;
-    deloadState.startDate = null;
-    deloadState.endDate = null;
+      deloadState.active = false;
+      deloadState.lastDeloadDate = deloadState.startDate;
+      deloadState.deloadType = null;
+      deloadState.startDate = null;
+      deloadState.endDate = null;
 
-    this.storage.saveDeloadState(deloadState);
+      this.storage.saveDeloadState(deloadState);
+    } catch (error) {
+      console.error('[DeloadManager] Error ending deload:', error);
+      // Don't throw - fail silently but log the error
+    }
   }
 
   /**
    * Postpones deload suggestion (increments dismiss count)
    */
   postponeDeload() {
-    const deloadState = this.storage.getDeloadState();
-    deloadState.dismissedCount = (deloadState.dismissedCount || 0) + 1;
-    this.storage.saveDeloadState(deloadState);
+    try {
+      const deloadState = this.storage.getDeloadState();
+      deloadState.dismissedCount = (deloadState.dismissedCount || 0) + 1;
+      this.storage.saveDeloadState(deloadState);
+    } catch (error) {
+      console.error('[DeloadManager] Error postponing deload:', error);
+      // Don't throw - fail silently but log the error
+    }
   }
 
   /**
