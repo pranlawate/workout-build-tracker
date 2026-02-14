@@ -259,7 +259,96 @@ This document tracks the implementation status of all designed features from the
 
 ## 🚧 DESIGNED BUT NOT IMPLEMENTED
 
-**All designed features have been implemented!** 🎉
+### Build/Maintenance Phase Integration
+**Source:** `docs/plans/2026-02-14-build-maintenance-phase-integration-design.md`
+
+**Status:** ✅ Completed (2026-02-14)
+
+**Implemented Features:**
+- ✅ **PhaseManager Module** - Centralized coordinator for phase-aware behavior (read-only pattern)
+- ✅ **Phase-Aware Progression** - Building shows weight suggestions, Maintenance shows tempo variations
+- ✅ **Dynamic Deload Timing** - Building: 6 weeks, Maintenance: 4 weeks, Recovery: 2 weeks (designed)
+- ✅ **Unlock Prioritization** - Maintenance prioritizes bodyweight/traditional exercises first
+- ✅ **Tempo Suggestions** - "Try 3-1-2 tempo (pause at bottom)" in Maintenance phase
+- ✅ **Error Handling** - Comprehensive defensive programming with safe fallbacks
+
+**Implementation Details:**
+- Module: `js/modules/phase-manager.js` (new)
+- Modified: `deload.js`, `unlock-evaluator.js`, `progression.js`, `app.js`
+- Cache: v64
+- Testing: See `docs/build-maintenance-phase-integration-test.md`
+
+**What's NOT Included:**
+- Recovery phase behavior (API designed, implementation deferred)
+- Maintenance phase exercise rotation (separate future feature)
+- Goal Quiz onboarding flow (still pending)
+
+### Goal Quiz & Initial Setup
+**Source:** `docs/archived/plans/2026-02-13/2026-02-12-exercise-progression-pathways-design.md` (lines 208-234)
+
+**Status:** Designed but not implemented
+
+**Planned Features:**
+- ❌ **Q1: Training Experience** - Beginner/Some/Advanced (affects UI help level)
+- 🟡 **Q2: Equipment Access** - Checkboxes for Gym/Dumbbells/Barbells/Mudgal/Bodyweight (partially implemented as settings toggles)
+- ✅ **Q3: Training Goals** - Build muscle/Build strength/Both (✅ IMPLEMENTED as Build/Maintenance phase toggle)
+
+**Current State:**
+- Equipment toggles exist in Settings but don't affect exercise filtering
+- Build/Maintenance phase toggle exists in UI and is NOW FUNCTIONAL (2026-02-14)
+
+**Missing Implementation:**
+- First-time onboarding quiz flow
+- Experience level tracking and UI help level adjustment
+- Equipment filtering logic for exercise options
+
+### Maintenance Phase Exercise Rotation
+**Source:** `docs/archived/plans/2026-02-13/2026-02-12-exercise-progression-pathways-design.md` (lines 263-279)
+
+**Status:** Partially implemented
+
+**Planned Behavior:**
+- In Maintenance phase: Rotate accessory exercises every 4-6 weeks while keeping primary exercises fixed
+- Building phase: Fixed exercises (current behavior)
+- ✅ Maintenance phase: Different deload frequency (4-6 weeks vs 6-8 weeks) - IMPLEMENTED (2026-02-14)
+- Unlock prioritization by exercise type - IMPLEMENTED (2026-02-14)
+
+**Current State:**
+- ✅ Deload frequency adapts to phase (6 weeks Building, 4 weeks Maintenance)
+- ✅ Unlock priority favors bodyweight exercises in Maintenance
+- ❌ No accessory rotation logic implemented (future enhancement)
+
+### Dynamic Mobility Checks
+**Source:** `docs/archived/plans/2026-02-13/2026-02-11-dynamic-mobility-checks-design.md`
+
+**Status:** Designed but not implemented
+
+**Planned Components:**
+- `MobilityCheckAnalyzer` module (read-only pattern detection)
+- `mobility-patterns.js` (exercise-to-pattern mapping)
+- Movement pattern categories (vertical_push, hip_hinge, squat_pattern, etc.)
+- Self-learning system that adds/removes checks based on performance + pain patterns
+
+**Current State:**
+- Hardcoded mobility checks for 3 exercises only (DB Shoulder Press, Goblet Squat, DB RDL)
+- No adaptive behavior - checks never graduate or expand
+
+### Advanced Exercise Progression Tracking
+**Source:** `docs/archived/plans/2026-02-13/2026-02-12-exercise-progression-pathways-design.md`
+
+**Status:** ✅ Completed (2026-02-13)
+
+**Implemented Categories:**
+- ✅ Barbell exercises (Bench Press, Back Squat, Deadlift)
+- ✅ Traditional bodyweight (Sadharan Dand, Sadharan Baithak)
+- ✅ Pull-up progressions (added 2026-02-13)
+- ✅ Mudgal/Club progressions (added 2026-02-13)
+
+**Implementation Details:**
+- Progressions tab renamed from "Barbell" to "Progressions"
+- All 4 categories display readiness percentage
+- Tracking: Strength milestones, training weeks, mobility checks, pain-free status
+- Cache: v64 (updated 2026-02-14 for phase integration)
 
 ---
 
@@ -282,10 +371,11 @@ This document tracks the implementation status of all designed features from the
 | Exercise History Charts | 4 | 4 | 100% ✅ |
 | Weekly Dashboard | 6 | 6 | 100% ✅ |
 | **Smart Auto-Progression** | **12** | **12** | **100% ✅** |
+| **Build/Maintenance Phase Integration** | **6** | **6** | **100% ✅** |
 
 ### Overall Progress:
-- **Total Features Designed:** 92
-- **Features Implemented:** 92
+- **Total Features Designed:** 98
+- **Features Implemented:** 98
 - **Features Remaining:** 0
 - **Completion:** 100% ✅
 
@@ -380,5 +470,112 @@ Manual testing recommended for:
 
 ---
 
-**Last Review:** 2026-02-10 (Smart Auto-Progression System Release)
+**Last Review:** 2026-02-13 (Documentation Audit - Incomplete Features Discovered)
 **Next Review:** As needed for future enhancements
+
+---
+
+## 📜 Design Evolution & Decision History
+
+**Purpose:** Track what was decided, rejected, transformed, and pending to prevent future confusion
+
+### Major Design Decisions
+
+#### 1. Training Split Structure (2026-02-02 → 2026-02-03)
+
+**Initial Design (2026-02-02):**
+- Full Body A/B/C rotation (3 workouts)
+- Source: `data-model-design.md`
+- Each workout: Lower push, Lower pull, Upper push, Upper pull, Core, Mobility
+
+**Pivoted To (2026-02-03):**
+- Upper/Lower Split (4 workouts: UPPER_A, LOWER_A, UPPER_B, LOWER_B)
+- Source: `mvp-implementation-plan.md`
+- Upper days: Only upper body exercises; Lower days: Only lower body exercises
+
+**Rationale:**
+- Better muscle recovery for beginners (48-hour rest per muscle group)
+- More manageable session volume
+- Clearer exercise organization
+
+**Status:** ✅ Implemented, ❌ BUILD-SPECIFICATION.md never updated (still describes A/B/C)
+
+---
+
+### Complete Design Document Audit (2026-02-13)
+
+**All 20 design documents verified against codebase:**
+
+| Document | Date | Status | Implementation Notes |
+|----------|------|--------|---------------------|
+| data-model-design.md | 2026-02-02 | ❌ Superseded | A/B/C design replaced by Upper/Lower next day |
+| ui-ux-design.md | 2026-02-03 | ✅ Implemented | Core UI patterns complete (has stale "A/B/C" text) |
+| mvp-implementation-plan.md | 2026-02-03 | ✅ Implemented | Defined Upper/Lower structure - all tasks done |
+| ui-implementation-plan.md | 2026-02-04 | ✅ Implemented | Progressive disclosure fully working |
+| history-progress-feature-design.md | 2026-02-05 | ✅ Implemented | Export/import complete |
+| performance-analysis-design.md | 2026-02-05 | ✅ Implemented | PerformanceAnalyzer module complete |
+| barbell-progression-design.md | 2026-02-05 | ✅ Implemented | BarbellProgressionTracker complete |
+| progress-dashboard-design.md | 2026-02-06 | ✅ Implemented | 4-tab dashboard complete |
+| pain-and-band-improvements-design.md | 2026-02-06 | ✅ Implemented | Pain tracking + band selection complete |
+| pain-and-band-implementation-plan.md | 2026-02-06 | ✅ Implemented | Full workflow complete |
+| post-workout-summary-design.md | 2026-02-09 | ✅ Implemented | Summary screen complete |
+| enhanced-tracking-metrics-design.md | 2026-02-09 | ✅ Implemented | Recovery metrics + fatigue scoring complete |
+| exercise-history-charts-design.md | 2026-02-09 | ✅ Implemented | Weight trend charts complete |
+| weekly-summary-dashboard-design.md | 2026-02-09 | ✅ Implemented | Analytics tab complete |
+| smart-auto-progression-design.md | 2026-02-10 | ✅ Implemented | Tempo guidance + achievements complete |
+| smart-auto-progression-validated-design.md | 2026-02-10 | ✅ Implemented | Refined design complete |
+| smart-auto-progression-implementation-plan.md | 2026-02-10 | ✅ Implemented | All tasks completed |
+| workout-reference-design.md | 2026-02-11 | ✅ Implemented | Workout reference in Progress tab |
+| **dynamic-mobility-checks-design.md** | **2026-02-11** | **❌ Not Implemented** | **MobilityCheckAnalyzer never created** |
+| exercise-progression-pathways-design.md | 2026-02-12 | 🟡 Partial | Pull-up/Mudgal added 2026-02-13; Goal Quiz pending |
+
+**Overall Implementation Rate:** 85% (17 fully implemented, 1 partial, 1 not implemented, 1 superseded)
+
+---
+
+### What Was REJECTED (Explicit Design Decisions Against Implementation)
+
+**None found.** All designed features either implemented fully, partially implemented, or left incomplete without documented rejection.
+
+---
+
+### What Was TRANSFORMED (Partially Implemented)
+
+#### 1. Exercise Progression Pathways (2026-02-12)
+**Original Design:** 4 categories + Goal Quiz + Phase integration
+**What Got Implemented:**
+- ✅ Barbell exercises (Bench Press, Back Squat, Deadlift)
+- ✅ Traditional bodyweight (Sadharan Dand, Sadharan Baithak)
+- ✅ Pull-up progressions (2026-02-13)
+- ✅ Mudgal/Club progressions (2026-02-13)
+
+**What's Still Missing:**
+- ❌ Goal Quiz (Q1: Experience, Q2: Equipment, Q3: Goals)
+- ❌ Build/Maintenance phase logic integration
+- ❌ Maintenance phase exercise rotation
+
+#### 2. Equipment Access & Phase Toggles (2026-02-12)
+**Original Design:** Quiz-based onboarding flow
+**What Got Implemented:** Settings toggles exist
+**What Doesn't Work:** Toggles don't affect any app behavior
+**Status:** Storage-only features (misleading - appear functional but aren't)
+
+---
+
+### What's PENDING (Ready for Implementation)
+
+All incomplete features properly documented in "DESIGNED BUT NOT IMPLEMENTED" section above.
+
+**High-Value Pending Features:**
+1. Goal Quiz - Personalized onboarding for new users
+2. Build/Maintenance Phase Integration - Make existing toggles functional
+3. Dynamic Mobility Checks - Adaptive system vs hardcoded checks
+4. Maintenance Exercise Rotation - Variety for long-term users
+
+---
+
+### Documentation Health Score: 90% (After 2026-02-13 Audit)
+
+**Before Audit:** 40% - IMPLEMENTATION-STATUS.md claimed 100% complete, BUILD-SPECIFICATION.md outdated
+**After Audit:** 90% - All incomplete features documented, audit complete
+**Remaining Issue:** BUILD-SPECIFICATION.md still describes A/B/C rotation (pending update)

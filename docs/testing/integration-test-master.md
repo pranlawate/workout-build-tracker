@@ -1,7 +1,8 @@
 # Build Tracker - Master Integration Test Report
 
-**Last Updated:** 2026-02-09
-**App Version:** v1.4 (Service Worker Cache: v9)
+**Last Updated:** 2026-02-14
+**App Version:** v1.5 (Service Worker Cache: v64)
+**Latest Feature:** Build/Maintenance Phase Integration
 
 ---
 
@@ -646,6 +647,258 @@
 
 ---
 
+## Feature 10: Build/Maintenance Phase Integration
+
+### Test 10.1: Default Phase is Building
+**Steps:**
+1. Navigate to ⚙️ Settings
+2. Look at "Training Phase" section
+
+**Expected:**
+- [ ] "Building" button is active/highlighted
+- [ ] Phase info text: "Building: Focus on progressive overload and strength gains"
+- [ ] localStorage check: `localStorage.getItem('build_training_phase')` → returns `"building"` or `null`
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.2: Switch to Maintenance Phase
+**Steps:**
+1. Navigate to ⚙️ Settings
+2. Click "Maintenance" button under "Training Phase"
+
+**Expected:**
+- [ ] "Maintenance" button becomes active/highlighted
+- [ ] "Building" button becomes inactive
+- [ ] Phase info text updates
+- [ ] localStorage check: `localStorage.getItem('build_training_phase')` → returns `"maintenance"`
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.3: Weight Progression in Building Phase
+**Steps:**
+1. Ensure you're in Building phase
+2. Complete exercise sets with max reps @ RIR 2-3
+   - Example: 3×12 reps @ RIR 2 on DB Flat Bench Press
+
+**Expected:**
+- [ ] Progression message shows: "🎯 Ready to progress! Add [X]kg next session"
+- [ ] Message suggests specific weight increment
+- [ ] Does NOT mention "tempo" or "Maintenance"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.4: Tempo Suggestions in Maintenance Phase
+**Steps:**
+1. Switch to Maintenance phase (Settings → Maintenance)
+2. Complete exercise sets with max reps @ RIR 3+
+   - Example: 3×12 reps @ RIR 3 on DB Flat Bench Press
+
+**Expected:**
+- [ ] Progression message shows: "💪 Maintenance: Try 3-1-2 tempo (pause at bottom)"
+- [ ] Does NOT suggest adding weight (e.g., "Add 1.25kg")
+- [ ] Message specifically mentions tempo variation
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.5: Weight Frozen in Maintenance Phase
+**Steps:**
+1. Ensure you're in Maintenance phase
+2. Complete multiple sets at max reps with high RIR
+3. Check suggested weight for next session
+
+**Expected:**
+- [ ] Weight remains SAME (not increased)
+- [ ] Tempo suggestion shown instead
+- [ ] No weight increase prompts appear
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.6: Phase Switching Persistence
+**Steps:**
+1. Switch to Maintenance phase
+2. Hard refresh page (Ctrl+Shift+R)
+3. Navigate to Settings
+
+**Expected:**
+- [ ] "Maintenance" button still active after refresh
+- [ ] Phase persists across page reloads
+- [ ] Behavior remains Maintenance-focused
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.7: Deload Timing - Building Phase (6 Weeks)
+**Steps:**
+1. Ensure you're in Building phase
+2. Open DevTools → Console
+3. Run:
+```javascript
+const storage = new (await import('./js/modules/storage.js')).StorageManager();
+const phaseManager = new (await import('./js/modules/phase-manager.js')).PhaseManager(storage);
+console.log('Phase:', phaseManager.getPhase());
+console.log('Deload Sensitivity:', phaseManager.getDeloadSensitivity());
+```
+
+**Expected:**
+- [ ] Phase: "building"
+- [ ] Deload Sensitivity: "normal"
+- [ ] Base threshold: 6 weeks
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.8: Deload Timing - Maintenance Phase (4 Weeks)
+**Steps:**
+1. Switch to Maintenance phase
+2. Open DevTools → Console
+3. Run same code as Test 10.7
+
+**Expected:**
+- [ ] Phase: "maintenance"
+- [ ] Deload Sensitivity: "high"
+- [ ] Base threshold: 4 weeks (earlier than Building)
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.9: Deload Timing Integration Test
+**Steps:**
+1. Open DevTools → Console
+2. Simulate 5 weeks since last deload:
+```javascript
+const state = JSON.parse(localStorage.getItem('build_deload_state'));
+const fiveWeeksAgo = new Date();
+fiveWeeksAgo.setDate(fiveWeeksAgo.getDate() - 35);
+state.lastDeloadDate = fiveWeeksAgo.toISOString();
+localStorage.setItem('build_deload_state', JSON.stringify(state));
+```
+3. Switch to Building phase, check if deload suggested
+4. Switch to Maintenance phase, check if deload suggested
+
+**Expected:**
+- [ ] Building (5 weeks): No deload suggested (< 6 week threshold)
+- [ ] Maintenance (5 weeks): Deload IS suggested (> 4 week threshold)
+- [ ] Deload timing adapts correctly to phase
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.10: Unlock Priority - Building Phase
+**Steps:**
+1. Ensure you're in Building phase
+2. Navigate to Settings → Browse Progressions
+
+**Expected:**
+- [ ] All exercise types shown without prioritization
+- [ ] Equipment progressions (Barbell Bench, Barbell Squat) visible
+- [ ] Bodyweight progressions (Sadharan Dand, Sadharan Baithak) visible
+- [ ] No specific ordering based on exercise type
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.11: Unlock Priority - Maintenance Phase
+**Steps:**
+1. Switch to Maintenance phase
+2. Navigate to Settings → Browse Progressions
+
+**Expected:**
+- [ ] Bodyweight exercises (Sadharan Dand, Sadharan Baithak) shown FIRST
+- [ ] Equipment progressions (Barbell Bench, Barbell Squat) shown SECOND
+- [ ] Both types still available (not hidden)
+- [ ] Clear visual prioritization of bodyweight/traditional exercises
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.12: Phase-Aware Error Handling
+**Steps:**
+1. Open DevTools → Console
+2. Set invalid phase:
+```javascript
+localStorage.setItem('build_training_phase', 'invalid');
+```
+3. Hard refresh page
+4. Complete a workout and check progression messages
+
+**Expected:**
+- [ ] App does NOT crash
+- [ ] Defaults to Building phase behavior (safe fallback)
+- [ ] No JavaScript errors in console
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.13: Service Worker Cache v64
+**Steps:**
+1. Open DevTools → Application → Service Workers
+2. Check cache version
+3. Look at cached files (Application → Cache Storage)
+
+**Expected:**
+- [ ] Service worker status: "activated and running"
+- [ ] Cache version: `build-tracker-v64`
+- [ ] PhaseManager cached: `./js/modules/phase-manager.js` in cache
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.14: Building → Maintenance Workflow
+**Steps:**
+1. Start in Building phase
+2. Complete 2-3 workouts with weight progression
+3. Switch to Maintenance phase
+4. Complete same workouts
+
+**Expected:**
+- [ ] Building: Weights increase session-to-session
+- [ ] Maintenance: Weights stay frozen, tempo suggestions appear
+- [ ] Progress tracked correctly in both phases
+- [ ] No data loss when switching phases
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 10.15: PhaseManager Null Safety
+**Steps:**
+1. Open DevTools → Console
+2. Test PhaseManager methods:
+```javascript
+const storage = new (await import('./js/modules/storage.js')).StorageManager();
+const phaseManager = new (await import('./js/modules/phase-manager.js')).PhaseManager(storage);
+console.log(phaseManager.getProgressionBehavior());
+console.log(phaseManager.getDeloadSensitivity());
+console.log(phaseManager.getUnlockPriority());
+```
+
+**Expected:**
+- [ ] All three calls return valid objects
+- [ ] No errors thrown
+- [ ] Safe defaults returned if any issues
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
 ## Edge Cases & Error Handling
 
 ### Test E1: Corrupted localStorage
@@ -769,16 +1022,16 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 
 ---
 
-### Test P3: Service Worker Cache (v7)
+### Test P3: Service Worker Cache (v64)
 **Steps:**
 1. Load app
 2. Check DevTools → Application → Service Workers
 
 **Expected:**
 - [ ] Service worker registered
-- [ ] Cache name: `build-tracker-v9`
-- [ ] Old caches deleted (v8 and earlier)
-- [ ] All assets cached correctly
+- [ ] Cache name: `build-tracker-v64`
+- [ ] Old caches deleted (v63 and earlier)
+- [ ] All assets cached correctly (including phase-manager.js)
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
 
@@ -812,9 +1065,10 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 - [ ] Mobile responsiveness verified
 - [ ] Cross-browser compatibility confirmed
 - [ ] Performance acceptable (< 2s load time)
-- [ ] Service worker cache updated (v7)
+- [ ] Service worker cache updated (v64)
 - [ ] localStorage migrations successful
 - [ ] Error handling robust
+- [ ] Build/Maintenance phase integration tested
 
 **Documentation:**
 - [ ] README.md updated
