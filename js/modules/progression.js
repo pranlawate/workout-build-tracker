@@ -87,11 +87,16 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
 
   // Check phase-aware progression behavior
   if (phaseManager) {
-    const progressionBehavior = phaseManager.getProgressionBehavior();
+    try {
+      const progressionBehavior = phaseManager.getProgressionBehavior();
 
-    // Maintenance/Recovery blocks weight increases
-    if (!progressionBehavior.allowWeightIncrease) {
-      return false;
+      // Maintenance/Recovery blocks weight increases
+      if (!progressionBehavior.allowWeightIncrease) {
+        return false;
+      }
+    } catch (error) {
+      console.error('[Progression] Error getting phase behavior:', error);
+      // Continue with building phase logic (safe fallback)
     }
   }
 
@@ -116,21 +121,28 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
   return allSetsMaxReps && allSetsGoodRIR;
 }
 
-export function getProgressionStatus(history, exercise) {
+export function getProgressionStatus(history, exercise, phaseManager) {
   if (!history || history.length === 0) return 'normal';
 
   const lastWorkout = history[history.length - 1];
-  const readyToProgress = shouldIncreaseWeight(lastWorkout.sets, exercise);
+  const readyToProgress = shouldIncreaseWeight(lastWorkout.sets, exercise, phaseManager);
 
   if (readyToProgress) return 'ready';
 
   // Check for plateau (sessions at same weight)
   if (history.length >= PLATEAU_THRESHOLD) {
     const lastN = history.slice(-PLATEAU_THRESHOLD);
-    const weights = lastN.map(w => w.sets[0].weight);
-    const allSameWeight = weights.every(w => w === weights[0]);
+    // Add null safety check before accessing sets array
+    const weights = lastN.map(w => {
+      if (!w.sets || w.sets.length === 0) return null;
+      return w.sets[0].weight;
+    }).filter(w => w !== null);
 
-    if (allSameWeight) return 'plateau';
+    // Only check for plateau if we have valid weights
+    if (weights.length === PLATEAU_THRESHOLD) {
+      const allSameWeight = weights.every(w => w === weights[0]);
+      if (allSameWeight) return 'plateau';
+    }
   }
 
   return 'normal';
