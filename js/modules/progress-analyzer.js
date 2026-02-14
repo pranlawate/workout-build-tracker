@@ -1,6 +1,13 @@
 /**
  * Analyzes workout progress and calculates statistics
  */
+
+// Analysis period constants
+const ANALYSIS_PERIOD_WEEKS = 4;
+const ANALYSIS_PERIOD_DAYS = ANALYSIS_PERIOD_WEEKS * 7; // 28 days
+const PLANNED_WORKOUTS_PER_WEEK = 3;
+const SESSION_DATE_TOLERANCE_DAYS = 3; // Flexibility window for finding historical sessions
+
 export class ProgressAnalyzer {
   constructor(storage) {
     this.storage = storage;
@@ -14,7 +21,7 @@ export class ProgressAnalyzer {
   getLast4WeeksRange() {
     const endDate = new Date();
     const startDate = new Date(endDate);
-    startDate.setDate(startDate.getDate() - 28); // 4 weeks
+    startDate.setDate(startDate.getDate() - ANALYSIS_PERIOD_DAYS);
     return { startDate, endDate };
   }
 
@@ -126,16 +133,114 @@ export class ProgressAnalyzer {
 
     // If no workout history exists, return all zeros
     const workoutsCompleted = workoutDates.size;
-    const workoutsPlanned = workoutsCompleted > 0 ? 12 : 0; // 3 per week × 4 weeks
+    const workoutsPlanned = workoutsCompleted > 0 ? (PLANNED_WORKOUTS_PER_WEEK * ANALYSIS_PERIOD_WEEKS) : 0;
 
     return {
       workoutsCompleted,
       workoutsPlanned,
       avgSessionMinutes: this.calculateAvgSessionTime(),
-      exercisesProgressed: 0, // TODO: Calculate progression
-      totalExercises: 0, // TODO: Count unique exercises
-      currentStreak: 0 // TODO: Calculate streak
+      exercisesProgressed: this.countProgressedExercises(startDate, endDate),
+      totalExercises: this.countUniqueExercises(startDate, endDate),
+      currentStreak: this.storage.getRotation().currentStreak
     };
+  }
+
+  /**
+   * Count exercises that showed weight progression in date range
+   * @param {Date} startDate - Start of range
+   * @param {Date} endDate - End of range
+   * @returns {number} Count of exercises with progression
+   * @private
+   */
+  countProgressedExercises(startDate, endDate) {
+    try {
+      let progressedCount = 0;
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith('build_exercise_')) continue;
+
+        const exerciseKey = key.replace('build_exercise_', '');
+        const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length === 0) continue;
+
+        // Get most recent session in range
+        const recentSession = history
+          .filter(session => {
+            const sessionDate = new Date(session.date);
+            return sessionDate >= startDate && sessionDate <= endDate;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+        if (!recentSession || !recentSession.sets || recentSession.sets.length === 0) continue;
+
+        // Find older session (around startDate)
+        const oldSession = history
+          .filter(session => {
+            const sessionDate = new Date(session.date);
+            const diffDays = Math.abs((sessionDate - startDate) / (1000 * 60 * 60 * 24));
+            return diffDays <= SESSION_DATE_TOLERANCE_DAYS;
+          })
+          .sort((a, b) => {
+            const diffA = Math.abs(new Date(a.date) - startDate);
+            const diffB = Math.abs(new Date(b.date) - startDate);
+            return diffA - diffB;
+          })[0];
+
+        if (!oldSession || !oldSession.sets || oldSession.sets.length === 0) continue;
+
+        // Calculate average weights
+        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + set.weight, 0) / recentSession.sets.length;
+        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + set.weight, 0) / oldSession.sets.length;
+
+        // Count if showed progression
+        if (oldAvgWeight > 0 && recentAvgWeight > oldAvgWeight) {
+          progressedCount++;
+        }
+      }
+
+      return progressedCount;
+    } catch (error) {
+      console.error('[ProgressAnalyzer] Error counting progressed exercises:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Count unique exercises performed in date range
+   * @param {Date} startDate - Start of range
+   * @param {Date} endDate - End of range
+   * @returns {number} Count of unique exercises
+   * @private
+   */
+  countUniqueExercises(startDate, endDate) {
+    try {
+      const uniqueExercises = new Set();
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith('build_exercise_')) continue;
+
+        const exerciseKey = key.replace('build_exercise_', '');
+        const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length === 0) continue;
+
+        // Check if exercise was performed in date range
+        const performedInRange = history.some(session => {
+          const sessionDate = new Date(session.date);
+          return sessionDate >= startDate && sessionDate <= endDate;
+        });
+
+        if (performedInRange) {
+          uniqueExercises.add(exerciseKey);
+        }
+      }
+
+      return uniqueExercises.size;
+    } catch (error) {
+      console.error('[ProgressAnalyzer] Error counting unique exercises:', error);
+      return 0;
+    }
   }
 
   /**
@@ -173,7 +278,7 @@ export class ProgressAnalyzer {
             const sessionDate = new Date(session.date);
             // Look for sessions around the start date (within a few days)
             const diffDays = Math.abs((sessionDate - startDate) / (1000 * 60 * 60 * 24));
-            return diffDays <= 3; // Within 3 days of 4 weeks ago
+            return diffDays <= SESSION_DATE_TOLERANCE_DAYS;
           })
           .sort((a, b) => {
             // Get closest to startDate
