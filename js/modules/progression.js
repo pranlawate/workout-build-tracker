@@ -71,7 +71,7 @@ function parseRIRTarget(rirTarget) {
   return { min, max };
 }
 
-export function shouldIncreaseWeight(sets, exercise) {
+export function shouldIncreaseWeight(sets, exercise, phaseManager) {
   // Input validation
   if (!sets || !Array.isArray(sets) || sets.length === 0) {
     return false;
@@ -85,6 +85,17 @@ export function shouldIncreaseWeight(sets, exercise) {
     throw new Error('Exercise must have repRange property');
   }
 
+  // Check phase-aware progression behavior
+  if (phaseManager) {
+    const progressionBehavior = phaseManager.getProgressionBehavior();
+
+    // Maintenance/Recovery blocks weight increases
+    if (!progressionBehavior.allowWeightIncrease) {
+      return false;
+    }
+  }
+
+  // Building phase - existing logic unchanged
   const { max } = parseRepRange(exercise.repRange);
 
   // Time-based exercises (no rirTarget): just check if all sets hit max duration
