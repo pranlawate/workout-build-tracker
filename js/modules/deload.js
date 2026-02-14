@@ -64,6 +64,13 @@ export class DeloadManager {
     if (!lastDeloadDate) return 0; // Never had a deload = 0 weeks (don't trigger immediately)
 
     const lastDate = new Date(lastDeloadDate);
+
+    // Check if date is valid
+    if (isNaN(lastDate.getTime())) {
+      console.warn('[DeloadManager] Invalid lastDeloadDate, treating as never had deload:', lastDeloadDate);
+      return 0;
+    }
+
     const now = new Date();
     const diffMs = now - lastDate;
     const diffWeeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
