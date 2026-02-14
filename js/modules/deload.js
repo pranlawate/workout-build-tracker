@@ -2,12 +2,14 @@
  * Manages deload system state and triggers
  */
 export class DeloadManager {
-  constructor(storage) {
+  constructor(storage, phaseManager) {
     this.storage = storage;
+    this.phaseManager = phaseManager;
   }
 
   /**
    * Checks if deload should be triggered based on time, performance, or fatigue
+   * Uses phase-aware sensitivity for time-based triggers
    * @returns {Object} Object with trigger status and reason
    */
   shouldTriggerDeload() {
@@ -16,9 +18,17 @@ export class DeloadManager {
     // Don't trigger if already in deload
     if (deloadState.active) return { trigger: false };
 
-    // Check time-based trigger (6-8 weeks)
+    // Get phase-aware base threshold
+    const sensitivity = this.phaseManager.getDeloadSensitivity();
+    const baseWeeks = {
+      normal: 6,      // Building: 6-8 weeks
+      high: 4,        // Maintenance: 4-6 weeks
+      very_high: 2    // Recovery: 2-3 weeks (future)
+    }[sensitivity];
+
+    // Check time-based trigger (dynamic threshold)
     const weeksSinceDeload = this.calculateWeeksSinceDeload(deloadState.lastDeloadDate);
-    if (weeksSinceDeload >= 6) {
+    if (weeksSinceDeload >= baseWeeks) {
       return { trigger: true, reason: 'time', weeks: weeksSinceDeload };
     }
 
