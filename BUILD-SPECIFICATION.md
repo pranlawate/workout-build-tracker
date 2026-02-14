@@ -1,10 +1,17 @@
 # BUILD-Style Beginner Training Specification (Source of Truth)
 
-**Version:** 2.0 - Enhanced
-**Last Updated:** 2026-02-02
+**Version:** 3.0 - Upper/Lower Split
+**Last Updated:** 2026-02-13
 **Status:** Custom Beginner Program
 
 This document is the **authoritative source of information** for the web-based gym tracker. It defines training philosophy, structure, workouts, progression rules, and safety constraints. The tracker should reflect this logic exactly.
+
+**⚠️ Design Evolution Note:**
+- **v1.0 (2026-02-02):** Originally designed as Full Body A/B/C rotation
+- **v2.0 (2026-02-03):** Pivoted to Upper/Lower Split for better muscle recovery
+- **v3.0 (2026-02-13):** Documentation updated to reflect actual implementation
+
+See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md#design-evolution--decision-history) for complete design history.
 
 ---
 
@@ -35,17 +42,26 @@ This document is the **authoritative source of information** for the web-based g
 
 ---
 
-## 3. Weekly Structure (Auto-Regulating)
+## 3. Weekly Structure (Upper/Lower Split)
 
-The program consists of **three rotating workouts: A, B, C**.
+The program uses an **Upper/Lower split with 4 rotating workouts:**
+- **UPPER_A** - Horizontal Push/Pull emphasis
+- **LOWER_A** - Bilateral Squat/Hinge emphasis
+- **UPPER_B** - Vertical Push/Pull emphasis
+- **LOWER_B** - Unilateral/Accessory emphasis
 
 ### Rotation Logic:
 
-* If 3 training days/week → A / B / C
-* If 4 training days/week → A / B / A / C
-* If 5 training days/week → A / B / C / A / B
+* **Standard rotation:** UPPER_A → LOWER_A → UPPER_B → LOWER_B → repeat
+* Missed days are skipped without reshuffling
+* Next session continues the rotation
+* Each muscle group trained 2x per week with 48-72hr recovery
 
-Missed days are skipped without reshuffling. The next session continues the rotation.
+**Rationale for Upper/Lower Split:**
+- Better muscle recovery for beginners (48hr minimum between same muscle groups)
+- More manageable per-session volume (7 exercises vs 12 in full body)
+- Clearer exercise organization and progression tracking
+- Proven effective for beginner strength and hypertrophy gains
 
 ### Rest Day Structure:
 
@@ -65,26 +81,33 @@ Missed days are skipped without reshuffling. The next session continues the rota
 
 Warm-ups are workout-specific to prep movement patterns:
 
-### Workout A (Lower Focus + Horizontal Push):
+### UPPER_A Warmup (Horizontal Push/Pull):
 1. Cat-Cow: 10 reps
 2. Band Pull-Aparts: 15 reps
-3. Goblet Squat (bodyweight): 10 reps
-4. Hip Hinge Drill: 10 reps
-5. Ramp-up Set: 50% weight × 10 reps of Goblet Squat
+3. Arm Circles: 10 each direction
+4. Scapular Retractions: 10 reps
+5. Ramp-up Set: 50% weight × 10 reps (DB Flat Bench Press)
 
-### Workout B (Posterior Chain + Vertical Pull):
+### LOWER_A Warmup (Bilateral Squat/Hinge):
+1. Cat-Cow: 10 reps
+2. Band Pull-Aparts: 15 reps
+3. Bodyweight Squats: 10 reps
+4. Leg Swings: 10 per leg
+5. Ramp-up Set: 50% weight × 10 reps (first exercise)
+
+### UPPER_B Warmup (Vertical Push/Pull):
 1. Dead Hang: 20-30 seconds
 2. Band Pull-Aparts: 15 reps
-3. Bodyweight Split Squat: 5/leg
-4. Scapular Pull-Ups: 5 reps (or lat activation)
-5. Ramp-up Set: 50% weight × 10 reps of Split Squat
+3. Scapular Pull-Ups: 5 reps
+4. Arm Circles: 10 each direction
+5. Ramp-up Set: 50% weight × 10 reps (first exercise)
 
-### Workout C (Technique + Stability):
-1. Shoulder Dislocates (band): 10 reps
-2. Cat-Cow: 10 reps
-3. Glute Bridges (bodyweight): 15 reps
-4. Push-ups: 5 reps
-5. Ramp-up Set: 50% weight × 10 reps of Bulgarian Split Squat
+### LOWER_B Warmup (Unilateral/Accessory):
+1. Glute Bridges (bodyweight): 15 reps
+2. Leg Swings: 10 per leg
+3. Ankle Mobility: 10 reps per side
+4. Hip Flexor Stretch: 30s per side
+5. Ramp-up Set: 50% weight × 10 reps (first exercise)
 
 **Purpose:** Shoulder health, spinal mobility, injury prevention, movement pattern priming
 
@@ -92,29 +115,46 @@ Warm-ups are workout-specific to prep movement patterns:
 
 ## 5. Workout Definitions
 
-### Workout A – Lower Body + Horizontal Push
+**Note:** Complete exercise definitions with sets/reps/RIR/tempo/notes are in `js/modules/workouts.js`. This section provides the structure overview.
 
-1. **Goblet Squat**
-   * Sets: 3
-   * Reps: 8–12
-   * RIR: 2–3
-   * Notes: Controlled descent, core braced, forces proper bracing
+### UPPER_A – Horizontal Push/Pull Emphasis
 
-2. **Dumbbell Bench Press**
-   * Sets: 3
-   * Reps: 8–12
-   * RIR: 2–3
-   * Notes: Neutral grip allowed for shoulder comfort
+1. **DB Flat Bench Press** - 3 sets × 8-12 reps @ RIR 2-3
+2. **Seated Cable Row** - 3 sets × 10-12 reps @ RIR 2-3
+3. **T-Bar Row** - 3 sets × 10-12 reps @ RIR 2-3
+4. **Cable Chest Fly** - 3 sets × 10-12 reps @ RIR 2-3
+5. **DB Lateral Raises** - 3 sets × 10-12 reps @ RIR 2-3
+6. **Face Pulls** - 3 sets × 12-15 reps @ RIR 2-3
+7. **Plank** - 3 sets × 30-60s
 
-3. **Seated Cable Row**
-   * Sets: 3
-   * Reps: 10–12
-   * RIR: 2–3
-   * Notes: 1-second pause at contraction
+### LOWER_A – Bilateral Squat/Hinge Emphasis
 
-4. **Dumbbell Romanian Deadlift**
-   * Sets: 3 (INCREASED from 2)
-   * Reps: 10
+1. **Hack Squat** - 3 sets × 8-12 reps @ RIR 2-3
+2. **Leg Press** - 3 sets × 10-12 reps @ RIR 2-3
+3. **DB Romanian Deadlift** - 3 sets × 10-12 reps @ RIR 2-3
+4. **Leg Extension** - 3 sets × 10-12 reps @ RIR 2-3
+5. **Standing Calf Raise** - 3 sets × 10-12 reps @ RIR 2-3
+6. **Seated Calf Raise** - 3 sets × 10-12 reps @ RIR 2-3
+7. **Dead Bug** - 3 sets × 10 reps each side
+
+### UPPER_B – Vertical Push/Pull Emphasis
+
+1. **DB Shoulder Press** - 3 sets × 8-10 reps @ RIR 2-3
+2. **Lat Pulldown** - 3 sets × 10-12 reps @ RIR 2-3
+3. **Incline DB Press** - 3 sets × 8-12 reps @ RIR 2-3
+4. **Chest-Supported Row** - 3 sets × 10-12 reps @ RIR 2-3
+5. **Cable Lateral Raises** - 3 sets × 10-12 reps @ RIR 2-3
+6. **Reverse Fly** - 3 sets × 12-15 reps @ RIR 2-3
+7. **Side Plank** - 3 sets × 20-30s each side
+
+### LOWER_B – Unilateral/Accessory Emphasis
+
+1. **DB Goblet Squat** - 3 sets × 10-12 reps @ RIR 2-3
+2. **Leg Abduction** - 3 sets × 12-15 reps @ RIR 2-3
+3. **45° Hyperextension** - 3 sets × 10-12 reps @ RIR 2-3
+4. **Hip Thrust** - 3 sets × 10-12 reps @ RIR 2-3
+
+**Complete workout definitions:** See `js/modules/workouts.js` for authoritative exercise definitions including tempo, detailed notes, starting weights, and progression rules
    * RIR: 3
    * Notes: Technique-focused hinge, light load, CRITICAL for weak lower back
 

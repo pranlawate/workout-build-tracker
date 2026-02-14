@@ -201,6 +201,250 @@ export class BarbellProgressionTracker {
   }
 
   /**
+   * Check readiness for Sadharan Dand (Traditional Push-up)
+   * @returns {Object} Readiness analysis with percentage, criteria status, blockers
+   */
+  getSadharanDandReadiness() {
+    const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+
+    // Strength check: 15kg × 3×12 @ RIR 2-3 (lower than barbell since bodyweight is the challenge)
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 15, 12, 3, 2);
+    const strengthMet = strengthProgress >= 100;
+
+    // Weeks check: 8+ weeks (COMPLEX tier requirement)
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 8);
+    const weeksMet = weeksProgress >= 100;
+
+    // Mobility check: full plank hold (5+ confirmations)
+    const mobilityProgress = this._calculateMobilityProgress('dand_plank_hold', 5);
+    const mobilityMet = mobilityProgress >= 100;
+
+    // Pain check: no shoulder/elbow/wrist pain in last 5 workouts
+    const painFree = this._isPainFree([exerciseKey], ['shoulder', 'elbow', 'wrist'], 5);
+
+    // Calculate overall percentage
+    const percentage = this._calculateOverallPercentage({
+      strengthMet, strengthProgress,
+      weeksMet, weeksProgress,
+      mobilityMet, mobilityProgress,
+      painFree
+    });
+
+    // Build blockers array
+    const blockers = [];
+    if (!strengthMet) {
+      blockers.push(`DB Flat Bench: Need 15kg × 3×12 @ RIR 2-3`);
+    }
+    if (!weeksMet) {
+      const currentWeeks = Math.floor(weeksProgress * 8 / 100);
+      const remainingWeeks = 8 - currentWeeks;
+      blockers.push(`Need ${remainingWeeks} more weeks of training`);
+    }
+    if (!mobilityMet) {
+      const currentConfirmations = Math.floor(mobilityProgress * 5 / 100);
+      blockers.push(`Plank hold mobility: ${currentConfirmations}/5 confirmations`);
+    }
+    if (!painFree) {
+      blockers.push(`Resolve recurring shoulder/elbow/wrist pain in DB Flat Bench`);
+    }
+
+    return {
+      percentage,
+      strengthMet,
+      weeksMet,
+      mobilityMet,
+      painFree,
+      blockers,
+      strengthProgress,
+      weeksProgress,
+      mobilityProgress
+    };
+  }
+
+  /**
+   * Check readiness for Sadharan Baithak (Traditional Hindu Squat)
+   * @returns {Object} Readiness analysis with percentage, criteria status, blockers
+   */
+  getSadharanBaithakReadiness() {
+    const exerciseKey = 'LOWER_B - DB Goblet Squat';
+
+    // Strength check: 15kg × 3×12 @ RIR 2-3 (bodyweight is the challenge)
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 15, 12, 3, 2);
+    const strengthMet = strengthProgress >= 100;
+
+    // Weeks check: 8+ weeks (COMPLEX tier requirement)
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 8);
+    const weeksMet = weeksProgress >= 100;
+
+    // Mobility check: full depth bodyweight squat (5+ confirmations)
+    const mobilityProgress = this._calculateMobilityProgress('baithak_full_depth', 5);
+    const mobilityMet = mobilityProgress >= 100;
+
+    // Pain check: no knee/ankle pain in last 5 workouts
+    const painFree = this._isPainFree([exerciseKey], ['knee', 'ankle'], 5);
+
+    // Calculate overall percentage
+    const percentage = this._calculateOverallPercentage({
+      strengthMet, strengthProgress,
+      weeksMet, weeksProgress,
+      mobilityMet, mobilityProgress,
+      painFree
+    });
+
+    // Build blockers array
+    const blockers = [];
+    if (!strengthMet) {
+      blockers.push(`DB Goblet Squat: Need 15kg × 3×12 @ RIR 2-3`);
+    }
+    if (!weeksMet) {
+      const currentWeeks = Math.floor(weeksProgress * 8 / 100);
+      const remainingWeeks = 8 - currentWeeks;
+      blockers.push(`Need ${remainingWeeks} more weeks of training`);
+    }
+    if (!mobilityMet) {
+      const currentConfirmations = Math.floor(mobilityProgress * 5 / 100);
+      blockers.push(`Full depth squat mobility: ${currentConfirmations}/5 confirmations`);
+    }
+    if (!painFree) {
+      blockers.push(`Resolve recurring knee/ankle pain in Goblet Squat`);
+    }
+
+    return {
+      percentage,
+      strengthMet,
+      weeksMet,
+      mobilityMet,
+      painFree,
+      blockers,
+      strengthProgress,
+      weeksProgress,
+      mobilityProgress
+    };
+  }
+
+  /**
+   * Check readiness for Mudgal/Gada (Indian Club) Exercises
+   * @returns {Object} Readiness analysis with percentage, criteria status, blockers
+   */
+  getMudgalReadiness() {
+    const exerciseKey = 'UPPER_A - DB Shoulder Press';
+
+    // Strength check: 15kg × 3×10 @ RIR 2-3 (shoulder stability and endurance for rotational movements)
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 15, 10, 3, 2);
+    const strengthMet = strengthProgress >= 100;
+
+    // Weeks check: 10+ weeks (shoulder conditioning for dynamic rotational loads)
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 10);
+    const weeksMet = weeksProgress >= 100;
+
+    // Mobility check: overhead shoulder mobility with rotation (5+ confirmations)
+    const mobilityProgress = this._calculateMobilityProgress('mudgal_overhead_rotation', 5);
+    const mobilityMet = mobilityProgress >= 100;
+
+    // Pain check: no shoulder/elbow/wrist pain in last 5 workouts
+    const painFree = this._isPainFree([exerciseKey], ['shoulder', 'elbow', 'wrist'], 5);
+
+    // Calculate overall percentage
+    const percentage = this._calculateOverallPercentage({
+      strengthMet, strengthProgress,
+      weeksMet, weeksProgress,
+      mobilityMet, mobilityProgress,
+      painFree
+    });
+
+    // Build blockers array
+    const blockers = [];
+    if (!strengthMet) {
+      blockers.push(`DB Shoulder Press: Need 15kg × 3×10 @ RIR 2-3`);
+    }
+    if (!weeksMet) {
+      const currentWeeks = Math.floor(weeksProgress * 10 / 100);
+      const remainingWeeks = 10 - currentWeeks;
+      blockers.push(`Need ${remainingWeeks} more weeks of training`);
+    }
+    if (!mobilityMet) {
+      const currentConfirmations = Math.floor(mobilityProgress * 5 / 100);
+      blockers.push(`Overhead rotation mobility: ${currentConfirmations}/5 confirmations`);
+    }
+    if (!painFree) {
+      blockers.push(`Resolve recurring shoulder/elbow/wrist pain in DB Shoulder Press`);
+    }
+
+    return {
+      percentage,
+      strengthMet,
+      weeksMet,
+      mobilityMet,
+      painFree,
+      blockers,
+      strengthProgress,
+      weeksProgress,
+      mobilityProgress
+    };
+  }
+
+  /**
+   * Check readiness for Pull-ups
+   * @returns {Object} Readiness analysis with percentage, criteria status, blockers
+   */
+  getPullUpReadiness() {
+    const exerciseKey = 'UPPER_B - Lat Pulldown';
+
+    // Strength check: 40kg × 3×10 @ RIR 2-3 (significant strength needed for bodyweight pull-ups)
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 40, 10, 3, 2);
+    const strengthMet = strengthProgress >= 100;
+
+    // Weeks check: 12+ weeks
+    const weeksProgress = this._calculateWeeksProgress(exerciseKey, 12);
+    const weeksMet = weeksProgress >= 100;
+
+    // Mobility check: overhead shoulder mobility (5+ confirmations)
+    const mobilityProgress = this._calculateMobilityProgress('pullup_overhead_mobility', 5);
+    const mobilityMet = mobilityProgress >= 100;
+
+    // Pain check: no shoulder/elbow pain in last 5 workouts
+    const painFree = this._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
+
+    // Calculate overall percentage
+    const percentage = this._calculateOverallPercentage({
+      strengthMet, strengthProgress,
+      weeksMet, weeksProgress,
+      mobilityMet, mobilityProgress,
+      painFree
+    });
+
+    // Build blockers array
+    const blockers = [];
+    if (!strengthMet) {
+      blockers.push(`Lat Pulldown: Need 40kg × 3×10 @ RIR 2-3`);
+    }
+    if (!weeksMet) {
+      const currentWeeks = Math.floor(weeksProgress * 12 / 100);
+      const remainingWeeks = 12 - currentWeeks;
+      blockers.push(`Need ${remainingWeeks} more weeks of training`);
+    }
+    if (!mobilityMet) {
+      const currentConfirmations = Math.floor(mobilityProgress * 5 / 100);
+      blockers.push(`Overhead mobility: ${currentConfirmations}/5 confirmations`);
+    }
+    if (!painFree) {
+      blockers.push(`Resolve recurring shoulder/elbow pain in Lat Pulldown`);
+    }
+
+    return {
+      percentage,
+      strengthMet,
+      weeksMet,
+      mobilityMet,
+      painFree,
+      blockers,
+      strengthProgress,
+      weeksProgress,
+      mobilityProgress
+    };
+  }
+
+  /**
    * Calculate strength progress toward target
    * @param {string} exerciseKey - Exercise identifier
    * @param {number} targetWeight - Target weight per hand

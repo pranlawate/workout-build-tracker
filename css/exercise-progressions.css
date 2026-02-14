@@ -2,7 +2,6 @@
 .progressions-modal-content {
   max-width: 800px;
   max-height: 90vh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
