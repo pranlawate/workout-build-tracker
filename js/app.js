@@ -941,10 +941,15 @@ class App {
         }
       } catch (error) {
         console.error('[App] Error getting phase behavior:', error);
-        // Fallback to building phase message
-        const lastWeight = lastWorkout.sets[0].weight;
-        const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
-        return `<p class="progression-hint success">🎯 Ready to progress! Add ${nextWeight}kg next session</p>`;
+        // Fallback to building phase message with null safety
+        if (lastWorkout?.sets?.length > 0) {
+          const lastWeight = lastWorkout.sets[0].weight;
+          const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
+          return `<p class="progression-hint success">🎯 Ready to progress! Add ${nextWeight}kg next session</p>`;
+        } else {
+          // Safe fallback if no workout data
+          return '';
+        }
       }
     }
 
