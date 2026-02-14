@@ -124,6 +124,16 @@
   color: var(--color-warning);
 }
 
+.phase-badge {
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
 .select-exercise-btn {
   padding: 0.5rem 1rem;
   background: var(--color-primary);

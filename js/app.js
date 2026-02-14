@@ -2585,15 +2585,62 @@ class App {
     label.textContent = categoryName;
     categoryDiv.appendChild(label);
 
-    exercises.forEach(exerciseName => {
-      const optionDiv = document.createElement('div');
+    // Get current exercise for prerequisite context
+    const currentSelections = this.storage.getExerciseSelections();
+    const currentExercise = currentSelections[slotKey];
+
+    // Evaluate each exercise with phase-aware priority
+    const evaluatedExercises = exercises.map(exerciseName => {
       const unlocked = this.storage.isExerciseUnlocked(exerciseName) ||
                        getComplexityTier(exerciseName) === COMPLEXITY_TIERS.SIMPLE;
 
+      // Get phase-aware evaluation for unlocked exercises
+      let priority = 1;
+      let phaseRecommended = true;
+
+      if (unlocked && currentExercise) {
+        const evaluation = this.unlockEvaluator.evaluateUnlockWithPhasePriority(
+          exerciseName,
+          currentExercise
+        );
+        priority = evaluation.priority || 1;
+        phaseRecommended = evaluation.phaseRecommended !== undefined
+          ? evaluation.phaseRecommended
+          : true;
+      }
+
+      return {
+        name: exerciseName,
+        unlocked,
+        priority,
+        phaseRecommended
+      };
+    });
+
+    // Sort by priority (lower number = higher priority, shown first)
+    evaluatedExercises.sort((a, b) => {
+      // Unlocked exercises before locked
+      if (a.unlocked !== b.unlocked) {
+        return a.unlocked ? -1 : 1;
+      }
+      // Then by priority
+      return a.priority - b.priority;
+    });
+
+    // Render sorted exercises
+    evaluatedExercises.forEach(({ name, unlocked, phaseRecommended }) => {
+      const optionDiv = document.createElement('div');
       optionDiv.className = `exercise-option ${unlocked ? '' : 'locked'}`;
+
+      // Add phase badge for recommended exercises
+      const phaseBadge = unlocked && phaseRecommended
+        ? '<span class="phase-badge">★ Recommended</span>'
+        : '';
+
       optionDiv.innerHTML = `
-        <span class="exercise-name">${exerciseName}</span>
+        <span class="exercise-name">${name}</span>
         <div class="exercise-status">
+          ${phaseBadge}
           <span class="status-badge ${unlocked ? 'unlocked' : 'locked'}">
             ${unlocked ? '✓ Unlocked' : '🔒 Locked'}
           </span>
@@ -2607,7 +2654,7 @@ class App {
       const selectBtn = optionDiv.querySelector('.select-exercise-btn');
       if (selectBtn && unlocked) {
         selectBtn.onclick = () => {
-          this.storage.saveExerciseSelection(slotKey, exerciseName);
+          this.storage.saveExerciseSelection(slotKey, name);
           document.getElementById('progressions-modal').style.display = 'none';
           this.showHomeScreen(); // Refresh
         };
