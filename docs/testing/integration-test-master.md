@@ -1,8 +1,8 @@
 # Build Tracker - Master Integration Test Report
 
-**Last Updated:** 2026-02-14
-**App Version:** v1.5 (Service Worker Cache: v64)
-**Latest Feature:** Build/Maintenance Phase Integration
+**Last Updated:** 2026-02-16
+**App Version:** v1.6 (Service Worker Cache: v67)
+**Latest Feature:** Lower Workout Restructure (LOWER_A/LOWER_B exercise swap)
 
 ---
 
@@ -846,7 +846,7 @@ localStorage.setItem('build_training_phase', 'invalid');
 
 ---
 
-### Test 10.13: Service Worker Cache v64
+### Test 10.13: Service Worker Cache v67
 **Steps:**
 1. Open DevTools → Application → Service Workers
 2. Check cache version
@@ -854,7 +854,7 @@ localStorage.setItem('build_training_phase', 'invalid');
 
 **Expected:**
 - [ ] Service worker status: "activated and running"
-- [ ] Cache version: `build-tracker-v64`
+- [ ] Cache version: `build-tracker-v67`
 - [ ] PhaseManager cached: `./js/modules/phase-manager.js` in cache
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
@@ -894,6 +894,329 @@ console.log(phaseManager.getUnlockPriority());
 - [ ] All three calls return valid objects
 - [ ] No errors thrown
 - [ ] Safe defaults returned if any issues
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+## Feature 11: Lower Workout Restructure (2026-02-16)
+
+### Test 11.1: LOWER_A Workout Definition
+**Steps:**
+1. Hard refresh to load service worker v67 (Ctrl+Shift+R)
+2. Open browser console
+3. Run: `window.app.workoutManager.getWorkout('LOWER_A').exercises.map(e => e.name)`
+
+**Expected:**
+- [ ] Returns: `['Hack Squat', '45° Hyperextension', 'Hip Thrust', 'Leg Extension', 'Standing Calf Raise', 'Plank']`
+- [ ] All 6 exercises in correct order
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.2: LOWER_B Workout Definition
+**Steps:**
+1. Open browser console
+2. Run: `window.app.workoutManager.getWorkout('LOWER_B').exercises.map(e => e.name)`
+
+**Expected:**
+- [ ] Returns: `['Leg Press', 'DB Romanian Deadlift', 'Leg Abduction', 'Leg Curl', 'Seated Calf Raise', 'Side Plank']`
+- [ ] All 6 exercises in correct order
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.3: Default Exercise Selections
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+const defaults = window.app.storage.getExerciseSelections();
+console.log('LOWER_A slots:', [
+  defaults['LOWER_A_SLOT_1'],
+  defaults['LOWER_A_SLOT_2'],
+  defaults['LOWER_A_SLOT_3'],
+  defaults['LOWER_A_SLOT_4']
+]);
+console.log('LOWER_B slots:', [
+  defaults['LOWER_B_SLOT_1'],
+  defaults['LOWER_B_SLOT_2'],
+  defaults['LOWER_B_SLOT_3'],
+  defaults['LOWER_B_SLOT_4']
+]);
+```
+
+**Expected:**
+- [ ] LOWER_A slots: `['Hack Squat', '45° Hyperextension', 'Hip Thrust', 'Leg Extension']`
+- [ ] LOWER_B slots: `['Leg Press', 'DB Romanian Deadlift', 'Leg Abduction', 'Leg Curl']`
+- [ ] No undefined or null values
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.4: LOWER_A UI Rendering
+**Steps:**
+1. Click "LOWER A" workout from home screen
+2. Verify exercises display in order with correct details
+
+**Expected:**
+- [ ] Hack Squat (3 sets × 8-12 reps @ RIR 2-3)
+- [ ] 45° Hyperextension (3 sets × 10-12 reps @ RIR 2-3)
+- [ ] Hip Thrust (3 sets × 10-12 reps @ RIR 2-3)
+- [ ] Leg Extension (3 sets × 10-12 reps @ RIR 2-3)
+- [ ] Standing Calf Raise (3 sets × 15-20 reps @ RIR 2-3)
+- [ ] Plank (3 sets × 30-60s)
+- [ ] All exercise details match specification
+- [ ] No missing or duplicate exercises
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.5: LOWER_B UI Rendering
+**Steps:**
+1. Go back to home, click "LOWER B" workout
+2. Verify exercises display in order with correct details
+
+**Expected:**
+- [ ] Leg Press (3 sets × 8-12 reps @ RIR 2-3)
+- [ ] DB Romanian Deadlift (3 sets × 10-12 reps @ RIR 2-3)
+- [ ] Leg Abduction (3 sets × 12-15 reps @ RIR 2-3)
+- [ ] Leg Curl (3 sets × 10-12 reps @ RIR 2-3)
+- [ ] Seated Calf Raise (3 sets × 15-20 reps @ RIR 2-3)
+- [ ] Side Plank (3 sets × 30s/side)
+- [ ] All exercise details match specification
+- [ ] No missing or duplicate exercises
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.6: Progression Pathways - LOWER_A_SLOT_1
+**Steps:**
+1. From any workout, click "Browse Progressions"
+2. Select LOWER_A_SLOT_1 (Hack Squat)
+3. Check progression options
+
+**Expected:**
+- [ ] Current: Hack Squat
+- [ ] Easier: Leg Press
+- [ ] Harder: Barbell Back Squat, Front Squat
+- [ ] Alternate: Bulgarian Split Squat
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.7: Progression Pathways - LOWER_A_SLOT_2
+**Steps:**
+1. Select LOWER_A_SLOT_2 (45° Hyperextension)
+
+**Expected:**
+- [ ] Current: 45° Hyperextension
+- [ ] Easier: Glute Bridges
+- [ ] Harder: DB Romanian Deadlift, Barbell RDL
+- [ ] Alternate: Good Mornings
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.8: Progression Pathways - LOWER_A_SLOT_3
+**Steps:**
+1. Select LOWER_A_SLOT_3 (Hip Thrust)
+
+**Expected:**
+- [ ] Current: Hip Thrust
+- [ ] Easier: Bodyweight Hip Thrust, Glute Bridges
+- [ ] Harder: Weighted Hip Thrust, Single-leg Hip Thrust
+- [ ] Alternate: Cable Pull-Through
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.9: Progression Pathways - LOWER_A_SLOT_4
+**Steps:**
+1. Select LOWER_A_SLOT_4 (Leg Extension)
+
+**Expected:**
+- [ ] Current: Leg Extension
+- [ ] Easier: Bodyweight Squats
+- [ ] Harder: Weighted Leg Extension
+- [ ] Alternate: Sissy Squats
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.10: Progression Pathways - LOWER_B_SLOT_1
+**Steps:**
+1. Select LOWER_B_SLOT_1 (Leg Press)
+
+**Expected:**
+- [ ] Current: Leg Press
+- [ ] Easier: Bodyweight Squats, Goblet Squat
+- [ ] Harder: Hack Squat, Barbell Back Squat
+- [ ] Alternate: Bulgarian Split Squat
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.11: Progression Pathways - LOWER_B_SLOT_2
+**Steps:**
+1. Select LOWER_B_SLOT_2 (DB Romanian Deadlift)
+
+**Expected:**
+- [ ] Current: DB Romanian Deadlift
+- [ ] Easier: 45° Hyperextension, Glute Bridges
+- [ ] Harder: Barbell RDL, Conventional Deadlift
+- [ ] Alternate: Single-leg RDL
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.12: Progression Pathways - LOWER_B_SLOT_3
+**Steps:**
+1. Select LOWER_B_SLOT_3 (Leg Abduction)
+
+**Expected:**
+- [ ] Current: Leg Abduction
+- [ ] Easier: Bodyweight Side-lying Abduction
+- [ ] Harder: Weighted Cable Abduction, Single-leg Press
+- [ ] Alternate: Clamshells, Fire Hydrants
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.13: Progression Pathways - LOWER_B_SLOT_4
+**Steps:**
+1. Select LOWER_B_SLOT_4 (Leg Curl)
+
+**Expected:**
+- [ ] Current: Leg Curl
+- [ ] Easier: Nordic Curls (assisted)
+- [ ] Harder: Nordic Curls, Single-leg Curl
+- [ ] Alternate: Sliding Leg Curl
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.14: Service Worker Update to v67
+**Steps:**
+1. Hard refresh page (Ctrl+Shift+R)
+2. Open DevTools → Application → Service Workers
+3. Check cache version
+
+**Expected:**
+- [ ] Service worker cache: `build-tracker-v67`
+- [ ] Old cache (v66) deleted
+- [ ] All assets cached correctly
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.15: Complete LOWER_A Workout Flow
+**Steps:**
+1. Start LOWER_A workout
+2. Log all 6 exercises (all sets)
+3. Mark workout complete
+
+**Expected:**
+- [ ] All exercises log correctly
+- [ ] Workout saves without errors
+- [ ] Progress tracked for each exercise
+- [ ] No console errors during flow
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.16: Complete LOWER_B Workout Flow
+**Steps:**
+1. Start LOWER_B workout
+2. Log all 6 exercises (all sets)
+3. Mark workout complete
+
+**Expected:**
+- [ ] All exercises log correctly
+- [ ] Workout saves without errors
+- [ ] Progress tracked for each exercise
+- [ ] No console errors during flow
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.17: Muscle Balance Verification
+**Steps:**
+1. Complete one LOWER_A and one LOWER_B workout
+2. Check muscle coverage per week
+
+**Expected:**
+- [ ] Quads: 3 exercises total (2 compounds + 1 isolation)
+- [ ] Hamstrings: 3 exercises total (2 compounds + 1 isolation)
+- [ ] Glutes: 5 exercises total (both max and medius)
+- [ ] Balanced distribution across both days
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.18: No Regression - UPPER Workouts
+**Steps:**
+1. Click UPPER_A workout
+2. Click UPPER_B workout
+3. Verify exercises unchanged
+
+**Expected:**
+- [ ] UPPER_A exercises: DB Flat Bench Press, Chest-Supported Row, DB Shoulder Press, Cable Fly, Face Pull, Plank
+- [ ] UPPER_B exercises: Lat Pulldown, DB Shoulder Press, Chest-Supported Row, Incline DB Press, Reverse Fly, Band Pull-Aparts, Dead Bug
+- [ ] No changes to UPPER workouts
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.19: BUILD-SPECIFICATION Documentation
+**Steps:**
+1. Open BUILD-SPECIFICATION.md
+2. Verify LOWER_A and LOWER_B sections updated
+
+**Expected:**
+- [ ] LOWER_A lists all 6 exercises correctly
+- [ ] LOWER_B lists all 6 exercises correctly
+- [ ] Rationale section explains restructure
+- [ ] Muscle coverage documented
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 11.20: No JavaScript Errors
+**Steps:**
+1. Open console (F12)
+2. Navigate through:
+   - Click LOWER_A workout
+   - Log a set for any exercise
+   - Browse Progressions
+   - Click LOWER_B workout
+   - Complete workout flow
+
+**Expected:**
+- [ ] No red errors in console
+- [ ] No warnings related to workout data
+- [ ] All navigation smooth and error-free
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
 
@@ -1022,16 +1345,16 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 
 ---
 
-### Test P3: Service Worker Cache (v64)
+### Test P3: Service Worker Cache (v67)
 **Steps:**
 1. Load app
 2. Check DevTools → Application → Service Workers
 
 **Expected:**
 - [ ] Service worker registered
-- [ ] Cache name: `build-tracker-v64`
-- [ ] Old caches deleted (v63 and earlier)
-- [ ] All assets cached correctly (including phase-manager.js)
+- [ ] Cache name: `build-tracker-v67`
+- [ ] Old caches deleted (v66 and earlier)
+- [ ] All assets cached correctly (including phase-manager.js, updated workouts.js)
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
 
@@ -1065,10 +1388,11 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 - [ ] Mobile responsiveness verified
 - [ ] Cross-browser compatibility confirmed
 - [ ] Performance acceptable (< 2s load time)
-- [ ] Service worker cache updated (v64)
+- [ ] Service worker cache updated (v67)
 - [ ] localStorage migrations successful
 - [ ] Error handling robust
 - [ ] Build/Maintenance phase integration tested
+- [ ] Lower workout restructure tested (Feature 11)
 
 **Documentation:**
 - [ ] README.md updated
