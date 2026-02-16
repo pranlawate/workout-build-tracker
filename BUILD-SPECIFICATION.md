@@ -127,15 +127,30 @@ Warm-ups are workout-specific to prep movement patterns:
 6. **Face Pulls** - 3 sets × 12-15 reps @ RIR 2-3
 7. **Plank** - 3 sets × 30-60s
 
-### LOWER_A – Bilateral Squat/Hinge Emphasis
+### LOWER_A – Machine Squat + Compound Emphasis
 
 1. **Hack Squat** - 3 sets × 8-12 reps @ RIR 2-3
-2. **Leg Press** - 3 sets × 10-12 reps @ RIR 2-3
-3. **DB Romanian Deadlift** - 3 sets × 10-12 reps @ RIR 2-3
+   * Tempo: 3 sec down, 2 sec up
+   * Notes: Quad compound (vertical squat pattern)
+
+2. **45° Hyperextension** - 3 sets × 10-12 reps @ RIR 2-3
+   * Tempo: 3-4 sec down, 2 sec up
+   * Notes: CRITICAL for weak lower back - bodyweight only, NOT to failure
+
+3. **Hip Thrust** - 3 sets × 10-12 reps @ RIR 2-3
+   * Tempo: 1 sec up, 2 sec down, 1 sec squeeze
+   * Notes: Primary glute isolation
+
 4. **Leg Extension** - 3 sets × 10-12 reps @ RIR 2-3
-5. **Standing Calf Raise** - 3 sets × 10-12 reps @ RIR 2-3
-6. **Seated Calf Raise** - 3 sets × 10-12 reps @ RIR 2-3
-7. **Dead Bug** - 3 sets × 10 reps each side
+   * Tempo: 2 sec extend, 3 sec return
+   * Notes: Quad isolation (pairs with Hack Squat)
+
+5. **Standing Calf Raise** - 3 sets × 15-20 reps @ RIR 2-3
+   * Tempo: Explosive up (1 sec), controlled down (2 sec)
+   * Notes: Gastrocnemius (fast-twitch)
+
+6. **Plank** - 3 sets × 30-60s
+   * Notes: Core strength for lower back health
 
 ### UPPER_B – Vertical Push/Pull Emphasis
 
@@ -147,26 +162,50 @@ Warm-ups are workout-specific to prep movement patterns:
 6. **Reverse Fly** - 3 sets × 12-15 reps @ RIR 2-3
 7. **Side Plank** - 3 sets × 20-30s each side
 
-### LOWER_B – Unilateral/Accessory Emphasis
+### LOWER_B – Free Weight Hinge + Accessory Emphasis
 
-1. **DB Goblet Squat** - 3 sets × 10-12 reps @ RIR 2-3
-2. **Leg Abduction** - 3 sets × 12-15 reps @ RIR 2-3
-3. **45° Hyperextension** - 3 sets × 10-12 reps @ RIR 2-3
-4. **Hip Thrust** - 3 sets × 10-12 reps @ RIR 2-3
+1. **Leg Press** - 3 sets × 8-12 reps @ RIR 2-3
+   * Tempo: 3 sec down, 2 sec up
+   * Notes: Quads + glutes compound (horizontal push pattern)
+
+2. **DB Romanian Deadlift** - 3 sets × 10-12 reps @ RIR 2-3
+   * Tempo: 3 sec down, 2 sec up
+   * Notes: Hamstrings, glutes, lower back - free weight (do when fresh)
+
+3. **Leg Abduction** - 3 sets × 12-15 reps @ RIR 2-3
+   * Tempo: 2 sec out, 2 sec in
+   * Notes: Hip abductors (glute medius) - pairs with Hip Thrust (glute isolation in slot 3)
+
+4. **Leg Curl** - 3 sets × 10-12 reps @ RIR 2-3
+   * Tempo: 2 sec curl, 3 sec return
+   * Notes: Hamstring isolation (pairs with DB RDL, analogous to Leg Extension in slot 4)
+
+5. **Seated Calf Raise** - 3 sets × 15-20 reps @ RIR 2-3
+   * Tempo: 3-5 sec (slow-twitch focus)
+   * Notes: Soleus (slow-twitch dominant)
+
+6. **Side Plank** - 3 sets × 30s/side
+   * Notes: Obliques, glute medius
 
 **Complete workout definitions:** See `js/modules/workouts.js` for authoritative exercise definitions including tempo, detailed notes, starting weights, and progression rules
-   * RIR: 3
-   * Notes: Technique-focused hinge, light load, CRITICAL for weak lower back
 
-5. **Dumbbell Lateral Raise**
-   * Sets: 2
-   * Reps: 12–15
-   * RIR: 2–3
+### Lower Workout Restructure Rationale (2026-02-16)
 
-6. **Weighted Plank** (NEW - replaces optional calf raise)
-   * Sets: 2
-   * Duration: 30–45 seconds
-   * Notes: Add weight on back when bodyweight becomes easy
+**Balance achieved:**
+- Each day: 1 squat compound + 1 hinge compound + matched isolation
+- LOWER_A: Machine squat (Hack) + bodyweight hinge (Hyper) + quad/glute isolation
+- LOWER_B: Machine squat (Leg Press) + free weight hinge (DB RDL) + hamstring/glute medius isolation
+
+**Equipment utilization:**
+- Uses BOTH Leg Press and Hack Squat (different movement patterns)
+- Balances free weight fatigue (only 1 free weight compound per day)
+- Removed redundant DB Goblet Squat (limited by grip/weight ceiling)
+
+**Muscle coverage per week:**
+- Quads: 2 compounds + 1 isolation = 3 exercises
+- Hamstrings: 2 compounds + 1 isolation = 3 exercises
+- Glutes (max + medius): 5 exercises total
+- Complete core and calf coverage
 
 ---
 

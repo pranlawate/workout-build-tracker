@@ -121,8 +121,8 @@ export const WORKOUTS = {
 
   LOWER_A: {
     name: 'LOWER_A',
-    displayName: 'Lower A - Bilateral',
-    description: 'Bilateral/compound emphasis',
+    displayName: 'Lower A',
+    description: 'Quad-focused lower body workout',
     exercises: [
       {
         name: 'Hack Squat',
@@ -132,29 +132,7 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Quad development (weak legs)',
-        machineOk: true
-      },
-      {
-        name: 'Leg Curl',
-        sets: 3,
-        repRange: '10-12',
-        rirTarget: '2-3',
-        startingWeight: 17.5,
-        weightIncrement: 2.5,
-        tempo: '2 sec curl, 3 sec return',
-        notes: 'Primary: Hamstrings',
-        machineOk: true
-      },
-      {
-        name: 'Leg Extension',
-        sets: 3,
-        repRange: '10-12',
-        rirTarget: '2-3',
-        startingWeight: 17.5,
-        weightIncrement: 2.5,
-        tempo: '2 sec extend, 3 sec return',
-        notes: 'Do AFTER squats (pre-exhaustion safer)',
+        notes: 'Quad compound (vertical squat pattern)',
         machineOk: true
       },
       {
@@ -167,6 +145,28 @@ export const WORKOUTS = {
         tempo: '3-4 sec down, 2 sec up',
         notes: 'CRITICAL: Lower back weakness - NOT to failure (bodyweight only)',
         machineOk: false
+      },
+      {
+        name: 'Hip Thrust',
+        sets: 3,
+        repRange: '10-12',
+        rirTarget: '2-3',
+        startingWeight: 20,
+        weightIncrement: 5,
+        tempo: '1 sec up, 2 sec down, 1 sec squeeze',
+        notes: 'Primary: Glutes (heavy isolation)',
+        machineOk: true
+      },
+      {
+        name: 'Leg Extension',
+        sets: 3,
+        repRange: '10-12',
+        rirTarget: '2-3',
+        startingWeight: 17.5,
+        weightIncrement: 2.5,
+        tempo: '2 sec extend, 3 sec return',
+        notes: 'Quad isolation (pairs with Hack Squat)',
+        machineOk: true
       },
       {
         name: 'Standing Calf Raise',
@@ -279,19 +279,19 @@ export const WORKOUTS = {
 
   LOWER_B: {
     name: 'LOWER_B',
-    displayName: 'Lower B - Unilateral',
-    description: 'Unilateral/accessory emphasis',
+    displayName: 'Lower B',
+    description: 'Hamstring-focused lower body workout',
     exercises: [
       {
-        name: 'DB Goblet Squat',
+        name: 'Leg Press',
         sets: 3,
         repRange: '8-12',
         rirTarget: '2-3',
-        startingWeight: 10,
-        weightIncrement: 2.5,
+        startingWeight: 20,
+        weightIncrement: 5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Full leg compound',
-        machineOk: false
+        notes: 'Quads + glutes compound (horizontal push pattern)',
+        machineOk: true
       },
       {
         name: 'DB Romanian Deadlift',
@@ -301,7 +301,7 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Hamstrings, glutes, lower back',
+        notes: 'Hamstrings, glutes, lower back (free weight - do when fresh)',
         machineOk: false
       },
       {
@@ -312,18 +312,18 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         tempo: '2 sec out, 2 sec in',
-        notes: 'Hip abductors (glute medius)',
+        notes: 'Hip abductors (glute medius) - pairs with Hip Thrust (glute isolation)',
         machineOk: true
       },
       {
-        name: 'Hip Thrust',
+        name: 'Leg Curl',
         sets: 3,
         repRange: '10-12',
         rirTarget: '2-3',
-        startingWeight: 20,
-        weightIncrement: 5,
-        tempo: '1 sec up, 2 sec down, 1 sec squeeze',
-        notes: 'Primary: Glutes',
+        startingWeight: 17.5,
+        weightIncrement: 2.5,
+        tempo: '2 sec curl, 3 sec return',
+        notes: 'Hamstring isolation (pairs with DB RDL)',
         machineOk: true
       },
       {

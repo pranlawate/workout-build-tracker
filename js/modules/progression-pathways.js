@@ -110,42 +110,35 @@ export const PROGRESSION_PATHS = {
   // ==================== LOWER A - BILATERAL ====================
 
   'LOWER_A_SLOT_1': {
-    slotName: 'Quad-dominant Bilateral',
+    slotName: 'Squat Compound',
     easier: ['Leg Press'],
     current: 'Hack Squat',
-    harder: ['Barbell Back Squat'],
-    alternate: ['Sadharan Baithak']
+    harder: ['Barbell Back Squat', 'Front Squat'],
+    alternate: ['Bulgarian Split Squat']
   },
 
   'LOWER_A_SLOT_2': {
-    slotName: 'Hamstring Isolation',
-    easier: ['Lighter weight, slow tempo'],
-    current: 'Leg Curl',
-    harder: ['Nordic Curls'],
-    alternate: []
+    slotName: 'Posterior Chain/Hinge',
+    easier: ['Glute Bridges'],
+    current: '45° Hyperextension',
+    harder: ['DB Romanian Deadlift', 'Barbell RDL'],
+    alternate: ['Good Mornings']
   },
 
   'LOWER_A_SLOT_3': {
-    slotName: 'Quad Isolation',
-    easier: ['Lighter weight'],
-    current: 'Leg Extension',
-    harder: [
-      'Single-leg Leg Extension',
-      'Sissy Squats'
-    ],
-    alternate: []
+    slotName: 'Glute Isolation',
+    easier: ['Bodyweight Hip Thrust', 'Glute Bridges'],
+    current: 'Hip Thrust',
+    harder: ['Weighted Hip Thrust', 'Single-leg Hip Thrust'],
+    alternate: ['Cable Pull-Through']
   },
 
   'LOWER_A_SLOT_4': {
-    slotName: 'Hip Hinge/Posterior Chain',
-    easier: ['Back Extension'],
-    current: '45° Hyperextension',
-    harder: [
-      'Weighted Hyperextension',
-      'Barbell RDL',
-      'Barbell Deadlift'
-    ],
-    alternate: ['Good Mornings']
+    slotName: 'Quad Isolation',
+    easier: ['Bodyweight Squats'],
+    current: 'Leg Extension',
+    harder: ['Weighted Leg Extension'],
+    alternate: ['Sissy Squats']
   },
 
   'LOWER_A_SLOT_5': {
@@ -239,57 +232,35 @@ export const PROGRESSION_PATHS = {
   // ==================== LOWER B - UNILATERAL ====================
 
   'LOWER_B_SLOT_1': {
-    slotName: 'Squat/Mobility Foundation',
-    easier: ['Bodyweight Squat'],
-    current: 'DB Goblet Squat',
-    harder: [
-      'Ardha Baithak',        // Half squat (partial ROM)
-      'Sadharan Baithak',     // Regular full Hindu squat with arm swing
-      'Pehalwani Baithak',    // Wrestler's squat with forward jump
-      'Pehalwani Baithak 2',  // Wrestler's squat with triple jump
-      'Rammurti Baithak',     // Named variant
-      'Hanuman Baithak',      // Side lunge squat (lateral plane)
-      'Bulgarian Split Squat',
-      'Pistol Squat'
-    ],
-    alternate: []
+    slotName: 'Squat Compound',
+    easier: ['Bodyweight Squats', 'Goblet Squat'],
+    current: 'Leg Press',
+    harder: ['Hack Squat', 'Barbell Back Squat'],
+    alternate: ['Bulgarian Split Squat']
   },
 
   'LOWER_B_SLOT_2': {
-    slotName: 'Hip Hinge',
-    easier: [
-      'Light DB RDL',
-      'Glute-Ham Developer'
-    ],
+    slotName: 'Hinge Compound',
+    easier: ['45° Hyperextension', 'Glute Bridges'],
     current: 'DB Romanian Deadlift',
-    harder: [
-      'Barbell RDL',
-      'Single-leg RDL',
-      'Deficit RDL'
-    ],
-    alternate: []
+    harder: ['Barbell RDL', 'Conventional Deadlift'],
+    alternate: ['Single-leg RDL']
   },
 
   'LOWER_B_SLOT_3': {
     slotName: 'Hip Abduction',
-    easier: ['Banded Hip Abduction'],
+    easier: ['Bodyweight Side-lying Abduction'],
     current: 'Leg Abduction',
-    harder: [
-      'Cable Hip Abduction',
-      'Copenhagen Plank'
-    ],
-    alternate: []
+    harder: ['Weighted Cable Abduction', 'Single-leg Press'],
+    alternate: ['Clamshells', 'Fire Hydrants']
   },
 
   'LOWER_B_SLOT_4': {
-    slotName: 'Hip Extension/Glutes',
-    easier: ['Bodyweight Hip Thrust'],
-    current: 'Hip Thrust',
-    harder: [
-      'Weighted Hip Thrust',
-      'Single-leg Hip Thrust'
-    ],
-    alternate: ['Glute Bridges']
+    slotName: 'Hamstring Isolation',
+    easier: ['Nordic Curls (assisted)'],
+    current: 'Leg Curl',
+    harder: ['Nordic Curls', 'Single-leg Curl'],
+    alternate: ['Sliding Leg Curl']
   },
 
   'LOWER_B_SLOT_5': {
