@@ -698,6 +698,8 @@ class App {
             </div>
           </div>
 
+          ${exercise.notes ? `<p class="exercise-type-info">${this.escapeHtml(exercise.notes)}</p>` : ''}
+
           <p class="exercise-meta">
             ${this.formatExerciseMeta(exercise)}
           </p>
@@ -715,8 +717,6 @@ class App {
           <div class="sets-container">
             ${this.renderSets(exercise, lastWorkout, index)}
           </div>
-
-          ${exercise.notes ? `<p class="exercise-notes">💡 ${this.escapeHtml(exercise.notes)}</p>` : ''}
         </div>
       `;
     }).join('');

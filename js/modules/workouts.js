@@ -47,7 +47,7 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 2.5,
         tempo: '2 sec down, 1 sec up',
-        notes: 'Primary: Chest, Secondary: Front delts, triceps',
+        notes: 'Compound | Chest, Front Delts, Triceps | 2s eccentric, 1s concentric',
         machineOk: true
       },
       {
@@ -58,7 +58,7 @@ export const WORKOUTS = {
         startingWeight: 22.5,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Mid back (lats, rhomboids)',
+        notes: 'Compound | Mid Back (Lats, Rhomboids) | 2s concentric, 2s eccentric',
         machineOk: true
       },
       {
@@ -69,7 +69,7 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '2 sec down, 1 sec up',
-        notes: 'Primary: Chest (horizontal adduction). Safer shoulder position than DB fly.',
+        notes: 'Isolation | Chest | Safer for shoulders',
         machineOk: true
       },
       {
@@ -80,7 +80,7 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Back thickness (lats, traps)',
+        notes: 'Compound | Back Thickness (Lats, Traps) | 2s concentric, 2s eccentric',
         machineOk: true
       },
       {
@@ -91,7 +91,7 @@ export const WORKOUTS = {
         startingWeight: 3.5,
         weightIncrement: 1.25,
         tempo: '2 sec up, 3 sec down',
-        notes: 'Primary: Side delts',
+        notes: 'Isolation | Side Delts | 2s up, 3s down',
         machineOk: false
       },
       {
@@ -102,7 +102,7 @@ export const WORKOUTS = {
         startingWeight: 12.5,
         weightIncrement: 2.5,
         tempo: 'Controlled, external rotation',
-        notes: 'Rotator cuff health (stiff shoulders)',
+        notes: 'Isolation | Rear Delts, Rotator Cuff | External rotation focus',
         machineOk: true
       },
       {
@@ -113,7 +113,7 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: '1 sec apart, 2 sec together',
-        notes: 'Rotator cuff activation',
+        notes: 'Isolation | Rotator Cuff | Activation work',
         machineOk: false
       }
     ]
@@ -132,7 +132,7 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Quad compound (vertical squat pattern)',
+        notes: 'Compound | Quads | 3s eccentric, 2s concentric',
         machineOk: true
       },
       {
@@ -143,7 +143,7 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: '3-4 sec down, 2 sec up',
-        notes: 'CRITICAL: Lower back weakness - NOT to failure (bodyweight only)',
+        notes: 'Isolation | Lower Back | Bodyweight only',
         machineOk: false
       },
       {
@@ -154,7 +154,7 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: '1 sec up, 2 sec down, 1 sec squeeze',
-        notes: 'Primary: Glutes (heavy isolation)',
+        notes: 'Isolation | Glutes | 1s concentric, 1s squeeze, 2s eccentric',
         machineOk: true
       },
       {
@@ -165,7 +165,7 @@ export const WORKOUTS = {
         startingWeight: 17.5,
         weightIncrement: 2.5,
         tempo: '2 sec extend, 3 sec return',
-        notes: 'Quad isolation (pairs with Hack Squat)',
+        notes: 'Isolation | Quads | 2s extend, 3s return',
         machineOk: true
       },
       {
@@ -176,7 +176,7 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: 'Explosive up (1 sec), controlled down (2 sec)',
-        notes: 'Gastrocnemius (fast-twitch)',
+        notes: 'Isolation | Gastrocnemius | Explosive up, 2s down',
         machineOk: true
       },
       {
@@ -186,7 +186,7 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: 'Hold with proper breathing',
-        notes: 'Core strength for lower back health',
+        notes: 'Core | Core Stability | Anti-extension hold',
         machineOk: false
       }
     ]
@@ -205,7 +205,7 @@ export const WORKOUTS = {
         startingWeight: 22.5,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Lats (back width)',
+        notes: 'Compound | Lats (Back Width) | 2s concentric, 2s eccentric',
         machineOk: true
       },
       {
@@ -216,7 +216,7 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 1.25,
         tempo: '2 sec press, 2 sec down',
-        notes: 'Primary: Shoulders (anterior/lateral delts)',
+        notes: 'Compound | Front & Side Delts | 2s concentric, 2s eccentric',
         machineOk: true
       },
       {
@@ -227,7 +227,7 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '2 sec pull, 2 sec return',
-        notes: 'Primary: Back thickness',
+        notes: 'Compound | Back Thickness | 2s concentric, 2s eccentric',
         machineOk: true
       },
       {
@@ -238,7 +238,7 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 2.5,
         tempo: '2 sec down, 1 sec up',
-        notes: 'Upper chest emphasis',
+        notes: 'Compound | Upper Chest | 2s eccentric, 1s concentric',
         machineOk: true
       },
       {
@@ -249,7 +249,7 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 1.25,
         tempo: 'Controlled, focus on rear delts',
-        notes: 'Rear delts, rotator cuff',
+        notes: 'Isolation | Rear Delts, Rotator Cuff | Controlled, rear delt focus',
         machineOk: true
       },
       {
@@ -260,7 +260,7 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: '1 sec apart, 2 sec together',
-        notes: 'Rotator cuff activation',
+        notes: 'Isolation | Rotator Cuff | Activation work',
         machineOk: false
       },
       {
@@ -271,7 +271,7 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: 'Controlled alternating',
-        notes: 'Core stability, lower back health',
+        notes: 'Core | Core Stability | Anti-rotation control',
         machineOk: false
       }
     ]
@@ -290,7 +290,7 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Quads + glutes compound (horizontal push pattern)',
+        notes: 'Compound | Quads, Glutes | 3s eccentric, 2s concentric',
         machineOk: true
       },
       {
@@ -301,7 +301,7 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         tempo: '3 sec down, 2 sec up',
-        notes: 'Hamstrings, glutes, lower back (free weight - do when fresh)',
+        notes: 'Compound | Hamstrings, Glutes, Lower Back | 3s eccentric, 2s concentric',
         machineOk: false
       },
       {
@@ -312,7 +312,7 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         tempo: '2 sec out, 2 sec in',
-        notes: 'Hip abductors (glute medius) - pairs with Hip Thrust (glute isolation)',
+        notes: 'Isolation | Hip Abductors (Glute Medius) | 2s out, 2s in',
         machineOk: true
       },
       {
@@ -323,7 +323,7 @@ export const WORKOUTS = {
         startingWeight: 17.5,
         weightIncrement: 2.5,
         tempo: '2 sec curl, 3 sec return',
-        notes: 'Hamstring isolation (pairs with DB RDL)',
+        notes: 'Isolation | Hamstrings | 2s curl, 3s return',
         machineOk: true
       },
       {
@@ -334,7 +334,7 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 5,
         tempo: '3-5 sec (slow-twitch focus)',
-        notes: 'Soleus (slow-twitch dominant)',
+        notes: 'Isolation | Soleus | Slow controlled tempo',
         machineOk: true
       },
       {
@@ -344,7 +344,7 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         tempo: 'Hold stable',
-        notes: 'Obliques, glute medius',
+        notes: 'Core | Obliques, Glute Medius | Anti-lateral flexion',
         machineOk: false
       }
     ]

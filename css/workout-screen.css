@@ -20,6 +20,14 @@
   color: var(--color-text);
 }
 
+.exercise-type-info {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  font-style: italic;
+}
+
 .exercise-meta {
   font-size: var(--font-sm);
   color: var(--color-text-dim);
