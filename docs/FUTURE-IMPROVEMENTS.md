@@ -6,47 +6,13 @@ This document tracks improvement ideas and potential enhancements for future dev
 
 ---
 
-## Workout Design & Balance
-
-### 1. Upper A & Upper B Balance Review
-**Priority:** Medium
-**Status:** Not Started
-**Description:**
-- Review UPPER_A and UPPER_B workouts for muscle balance (similar to LOWER restructure)
-- Check if exercise ordering is optimal (compound → isolation → small muscles)
-- Verify muscle coverage per week is balanced
-- Consider if any exercises should be swapped between days
-
-**Context:** After successfully restructuring LOWER_A and LOWER_B to achieve balanced muscle distribution (3 quad exercises, 3 hamstring exercises, 5 glute exercises per week), we should apply similar analysis to UPPER workouts.
-
----
-
 ## Exercise Hints & User Guidance
-
-### 2. Enhanced Exercise Hints (Isolation/Compound Labels)
-**Priority:** Medium
-**Status:** Not Started
-**Description:**
-- Add exercise type labels to hints (e.g., "compound" or "isolation")
-- Update exercise notes to include:
-  - Already mentioned: Muscle groups targeted
-  - **NEW:** Exercise type (compound/isolation)
-  - Example: "Hack Squat - Quad compound (vertical squat pattern)"
-
-**Benefits:**
-- Helps users understand exercise purpose
-- Educational - teaches compound vs isolation concepts
-- Better workout planning and exercise selection
-
-**Affected Files:**
-- `js/modules/workouts.js` - Exercise notes field
-- UI rendering code (app.js) - Display hints
 
 ---
 
 ## Progression Pathways
 
-### 3. Kettlebell Exercise Integration
+### 1. Kettlebell Exercise Integration
 **Priority:** Low
 **Status:** Not Started
 **Description:**
@@ -91,9 +57,25 @@ When implementing these improvements:
 
 _(Ideas that have been implemented or rejected will be moved here with notes)_
 
+### ✅ Enhanced Exercise Hints with Type Labels (Implemented 2026-02-20)
+- Implemented pipe-separated format: `[Type] | [Specific Muscles] | [Tempo/Key Info]`
+- Updated all 28 exercises across 4 workouts
+- Compounds use educational eccentric/concentric terminology
+- Isolations use intuitive movement-specific terms
+- Repositioned display from bottom to top of exercise card
+- Added CSS styling for `.exercise-type-info` class
+- **Benefits:** Educational, specific muscle targeting, visible at-a-glance
+- **Commit:** d85b714
+
 ### ✅ Lower Workout Restructure (Implemented 2026-02-16)
 - Swapped exercises 1-4 between LOWER_A and LOWER_B
 - Achieved balanced muscle distribution (3 quads, 3 hamstrings, 5 glutes per week)
 - Utilized both Leg Press and Hack Squat machines
 - Removed redundant DB Goblet Squat
 - **Commits:** c22fa6c, 7a53f93
+
+### ⚪ Upper A & Upper B Balance Review (Reviewed 2026-02-16 - No Changes)
+- Reviewed UPPER_A and UPPER_B for muscle balance (chest: 9 sets/week, back: 12 sets/week)
+- Exercise ordering confirmed optimal (compound → isolation → small muscles)
+- Verified muscle coverage per week is balanced
+- **Decision:** Keep current structure - good rotator cuff coverage, both horizontal and vertical patterns, adequate volume
