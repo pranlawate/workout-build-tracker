@@ -25,13 +25,13 @@ export const FORM_CUES = {
   // UPPER_A exercises
   'DB Flat Bench Press': {
     setup: ['Retract shoulder blades', 'Feet flat on floor', 'Arch lower back slightly'],
-    execution: ['Elbows at 45° (not 90°)', 'Control descent (2 sec)', 'Press to lockout'],
+    execution: ['Elbows at 45° (not 90°)', 'Slow eccentric - 2s down', 'Explosive concentric - 1s up'],
     mistakes: ['Dumbbells drifting apart', 'Bouncing off chest', 'Shoulders rolling forward']
   },
 
   'Seated Cable Row': {
     setup: ['Feet on platform', 'Knees slightly bent', 'Chest up, shoulders back'],
-    execution: ['Pull to lower chest', 'Squeeze shoulder blades together', 'Control release (2 sec)'],
+    execution: ['Controlled concentric - 2s pull to lower chest', 'Squeeze shoulder blades together', 'Slow eccentric - 2s release'],
     mistakes: ['Rounding back', 'Using momentum/rocking', 'Pulling to stomach instead of chest']
   },
 
@@ -68,7 +68,7 @@ export const FORM_CUES = {
   // LOWER_A exercises
   'Hack Squat': {
     setup: ['Feet shoulder-width', 'Toes slightly out', 'Back against pad'],
-    execution: ['Descend slowly (3 sec)', 'Knees track over toes', 'Drive through heels'],
+    execution: ['Slow eccentric - 3s down', 'Knees track over toes', 'Explosive concentric - 2s up through heels'],
     mistakes: ['Knees caving in', 'Heels lifting off platform', 'Partial ROM (not to 90°)']
   },
 
@@ -105,25 +105,25 @@ export const FORM_CUES = {
   // UPPER_B exercises
   'Lat Pulldown': {
     setup: ['Wide grip on bar', 'Chest up, shoulders back', 'Slight lean back (15°)'],
-    execution: ['Pull to upper chest', 'Lead with elbows', 'Squeeze lats at bottom (1 sec)'],
+    execution: ['Controlled concentric - 2s pull to upper chest', 'Lead with elbows, squeeze lats', 'Slow eccentric - 2s release'],
     mistakes: ['Pulling behind neck', 'Leaning back too far', 'Using momentum/swinging']
   },
 
   'DB Shoulder Press': {
     setup: ['Dumbbells at shoulders', 'Feet flat on floor', 'Core braced, ribs down'],
-    execution: ['Press straight up', 'Avoid arching back', 'Control descent (2 sec)'],
+    execution: ['Controlled concentric - 2s press straight up', 'Avoid arching back', 'Slow eccentric - 2s descent'],
     mistakes: ['Excessive back arch', 'Pressing forward instead of up', 'Dumbbells drifting apart']
   },
 
   'Chest-Supported Row': {
     setup: ['Chest on pad', 'Neutral spine', 'Dumbbells hanging'],
-    execution: ['Pull to sides of ribs', 'Squeeze shoulder blades', 'Control descent (2 sec)'],
+    execution: ['Controlled concentric - 2s pull to sides of ribs', 'Squeeze shoulder blades', 'Slow eccentric - 2s descent'],
     mistakes: ['Lifting chest off pad', 'Using momentum', 'Partial ROM']
   },
 
   'Incline DB Press': {
     setup: ['Bench at 30-45°', 'Retract shoulder blades', 'Feet flat on floor'],
-    execution: ['Elbows at 45°', 'Control descent (2 sec)', 'Press to lockout'],
+    execution: ['Elbows at 45°', 'Slow eccentric - 2s down', 'Explosive concentric - 1s up to lockout'],
     mistakes: ['Dumbbells drifting apart', 'Bench too steep (>45°)', 'Shoulders rolling forward']
   },
 
@@ -148,7 +148,7 @@ export const FORM_CUES = {
 
   'DB Romanian Deadlift': {
     setup: ['Feet hip-width', 'Dumbbells at thighs', 'Slight knee bend locked'],
-    execution: ['Hinge at hips', 'Keep back flat', 'Lower to shin level (3 sec)'],
+    execution: ['Hinge at hips', 'Slow eccentric - 3s lower to shin level', 'Controlled concentric - 2s up, keep back flat'],
     mistakes: ['Rounding back', 'Squatting down', 'Bending knees more during descent']
   },
 
