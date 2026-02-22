@@ -212,6 +212,9 @@ export class UnlockEvaluator {
       },
       'Lat Pulldown': {
         'Pull-ups': { weight: 50, reps: 10, sets: 3 } // Pulldown weight
+      },
+      'Hip Thrust': {
+        'KB Swings': { weight: 40, reps: 12, sets: 3 }
       }
       // Add more as needed
     };

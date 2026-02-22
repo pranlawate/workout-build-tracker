@@ -70,9 +70,9 @@ export const EXERCISE_UNLOCK_CRITERIA = {
       threshold: { weight: 40, reps: 12, sets: 3 }
     },
     mobilityCheck: 'Hip hinge pattern proficiency',
-    painFree: true,  // No lower back pain in last 4 weeks
-    trainingWeeks: 8,
-    prerequisiteExercise: 'DB Romanian Deadlift'
+    painFreeWeeks: 4,  // No lower back pain in last 4 weeks
+    trainingWeeks: 8
+    // TODO: Add prerequisiteExercise: 'DB Romanian Deadlift' when evaluator supports it
   }
 };
 
