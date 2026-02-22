@@ -2,35 +2,245 @@
 
 This directory contains automated test scripts designed to run in the browser console.
 
-## Test Files
+## Quick Start
 
-### Phase Integration Tests
+**Run ALL tests:**
+```javascript
+fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
+```
 
-**`test-comprehensive-phase-integration.js`** (Recommended)
-- **Coverage:** 50+ automated tests for Build/Maintenance Phase Integration
-- **What it tests:**
-  - PhaseManager methods (getPhase, getProgressionBehavior, getDeloadSensitivity, getUnlockPriority)
-  - DeloadManager phase-aware timing (6 weeks Building, 4 weeks Maintenance)
-  - UnlockEvaluator phase-aware prioritization
-  - Error handling and edge cases
-  - State transitions between phases
-  - Reset and initialization behavior
-- **Pass rate:** 100% (when feature is working)
+**Or load individual test suites** (see sections below).
 
-**`test-phase-integration-ui.js`**
-- **Coverage:** 12 manual + 4 automated DOM checks for UI integration
-- **What it tests:**
-  - Phase toggle persistence across page reloads
-  - Progression messages (weight vs tempo)
-  - Unlock priority UI (bodyweight exercises first in Maintenance)
-  - Visual badge styling
-  - Deload timing UI display
-  - Edge cases (phase switch while modal open, empty lists)
+---
 
-**`test-phase-integration.js`**
-- **Coverage:** Earlier version of phase integration tests
-- **Status:** Superseded by test-comprehensive-phase-integration.js
-- **Keep for:** Reference if needed
+## Master Test Runner
+
+### `test-runner.js` ⭐ RECOMMENDED
+
+**The master test runner that executes all test suites and provides comprehensive reporting.**
+
+**What it tests:**
+- All exercises (28 exercises)
+- All progression pathways (all slots across 4 workouts)
+- All feature modules (23 modules)
+- Phase integration (50+ tests)
+
+**Usage:**
+```javascript
+// Option 1: Load and auto-run everything
+fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
+
+// Option 2: Manual control
+fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
+// Then run:
+testRunner.runAll()              // Run all tests
+testRunner.runExercises()        // Run exercise tests only
+testRunner.runProgressions()     // Run progression tests only
+testRunner.runFeatures()         // Run feature tests only
+testRunner.runPhaseIntegration() // Run phase tests only
+testRunner.stats()               // Show quick stats
+testRunner.exportResults()       // Download JSON report
+```
+
+**Output:**
+- Comprehensive pass/fail summary
+- Success percentage per test suite
+- Total duration
+- Exportable JSON results
+
+---
+
+## Individual Test Suites
+
+### 1. Exercise Testing
+
+**`test-all-exercises.js`**
+
+**Coverage:** All 28 exercises in the app
+- Exercise definitions (sets, reps, weights, increments)
+- Form cues (setup, execution, mistakes)
+- Equipment profiles
+- Complexity tier classification
+- Workout integration
+
+**Usage:**
+```javascript
+fetch('./tests/test-all-exercises.js').then(r => r.text()).then(eval);
+// Results: window._exerciseTestResults
+```
+
+**What it validates:**
+- Every exercise has required fields (sets, repRange, rirTarget, startingWeight)
+- Valid sets count (1-5)
+- Valid starting weights (> 0kg, < 200kg)
+- Weight increments defined
+- Form cues exist and are complete (setup, execution, mistakes)
+- Equipment profiles defined
+- Complexity tiers assigned
+- Proper integration with workouts
+
+**Sample Output:**
+```
+🏋️ COMPREHENSIVE EXERCISE TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: DB Flat Bench Press - Has required fields
+✅ PASS: DB Flat Bench Press - Valid sets count (1-5)
+✅ PASS: DB Flat Bench Press - Has form cues defined
+...
+
+📊 TEST SUMMARY
+Exercise Definitions: 140/140 passed (100%)
+Form Cues: 84/84 passed (100%)
+Equipment Profiles: 28/28 passed (100%)
+
+🎯 OVERALL: 252/252 tests passed (100%)
+```
+
+---
+
+### 2. Progression Testing
+
+**`test-all-progressions.js`**
+
+**Coverage:** All progression pathways across all workout slots
+- Slot definitions (UPPER_A_SLOT_1, UPPER_A_SLOT_2, etc.)
+- Easier/harder/alternate options
+- Target exercise existence
+- Cross-slot consistency
+- Unlock integration
+
+**Usage:**
+```javascript
+fetch('./tests/test-all-progressions.js').then(r => r.text()).then(eval);
+// Results: window._progressionTestResults
+```
+
+**What it validates:**
+- All slots have current exercise defined
+- Current exercises exist in workout system
+- All easier/harder/alternate exercises exist
+- No duplicates in progression arrays
+- All progression exercises have equipment profiles
+- All progression exercises have complexity tiers
+- Slot naming conventions (WORKOUT_SLOT_N)
+- Sequential slot numbering
+- Unlock evaluator integration
+
+**Sample Output:**
+```
+🔄 COMPREHENSIVE PROGRESSION PATHWAYS TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: UPPER_A_SLOT_1 - Has current exercise (Current: DB Flat Bench Press)
+✅ PASS: UPPER_A_SLOT_1 - Current exercise exists in system
+✅ PASS: UPPER_A_SLOT_1 - Harder[0]: "Barbell Bench Press" exists
+...
+
+📊 TEST SUMMARY
+Slot Definitions: 48/48 passed (100%)
+Easier Progressions: 32/32 passed (100%)
+Harder Progressions: 45/45 passed (100%)
+Unlock Integration: 12/12 passed (100%)
+
+🎯 OVERALL: 189/189 tests passed (100%)
+```
+
+---
+
+### 3. Feature Module Testing
+
+**`test-all-features.js`**
+
+**Coverage:** All 23 feature modules
+- Module loading
+- Public API methods
+- Error handling
+- App integration
+- localStorage compatibility
+
+**Usage:**
+```javascript
+fetch('./tests/test-all-features.js').then(r => r.text()).then(eval);
+// Results: window._featureTestResults
+```
+
+**Modules tested:**
+- Achievements
+- Analytics Calculator
+- Barbell Progression Tracker
+- Body Weight
+- Complexity Tiers
+- Deload Manager
+- Equipment Profiles
+- Exercise Metadata
+- Form Cues
+- Optional Fifth Day
+- Performance Analyzer
+- Phase Manager
+- Progress Analyzer
+- Progression
+- Progression Pathways
+- Smart Progression
+- Storage Manager
+- Tempo Guidance
+- Unlock Criteria
+- Unlock Evaluator
+- Warm-up Protocols
+- Workout Manager
+- Workouts
+
+**What it validates:**
+- Module loads without errors
+- Public API methods exist
+- Methods handle basic inputs without crashing
+- Proper integration with window.app
+- Safe error handling for edge cases
+
+**Sample Output:**
+```
+⚙️ COMPREHENSIVE FEATURE MODULES TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: Storage Manager - Loads successfully
+✅ PASS: Storage Manager - StorageManager instantiates
+✅ PASS: Storage Manager - Has method: getExerciseHistory
+✅ PASS: Phase Manager - PhaseManager instantiates
+✅ PASS: Phase Manager - getPhase returns valid phase (Phase: building)
+...
+
+📊 TEST SUMMARY
+Module Loading: 23/23 passed (100%)
+Storage Manager: 8/8 passed (100%)
+Phase Manager: 5/5 passed (100%)
+App Integration: 5/5 passed (100%)
+
+🎯 OVERALL: 95/95 tests passed (100%)
+```
+
+---
+
+### 4. Phase Integration Tests
+
+**`test-comprehensive-phase-integration.js`**
+
+**Coverage:** 50+ automated tests for Build/Maintenance Phase Integration
+- PhaseManager methods (getPhase, getProgressionBehavior, getDeloadSensitivity, getUnlockPriority)
+- DeloadManager phase-aware timing (6 weeks Building, 4 weeks Maintenance)
+- UnlockEvaluator phase-aware prioritization
+- Error handling and edge cases
+- State transitions between phases
+- Reset and initialization behavior
+
+**Usage:**
+```javascript
+fetch('./tests/test-comprehensive-phase-integration.js').then(r => r.text()).then(eval);
+// Results: window._phaseTestResults
+```
+
+**Legacy test files:**
+- `test-phase-integration-ui.js` - UI integration tests
+- `test-phase-integration.js` - Earlier version (superseded)
 
 ---
 
