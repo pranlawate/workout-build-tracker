@@ -33,6 +33,28 @@ export function getWarmup(workoutName) {
   return WARMUPS[workoutName] || [];
 }
 
+// Exercise definitions for progression pathway exercises
+export const EXERCISE_DEFINITIONS = {
+  'KB Goblet Squat': {
+    sets: 3,
+    repRange: '8-12',
+    rirTarget: '2-3',
+    startingWeight: 12,  // 12kg KB
+    weightIncrement: 4,   // KB increments (8, 12, 16, 20, 24, 28, 32kg)
+    notes: 'Compound | Quads, Glutes',
+    machineOk: false
+  },
+  'KB Swings': {
+    sets: 3,
+    repRange: '15-20',  // Higher reps for ballistic work
+    rirTarget: '2-3',
+    startingWeight: 12,  // Start conservative
+    weightIncrement: 4,
+    notes: 'Compound | Glutes, Hamstrings | Ballistic hip power',
+    machineOk: false
+  }
+};
+
 export const WORKOUTS = {
   UPPER_A: {
     name: 'UPPER_A',
