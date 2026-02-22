@@ -176,6 +176,43 @@ export const FORM_CUES = {
     mistakes: ['Hips sagging', 'Rotating torso', 'Holding breath']
   },
 
+  // Kettlebell progressions
+  'KB Goblet Squat': {
+    setup: [
+      'Hold KB at chest height',
+      'Elbows pointing down',
+      'Feet shoulder-width, toes slightly out'
+    ],
+    execution: [
+      'Slow eccentric - 3s down to parallel',
+      'Chest up, elbows between knees',
+      'Explosive concentric - 2s up through heels'
+    ],
+    mistakes: [
+      'Rounding back',
+      'KB drifting away from chest',
+      'Knees caving inward'
+    ]
+  },
+
+  'KB Swings': {
+    setup: [
+      'KB on floor ahead',
+      'Hip-width stance',
+      'Hinge to grip KB with both hands'
+    ],
+    execution: [
+      'Explosive hip snap drives KB up',
+      'Arms stay straight - hips do the work',
+      'Controlled eccentric - let KB swing back between legs'
+    ],
+    mistakes: [
+      'Squatting instead of hinging',
+      'Pulling with arms instead of hip snap',
+      'Rounding lower back - STOP IMMEDIATELY if this occurs'
+    ]
+  },
+
   // Barbell progressions (for future unlocking)
   'Barbell Bench Press': {
     setup: ['Retract shoulder blades', 'Feet flat on floor', 'Arch lower back', 'Grip slightly wider than shoulders'],
