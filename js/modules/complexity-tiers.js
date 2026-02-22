@@ -53,6 +53,7 @@ export const EXERCISE_COMPLEXITY = {
   'Concentration Curl': COMPLEXITY_TIERS.SIMPLE,
   'Overhead Cable Triceps Extension': COMPLEXITY_TIERS.SIMPLE,
   'Cable Triceps Pushdown': COMPLEXITY_TIERS.SIMPLE,
+  'KB Goblet Squat': COMPLEXITY_TIERS.SIMPLE,
 
   // MODERATE tier (62 exercises: multi-joint OR unstable base OR multi-plane)
   'DB Flat Bench Press': COMPLEXITY_TIERS.MODERATE,
@@ -121,6 +122,7 @@ export const EXERCISE_COMPLEXITY = {
 
   // MODERATE tier additions
   'Ardha Baithak': COMPLEXITY_TIERS.MODERATE,          // Half squat - partial ROM, less demanding
+  'KB Swings': COMPLEXITY_TIERS.MODERATE,
 
   // COMPLEX tier (22 exercises: multi-joint + unstable base + multi-plane, or advanced barbell/bodyweight/traditional)
   // Barbell compound movements
