@@ -24,6 +24,10 @@ fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
 - All progression pathways (all slots across 4 workouts)
 - All feature modules (23 modules)
 - Phase integration (50+ tests)
+- Workout rotation logic (sequence, streaks, cycles, recovery)
+- Deload logic (phase-aware triggers, state management)
+- Unlock system (criteria evaluation, phase prioritization)
+- Smart progression (plateau detection, weight suggestions, decision engine)
 
 **Usage:**
 ```javascript
@@ -38,6 +42,10 @@ testRunner.runExercises()        // Run exercise tests only
 testRunner.runProgressions()     // Run progression tests only
 testRunner.runFeatures()         // Run feature tests only
 testRunner.runPhaseIntegration() // Run phase tests only
+testRunner.runWorkoutRotation()  // Run rotation logic tests only
+testRunner.runDeloadLogic()      // Run deload logic tests only
+testRunner.runUnlockSystem()     // Run unlock system tests only
+testRunner.runSmartProgression() // Run smart progression tests only
 testRunner.stats()               // Show quick stats
 testRunner.exportResults()       // Download JSON report
 ```
@@ -241,6 +249,209 @@ fetch('./tests/test-comprehensive-phase-integration.js').then(r => r.text()).the
 **Legacy test files:**
 - `test-phase-integration-ui.js` - UI integration tests
 - `test-phase-integration.js` - Earlier version (superseded)
+
+---
+
+### 5. Workout Rotation Logic Tests
+
+**`test-workout-rotation.js`**
+
+**Coverage:** Complete workout rotation algorithm testing
+- Next workout suggestion (UPPER_A → LOWER_A → UPPER_B → LOWER_B cycle)
+- Rotation sequence tracking (maintains last 12 workouts)
+- Streak counting (increments on each workout completion)
+- Cycle detection (full 4-workout rotations)
+- Muscle recovery warnings (48-hour rest periods)
+- State persistence across manager instances
+- Edge cases (wrapping, state restoration)
+
+**Usage:**
+```javascript
+fetch('./tests/test-workout-rotation.js').then(r => r.text()).then(eval);
+// Results: window._workoutRotationTestResults
+```
+
+**What it validates:**
+- Fresh rotation starts with UPPER_A
+- Sequence advances correctly (A→B→C→D→A)
+- Streak increments on each completion
+- Cycle count increases after completing all 4 workouts
+- Recovery warnings for same muscle groups < 48 hours apart
+- State persists to localStorage correctly
+
+**Sample Output:**
+```
+🔄 COMPREHENSIVE WORKOUT ROTATION LOGIC TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: Fresh rotation suggests UPPER_A
+✅ PASS: After UPPER_A, suggests LOWER_A
+✅ PASS: Cycle detected after completing all 4 workouts
+✅ PASS: Warns when doing UPPER_B immediately after UPPER_A
+...
+
+📊 TEST SUMMARY
+Initial State: 4/4 passed (100%)
+Rotation Sequence: 5/5 passed (100%)
+Streak Tracking: 5/5 passed (100%)
+Cycle Detection: 3/3 passed (100%)
+Muscle Recovery: 4/4 passed (100%)
+
+🎯 OVERALL: 35/35 tests passed (100%)
+```
+
+---
+
+### 6. Deload Logic Tests
+
+**`test-deload-logic.js`**
+
+**Coverage:** Phase-aware deload management testing
+- Weeks-since-deload calculation (handles null, invalid dates, future dates)
+- Phase-aware trigger thresholds (6 weeks Building, 4 weeks Maintenance)
+- Deload state management (start, end, postpone)
+- Days remaining calculation
+- Phase integration with PhaseManager
+- Edge cases (boundary conditions, error handling)
+
+**Usage:**
+```javascript
+fetch('./tests/test-deload-logic.js').then(r => r.text()).then(eval);
+// Results: window._deloadTestResults
+```
+
+**What it validates:**
+- Returns 0 weeks for null/undefined/invalid lastDeloadDate
+- Calculates correct weeks from date (7 days = 1 week, 28 days = 4 weeks, etc.)
+- Building phase triggers after 6 weeks
+- Maintenance phase triggers after 4 weeks
+- Active deload prevents new triggers
+- Postpone increments dismissedCount
+- Days remaining calculated correctly
+
+**Sample Output:**
+```
+⏸️ COMPREHENSIVE DELOAD LOGIC TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: Returns 0 weeks for null lastDeloadDate
+✅ PASS: Building phase: Triggers after 6 weeks
+✅ PASS: Maintenance phase: Triggers after 4 weeks
+✅ PASS: startDeload() sets active to true
+...
+
+📊 TEST SUMMARY
+Weeks Calculation: 7/7 passed (100%)
+Phase-Aware Triggers: 4/4 passed (100%)
+Deload State Management: 7/7 passed (100%)
+Phase Integration: 3/3 passed (100%)
+
+🎯 OVERALL: 40/40 tests passed (100%)
+```
+
+---
+
+### 7. Unlock System Tests
+
+**`test-unlock-system.js`**
+
+**Coverage:** Exercise unlock evaluation system testing
+- Simple tier exercises (always unlocked)
+- Strength milestone checking (weight × reps × sets thresholds)
+- Mobility requirement checking (3+ "yes" responses)
+- Pain-free status checking (N consecutive pain-free workouts)
+- Training weeks calculation (time since first workout)
+- Phase-aware prioritization (bodyweight priority in Maintenance)
+- Exercise type detection (barbell, bodyweight, traditional, equipment)
+- Priority calculation (1 = high priority, 2 = lower, 999 = not recommended)
+
+**Usage:**
+```javascript
+fetch('./tests/test-unlock-system.js').then(r => r.text()).then(eval);
+// Results: window._unlockSystemTestResults
+```
+
+**What it validates:**
+- SIMPLE tier always returns unlocked: true
+- Already unlocked exercises return unlocked: true
+- Strength milestones check recent performance (e.g., 15kg × 12 reps × 3 sets)
+- Pain-free requires all recent workouts with painLevel: 0
+- Training weeks calculated from first workout date
+- Building phase: all exercises priority 1, all phase-recommended
+- Maintenance phase: bodyweight priority 1, barbell priority 2
+- Constructor requires PhaseManager instance
+
+**Sample Output:**
+```
+🔓 COMPREHENSIVE UNLOCK SYSTEM TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: Simple tier exercise is always unlocked
+✅ PASS: Building phase: All exercises have priority 1
+✅ PASS: Maintenance phase: Bodyweight exercise has priority 1
+✅ PASS: Maintenance phase: Barbell exercise has priority 2 (lower)
+...
+
+📊 TEST SUMMARY
+Simple Tier: 3/3 passed (100%)
+Phase-Aware Prioritization: 6/6 passed (100%)
+Exercise Type Detection: 6/6 passed (100%)
+Strength Milestones: 3/3 passed (100%)
+
+🎯 OVERALL: 45/45 tests passed (100%)
+```
+
+---
+
+### 8. Smart Progression Tests
+
+**`test-smart-progression.js`**
+
+**Coverage:** Smart progression calculation engine testing
+- Rep range checking (standard 8-12 reps, time-based for planks)
+- Plateau detection (same weight for 3+ workouts)
+- Regression detection (weight drop OR 25%+ rep drop)
+- Weight gap failure (increased weight, failed min reps, RIR 0)
+- Successful progression (top reps with RIR 2-3)
+- Weight increase suggestions (+2.5kg standard increment)
+- Adaptive pattern learning (detects user's progression pattern)
+- Main decision engine (getSuggestion with 6-priority system)
+
+**Usage:**
+```javascript
+fetch('./tests/test-smart-progression.js').then(r => r.text()).then(eval);
+// Results: window._smartProgressionTestResults
+```
+
+**What it validates:**
+- hitTopOfReps returns true for reps >= max (12)
+- Plateau detected when same weight for 3+ workouts
+- Regression detected on weight drop OR 25%+ rep drop
+- Weight gap failure requires: weight increase + below min reps + RIR 0
+- Successful progression requires: top reps (12) + good RIR (2-3)
+- Weight increase suggests +2.5kg increment
+- Adaptive learning detects large jumps (5kg) vs small steps (1kg)
+- getSuggestion priorities: pain → progression → weight gap → plateau → regression → continue
+
+**Sample Output:**
+```
+📈 COMPREHENSIVE SMART PROGRESSION TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: Returns true for 12 reps (top of standard range)
+✅ PASS: Detects plateau with same weight for 3 workouts
+✅ PASS: Detects regression with 25%+ rep drop at same weight
+✅ PASS: Priority 1: Pain handling takes precedence
+...
+
+📊 TEST SUMMARY
+Rep Range: 4/4 passed (100%)
+Plateau Detection: 3/3 passed (100%)
+Regression Detection: 3/3 passed (100%)
+Decision Engine: 5/5 passed (100%)
+
+🎯 OVERALL: 50/50 tests passed (100%)
+```
 
 ---
 

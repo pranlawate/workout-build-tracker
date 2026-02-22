@@ -12,6 +12,10 @@
  *    - testRunner.runProgressions()
  *    - testRunner.runFeatures()
  *    - testRunner.runPhaseIntegration()
+ *    - testRunner.runWorkoutRotation()
+ *    - testRunner.runDeloadLogic()
+ *    - testRunner.runUnlockSystem()
+ *    - testRunner.runSmartProgression()
  *    - testRunner.runAll()
  */
 
@@ -20,7 +24,11 @@ const testRunner = {
     exercises: null,
     progressions: null,
     features: null,
-    phaseIntegration: null
+    phaseIntegration: null,
+    workoutRotation: null,
+    deloadLogic: null,
+    unlockSystem: null,
+    smartProgression: null
   },
 
   async loadScript(path) {
@@ -67,6 +75,38 @@ const testRunner = {
     }
   },
 
+  async runWorkoutRotation() {
+    console.log('\n🔄 RUNNING WORKOUT ROTATION TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-workout-rotation.js');
+    if (loaded) {
+      this.results.workoutRotation = window._workoutRotationTestResults;
+    }
+  },
+
+  async runDeloadLogic() {
+    console.log('\n⏸️ RUNNING DELOAD LOGIC TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-deload-logic.js');
+    if (loaded) {
+      this.results.deloadLogic = window._deloadTestResults;
+    }
+  },
+
+  async runUnlockSystem() {
+    console.log('\n🔓 RUNNING UNLOCK SYSTEM TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-unlock-system.js');
+    if (loaded) {
+      this.results.unlockSystem = window._unlockSystemTestResults;
+    }
+  },
+
+  async runSmartProgression() {
+    console.log('\n📈 RUNNING SMART PROGRESSION TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-smart-progression.js');
+    if (loaded) {
+      this.results.smartProgression = window._smartProgressionTestResults;
+    }
+  },
+
   async runAll() {
     console.clear();
     console.log('═══════════════════════════════════════════════════════════════');
@@ -81,6 +121,10 @@ const testRunner = {
     await this.runProgressions();
     await this.runFeatures();
     await this.runPhaseIntegration();
+    await this.runWorkoutRotation();
+    await this.runDeloadLogic();
+    await this.runUnlockSystem();
+    await this.runSmartProgression();
 
     const endTime = Date.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -99,7 +143,11 @@ const testRunner = {
       { name: 'Exercise Tests', key: 'exercises', icon: '🏋️' },
       { name: 'Progression Tests', key: 'progressions', icon: '🔄' },
       { name: 'Feature Tests', key: 'features', icon: '⚙️' },
-      { name: 'Phase Integration Tests', key: 'phaseIntegration', icon: '🎯' }
+      { name: 'Phase Integration Tests', key: 'phaseIntegration', icon: '🎯' },
+      { name: 'Workout Rotation Tests', key: 'workoutRotation', icon: '🔄' },
+      { name: 'Deload Logic Tests', key: 'deloadLogic', icon: '⏸️' },
+      { name: 'Unlock System Tests', key: 'unlockSystem', icon: '🔓' },
+      { name: 'Smart Progression Tests', key: 'smartProgression', icon: '📈' }
     ];
 
     let totalPassed = 0;
@@ -167,7 +215,11 @@ const testRunner = {
     console.log('   - testRunner.runExercises() - Run exercise tests only');
     console.log('   - testRunner.runProgressions() - Run progression tests only');
     console.log('   - testRunner.runFeatures() - Run feature tests only');
-    console.log('   - testRunner.runPhaseIntegration() - Run phase tests only\n');
+    console.log('   - testRunner.runPhaseIntegration() - Run phase tests only');
+    console.log('   - testRunner.runWorkoutRotation() - Run rotation tests only');
+    console.log('   - testRunner.runDeloadLogic() - Run deload tests only');
+    console.log('   - testRunner.runUnlockSystem() - Run unlock tests only');
+    console.log('   - testRunner.runSmartProgression() - Run progression tests only\n');
 
     return window._allTestResults;
   },
