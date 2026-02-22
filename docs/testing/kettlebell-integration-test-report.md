@@ -4,6 +4,12 @@
 **Version:** v70
 **Tester:** [Name]
 
+## Testing Environment
+- **Browser:** [Chrome/Firefox/Safari]
+- **Device:** [Desktop/Mobile]
+- **Screen Size:** [Resolution]
+- **Note:** Monitor browser console for errors during testing
+
 ## Test Scenarios
 
 ### 1. Equipment Filtering
@@ -20,14 +26,59 @@
 - [ ] Can be selected as regression from Hack Squat
 
 #### KB Swings
-- [ ] KB Swings locked without DB RDL completion
-- [ ] KB Swings locked without Hip Thrust strength milestone (8+ reps at 50+ lbs)
-- [ ] KB Swings locked with lower back pain flag active
-- [ ] KB Swings unlocked when all criteria met:
-  - DB RDL completed at least once
-  - Hip Thrust strength milestone achieved
-  - No lower back pain flag
-- [ ] Lock reason messages display correctly for each blocking condition
+
+**Test Steps - Locked State (No DB RDL Completion):**
+1. Clear localStorage to reset all exercise history
+2. Enable kettlebells in equipment settings
+3. Navigate to Browse Progressions for Hip Thrust slot
+4. Locate KB Swings in the exercise list
+
+**Expected Results:**
+- [ ] KB Swings shows lock icon
+- [ ] Lock reason displays: "Complete DB RDL first"
+- [ ] Exercise is not selectable
+- [ ] Tooltip/message clearly explains prerequisite
+
+**Test Steps - Locked State (No Hip Thrust Milestone):**
+1. Complete DB RDL at least once (any weight/reps)
+2. Complete Hip Thrust with insufficient strength (e.g., 5 reps at 40 lbs)
+3. Navigate to Browse Progressions for Hip Thrust slot
+4. Locate KB Swings in the exercise list
+
+**Expected Results:**
+- [ ] KB Swings shows lock icon
+- [ ] Lock reason displays: "Build Hip Thrust strength (8+ reps at 50+ lbs)"
+- [ ] Exercise is not selectable
+- [ ] Progress toward milestone is visible if implemented
+
+**Test Steps - Locked State (Lower Back Pain Flag):**
+1. Complete DB RDL at least once
+2. Complete Hip Thrust with 8+ reps at 50+ lbs
+3. Set lower back pain flag active in settings
+4. Navigate to Browse Progressions for Hip Thrust slot
+5. Locate KB Swings in the exercise list
+
+**Expected Results:**
+- [ ] KB Swings shows lock icon
+- [ ] Lock reason displays: "Lower back pain flag active - see settings"
+- [ ] Exercise is not selectable
+- [ ] Safety message emphasizes injury prevention
+
+**Test Steps - Unlocked State:**
+1. Clear lower back pain flag (if set)
+2. Verify DB RDL completion exists in history
+3. Verify Hip Thrust history shows at least one session with 8+ reps at 50+ lbs
+4. Navigate to Browse Progressions for Hip Thrust slot
+5. Locate KB Swings in the exercise list
+6. Select KB Swings as active exercise
+7. Navigate to workout screen
+
+**Expected Results:**
+- [ ] KB Swings shows no lock icon
+- [ ] Exercise is selectable
+- [ ] Selection persists when navigating away and back
+- [ ] Workout screen displays KB Swings with form cues
+- [ ] Set logging functions correctly
 
 ### 3. Form Cues
 
@@ -90,8 +141,18 @@
 ### Progression UI
 [Document test results here]
 
-### Workflow Integration
+### Workout Screen Integration
 [Document test results here]
+
+## Test Results Summary
+**Total Tests:** [Count]
+**Passed:** [Count]
+**Failed:** [Count]
+
+## Deployment Status
+- [ ] ✅ PASS - Ready for production
+- [ ] ⚠️ PASS WITH WARNINGS - Acceptable with documented limitations
+- [ ] ❌ FAIL - Do not deploy
 
 ## Edge Cases Verified
 
@@ -142,4 +203,12 @@
 - [ ] Screenshots captured for UI issues
 
 ## Notes
+
+### Testing Best Practices
+- Monitor browser console throughout testing for JavaScript errors or warnings
+- Capture screenshots for any UI issues or unexpected behavior
+- Test on multiple screen sizes to verify mobile responsiveness
+- Clear localStorage between test runs to ensure clean state
+- Document exact steps to reproduce any issues found
+
 [Any additional observations or context]
