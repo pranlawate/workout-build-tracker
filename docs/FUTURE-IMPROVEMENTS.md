@@ -1,6 +1,6 @@
 # Future Improvement Ideas
 
-**Last Updated:** 2026-02-16
+**Last Updated:** 2026-02-22
 
 This document tracks improvement ideas and potential enhancements for future development.
 
@@ -12,33 +12,7 @@ This document tracks improvement ideas and potential enhancements for future dev
 
 ## Progression Pathways
 
-### 1. Kettlebell Exercise Integration
-**Priority:** Low
-**Status:** Not Started
-**Description:**
-- Evaluate adding kettlebell exercises to progression pathways
-- Similar to how we have barbell and dumbbell progressions
-- Identify exercises that work well with kettlebells:
-  - Kettlebell Swings (hip hinge pattern - could replace DB RDL)
-  - Kettlebell Goblet Squat (squat pattern)
-  - Kettlebell Turkish Get-Up (full body)
-  - Kettlebell Clean & Press (explosive compound)
-
-**Considerations:**
-- User has weak lower back (kettlebell swings may be risky - need proper form)
-- User successfully did Hip Thrust with 12.5kg kettlebell
-- Kettlebells excel at ballistic/explosive movements
-- May need to add `equipmentType: 'kettlebell'` to exercise definitions
-
-**Affected Files:**
-- `js/modules/workouts.js` - Add kettlebell exercises
-- `js/modules/progression-pathways.js` - Add kettlebell progression options
-- `js/modules/unlock-evaluator.js` - Handle kettlebell equipment type
-
-**Questions to Resolve:**
-- Which exercises benefit most from kettlebell variant?
-- Should kettlebells be in progression pathways or alternatives?
-- Do we need separate unlock criteria for kettlebell exercises?
+_(No pending progression pathway improvements at this time)_
 
 ---
 
@@ -56,6 +30,14 @@ When implementing these improvements:
 ## Archived Ideas
 
 _(Ideas that have been implemented or rejected will be moved here with notes)_
+
+### ✅ Kettlebell Exercise Integration (Implemented 2026-02-22)
+- Added KB Goblet Squat as default-unlocked regression option for Hack Squat
+- Added KB Swings with MODERATE complexity and DB RDL prerequisite
+- Integrated with existing equipment-aware architecture
+- Safety-focused unlock criteria (8 weeks training, strength milestone, pain-free requirement)
+- **Files modified:** progression-pathways.js, equipment-profiles.js, complexity-tiers.js, unlock-criteria.js, form-cues.js, workouts.js
+- **Commits:** cc0b920, 47da4b2, 654769e, 79b2cf6, 08761a8, 1bade85, c4b8bd3, 831458b, 63e19da, 2eaf671, e717940, 6f728b4, 2d51472
 
 ### ✅ Enhanced Exercise Hints with Type Labels (Implemented 2026-02-20)
 - Implemented pipe-separated format: `[Type] | [Specific Muscles] | [Tempo/Key Info]`
