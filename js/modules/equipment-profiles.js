@@ -43,6 +43,10 @@ export const EQUIPMENT_REQUIREMENTS = {
   'Barbell Deadlift': ['barbells'],
   'Barbell Overhead Press': ['barbells'],
 
+  // Kettlebell exercises
+  'KB Goblet Squat': ['kettlebells'],
+  'KB Swings': ['kettlebells'],
+
   // Mudgal/Gada exercises
   'Mudgal 360 Swings': ['mudgal'],
   'Mudgal Pendulum': ['mudgal'],
