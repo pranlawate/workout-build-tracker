@@ -1,8 +1,8 @@
 # Build Tracker - Master Integration Test Report
 
-**Last Updated:** 2026-02-16
-**App Version:** v1.6 (Service Worker Cache: v67)
-**Latest Feature:** Lower Workout Restructure (LOWER_A/LOWER_B exercise swap)
+**Last Updated:** 2026-02-22
+**App Version:** v1.7 (Service Worker Cache: v70)
+**Latest Feature:** Kettlebell Integration (KB Goblet Squat, KB Swings)
 
 ---
 
@@ -1222,6 +1222,532 @@ console.log('LOWER_B slots:', [
 
 ---
 
+## Feature 12: Kettlebell Integration (2026-02-22)
+
+### Test 12.1: Equipment Profile - Kettlebells Added
+**Steps:**
+1. Open browser console
+2. Run: `import('./js/modules/equipment-profiles.js').then(m => console.log(m.EQUIPMENT_REQUIREMENTS))`
+3. Check for KB exercise entries
+
+**Expected:**
+- [ ] `'KB Goblet Squat': ['kettlebells']` exists in EQUIPMENT_REQUIREMENTS
+- [ ] `'KB Swings': ['kettlebells']` exists in EQUIPMENT_REQUIREMENTS
+- [ ] Both exercises properly filtered by equipment selection
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.2: Complexity Tiers Classification
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+import('./js/modules/complexity-tiers.js').then(m => {
+  console.log('KB Goblet Squat tier:', m.EXERCISE_COMPLEXITY['KB Goblet Squat']);
+  console.log('KB Swings tier:', m.EXERCISE_COMPLEXITY['KB Swings']);
+});
+```
+
+**Expected:**
+- [ ] KB Goblet Squat: `COMPLEXITY_TIERS.SIMPLE`
+- [ ] KB Swings: `COMPLEXITY_TIERS.MODERATE`
+- [ ] Classification affects default unlock behavior
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.3: Form Cues - KB Goblet Squat
+**Steps:**
+1. Navigate to Browse Progressions
+2. Select KB Goblet Squat from LOWER_A_SLOT_1 alternates
+3. View form cues/exercise details
+
+**Expected:**
+- [ ] Setup cues: "Hold KB at chest height", "Elbows pointing down", "Feet shoulder-width, toes slightly out"
+- [ ] Execution cues: "Slow eccentric - 3s down to parallel", "Chest up, elbows between knees", "Explosive concentric - 2s up through heels"
+- [ ] Mistakes: "Rounding back", "KB drifting away from chest", "Knees caving inward"
+- [ ] All three categories (setup, execution, mistakes) display correctly
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.4: Form Cues - KB Swings with Safety Warnings
+**Steps:**
+1. Navigate to Browse Progressions
+2. Select KB Swings from LOWER_A_SLOT_3 harder progressions (if unlocked)
+3. View form cues/exercise details
+
+**Expected:**
+- [ ] Setup cues: "KB on floor ahead", "Hip-width stance", "Hinge to grip KB with both hands"
+- [ ] Execution cues: "Explosive hip snap drives KB up", "Arms stay straight - hips do the work", "Controlled eccentric - let KB swing back between legs"
+- [ ] Mistakes include safety warning: "Rounding lower back - STOP IMMEDIATELY if this occurs"
+- [ ] Safety-focused language prominent and clear
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.5: Equipment Filtering - Kettlebells Disabled
+**Steps:**
+1. Navigate to Settings → Equipment Profile
+2. Ensure "Kettlebells" is NOT selected/enabled
+3. Navigate to Browse Progressions → LOWER_A_SLOT_1
+4. Check available alternates
+
+**Expected:**
+- [ ] KB Goblet Squat does NOT appear in progression options
+- [ ] Only non-kettlebell exercises visible
+- [ ] Equipment filtering working correctly
+
+**Actions:**
+5. Check LOWER_A_SLOT_3 harder progressions
+
+**Expected:**
+- [ ] KB Swings does NOT appear in progression options
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.6: Equipment Filtering - Kettlebells Enabled
+**Steps:**
+1. Navigate to Settings → Equipment Profile
+2. Enable "Kettlebells" in equipment selection
+3. Navigate to Browse Progressions → LOWER_A_SLOT_1
+4. Check available alternates
+
+**Expected:**
+- [ ] KB Goblet Squat APPEARS in alternates list
+- [ ] Kettlebell badge/icon displayed on exercise card
+- [ ] Can be selected as progression option
+
+**Actions:**
+5. Check LOWER_A_SLOT_3 harder progressions
+
+**Expected:**
+- [ ] KB Swings APPEARS in harder progressions list (if unlock criteria met)
+- [ ] Kettlebell badge/icon displayed
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.7: KB Goblet Squat - Default Unlocked
+**Steps:**
+1. Clear localStorage or create new user profile
+2. Navigate to Browse Progressions → LOWER_A_SLOT_1
+3. Check if KB Goblet Squat is unlocked
+
+**Expected:**
+- [ ] KB Goblet Squat is unlocked immediately (SIMPLE tier, no prerequisites)
+- [ ] Can be selected without meeting any criteria
+- [ ] Available as regression option from Hack Squat
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.8: KB Goblet Squat - Regression from Hack Squat
+**Steps:**
+1. Ensure KB Goblet Squat is unlocked
+2. In Browse Progressions, view Hack Squat slot
+3. Check regression/"easier" options
+
+**Expected:**
+- [ ] KB Goblet Squat appears as alternate/regression option
+- [ ] Smart detection may suggest KB Goblet Squat as regression
+- [ ] Can switch to KB Goblet Squat from Hack Squat
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.9: KB Swings - Unlock Criteria Check
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+import('./js/modules/unlock-criteria.js').then(m => {
+  console.log('KB Swings criteria:', m.EXERCISE_UNLOCK_CRITERIA['KB Swings']);
+});
+```
+
+**Expected:**
+- [ ] Displays unlock criteria object:
+  - `strengthMilestone`: Hip Thrust @ 40kg × 12 reps × 3 sets
+  - `mobilityCheck`: "Hip hinge pattern proficiency"
+  - `painFreeWeeks`: 4
+  - `trainingWeeks`: 8
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.10: KB Swings - Locked Without Criteria
+**Steps:**
+1. Create new user profile (clear localStorage)
+2. Complete 2-3 workouts with Hip Thrust at 30kg (below milestone)
+3. Navigate to Browse Progressions → LOWER_A_SLOT_3
+4. Check if KB Swings appears
+
+**Expected:**
+- [ ] KB Swings is LOCKED (does not appear or shows lock icon)
+- [ ] Does not appear in available progressions
+- [ ] Unlock message explains missing criteria
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.11: KB Swings - Unlocked When Criteria Met
+**Steps:**
+1. Simulate meeting unlock criteria via console:
+```javascript
+// Set Hip Thrust strength milestone
+const hipThrustHistory = {
+  sets: [
+    { weight: 40, reps: 12, rir: 2 },
+    { weight: 40, reps: 12, rir: 2 },
+    { weight: 40, reps: 12, rir: 2 }
+  ]
+};
+localStorage.setItem('build_exercise_Hip Thrust', JSON.stringify([hipThrustHistory, hipThrustHistory]));
+
+// Set training weeks >= 8 (simulate 60 days of workouts)
+const oldDate = new Date();
+oldDate.setDate(oldDate.getDate() - 60);
+// ... set up training history with 8+ weeks
+```
+2. Navigate to Browse Progressions → LOWER_A_SLOT_3
+3. Check if KB Swings unlocked
+
+**Expected:**
+- [ ] KB Swings IS UNLOCKED and appears in harder progressions
+- [ ] Can be selected for LOWER_A_SLOT_3
+- [ ] No lock icon displayed
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.12: KB Swings - Hip Thrust Milestone Evaluator Integration
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+import('./js/modules/unlock-evaluator.js').then(m => {
+  const evaluator = new m.UnlockEvaluator(window.app.storage);
+  console.log('Hip Thrust milestone:', evaluator.MILESTONES['Hip Thrust']);
+});
+```
+
+**Expected:**
+- [ ] Hip Thrust milestone exists: `{ weight: 40, reps: 12, sets: 3 }`
+- [ ] Milestone matches unlock-criteria.js specification
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.13: Exercise Definitions - KB Goblet Squat
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+import('./js/modules/workouts.js').then(m => {
+  console.log('KB Goblet Squat definition:', m.EXERCISE_DEFINITIONS['KB Goblet Squat']);
+});
+```
+
+**Expected:**
+- [ ] Returns definition object:
+  - `sets`: 3
+  - `repRange`: '8-12'
+  - `rirTarget`: '2-3'
+  - `startingWeight`: 12 (12kg KB)
+  - `weightIncrement`: 4 (KB increments)
+  - `notes`: 'Compound | Quads, Glutes'
+  - `machineOk`: false
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.14: Exercise Definitions - KB Swings
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+import('./js/modules/workouts.js').then(m => {
+  console.log('KB Swings definition:', m.EXERCISE_DEFINITIONS['KB Swings']);
+});
+```
+
+**Expected:**
+- [ ] Returns definition object:
+  - `sets`: 3
+  - `repRange`: '15-20' (higher reps for ballistic work)
+  - `rirTarget`: '2-3'
+  - `startingWeight`: 12
+  - `weightIncrement`: 4
+  - `notes`: 'Compound | Glutes, Hamstrings | Ballistic hip power'
+  - `machineOk`: false
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.15: Workout Display Integration - KB Goblet Squat
+**Steps:**
+1. Navigate to Browse Progressions → LOWER_A_SLOT_1
+2. Select KB Goblet Squat as exercise for slot
+3. Return to home, start LOWER_A workout
+4. Check that KB Goblet Squat appears with correct parameters
+
+**Expected:**
+- [ ] KB Goblet Squat displays in workout
+- [ ] Shows: 3 sets × 8-12 reps @ RIR 2-3
+- [ ] Starting weight: 12kg
+- [ ] Weight increment: 4kg (KB sizes)
+- [ ] Notes visible: "Compound | Quads, Glutes"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.16: Workout Display Integration - KB Swings
+**Steps:**
+1. Ensure KB Swings is unlocked
+2. Navigate to Browse Progressions → LOWER_A_SLOT_3
+3. Select KB Swings as exercise for slot
+4. Return to home, start LOWER_A workout
+5. Check that KB Swings appears with correct parameters
+
+**Expected:**
+- [ ] KB Swings displays in workout
+- [ ] Shows: 3 sets × 15-20 reps @ RIR 2-3
+- [ ] Starting weight: 12kg
+- [ ] Notes visible: "Compound | Glutes, Hamstrings | Ballistic hip power"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.17: getWorkoutWithSelections() Integration
+**Steps:**
+1. Select KB Goblet Squat for LOWER_A_SLOT_1
+2. Open browser console
+3. Run:
+```javascript
+import('./js/modules/workouts.js').then(m => {
+  const workout = m.getWorkoutWithSelections('LOWER_A', window.app.storage);
+  console.log('First exercise:', workout.exercises[0]);
+});
+```
+
+**Expected:**
+- [ ] First exercise shows KB Goblet Squat (not Hack Squat)
+- [ ] Exercise has all properties from EXERCISE_DEFINITIONS
+- [ ] Function correctly merges user selections with workout definitions
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.18: Progression Pathways - LOWER_A_SLOT_1 Updated
+**Steps:**
+1. Navigate to Browse Progressions → LOWER_A_SLOT_1 (Hack Squat)
+2. Check alternates list
+
+**Expected:**
+- [ ] Current: Hack Squat
+- [ ] Alternates: Bulgarian Split Squat, KB Goblet Squat
+- [ ] KB Goblet Squat appears as second alternate
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.19: Progression Pathways - LOWER_A_SLOT_3 Updated
+**Steps:**
+1. Navigate to Browse Progressions → LOWER_A_SLOT_3 (Hip Thrust)
+2. Check harder progressions list
+
+**Expected:**
+- [ ] Current: Hip Thrust
+- [ ] Harder: Weighted Hip Thrust, Single-leg Hip Thrust, KB Swings
+- [ ] KB Swings appears as third harder progression
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.20: Service Worker Cache Update to v70
+**Steps:**
+1. Hard refresh page (Ctrl+Shift+R)
+2. Open DevTools → Application → Service Workers
+3. Check cache version
+
+**Expected:**
+- [ ] Service worker cache: `build-tracker-v70`
+- [ ] Old caches (v67, v68, v69) deleted
+- [ ] New modules cached: unlock-criteria.js
+- [ ] Updated modules cached: workouts.js, unlock-evaluator.js, progression-pathways.js
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.21: Complete Workout Flow - KB Goblet Squat
+**Steps:**
+1. Select KB Goblet Squat for LOWER_A_SLOT_1
+2. Start LOWER_A workout
+3. Log all 3 sets for KB Goblet Squat:
+   - Set 1: 12kg × 10 reps @ RIR 3
+   - Set 2: 12kg × 10 reps @ RIR 3
+   - Set 3: 12kg × 9 reps @ RIR 3
+4. Complete workout
+
+**Expected:**
+- [ ] All sets log correctly
+- [ ] Weight input accepts 12kg starting weight
+- [ ] Progress tracked in localStorage
+- [ ] Form cues accessible during workout
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.22: Complete Workout Flow - KB Swings
+**Steps:**
+1. Ensure KB Swings unlocked
+2. Select KB Swings for LOWER_A_SLOT_3
+3. Start LOWER_A workout
+4. Log all 3 sets for KB Swings:
+   - Set 1: 12kg × 18 reps @ RIR 2
+   - Set 2: 12kg × 17 reps @ RIR 2
+   - Set 3: 12kg × 16 reps @ RIR 3
+5. Complete workout
+
+**Expected:**
+- [ ] All sets log correctly
+- [ ] Rep range 15-20 validated properly
+- [ ] Higher rep counts accepted
+- [ ] Ballistic exercise tracked correctly
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.23: Weight Progression - KB Increments
+**Steps:**
+1. Complete 2 workouts with KB Goblet Squat at 12kg hitting max reps
+2. Check suggested weight for next session
+
+**Expected:**
+- [ ] Progression suggests 16kg (4kg increment, next KB size)
+- [ ] NOT 13.25kg or 14.5kg (standard DB increments)
+- [ ] Weight increment matches KB availability (4kg jumps)
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.24: Edge Case - KB Exercise Without Kettlebells
+**Steps:**
+1. Select KB Goblet Squat for LOWER_A_SLOT_1
+2. Navigate to Settings → Equipment Profile
+3. Disable "Kettlebells"
+4. Start LOWER_A workout
+
+**Expected:**
+- [ ] KB Goblet Squat either:
+  - Reverts to default Hack Squat, OR
+  - Shows warning about missing equipment, OR
+  - Still displays but with equipment warning
+- [ ] No crash or undefined behavior
+- [ ] User can still complete workout
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.25: Integration Test Documentation
+**Steps:**
+1. Open `docs/testing/kettlebell-integration-test-report.md`
+2. Verify test scenarios documented
+
+**Expected:**
+- [ ] File exists
+- [ ] Contains test scenarios for equipment filtering, unlock flow, form cues, progression UI
+- [ ] Template includes sections for results, edge cases, issues found
+- [ ] Date: 2026-02-20, Version: v70
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.26: FUTURE-IMPROVEMENTS.md Updated
+**Steps:**
+1. Open `docs/FUTURE-IMPROVEMENTS.md`
+2. Check for Kettlebell Integration section
+
+**Expected:**
+- [ ] Kettlebell Integration moved to "Archived Ideas" or "Completed Features"
+- [ ] Implementation date: 2026-02-20
+- [ ] Lists files modified
+- [ ] Marks feature as completed
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.27: No Regression - Existing Exercises
+**Steps:**
+1. Start UPPER_A workout
+2. Verify DB Flat Bench Press still works
+3. Start LOWER_B workout
+4. Verify Leg Press still works
+
+**Expected:**
+- [ ] Existing exercises unchanged
+- [ ] No impact on non-kettlebell exercises
+- [ ] All previous functionality intact
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 12.28: Null Safety - Missing Unlock Criteria
+**Steps:**
+1. Open browser console
+2. Run:
+```javascript
+import('./js/modules/unlock-evaluator.js').then(m => {
+  const evaluator = new m.UnlockEvaluator(window.app.storage);
+  const result = evaluator.evaluateUnlock('NonExistentExercise');
+  console.log('Result:', result);
+});
+```
+
+**Expected:**
+- [ ] No errors thrown
+- [ ] Returns safe default (unlocked or locked based on tier defaults)
+- [ ] Graceful handling of missing exercise
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
 ## Edge Cases & Error Handling
 
 ### Test E1: Corrupted localStorage
@@ -1345,16 +1871,16 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 
 ---
 
-### Test P3: Service Worker Cache (v67)
+### Test P3: Service Worker Cache (v70)
 **Steps:**
 1. Load app
 2. Check DevTools → Application → Service Workers
 
 **Expected:**
 - [ ] Service worker registered
-- [ ] Cache name: `build-tracker-v67`
-- [ ] Old caches deleted (v66 and earlier)
-- [ ] All assets cached correctly (including phase-manager.js, updated workouts.js)
+- [ ] Cache name: `build-tracker-v70`
+- [ ] Old caches deleted (v69 and earlier)
+- [ ] All assets cached correctly (including unlock-criteria.js, updated workouts.js, unlock-evaluator.js)
 
 **Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
 
@@ -1388,11 +1914,12 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 - [ ] Mobile responsiveness verified
 - [ ] Cross-browser compatibility confirmed
 - [ ] Performance acceptable (< 2s load time)
-- [ ] Service worker cache updated (v67)
+- [ ] Service worker cache updated (v70)
 - [ ] localStorage migrations successful
 - [ ] Error handling robust
-- [ ] Build/Maintenance phase integration tested
+- [ ] Build/Maintenance phase integration tested (Feature 10)
 - [ ] Lower workout restructure tested (Feature 11)
+- [ ] Kettlebell integration tested (Feature 12)
 
 **Documentation:**
 - [ ] README.md updated
