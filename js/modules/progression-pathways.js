@@ -114,7 +114,7 @@ export const PROGRESSION_PATHS = {
     easier: ['Leg Press'],
     current: 'Hack Squat',
     harder: ['Barbell Back Squat', 'Front Squat'],
-    alternate: ['Bulgarian Split Squat']
+    alternate: ['Bulgarian Split Squat', 'KB Goblet Squat']
   },
 
   'LOWER_A_SLOT_2': {
@@ -129,7 +129,7 @@ export const PROGRESSION_PATHS = {
     slotName: 'Glute Isolation',
     easier: ['Bodyweight Hip Thrust', 'Glute Bridges'],
     current: 'Hip Thrust',
-    harder: ['Weighted Hip Thrust', 'Single-leg Hip Thrust'],
+    harder: ['Weighted Hip Thrust', 'Single-leg Hip Thrust', 'KB Swings'],
     alternate: ['Cable Pull-Through']
   },
 
