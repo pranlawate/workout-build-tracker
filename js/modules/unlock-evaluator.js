@@ -10,6 +10,7 @@
  */
 
 import { getComplexityTier, getUnlockCriteria, COMPLEXITY_TIERS } from './complexity-tiers.js';
+import { EXERCISE_UNLOCK_CRITERIA } from './unlock-criteria.js';
 
 export class UnlockEvaluator {
   /**
@@ -52,7 +53,11 @@ export class UnlockEvaluator {
         };
       }
 
-      const requirements = getUnlockCriteria(targetExercise);
+      // Get exercise-specific criteria if available, otherwise use tier defaults
+      const tierDefaults = getUnlockCriteria(targetExercise);
+      const specificCriteria = EXERCISE_UNLOCK_CRITERIA[targetExercise];
+      const requirements = specificCriteria || tierDefaults;
+
       const met = {
         strength: false,
         mobility: false,
