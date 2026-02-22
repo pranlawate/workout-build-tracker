@@ -8,7 +8,7 @@ import { BodyWeightManager } from './modules/body-weight.js';
 import { ProgressAnalyzer } from './modules/progress-analyzer.js';
 import { AnalyticsCalculator } from './modules/analytics-calculator.js';
 import { WeightTrendChart } from './components/weight-trend-chart.js';
-import { getWorkout, getWarmup } from './modules/workouts.js';
+import { getWorkout, getWorkoutWithSelections, getWarmup } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { getSuggestion } from './modules/smart-progression.js';
 import { getFormCues } from './modules/form-cues.js';
@@ -509,7 +509,7 @@ class App {
   }
 
   proceedWithWorkout(workoutName) {
-    this.currentWorkout = getWorkout(workoutName);
+    this.currentWorkout = getWorkoutWithSelections(workoutName, this.storage);
     this.currentExerciseIndex = 0;
 
     if (!this.currentWorkout) {

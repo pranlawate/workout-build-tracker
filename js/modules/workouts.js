@@ -359,3 +359,47 @@ export function getAllWorkouts() {
     WORKOUTS.LOWER_B
   ];
 }
+
+/**
+ * Get workout with user exercise selections applied
+ *
+ * @param {string} workoutName - Workout key (e.g., 'UPPER_A')
+ * @param {Object} storage - Storage instance to get exercise selections
+ * @returns {Object} Workout with user selections applied
+ */
+export function getWorkoutWithSelections(workoutName, storage) {
+  const baseWorkout = getWorkout(workoutName);
+  if (!baseWorkout || !storage) return baseWorkout;
+
+  const selections = storage.getExerciseSelections();
+
+  // Deep clone the workout to avoid mutating the original
+  const customWorkout = {
+    ...baseWorkout,
+    exercises: baseWorkout.exercises.map((exercise, index) => {
+      const slotKey = `${workoutName}_SLOT_${index + 1}`;
+      const selectedName = selections[slotKey];
+
+      // If user selected a different exercise for this slot
+      if (selectedName && selectedName !== exercise.name) {
+        // Try to get definition from EXERCISE_DEFINITIONS
+        const altDefinition = EXERCISE_DEFINITIONS[selectedName];
+        if (altDefinition) {
+          return { ...altDefinition, name: selectedName };
+        }
+
+        // If not in EXERCISE_DEFINITIONS, search in other workout slots
+        // (for exercises that exist in default workouts)
+        for (const workout of getAllWorkouts()) {
+          const found = workout.exercises.find(ex => ex.name === selectedName);
+          if (found) return { ...found };
+        }
+      }
+
+      // Return original exercise if no selection or selection not found
+      return { ...exercise };
+    })
+  };
+
+  return customWorkout;
+}
