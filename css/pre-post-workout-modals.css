@@ -167,6 +167,7 @@
 #cooldown-modal .foam-area {
   font-weight: 500;
   font-size: 0.95rem;
+  color: #1f2937;
 }
 
 #cooldown-modal .stretch-duration,
@@ -230,6 +231,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: #1f2937;
 }
 
 #cooldown-modal .duration-input {
