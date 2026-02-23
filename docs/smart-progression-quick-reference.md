@@ -317,6 +317,64 @@ Before deploying changes:
 
 ---
 
+## Suggestion Priority Order
+
+The smart progression system evaluates suggestions in this strict priority order:
+
+1. **Pain handling** (safety first)
+   - Moderate/severe pain → suggest easier alternative
+   - Mild pain → warning only
+   - Always takes precedence over all other suggestions
+
+2. **Successful progression** (reward good performance)
+   - Hit top of rep range with good RIR → increase weight
+   - Reinforces positive training adaptations
+
+3. **Rotation due** (muscle head coverage)
+   - 8+ weeks on exercise with rotation pool → suggest variation
+   - Suppressed if user 80%+ toward unlock milestone
+   - Ensures complete muscle head coverage over time
+
+4. **Weight gap** (tempo progression)
+   - Increased weight but struggling → suggest tempo work
+   - Builds strength capacity at new weight
+
+5. **Plateau warning** (stagnation detection)
+   - Same weight 3+ workouts → try alternative or add reps
+   - Prevents adaptive plateau
+
+6. **Regression warning** (performance drop)
+   - Weight dropped OR reps dropped 25%+ → recovery needed
+   - Prevents overtraining
+
+7. **Continue** (all clear)
+   - Keep current weight, work within rep range
+   - Default when no intervention needed
+
+---
+
+## Rotation System
+
+**Purpose:** Ensure complete muscle head coverage through systematic exercise variation.
+
+**How it works:**
+- Tracks exercise tenure (weeks on current variation)
+- Suggests rotation after 8-12 weeks
+- Rotations stay within same complexity tier
+- Suppresses suggestion when user close to unlock (80%+ progress)
+
+**Rotation pools:**
+- DB Hammer Curls ↔ Standard DB Curls (arm flexors)
+- Tricep Pushdowns ↔ Overhead Tricep Extension (triceps)
+- Barbell variations (post-unlock): Bench/Curls/Squat/Deadlift
+
+**Rotation-based unlocks:**
+- Hit milestone TWICE on EACH rotation variant
+- Proves movement mastery, not just single exercise proficiency
+- Example: 15kg × 12 twice on BOTH DB Hammer Curls AND Standard DB Curls → unlock Barbell Curls
+
+---
+
 ## Quick Start Examples
 
 ### Add a New Exercise
