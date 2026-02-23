@@ -5553,7 +5553,7 @@ class App {
           endTime: Date.now()
         };
 
-        this.showWorkoutSummary(workoutData);
+        this.showCooldownModal(workoutData);
       }
     } catch (error) {
       console.error('Failed to save workout:', error);
