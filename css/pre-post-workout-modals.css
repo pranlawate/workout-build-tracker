@@ -44,6 +44,27 @@
   font-size: 0.95rem;
 }
 
+#warmup-modal .exercise-name {
+  display: block;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+#warmup-modal .exercise-detail {
+  display: block;
+  font-size: 0.85rem;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+#warmup-modal .exercise-note {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
 #warmup-modal .progress-indicator {
   text-align: center;
   margin-bottom: 1.5rem;
