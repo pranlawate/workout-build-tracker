@@ -151,6 +151,29 @@ export const ROTATION_POOLS = {
 };
 
 /**
+ * Unlock milestones per exercise variation
+ * User must hit milestone TWICE consecutively on EACH rotation variant
+ */
+export const UNLOCK_MILESTONES = {
+  // Simple tier variations - unlock to Moderate tier
+  'DB Hammer Curls': { weight: 15, reps: 12, sets: 3 },
+  'Standard DB Curls': { weight: 15, reps: 12, sets: 3 },
+  'Tricep Pushdowns': { weight: 17.5, reps: 12, sets: 3 },
+  'Overhead Tricep Extension': { weight: 15, reps: 12, sets: 3 },
+
+  // Moderate tier - unlock to Complex tier
+  'Barbell Curls': { weight: 20, reps: 10, sets: 3 },
+  'EZ Bar Curls': { weight: 20, reps: 10, sets: 3 },
+  'DB Flat Bench Press': { weight: 20, reps: 10, sets: 3 },
+  'Incline DB Press': { weight: 17.5, reps: 10, sets: 3 },
+
+  // Exercises without rotations - use old unlock logic
+  'Hack Squat': { weight: 40, reps: 10, sets: 3 },
+  'DB Romanian Deadlift': { weight: 20, reps: 10, sets: 3 },
+  'Leg Press': { weight: 60, reps: 10, sets: 3 }
+};
+
+/**
  * Exercise difficulty scale
  * 1 = beginner-friendly exercises (e.g., planks, bodyweight movements)
  * 2 = intermediate exercises (most dumbbell/cable/machine work)
@@ -546,4 +569,35 @@ export function getAllAlternatives(exerciseName) {
     return { easier: [], harder: [], different: [] };
   }
   return metadata.alternatives;
+}
+
+/**
+ * Get unlock milestone for an exercise
+ *
+ * @param {string} exerciseName - Name of exercise
+ * @returns {Object|null} Milestone { weight, reps, sets } or null if no milestone
+ */
+export function getUnlockMilestone(exerciseName) {
+  return UNLOCK_MILESTONES[exerciseName] || null;
+}
+
+/**
+ * Check if exercise has rotation pool
+ *
+ * @param {string} exerciseName - Name of exercise
+ * @returns {boolean} True if exercise has rotation variants
+ */
+export function hasRotationPool(exerciseName) {
+  return !!ROTATION_POOLS[exerciseName];
+}
+
+/**
+ * Get rotation variants for an exercise
+ *
+ * @param {string} exerciseName - Name of exercise
+ * @returns {string[]|null} Array of rotation variant names, or null
+ */
+export function getRotationVariants(exerciseName) {
+  const pool = ROTATION_POOLS[exerciseName];
+  return pool ? pool.rotations : null;
 }
