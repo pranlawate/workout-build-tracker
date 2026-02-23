@@ -451,7 +451,7 @@
       `Type: ${suggestion2?.type}, Suggested: ${suggestion2?.suggestedWeight}kg`
     );
 
-    // Test: Priority 4 - Plateau alternative
+    // Test: Priority 5 - Plateau alternative
     const plateauHistory = [
       { date: '2026-02-10', sets: [{ weight: 10, reps: 10, rir: 2 }] },
       { date: '2026-02-07', sets: [{ weight: 10, reps: 10, rir: 2 }] },
@@ -461,12 +461,12 @@
     const isPlateauWarning = suggestion3?.type === 'TRY_ALTERNATIVE' || suggestion3?.type === 'PLATEAU_WARNING';
     logTest(
       category8,
-      'Priority 4: Detects plateau and suggests action',
+      'Priority 5: Detects plateau and suggests action',
       isPlateauWarning,
       `Type: ${suggestion3?.type}`
     );
 
-    // Test: Priority 5 - Regression warning
+    // Test: Priority 6 - Regression warning
     const regressionHistory = [
       { date: '2026-02-10', sets: [{ weight: 10, reps: 8, rir: 2 }] },
       { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
@@ -474,19 +474,19 @@
     const suggestion4 = SmartProgression.getSuggestion('UPPER_A - DB Lateral Raises', regressionHistory);
     logTest(
       category8,
-      'Priority 5: Warns about regression',
+      'Priority 6: Warns about regression',
       suggestion4?.type === 'RECOVERY_WARNING',
       `Type: ${suggestion4?.type}`
     );
 
-    // Test: Priority 6 - Continue with current weight
+    // Test: Priority 7 - Continue with current weight
     const continueHistory = [
       { date: '2026-02-10', sets: [{ weight: 10, reps: 10, rir: 2 }] }
     ];
     const suggestion5 = SmartProgression.getSuggestion('UPPER_A - DB Lateral Raises', continueHistory);
     logTest(
       category8,
-      'Priority 6: Suggests continue when in good range',
+      'Priority 7: Suggests continue when in good range',
       suggestion5?.type === 'CONTINUE',
       `Type: ${suggestion5?.type}, Message: ${suggestion5?.message}`
     );
