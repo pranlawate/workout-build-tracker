@@ -71,3 +71,30 @@
 - Browser console testing: Use dynamic imports to test modules in isolation
 - Test data injection: Manually set localStorage values to create specific scenarios
 - Real-world scenarios: Document step-by-step user workflows for each feature
+
+## System Interaction Rules
+
+**Six major systems with defined priorities:**
+
+1. **Deload** (Priority 0) - Recovery weeks suppress all other suggestions
+2. **Pain** (Priority 1) - Safety first, blocks progression/rotation
+3. **Progression** (Priority 2) - Weight/rep increases
+4. **Rotation** (Priority 3) - 8-12 week exercise variety cycles
+5. **Unlock** - Barbell progression milestones (checked in rotation logic)
+6. **Phase** - Building vs Maintenance (affects deload sensitivity)
+
+**Key interaction rules:**
+
+- **Deload active?** → Suppress progression, rotation, tempo suggestions (show deload message)
+- **Pain detected?** → Suggest alternatives, block progression/rotation
+- **Near unlock (80%+)?** → Suppress rotation to maintain unlock momentum
+- **Maintenance phase?** → Different deload sensitivity (4-6 weeks vs 6-8 weeks)
+- **Rotation due?** → Only if no deload, no pain, not near unlock
+
+**Implementation:**
+- Single source of truth: `smart-progression.js` `getSuggestion()` function
+- Priority order enforced by early returns (Priority 0 → 7)
+- Defense in depth: Rotation manager also checks deload internally
+- Full matrix documented in: `docs/system-interaction-matrix.md`
+
+**Critical: When adding new systems, update interaction matrix and test all combinations**

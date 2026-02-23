@@ -813,8 +813,18 @@ export function suggestRecoveryCheck(history) {
  *
  * @example
  * getSuggestion('UPPER_A - DB Bench Press', workoutHistory, painHistory, rotationManager)
- * // Returns one of: pain suggestion, weight increase, rotation variety, tempo progression,
- * // plateau alternative, regression warning, or continue message
+ * // Returns one of: deload message, pain suggestion, weight increase, rotation variety,
+ * // tempo progression, plateau alternative, regression warning, or continue message
+ *
+ * Priority Order:
+ * 0. Deload active → suppress all suggestions
+ * 1. Pain handling → suggest alternatives
+ * 2. Successful progression → suggest weight increase
+ * 3. Rotation due (8-12 weeks) → suggest variety
+ * 4. Weight gap failure → suggest tempo progression
+ * 5. Plateau detected → suggest alternatives
+ * 6. Regression detected → suggest recovery check
+ * 7. Default → continue current approach
  */
 export function getSuggestion(exerciseKey, history, painHistory = null, rotationManager = null) {
   // Validate inputs
@@ -836,6 +846,20 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
   const exerciseName = exerciseKey.includes(' - ')
     ? exerciseKey.split(' - ')[1]
     : exerciseKey;
+
+  // PRIORITY 0: Deload week (suppress all suggestions during recovery)
+  if (rotationManager) {
+    const deloadState = rotationManager.storage.getDeloadState();
+    if (deloadState && deloadState.active) {
+      console.log('[SmartProgression] Priority 0: Deload active - suppressing all suggestions');
+      return {
+        type: 'DELOAD',
+        message: 'Focus on recovery this week',
+        reason: 'Active deload week - reduced volume and intensity',
+        urgency: 'normal'
+      };
+    }
+  }
 
   // PRIORITY 1: Safety (pain handling)
   if (painHistory && painHistory.latestPain) {
