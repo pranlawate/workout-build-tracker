@@ -184,6 +184,52 @@
   }
 
   // ========================================
+  // SECTION 4: Unlock Proximity Tests
+  // ========================================
+  console.log('\n🔒 TESTING UNLOCK PROXIMITY SUPPRESSION...\n');
+
+  const category3 = 'Unlock Proximity';
+
+  try {
+    const storage = new StorageManager();
+    const unlockEval = new UnlockEvaluator(storage, null);
+    const rotationManager = new RotationManager(storage, unlockEval);
+
+    // Test: Suppress rotation when 80%+ toward unlock
+    const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString();
+    localStorage.setItem('build_exercise_UPPER_B - DB Hammer Curls', JSON.stringify([
+      { date: eightWeeksAgo, sets: [{ weight: 12.5, reps: 12 }] } // 83% of 15kg milestone
+    ]));
+
+    const suggestion1 = rotationManager.checkRotationDue('UPPER_B - DB Hammer Curls', 'DB Hammer Curls');
+    logTest(
+      category3,
+      'Suppress rotation when user 80%+ toward unlock',
+      suggestion1 === null,
+      `Weight: 12.5kg (83% of 15kg), Suggestion: ${suggestion1}`
+    );
+
+    // Test: Don't suppress when <80% (plateau scenario)
+    localStorage.setItem('build_exercise_UPPER_B - DB Hammer Curls', JSON.stringify([
+      { date: eightWeeksAgo, sets: [{ weight: 8, reps: 12 }] } // 53% of 15kg milestone
+    ]));
+
+    const suggestion2 = rotationManager.checkRotationDue('UPPER_B - DB Hammer Curls', 'DB Hammer Curls');
+    logTest(
+      category3,
+      'Show rotation when user <80% toward unlock',
+      suggestion2?.type === 'ROTATION_DUE',
+      `Weight: 8kg (53% of 15kg), Type: ${suggestion2?.type}`
+    );
+
+    // Cleanup
+    localStorage.removeItem('build_exercise_UPPER_B - DB Hammer Curls');
+
+  } catch (e) {
+    logTest(category3, 'Unlock proximity tests', false, e.message);
+  }
+
+  // ========================================
   // SUMMARY
   // ========================================
   console.log('\n═══════════════════════════════════════════════════════════════');
