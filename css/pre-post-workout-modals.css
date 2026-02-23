@@ -253,6 +253,60 @@
   font-weight: 500;
 }
 
+/* Weigh-in section styles */
+#cooldown-modal .weighin-section {
+  padding: 1rem;
+  background: var(--color-background-secondary, #f9fafb);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+#cooldown-modal .weighin-question {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+#cooldown-modal .weighin-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#cooldown-modal #weighin-input-cooldown {
+  margin-top: 1rem;
+}
+
+#cooldown-modal #weighin-input-cooldown label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+#cooldown-modal #weight-input-cooldown {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--color-border, #d1d5db);
+  border-radius: 8px;
+  background: white;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+#cooldown-modal #weight-input-cooldown:focus {
+  outline: none;
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#cooldown-modal #weighin-save-cooldown {
+  width: 100%;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   #cooldown-modal .modal-content {
