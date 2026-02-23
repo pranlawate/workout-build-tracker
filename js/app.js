@@ -1110,8 +1110,6 @@ class App {
 
           ${formCuesHTML}
 
-          ${this.renderProgressionHint(exercise, history, lastWorkout)}
-
           <div class="sets-container">
             ${this.renderSets(exercise, lastWorkout, index)}
           </div>

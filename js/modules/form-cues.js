@@ -29,6 +29,12 @@ export const FORM_CUES = {
     mistakes: ['Dumbbells drifting apart', 'Bouncing off chest', 'Shoulders rolling forward']
   },
 
+  'Decline DB Press': {
+    setup: ['Lock ankles under pads', 'Retract shoulder blades', 'Head supported on bench'],
+    execution: ['Press toward hips (not vertical)', 'Slow eccentric - 2s down to lower chest', 'Explosive concentric - 1s up'],
+    mistakes: ['Pressing straight up instead of toward hips', 'Dumbbells drifting apart', 'Losing scapular retraction']
+  },
+
   'Seated Cable Row': {
     setup: ['Feet on platform', 'Knees slightly bent', 'Chest up, shoulders back'],
     execution: ['Controlled concentric - 2s pull to lower chest', 'Squeeze shoulder blades together', 'Slow eccentric - 2s release'],
