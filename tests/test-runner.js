@@ -33,11 +33,23 @@ const testRunner = {
     rotationSystem: null
   },
 
-  async loadScript(path) {
+  async loadScript(path, resultVariable, maxWaitMs = 10000) {
     try {
       const response = await fetch(path);
       const code = await response.text();
-      eval(code);
+      eval(code); // Start async test execution
+
+      // Wait for test to complete and set global result variable
+      const startTime = Date.now();
+      while (!window[resultVariable] && (Date.now() - startTime) < maxWaitMs) {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
+      }
+
+      if (!window[resultVariable]) {
+        console.warn(`⚠️ Timeout waiting for ${resultVariable} (${maxWaitMs}ms)`);
+        return false;
+      }
+
       return true;
     } catch (e) {
       console.error(`❌ Failed to load ${path}:`, e);
@@ -47,7 +59,7 @@ const testRunner = {
 
   async runExercises() {
     console.log('\n🏋️ RUNNING EXERCISE TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-all-exercises.js');
+    const loaded = await this.loadScript('./tests/test-all-exercises.js', '_exerciseTestResults');
     if (loaded) {
       this.results.exercises = window._exerciseTestResults;
     }
@@ -55,7 +67,7 @@ const testRunner = {
 
   async runProgressions() {
     console.log('\n🔄 RUNNING PROGRESSION TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-all-progressions.js');
+    const loaded = await this.loadScript('./tests/test-all-progressions.js', '_progressionTestResults');
     if (loaded) {
       this.results.progressions = window._progressionTestResults;
     }
@@ -63,7 +75,7 @@ const testRunner = {
 
   async runFeatures() {
     console.log('\n⚙️ RUNNING FEATURE TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-all-features.js');
+    const loaded = await this.loadScript('./tests/test-all-features.js', '_featureTestResults');
     if (loaded) {
       this.results.features = window._featureTestResults;
     }
@@ -71,7 +83,7 @@ const testRunner = {
 
   async runPhaseIntegration() {
     console.log('\n🎯 RUNNING PHASE INTEGRATION TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-comprehensive-phase-integration.js');
+    const loaded = await this.loadScript('./tests/test-comprehensive-phase-integration.js', '_phaseTestResults');
     if (loaded) {
       this.results.phaseIntegration = window._phaseTestResults;
     }
@@ -79,7 +91,7 @@ const testRunner = {
 
   async runWorkoutRotation() {
     console.log('\n🔄 RUNNING WORKOUT ROTATION TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-workout-rotation.js');
+    const loaded = await this.loadScript('./tests/test-workout-rotation.js', '_workoutRotationTestResults');
     if (loaded) {
       this.results.workoutRotation = window._workoutRotationTestResults;
     }
@@ -87,7 +99,7 @@ const testRunner = {
 
   async runDeloadLogic() {
     console.log('\n⏸️ RUNNING DELOAD LOGIC TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-deload-logic.js');
+    const loaded = await this.loadScript('./tests/test-deload-logic.js', '_deloadTestResults');
     if (loaded) {
       this.results.deloadLogic = window._deloadTestResults;
     }
@@ -95,7 +107,7 @@ const testRunner = {
 
   async runUnlockSystem() {
     console.log('\n🔓 RUNNING UNLOCK SYSTEM TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-unlock-system.js');
+    const loaded = await this.loadScript('./tests/test-unlock-system.js', '_unlockSystemTestResults');
     if (loaded) {
       this.results.unlockSystem = window._unlockSystemTestResults;
     }
@@ -103,7 +115,7 @@ const testRunner = {
 
   async runSmartProgression() {
     console.log('\n📈 RUNNING SMART PROGRESSION TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-smart-progression.js');
+    const loaded = await this.loadScript('./tests/test-smart-progression.js', '_smartProgressionTestResults');
     if (loaded) {
       this.results.smartProgression = window._smartProgressionTestResults;
     }
@@ -111,7 +123,7 @@ const testRunner = {
 
   async runRotationSystem() {
     console.log('\n🔄 RUNNING ROTATION SYSTEM TESTS...\n');
-    const loaded = await this.loadScript('./tests/test-rotation-system.js');
+    const loaded = await this.loadScript('./tests/test-rotation-system.js', '_rotationSystemTestResults');
     if (loaded) {
       this.results.rotationSystem = window._rotationSystemTestResults;
     }
