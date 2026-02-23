@@ -766,6 +766,9 @@ class App {
     // Setup LISS recommendations (optional)
     this.renderLISSRecommendations(workoutData.workoutName);
 
+    // Setup weigh-in (optional)
+    this.setupCooldownWeighIn();
+
     // Setup finish button (placeholder for now - will be completed in Task 7)
     const finishBtn = document.getElementById('finish-review-btn');
     finishBtn.disabled = true; // Will be enabled by stretching progress
