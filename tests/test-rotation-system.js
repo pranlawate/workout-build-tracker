@@ -131,6 +131,9 @@
   const category2 = 'Rotation Eligibility';
 
   try {
+    // Clear deload state from previous tests
+    localStorage.removeItem('build_deload_state');
+
     const storage = new StorageManager();
     const phaseManager = new PhaseManager(storage);
     const unlockEval = new UnlockEvaluator(storage, phaseManager);
@@ -195,6 +198,9 @@
   const category3 = 'Unlock Proximity';
 
   try {
+    // Clear deload state from previous tests
+    localStorage.removeItem('build_deload_state');
+
     const storage = new StorageManager();
     const phaseManager = new PhaseManager(storage);
     const unlockEval = new UnlockEvaluator(storage, phaseManager);
