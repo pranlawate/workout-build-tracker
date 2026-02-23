@@ -2021,6 +2021,42 @@ class App {
     }
   }
 
+  /**
+   * Accept rotation suggestion and switch to new exercise
+   *
+   * @param {string} slotKey - Slot key (e.g., 'UPPER_A_SLOT_3')
+   * @param {string} newExerciseName - New exercise to rotate to
+   */
+  acceptRotation(slotKey, newExerciseName) {
+    try {
+      // Extract exercise key from slot
+      const workout = slotKey.split('_SLOT_')[0];
+      const slotIndex = parseInt(slotKey.split('_SLOT_')[1]) - 1;
+
+      const workoutObj = this.workoutManager.getWorkout(workout);
+      if (!workoutObj || !workoutObj.exercises[slotIndex]) {
+        console.error('[App] Invalid slot key:', slotKey);
+        return;
+      }
+
+      const oldExerciseName = workoutObj.exercises[slotIndex].name;
+      const exerciseKey = `${workout} - ${oldExerciseName}`;
+
+      // Save exercise selection
+      this.storage.saveExerciseSelection(slotKey, newExerciseName);
+
+      // Record rotation in rotation manager
+      this.rotationManager.recordRotation(exerciseKey, newExerciseName);
+
+      // Refresh UI
+      this.showHomeScreen();
+
+      console.log(`[App] ✓ Rotated ${oldExerciseName} → ${newExerciseName}`);
+    } catch (e) {
+      console.error('[App] Error accepting rotation:', e);
+    }
+  }
+
   jumpToExercise(exerciseIndex) {
     // Validate index
     if (exerciseIndex < 0 || exerciseIndex >= this.currentWorkout.exercises.length) {
@@ -5290,7 +5326,17 @@ class App {
 
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => window.app = new App());
+  document.addEventListener('DOMContentLoaded', () => {
+    window.app = new App();
+    // Make acceptRotation accessible from onclick handlers
+    window.acceptRotation = (slotKey, exerciseName) => {
+      window.app.acceptRotation(slotKey, exerciseName);
+    };
+  });
 } else {
   window.app = new App();
+  // Make acceptRotation accessible from onclick handlers
+  window.acceptRotation = (slotKey, exerciseName) => {
+    window.app.acceptRotation(slotKey, exerciseName);
+  };
 }
