@@ -1,4 +1,4 @@
-const CACHE_NAME = 'build-tracker-v70';
+const CACHE_NAME = 'build-tracker-v71';
 const CACHE_URLS = [
   './',
   './index.html',
@@ -28,6 +28,7 @@ const CACHE_URLS = [
   './js/modules/equipment-profiles.js',
   './js/modules/unlock-evaluator.js',
   './js/modules/warm-up-protocols.js',
+  './js/modules/stretching-protocols.js',
   './js/modules/optional-fifth-day.js',
   './js/modules/phase-manager.js',
   './js/components/weight-trend-chart.js',
