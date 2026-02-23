@@ -40,18 +40,25 @@ export class RotationManager {
    */
   checkRotationDue(exerciseKey, currentExerciseName) {
     try {
-      // 1. Check if exercise has rotation pool
+      // 1. Suppress rotation suggestions during deload (focus on recovery)
+      const deloadState = this.storage.getDeloadState();
+      if (deloadState && deloadState.active) {
+        console.log('[RotationManager] Suppressing rotation - deload week active');
+        return null;
+      }
+
+      // 2. Check if exercise has rotation pool
       if (!hasRotationPool(currentExerciseName)) {
         return null;
       }
 
-      // 2. Get tenure
+      // 3. Get tenure
       const tenure = this.getTenure(exerciseKey);
       if (tenure.weeksOnExercise < 8) {
         return null; // Not due yet
       }
 
-      // 3. Check unlock proximity (suppress if user close to unlock)
+      // 4. Check unlock proximity (suppress if user close to unlock)
       const milestone = getUnlockMilestone(currentExerciseName);
       if (milestone) {
         const progress = this.getMilestoneProgress(currentExerciseName, exerciseKey);
@@ -61,11 +68,11 @@ export class RotationManager {
         }
       }
 
-      // 4. Get next rotation variant
+      // 5. Get next rotation variant
       const pool = ROTATION_POOLS[currentExerciseName];
       const nextVariation = pool.rotations[0]; // Simple: alternate between 2
 
-      // 5. Return rotation suggestion
+      // 6. Return rotation suggestion
       return {
         type: 'ROTATION_DUE',
         suggestedExercise: nextVariation,
