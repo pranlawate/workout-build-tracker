@@ -21,6 +21,72 @@ export const SWAP_REASONS = {
 };
 
 /**
+ * Muscle head coverage for exercises with rotation variants
+ * Maps which specific muscle heads each exercise emphasizes
+ */
+export const MUSCLE_HEAD_COVERAGE = {
+  // Tricep variations (UPPER_A)
+  'Tricep Pushdowns': {
+    primary: ['triceps_lateral', 'triceps_long'],
+    secondary: []
+  },
+  'Overhead Tricep Extension': {
+    primary: ['triceps_long', 'triceps_medial'],
+    secondary: ['triceps_lateral']
+  },
+
+  // Bicep variations (UPPER_B)
+  'DB Hammer Curls': {
+    primary: ['brachialis', 'brachioradialis'],
+    secondary: ['biceps_long']
+  },
+  'Standard DB Curls': {
+    primary: ['biceps_long', 'biceps_short'],
+    secondary: ['brachialis']
+  },
+
+  // Chest variations (UPPER_A)
+  'Decline DB Press': {
+    primary: ['pectoralis_costal'], // Lower chest
+    secondary: ['pectoralis_sternal']
+  },
+
+  // Barbell variations (post-unlock)
+  'Barbell Curls': {
+    primary: ['biceps_long', 'biceps_short'],
+    secondary: ['brachialis']
+  },
+  'EZ Bar Curls': {
+    primary: ['biceps_long', 'biceps_short'],
+    secondary: ['brachialis', 'brachioradialis']
+  },
+  'Barbell Bench Press': {
+    primary: ['pectoralis_sternal'],
+    secondary: ['triceps_lateral', 'anterior_deltoid']
+  },
+  'Close-Grip Bench Press': {
+    primary: ['triceps_lateral', 'triceps_long', 'triceps_medial'],
+    secondary: ['pectoralis_sternal']
+  },
+  'Barbell Back Squat': {
+    primary: ['quadriceps', 'gluteus_maximus'],
+    secondary: ['hamstrings']
+  },
+  'Front Squat': {
+    primary: ['quadriceps'],
+    secondary: ['gluteus_maximus', 'core']
+  },
+  'Barbell Deadlift': {
+    primary: ['hamstrings', 'gluteus_maximus', 'erectors'],
+    secondary: ['quadriceps', 'lats']
+  },
+  'Sumo Deadlift': {
+    primary: ['gluteus_medius', 'adductors', 'gluteus_maximus'],
+    secondary: ['hamstrings', 'quadriceps']
+  }
+};
+
+/**
  * Exercise difficulty scale
  * 1 = beginner-friendly exercises (e.g., planks, bodyweight movements)
  * 2 = intermediate exercises (most dumbbell/cable/machine work)
