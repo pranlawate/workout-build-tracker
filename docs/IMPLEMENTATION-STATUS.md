@@ -310,6 +310,44 @@ docs/rotation-system-usage.md         (new, 111 lines)
 
 ---
 
+### Pre/Post-Workout Modals ✅
+**Source:** `docs/plans/2026-02-23-pre-post-workout-modals-design.md`
+
+**Status:** ✅ Completed (2026-02-23)
+
+**Implemented Features:**
+- ✅ **Warm-up Modal** - Pre-workout checklist before workout timer starts
+- ✅ **Cooldown Modal** - Post-workout stretching, foam rolling, LISS, weigh-in
+- ✅ **Accurate Workout Timing** - Warm-up excluded from workout duration
+- ✅ **Workout-Specific Protocols** - Upper/lower body stretches and foam rolling
+- ✅ **Smart LISS Recommendations** - Machine selection based on muscle fatigue
+- ✅ **Mandatory Stretching** - Enforced completion before summary screen
+- ✅ **Optional Extras** - Foam rolling and LISS can be skipped for time constraints
+- ✅ **Weigh-in Relocated** - Moved from summary to post-workout modal
+
+**Implementation Details:**
+- New Module: `js/modules/stretching-protocols.js` (stretching and foam rolling content)
+- New Modals: `#warmup-modal`, `#cooldown-modal` (gate workout start/finish)
+- Modified: `js/app.js` (modal handlers, flow changes)
+- Removed: In-workout warm-up section (now in dedicated modal)
+- Cache: v71 (updated for new module)
+
+**Flow:**
+```
+Home → Warm-up Modal → Workout Screen (timer starts) → Cooldown Modal → Summary → Home
+```
+
+**Files Modified/Created:**
+```
+js/modules/stretching-protocols.js    (new, 150+ lines)
+index.html                             (+200 lines - 2 modals)
+css/styles.css                         (+150 lines - modal styles)
+js/app.js                              (+300 lines - modal handlers)
+sw.js                                  (cache v71)
+```
+
+---
+
 ## 🚧 DESIGNED BUT NOT IMPLEMENTED
 
 ### Build/Maintenance Phase Integration
