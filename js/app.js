@@ -5002,6 +5002,11 @@ class App {
     const weighinSection = document.getElementById('summary-weighin');
     const weighinInput = document.getElementById('weighin-input-summary');
 
+    // Weigh-in moved to cooldown modal - skip if elements don't exist
+    if (!weighinSection || !weighinInput) {
+      return;
+    }
+
     // Initialize BodyWeightManager if not already done
     if (!this.bodyWeight) {
       this.bodyWeight = new BodyWeightManager(this.storage);
@@ -5111,12 +5116,23 @@ class App {
   saveSummaryWeighInData() {
     const weighinSection = document.getElementById('summary-weighin');
 
+    // Weigh-in moved to cooldown modal - skip if element doesn't exist
+    if (!weighinSection) {
+      return;
+    }
+
     // Only save if section is visible
     if (weighinSection.style.display === 'none') {
       return;
     }
 
     const weighinInput = document.getElementById('weighin-input-summary');
+
+    // Additional safety check
+    if (!weighinInput) {
+      return;
+    }
+
     const weight = parseFloat(weighinInput.value);
 
     // Validate weight
