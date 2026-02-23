@@ -84,7 +84,7 @@ See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for detailed progr
   - Body Weight and Barbell tabs now properly render content
   - Added dedicated render functions for each tab
 
-**Cache Version:** v27 (updated for bug fixes)
+**Cache Version:** v71 (updated for pre/post-workout modals)
 
 ## Technology Stack
 
@@ -121,6 +121,59 @@ npm run test:watch
 python -m http.server 8000
 # Navigate to http://localhost:8000/
 ```
+
+### Testing
+
+**Automated Browser Console Tests:**
+
+The project includes comprehensive automated test suites that run directly in the browser console. **No build step or test framework required** - just load and run.
+
+**Quick Start:**
+```javascript
+// Open browser console (F12), then run:
+fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
+```
+
+This executes the master test runner which validates:
+- ✅ All exercises (28 exercises)
+- ✅ All progression pathways (26 exercise slots)
+- ✅ All feature modules (23 modules)
+- ✅ Phase integration (50+ tests)
+- ✅ Workout rotation logic
+- ✅ Deload system
+- ✅ Unlock criteria
+- ✅ Smart progression engine
+- ✅ Exercise rotation system
+
+**Run Specific Test Suites:**
+```javascript
+// After loading test-runner.js:
+testRunner.runExercises()        // Exercise definitions
+testRunner.runProgressions()     // Progression pathways
+testRunner.runFeatures()         // Feature modules
+testRunner.runPhaseIntegration() // Phase system
+testRunner.runWorkoutRotation()  // Rotation logic
+testRunner.runDeloadLogic()      // Deload triggers
+testRunner.runUnlockSystem()     // Unlock criteria
+testRunner.runSmartProgression() // Smart suggestions
+testRunner.runRotationSystem()   // Exercise rotation
+testRunner.generateReport()      // HTML test report
+```
+
+**Individual Test Files:**
+```javascript
+// Load specific test suite:
+fetch('./tests/test-exercises.js').then(r => r.text()).then(eval);
+fetch('./tests/test-progressions.js').then(r => r.text()).then(eval);
+fetch('./tests/test-smart-progression.js').then(r => r.text()).then(eval);
+// ... see tests/README.md for full list
+```
+
+**Test Documentation:**
+- [Automated Test Suite README](tests/README.md) - Complete test suite documentation
+- [Integration Test Master](docs/testing/integration-test-master.md) - Manual testing checklist for all features
+
+**Test Coverage:** 12 automated test suites covering core functionality, progression logic, and feature integration.
 
 ### Project Structure
 
@@ -205,7 +258,7 @@ workout-build-tracker/
 
 **Cache Management:**
 - Service Worker caches all assets for offline use
-- Version: `build-tracker-v58` (auto-updates on new deployments)
+- Version: `build-tracker-v71` (auto-updates on new deployments)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
 ### 📊 Progress Dashboard

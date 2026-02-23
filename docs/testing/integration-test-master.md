@@ -1,8 +1,8 @@
 # Build Tracker - Master Integration Test Report
 
 **Last Updated:** 2026-02-23
-**App Version:** v1.8 (Service Worker Cache: v70)
-**Latest Feature:** Exercise Rotation & Muscle Coverage System
+**App Version:** v1.9 (Service Worker Cache: v71)
+**Latest Feature:** Pre/Post-Workout Modals (Warm-up & Cooldown)
 
 ---
 
@@ -2241,6 +2241,397 @@ Fix applied:
 Issue #2:
 ...
 ```
+
+---
+
+## Feature 14: Pre/Post-Workout Modals (2026-02-23)
+
+**Feature Overview:**
+Dedicated warm-up and cooldown modals that separate pre/post-workout activities from the tracked workout time. Enforces proper preparation (warm-up) and recovery (stretching, foam rolling, LISS cardio, weigh-in) for better training outcomes.
+
+**Key Changes:**
+- Warm-up modal appears BEFORE workout starts (timer starts after completion)
+- Cooldown modal appears AFTER workout (mandatory stretching enforced)
+- Weigh-in moved from summary screen to cooldown modal
+- In-workout warm-up section removed
+
+---
+
+### Test 14.1: Warm-up Modal - Upper Body Workout
+**Steps:**
+1. From home screen, click "UPPER A" workout
+2. Warm-up modal should appear immediately
+
+**Expected:**
+- [ ] Modal title: "🔥 Warm-up (5-7 min)"
+- [ ] Subtitle: "Complete all before starting:"
+- [ ] 5-6 exercises displayed (e.g., Wrist Circles, Arm Circles, Band Pull-Aparts)
+- [ ] Each exercise shows reps/duration
+- [ ] Progress indicator: "✓ 0 of 6 completed"
+- [ ] "Begin Workout" button is DISABLED
+- [ ] Checkboxes are 24px and easily clickable
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.2: Warm-up Modal - Progress Tracking
+**Steps:**
+1. In warm-up modal, check off exercises one by one
+2. Observe progress indicator updates
+
+**Expected:**
+- [ ] Progress updates immediately: "✓ 1 of 6 completed", "✓ 2 of 6 completed", etc.
+- [ ] "Begin Workout" button remains disabled until ALL checked
+- [ ] When all checked: "✓ 6 of 6 completed"
+- [ ] "Begin Workout" button becomes ENABLED (no longer grayed out)
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.3: Warm-up Modal - Equipment Substitutions
+**Steps:**
+1. Clear localStorage, set equipment profile to no bands:
+```javascript
+localStorage.setItem('build_equipment_profile', JSON.stringify({ bands: false }));
+location.reload();
+```
+2. Start UPPER A workout, check warm-up exercises
+
+**Expected:**
+- [ ] Band exercises replaced with bodyweight alternatives
+- [ ] "Band Pull-Aparts" → "Scapular Wall Slides"
+- [ ] "Band External Rotation" → "Floor Angels"
+- [ ] Substitution notes displayed: "Equipment substitution: no bands available"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.4: Warm-up Completion - Timer Starts After
+**Steps:**
+1. Start UPPER A workout, complete warm-up checklist
+2. Click "Begin Workout"
+3. Note the time
+4. Check workout timer
+
+**Expected:**
+- [ ] Warm-up modal closes
+- [ ] Workout screen appears
+- [ ] NO warm-up section at top of workout screen (removed)
+- [ ] Exercises displayed immediately
+- [ ] Workout timer starts NOW (not during warm-up)
+- [ ] Console log: "[App] Warm-up completed, starting workout timer"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.5: Lower Body Warm-up Protocol
+**Steps:**
+1. Go back home, start "LOWER A" workout
+2. Check warm-up modal content
+
+**Expected:**
+- [ ] Modal title: "🔥 Warm-up (5-8 min)"
+- [ ] Different exercises than UPPER: Light Cycling, Leg Swings, Spiderman Lunge, etc.
+- [ ] 5 exercises total
+- [ ] Progress tracking works same as UPPER
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.6: Cooldown Modal - Appears After Workout
+**Steps:**
+1. Complete a full workout (all exercises logged)
+2. Click "Complete Workout"
+3. Observe modal sequence
+
+**Expected:**
+- [ ] Cooldown modal appears (NOT summary screen)
+- [ ] Modal title: "🧘 Cool Down"
+- [ ] 4 sections visible:
+  - STRETCHING (Required) - expanded
+  - FOAM ROLLING (Optional) - collapsed
+  - LISS CARDIO (Optional) - collapsed
+  - WEIGH-IN - collapsed
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.7: Cooldown Modal - Mandatory Stretching (Upper)
+**Steps:**
+1. After completing UPPER A workout, view stretching section
+
+**Expected:**
+- [ ] Section title: "🎯 STRETCHING (Required)" in RED
+- [ ] 5 stretches displayed:
+  - Doorway Chest Stretch (30-60s per side)
+  - Cross-Body Shoulder Stretch (30s per side)
+  - Overhead Tricep Stretch (30s per side)
+  - Behind-Back Lat Stretch (30-60s)
+  - Wrist Flexor/Extensor Stretch (30s each)
+- [ ] Each stretch shows: name, duration, target muscles
+- [ ] Progress indicator: "✓ 0 of 5 completed"
+- [ ] "Finish & Review" button is DISABLED
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.8: Cooldown Modal - Mandatory Stretching (Lower)
+**Steps:**
+1. Complete LOWER A workout, view cooldown stretching section
+
+**Expected:**
+- [ ] 6 stretches displayed:
+  - Standing Quad Stretch
+  - Standing Hamstring Stretch
+  - Hip Flexor Stretch
+  - Figure-4 Glute Stretch
+  - Standing Calf Stretch
+  - Seated Spinal Twist
+- [ ] Progress indicator: "✓ 0 of 6 completed"
+- [ ] "Finish & Review" button DISABLED until all checked
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.9: Cooldown Modal - Optional Foam Rolling
+**Steps:**
+1. In cooldown modal, click "💆 FOAM ROLLING (Optional - 5-8 min)" header
+2. Observe section expand
+
+**Expected:**
+- [ ] Section expands (toggle icon changes ▼ → ▲)
+- [ ] For UPPER workout: 3 areas (Upper Back/Traps, Lats, Chest/Pec Minor)
+- [ ] For LOWER workout: 4 areas (Quads, IT Band, Glutes, Calves)
+- [ ] Each shows: area name, duration, technique notes
+- [ ] Can check/uncheck items (does NOT affect "Finish & Review" button)
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.10: Cooldown Modal - Smart LISS Recommendations (Upper)
+**Steps:**
+1. After UPPER workout, expand "🚴 LISS CARDIO (Optional - 10-15 min)" section
+
+**Expected:**
+- [ ] Recommendation: "💡 Recommended: Bike (10 min)"
+- [ ] Warning message: "Legs are fresh - any low-impact cardio works"
+- [ ] 4 radio options:
+  - ✓ Bike - 10 min (default selected, GREEN highlighted)
+  - Elliptical - 10 min
+  - Treadmill - 10 min (NO warning)
+  - Skip LISS
+- [ ] Duration inputs allow 5-20 min range
+- [ ] Note: "Choose light intensity (can hold conversation)"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.11: Cooldown Modal - Smart LISS Recommendations (Lower)
+**Steps:**
+1. After LOWER workout, expand LISS CARDIO section
+
+**Expected:**
+- [ ] Recommendation: "💡 Recommended: Bike (10 min)"
+- [ ] Warning message: "⚠️ Legs are fatigued - avoid high-impact"
+- [ ] Treadmill option shows: "⚠️ Walking only - legs need rest"
+- [ ] Bike is recommended (GREEN) to reduce leg impact
+- [ ] Elliptical available as alternative
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.12: Cooldown Modal - Weigh-in Section
+**Steps:**
+1. In cooldown modal, expand "⚖️ WEIGH-IN" section
+2. Click "Yes" to weigh in
+3. Enter weight: 75.5 kg
+4. Click "Save Weight"
+
+**Expected:**
+- [ ] Section expands showing Yes/Skip buttons
+- [ ] Clicking "Yes" reveals weight input field
+- [ ] Input accepts decimal values (70.5, 75.3, etc.)
+- [ ] Validation: rejects < 30 kg or > 200 kg
+- [ ] Alert: "✅ Weight saved: 75.5 kg"
+- [ ] Data saved to localStorage: `build_body_weight`
+- [ ] Input field hides after save
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.13: Cooldown Modal - Finish Button Enforcement
+**Steps:**
+1. In cooldown modal with UPPER workout (5 stretches)
+2. Try clicking "Finish & Review" without checking stretches
+3. Check only 4 of 5 stretches
+4. Try clicking "Finish & Review"
+5. Check the 5th stretch
+
+**Expected:**
+- [ ] Button disabled (grayed out) when 0 stretches checked
+- [ ] Button remains disabled when only 4/5 checked
+- [ ] Progress shows "✓ 4 of 5 completed"
+- [ ] Button becomes ENABLED when all 5 checked
+- [ ] Optional sections (foam rolling, LISS) do NOT affect button state
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.14: Cooldown Modal - Data Collection
+**Steps:**
+1. Complete cooldown modal with:
+   - All stretches checked
+   - 2 foam rolling areas checked
+   - LISS: Bike, 12 minutes
+   - Weigh-in: 75.0 kg
+2. Click "Finish & Review"
+3. Check browser console
+
+**Expected:**
+- [ ] Console log: "[App] Cooldown completed:" with data object
+- [ ] Data structure:
+```javascript
+{
+  stretchesCompleted: true,
+  foamRolling: { completed: true, areas: ['Upper Back/Traps', 'Lats'] },
+  lissCardio: { type: 'bike', duration: 12 },
+  weighIn: { completed: true, weight: 75.0 }
+}
+```
+- [ ] Data stored in `workoutSession.cooldownData`
+- [ ] Modal closes
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.15: Summary Screen - Weigh-in Removed
+**Steps:**
+1. After completing cooldown, view summary screen
+
+**Expected:**
+- [ ] Summary screen displays (after cooldown modal)
+- [ ] Workout stats section present
+- [ ] Pain tracking section present
+- [ ] Done button present
+- [ ] NO weigh-in section (removed - now in cooldown)
+- [ ] Workout duration EXCLUDES warm-up time (accurate)
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.16: Complete Workflow - End-to-End
+**Steps:**
+1. Start UPPER A from home screen
+2. Complete warm-up checklist (all 6 exercises)
+3. Click "Begin Workout"
+4. Log sets for all exercises
+5. Click "Complete Workout"
+6. Complete all mandatory stretches in cooldown
+7. Optionally: foam roll, LISS cardio, weigh-in
+8. Click "Finish & Review"
+9. Complete pain tracking in summary
+10. Click "Done"
+
+**Expected:**
+- [ ] Flow: Home → Warm-up Modal → Workout Screen → Cooldown Modal → Summary → Home
+- [ ] Each transition is smooth, no errors
+- [ ] Workout duration accurate (excludes warm-up time)
+- [ ] All data persisted correctly
+- [ ] Can immediately start another workout
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.17: Edge Case - Browser Refresh During Warm-up
+**Steps:**
+1. Start workout, warm-up modal appears
+2. Check 3 of 6 exercises
+3. Refresh browser (F5)
+
+**Expected:**
+- [ ] Returns to home screen (warm-up progress lost - expected)
+- [ ] No console errors
+- [ ] Can start workout again from scratch
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.18: Edge Case - Skip Optional Sections
+**Steps:**
+1. Complete workout and warm-up
+2. In cooldown modal:
+   - Check all mandatory stretches
+   - Leave foam rolling UNCHECKED
+   - Leave LISS as "Skip LISS"
+   - Leave weigh-in SKIPPED
+3. Click "Finish & Review"
+
+**Expected:**
+- [ ] Button enabled (only stretches required)
+- [ ] Summary screen appears
+- [ ] No errors about missing optional data
+- [ ] Cooldown data shows:
+```javascript
+{
+  stretchesCompleted: true,
+  foamRolling: { completed: false, areas: [] },
+  lissCardio: { type: null, duration: 0 },
+  weighIn: { completed: false, weight: null }
+}
+```
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.19: Mobile Responsive - Warm-up Modal
+**Steps:**
+1. Open DevTools, switch to mobile view (iPhone 12: 390×844)
+2. Start workout, view warm-up modal
+
+**Expected:**
+- [ ] Modal scales to 95% width on mobile
+- [ ] Modal height fits screen (max-height: 95vh)
+- [ ] Checkboxes are 24px (easy to tap)
+- [ ] Text is readable (not too small)
+- [ ] "Begin Workout" button full-width
+- [ ] Button tap target is 60px height (accessible)
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 14.20: Mobile Responsive - Cooldown Modal
+**Steps:**
+1. In mobile view, complete workout and view cooldown modal
+
+**Expected:**
+- [ ] Modal scrollable (max-height: 95vh, overflow-y: auto)
+- [ ] All 4 sections accessible
+- [ ] Collapsible sections work (tap headers)
+- [ ] Radio buttons and checkboxes easy to tap
+- [ ] Number inputs for LISS duration usable
+- [ ] "Finish & Review" button full-width
+- [ ] No horizontal scrolling
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
 
 ---
 
