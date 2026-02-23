@@ -58,10 +58,10 @@
   let UnlockEvaluator, StorageManager, PhaseManager, COMPLEXITY_TIERS;
 
   try {
-    const unlockModule = await import('./js/modules/unlock-evaluator.js');
-    const storageModule = await import('./js/modules/storage.js');
-    const phaseModule = await import('./js/modules/phase-manager.js');
-    const tiersModule = await import('./js/modules/complexity-tiers.js');
+    const unlockModule = await import('../js/modules/unlock-evaluator.js');
+    const storageModule = await import('../js/modules/storage.js');
+    const phaseModule = await import('../js/modules/phase-manager.js');
+    const tiersModule = await import('../js/modules/complexity-tiers.js');
     UnlockEvaluator = unlockModule.UnlockEvaluator;
     StorageManager = storageModule.StorageManager;
     PhaseManager = phaseModule.PhaseManager;

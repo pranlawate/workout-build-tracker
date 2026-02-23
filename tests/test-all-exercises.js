@@ -56,11 +56,11 @@
   let workouts, equipmentProfiles, formCues, complexityTiers, exerciseMetadata;
 
   try {
-    workouts = await import('./js/modules/workouts.js');
-    equipmentProfiles = await import('./js/modules/equipment-profiles.js');
-    formCues = await import('./js/modules/form-cues.js');
-    complexityTiers = await import('./js/modules/complexity-tiers.js');
-    exerciseMetadata = await import('./js/modules/exercise-metadata.js');
+    workouts = await import('../js/modules/workouts.js');
+    equipmentProfiles = await import('../js/modules/equipment-profiles.js');
+    formCues = await import('../js/modules/form-cues.js');
+    complexityTiers = await import('../js/modules/complexity-tiers.js');
+    exerciseMetadata = await import('../js/modules/exercise-metadata.js');
     console.log('✅ All modules loaded successfully\n');
   } catch (e) {
     console.error('❌ FATAL: Failed to load modules', e);

@@ -56,8 +56,8 @@
   let WorkoutManager, StorageManager;
 
   try {
-    const workoutManagerModule = await import('./js/modules/workout-manager.js');
-    const storageModule = await import('./js/modules/storage.js');
+    const workoutManagerModule = await import('../js/modules/workout-manager.js');
+    const storageModule = await import('../js/modules/storage.js');
     WorkoutManager = workoutManagerModule.WorkoutManager;
     StorageManager = storageModule.StorageManager;
     console.log('✅ Modules loaded successfully\n');

@@ -55,9 +55,9 @@
   let DeloadManager, StorageManager, PhaseManager;
 
   try {
-    const deloadModule = await import('./js/modules/deload.js');
-    const storageModule = await import('./js/modules/storage.js');
-    const phaseModule = await import('./js/modules/phase-manager.js');
+    const deloadModule = await import('../js/modules/deload.js');
+    const storageModule = await import('../js/modules/storage.js');
+    const phaseModule = await import('../js/modules/phase-manager.js');
     DeloadManager = deloadModule.DeloadManager;
     StorageManager = storageModule.StorageManager;
     PhaseManager = phaseModule.PhaseManager;

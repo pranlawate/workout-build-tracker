@@ -58,7 +58,7 @@
   let SmartProgression;
 
   try {
-    SmartProgression = await import('./js/modules/smart-progression.js');
+    SmartProgression = await import('../js/modules/smart-progression.js');
     console.log('✅ Module loaded successfully\n');
   } catch (e) {
     console.error('❌ FATAL: Failed to load module', e);

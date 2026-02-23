@@ -56,11 +56,11 @@
   let progressionPathways, workouts, unlockEvaluator, equipmentProfiles, complexityTiers;
 
   try {
-    progressionPathways = await import('./js/modules/progression-pathways.js');
-    workouts = await import('./js/modules/workouts.js');
-    unlockEvaluator = await import('./js/modules/unlock-evaluator.js');
-    equipmentProfiles = await import('./js/modules/equipment-profiles.js');
-    complexityTiers = await import('./js/modules/complexity-tiers.js');
+    progressionPathways = await import('../js/modules/progression-pathways.js');
+    workouts = await import('../js/modules/workouts.js');
+    unlockEvaluator = await import('../js/modules/unlock-evaluator.js');
+    equipmentProfiles = await import('../js/modules/equipment-profiles.js');
+    complexityTiers = await import('../js/modules/complexity-tiers.js');
     console.log('✅ All modules loaded successfully\n');
   } catch (e) {
     console.error('❌ FATAL: Failed to load modules', e);

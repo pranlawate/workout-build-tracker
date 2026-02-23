@@ -39,7 +39,7 @@
   let storage, phaseManager, deloadManager, unlockEvaluator;
 
   try {
-    const storageModule = await import('./js/modules/storage.js');
+    const storageModule = await import('../js/modules/storage.js');
     StorageManager = storageModule.StorageManager;
     logTest('Import StorageManager', true);
   } catch (error) {
@@ -47,7 +47,7 @@
   }
 
   try {
-    const phaseModule = await import('./js/modules/phase-manager.js');
+    const phaseModule = await import('../js/modules/phase-manager.js');
     PhaseManager = phaseModule.PhaseManager;
     logTest('Import PhaseManager', true);
   } catch (error) {
@@ -55,7 +55,7 @@
   }
 
   try {
-    const deloadModule = await import('./js/modules/deload.js');
+    const deloadModule = await import('../js/modules/deload.js');
     DeloadManager = deloadModule.DeloadManager;
     logTest('Import DeloadManager', true);
   } catch (error) {
@@ -63,7 +63,7 @@
   }
 
   try {
-    const unlockModule = await import('./js/modules/unlock-evaluator.js');
+    const unlockModule = await import('../js/modules/unlock-evaluator.js');
     UnlockEvaluator = unlockModule.UnlockEvaluator;
     logTest('Import UnlockEvaluator', true);
   } catch (error) {

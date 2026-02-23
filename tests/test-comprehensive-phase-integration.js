@@ -56,7 +56,7 @@
   let storage, phaseManager, deloadManager, unlockEvaluator;
 
   try {
-    const storageModule = await import('./js/modules/storage.js');
+    const storageModule = await import('../js/modules/storage.js');
     StorageManager = storageModule.StorageManager;
     storage = new StorageManager();
     logTest('Setup', 'Import and instantiate StorageManager', true);
@@ -66,7 +66,7 @@
   }
 
   try {
-    const phaseModule = await import('./js/modules/phase-manager.js');
+    const phaseModule = await import('../js/modules/phase-manager.js');
     PhaseManager = phaseModule.PhaseManager;
     phaseManager = new PhaseManager(storage);
     logTest('Setup', 'Import and instantiate PhaseManager', true);
@@ -76,7 +76,7 @@
   }
 
   try {
-    const deloadModule = await import('./js/modules/deload.js');
+    const deloadModule = await import('../js/modules/deload.js');
     DeloadManager = deloadModule.DeloadManager;
     deloadManager = new DeloadManager(storage, phaseManager);
     logTest('Setup', 'Import and instantiate DeloadManager', true);
@@ -86,7 +86,7 @@
   }
 
   try {
-    const unlockModule = await import('./js/modules/unlock-evaluator.js');
+    const unlockModule = await import('../js/modules/unlock-evaluator.js');
     UnlockEvaluator = unlockModule.UnlockEvaluator;
     unlockEvaluator = new UnlockEvaluator(storage, phaseManager);
     logTest('Setup', 'Import and instantiate UnlockEvaluator', true);
