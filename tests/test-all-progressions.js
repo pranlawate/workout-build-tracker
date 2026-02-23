@@ -72,8 +72,8 @@
   // ========================================
   console.log('\n🔍 EXTRACTING ALL PROGRESSION SLOTS...\n');
 
-  const PROGRESSION_PATHWAYS = progressionPathways.PROGRESSION_PATHWAYS;
-  const slotKeys = Object.keys(PROGRESSION_PATHWAYS);
+  const PROGRESSION_PATHS = progressionPathways.PROGRESSION_PATHS;
+  const slotKeys = Object.keys(PROGRESSION_PATHS);
 
   console.log(`Found ${slotKeys.length} progression slots\n`);
 
@@ -97,7 +97,7 @@
 
   slotKeys.forEach(slotKey => {
     const category = 'Slot Definitions';
-    const pathway = PROGRESSION_PATHWAYS[slotKey];
+    const pathway = PROGRESSION_PATHS[slotKey];
 
     // Test: Has current exercise
     const hasCurrent = pathway.current !== undefined && pathway.current.length > 0;
@@ -140,7 +140,7 @@
 
   slotKeys.forEach(slotKey => {
     const category = 'Easier Progressions';
-    const pathway = PROGRESSION_PATHWAYS[slotKey];
+    const pathway = PROGRESSION_PATHS[slotKey];
 
     if (pathway.easier && pathway.easier.length > 0) {
       // Test: All easier exercises exist
@@ -173,7 +173,7 @@
 
   slotKeys.forEach(slotKey => {
     const category = 'Harder Progressions';
-    const pathway = PROGRESSION_PATHWAYS[slotKey];
+    const pathway = PROGRESSION_PATHS[slotKey];
 
     if (pathway.harder && pathway.harder.length > 0) {
       // Test: All harder exercises exist
@@ -206,7 +206,7 @@
 
   slotKeys.forEach(slotKey => {
     const category = 'Alternate Progressions';
-    const pathway = PROGRESSION_PATHWAYS[slotKey];
+    const pathway = PROGRESSION_PATHS[slotKey];
 
     if (pathway.alternate && pathway.alternate.length > 0) {
       // Test: All alternate exercises exist
@@ -239,7 +239,7 @@
 
   const allProgressionExercises = new Set();
   slotKeys.forEach(slotKey => {
-    const pathway = PROGRESSION_PATHWAYS[slotKey];
+    const pathway = PROGRESSION_PATHS[slotKey];
     allProgressionExercises.add(pathway.current);
     (pathway.easier || []).forEach(ex => allProgressionExercises.add(ex));
     (pathway.harder || []).forEach(ex => allProgressionExercises.add(ex));
