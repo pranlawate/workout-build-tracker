@@ -253,32 +253,14 @@
   font-weight: 500;
 }
 
-/* Weigh-in section styles */
+/* Weigh-in section styles (simplified) */
 #cooldown-modal .weighin-section {
   padding: 1rem;
   background: var(--color-background-secondary, #f9fafb);
   border-radius: 8px;
-  margin-top: 1rem;
 }
 
-#cooldown-modal .weighin-question {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
-  color: #1f2937;
-}
-
-#cooldown-modal .weighin-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-#cooldown-modal #weighin-input-cooldown {
-  margin-top: 1rem;
-}
-
-#cooldown-modal #weighin-input-cooldown label {
+#cooldown-modal .weighin-section label {
   display: block;
   font-size: 0.95rem;
   font-weight: 500;

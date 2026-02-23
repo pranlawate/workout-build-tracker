@@ -815,31 +815,43 @@ class App {
   }
 
   /**
-   * Setup weigh-in UI in cooldown modal (moved from summary)
+   * Setup weigh-in UI in cooldown modal (simplified - direct input)
    */
   setupCooldownWeighIn() {
     const container = document.getElementById('cooldown-weighin');
     if (!container) return;
 
-    // Copy existing weigh-in HTML structure
-    // (Find existing weigh-in code in setupSummaryWeighIn and reuse)
+    // Simple direct input (no Yes/Skip buttons)
     container.innerHTML = `
       <div class="weighin-section">
-        <p class="weighin-question">Have you weighed in today?</p>
-        <div class="weighin-buttons">
-          <button id="weighin-yes-cooldown" class="btn-secondary">Yes</button>
-          <button id="weighin-skip-cooldown" class="btn-secondary">Skip</button>
-        </div>
-        <div id="weighin-input-cooldown" style="display: none;">
-          <label for="weight-input-cooldown">Weight (kg):</label>
-          <input type="number" id="weight-input-cooldown" step="0.1" min="30" max="200" placeholder="70.0">
-          <button id="weighin-save-cooldown" class="btn-primary">Save Weight</button>
-        </div>
+        <label for="weight-input-cooldown">Body Weight (kg):</label>
+        <input type="number" id="weight-input-cooldown" step="0.1" min="30" max="200" placeholder="70.0">
+        <button id="weighin-save-cooldown" class="btn-primary">Save Weight</button>
       </div>
     `;
 
-    // Setup event listeners (reuse existing weigh-in logic)
-    this.setupWeighInListeners('cooldown');
+    // Setup save button listener
+    const saveBtn = document.getElementById('weighin-save-cooldown');
+    const weightInput = document.getElementById('weight-input-cooldown');
+
+    if (!saveBtn || !weightInput) return;
+
+    saveBtn.onclick = () => {
+      const weight = parseFloat(weightInput.value);
+
+      if (weight && weight >= 30 && weight <= 200) {
+        // Save to localStorage
+        const today = new Date().toISOString().split('T')[0];
+        const weighIns = JSON.parse(localStorage.getItem('build_body_weight') || '[]');
+        weighIns.push({ date: today, weight });
+        localStorage.setItem('build_body_weight', JSON.stringify(weighIns));
+
+        alert(`✅ Weight saved: ${weight} kg`);
+        weightInput.value = ''; // Clear input after save
+      } else {
+        alert('⚠️ Please enter a valid weight (30-200 kg)');
+      }
+    };
   }
 
   /**
