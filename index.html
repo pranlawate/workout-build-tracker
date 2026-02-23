@@ -763,7 +763,117 @@
     </div>
   </div>
 
+  <!-- Cooldown Modal -->
+  <div id="cooldown-modal" class="modal" style="display: none;">
+    <div class="modal-content modal-large">
+      <h2 class="modal-title">🧘 Cool Down</h2>
+
+      <!-- Section 1: Mandatory Stretching -->
+      <div class="cooldown-section">
+        <h3 class="section-title required-section">
+          <span class="section-icon">🎯</span>
+          STRETCHING (Required)
+        </h3>
+        <div id="stretching-checklist" class="checklist">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="progress-indicator">
+          <span id="stretching-progress">✓ 0 of 0 completed</span>
+        </div>
+      </div>
+
+      <!-- Section 2: Optional Foam Rolling -->
+      <div class="cooldown-section collapsible">
+        <h3 class="section-title optional-section" onclick="toggleCooldownSection(this)">
+          <span class="section-icon">💆</span>
+          FOAM ROLLING (Optional - 5-8 min)
+          <span class="toggle-icon">▼</span>
+        </h3>
+        <div class="section-content" style="display: none;">
+          <div id="foam-rolling-checklist" class="checklist">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Optional LISS Cardio -->
+      <div class="cooldown-section collapsible">
+        <h3 class="section-title optional-section" onclick="toggleCooldownSection(this)">
+          <span class="section-icon">🚴</span>
+          LISS CARDIO (Optional - 10-15 min)
+          <span class="toggle-icon">▼</span>
+        </h3>
+        <div class="section-content" style="display: none;">
+          <p class="recommendation" id="liss-recommendation">
+            💡 Recommended: Bike (10-15 min)<br>
+            <small>Legs are fresh - any low-impact cardio works</small>
+          </p>
+
+          <div class="radio-group" id="liss-options">
+            <label class="radio-item recommended">
+              <input type="radio" name="liss-type" value="bike" checked>
+              <span class="radio-text">
+                Bike - <input type="number" id="liss-bike-duration" value="10" min="5" max="20" class="duration-input"> min
+              </span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="liss-type" value="elliptical">
+              <span class="radio-text">
+                Elliptical - <input type="number" id="liss-elliptical-duration" value="10" min="5" max="20" class="duration-input"> min
+              </span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="liss-type" value="treadmill">
+              <span class="radio-text">
+                Treadmill - <input type="number" id="liss-treadmill-duration" value="10" min="5" max="20" class="duration-input"> min
+              </span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="liss-type" value="skip">
+              <span class="radio-text">Skip LISS</span>
+            </label>
+          </div>
+
+          <p class="note">Note: Choose light intensity (can hold conversation)</p>
+        </div>
+      </div>
+
+      <!-- Section 4: Weigh-in (moved from summary) -->
+      <div class="cooldown-section collapsible">
+        <h3 class="section-title" onclick="toggleCooldownSection(this)">
+          <span class="section-icon">⚖️</span>
+          WEIGH-IN
+          <span class="toggle-icon">▼</span>
+        </h3>
+        <div class="section-content" style="display: none;" id="cooldown-weighin">
+          <!-- Will be populated by existing weigh-in logic -->
+        </div>
+      </div>
+
+      <button id="finish-review-btn" class="btn-primary btn-large" disabled>
+        Finish & Review
+      </button>
+    </div>
+  </div>
+
   <script type="module" src="js/app.js"></script>
+
+  <script>
+    // Toggle cooldown section visibility
+    function toggleCooldownSection(headerElement) {
+      const section = headerElement.parentElement;
+      const content = section.querySelector('.section-content');
+      const icon = headerElement.querySelector('.toggle-icon');
+
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.textContent = '▲';
+      } else {
+        content.style.display = 'none';
+        icon.textContent = '▼';
+      }
+    }
+  </script>
 
   <!-- Service Worker Registration -->
   <script>
