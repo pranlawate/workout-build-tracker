@@ -52,15 +52,17 @@
   // ========================================
   console.log('\n📦 LOADING MODULES...\n');
 
-  let RotationManager, StorageManager, UnlockEvaluator;
+  let RotationManager, StorageManager, UnlockEvaluator, PhaseManager;
 
   try {
     const rotationModule = await import('./js/modules/rotation-manager.js');
     const storageModule = await import('./js/modules/storage.js');
     const unlockModule = await import('./js/modules/unlock-evaluator.js');
+    const phaseModule = await import('./js/modules/phase-manager.js');
     RotationManager = rotationModule.RotationManager;
     StorageManager = storageModule.StorageManager;
     UnlockEvaluator = unlockModule.UnlockEvaluator;
+    PhaseManager = phaseModule.PhaseManager;
     console.log('✅ Modules loaded successfully\n');
   } catch (e) {
     console.error('❌ FATAL: Failed to load modules', e);
@@ -76,7 +78,8 @@
 
   try {
     const storage = new StorageManager();
-    const unlockEval = new UnlockEvaluator(storage, null);
+    const phaseManager = new PhaseManager(storage);
+    const unlockEval = new UnlockEvaluator(storage, phaseManager);
     const rotationManager = new RotationManager(storage, unlockEval);
 
     // Test: No history returns 0 weeks
@@ -129,7 +132,8 @@
 
   try {
     const storage = new StorageManager();
-    const unlockEval = new UnlockEvaluator(storage, null);
+    const phaseManager = new PhaseManager(storage);
+    const unlockEval = new UnlockEvaluator(storage, phaseManager);
     const rotationManager = new RotationManager(storage, unlockEval);
 
     // Test: Don't trigger before 8 weeks
@@ -192,7 +196,8 @@
 
   try {
     const storage = new StorageManager();
-    const unlockEval = new UnlockEvaluator(storage, null);
+    const phaseManager = new PhaseManager(storage);
+    const unlockEval = new UnlockEvaluator(storage, phaseManager);
     const rotationManager = new RotationManager(storage, unlockEval);
 
     // Test: Suppress rotation when 80%+ toward unlock
