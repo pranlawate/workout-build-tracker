@@ -87,6 +87,70 @@ export const MUSCLE_HEAD_COVERAGE = {
 };
 
 /**
+ * Exercise rotation pools - defines which exercises can rotate
+ * Rotation stays within same complexity tier
+ */
+export const ROTATION_POOLS = {
+  // Simple tier - mandatory rotations for muscle head coverage
+  'Tricep Pushdowns': {
+    tier: 'simple',
+    rotations: ['Overhead Tricep Extension']
+  },
+  'Overhead Tricep Extension': {
+    tier: 'simple',
+    rotations: ['Tricep Pushdowns']
+  },
+  'DB Hammer Curls': {
+    tier: 'simple',
+    rotations: ['Standard DB Curls']
+  },
+  'Standard DB Curls': {
+    tier: 'simple',
+    rotations: ['DB Hammer Curls']
+  },
+
+  // Moderate tier - post-unlock rotations
+  'Barbell Curls': {
+    tier: 'moderate',
+    rotations: ['EZ Bar Curls']
+  },
+  'EZ Bar Curls': {
+    tier: 'moderate',
+    rotations: ['Barbell Curls']
+  },
+
+  // Complex tier - barbell compound variations
+  'Barbell Bench Press': {
+    tier: 'complex',
+    rotations: ['Close-Grip Bench Press', 'Incline Bench Press']
+  },
+  'Close-Grip Bench Press': {
+    tier: 'complex',
+    rotations: ['Barbell Bench Press']
+  },
+  'Incline Bench Press': {
+    tier: 'complex',
+    rotations: ['Barbell Bench Press']
+  },
+  'Barbell Back Squat': {
+    tier: 'complex',
+    rotations: ['Front Squat']
+  },
+  'Front Squat': {
+    tier: 'complex',
+    rotations: ['Barbell Back Squat']
+  },
+  'Barbell Deadlift': {
+    tier: 'complex',
+    rotations: ['Sumo Deadlift']
+  },
+  'Sumo Deadlift': {
+    tier: 'complex',
+    rotations: ['Barbell Deadlift']
+  }
+};
+
+/**
  * Exercise difficulty scale
  * 1 = beginner-friendly exercises (e.g., planks, bodyweight movements)
  * 2 = intermediate exercises (most dumbbell/cable/machine work)
