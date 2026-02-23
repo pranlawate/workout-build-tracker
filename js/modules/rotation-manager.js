@@ -39,8 +39,44 @@ export class RotationManager {
    * @returns {Object|null} Rotation suggestion or null
    */
   checkRotationDue(exerciseKey, currentExerciseName) {
-    // TODO: Implement in next task
-    return null;
+    try {
+      // 1. Check if exercise has rotation pool
+      if (!hasRotationPool(currentExerciseName)) {
+        return null;
+      }
+
+      // 2. Get tenure
+      const tenure = this.getTenure(exerciseKey);
+      if (tenure.weeksOnExercise < 8) {
+        return null; // Not due yet
+      }
+
+      // 3. Check unlock proximity (suppress if user close to unlock)
+      const milestone = getUnlockMilestone(currentExerciseName);
+      if (milestone) {
+        const progress = this.getMilestoneProgress(currentExerciseName, exerciseKey);
+        if (progress >= 0.8) {
+          console.log(`[RotationManager] Suppressing rotation - user at ${(progress * 100).toFixed(0)}% toward unlock`);
+          return null; // Don't disrupt unlock momentum
+        }
+      }
+
+      // 4. Get next rotation variant
+      const pool = ROTATION_POOLS[currentExerciseName];
+      const nextVariation = pool.rotations[0]; // Simple: alternate between 2
+
+      // 5. Return rotation suggestion
+      return {
+        type: 'ROTATION_DUE',
+        suggestedExercise: nextVariation,
+        reason: `Try ${nextVariation} for complete muscle coverage (${tenure.weeksOnExercise} weeks on current variation)`,
+        currentExercise: currentExerciseName,
+        weeksOnExercise: tenure.weeksOnExercise
+      };
+    } catch (e) {
+      console.error('[RotationManager] Error checking rotation:', e);
+      return null;
+    }
   }
 
   /**
