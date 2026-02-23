@@ -94,7 +94,22 @@ export class RotationManager {
    * @param {string} newExerciseName - New exercise name after rotation
    */
   recordRotation(exerciseKey, newExerciseName) {
-    // TODO: Implement in next task
+    try {
+      const allTenure = JSON.parse(localStorage.getItem(this.TENURE_KEY) || '{}');
+
+      // Reset tenure for new exercise
+      allTenure[exerciseKey] = {
+        exerciseName: newExerciseName,
+        startDate: new Date().toISOString(),
+        lastRotationDate: new Date().toISOString()
+      };
+
+      localStorage.setItem(this.TENURE_KEY, JSON.stringify(allTenure));
+
+      console.log(`[RotationManager] Recorded rotation: ${exerciseKey} → ${newExerciseName}`);
+    } catch (e) {
+      console.error('[RotationManager] Error recording rotation:', e);
+    }
   }
 
   /**
