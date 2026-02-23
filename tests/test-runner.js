@@ -16,6 +16,7 @@
  *    - testRunner.runDeloadLogic()
  *    - testRunner.runUnlockSystem()
  *    - testRunner.runSmartProgression()
+ *    - testRunner.runRotationSystem()
  *    - testRunner.runAll()
  */
 
@@ -28,7 +29,8 @@ const testRunner = {
     workoutRotation: null,
     deloadLogic: null,
     unlockSystem: null,
-    smartProgression: null
+    smartProgression: null,
+    rotationSystem: null
   },
 
   async loadScript(path) {
@@ -107,6 +109,14 @@ const testRunner = {
     }
   },
 
+  async runRotationSystem() {
+    console.log('\n🔄 RUNNING ROTATION SYSTEM TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-rotation-system.js');
+    if (loaded) {
+      this.results.rotationSystem = window._rotationSystemTestResults;
+    }
+  },
+
   async runAll() {
     console.clear();
     console.log('═══════════════════════════════════════════════════════════════');
@@ -125,6 +135,7 @@ const testRunner = {
     await this.runDeloadLogic();
     await this.runUnlockSystem();
     await this.runSmartProgression();
+    await this.runRotationSystem();
 
     const endTime = Date.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -147,7 +158,8 @@ const testRunner = {
       { name: 'Workout Rotation Tests', key: 'workoutRotation', icon: '🔄' },
       { name: 'Deload Logic Tests', key: 'deloadLogic', icon: '⏸️' },
       { name: 'Unlock System Tests', key: 'unlockSystem', icon: '🔓' },
-      { name: 'Smart Progression Tests', key: 'smartProgression', icon: '📈' }
+      { name: 'Smart Progression Tests', key: 'smartProgression', icon: '📈' },
+      { name: 'Rotation System Tests', key: 'rotationSystem', icon: '🔄' }
     ];
 
     let totalPassed = 0;
@@ -219,7 +231,8 @@ const testRunner = {
     console.log('   - testRunner.runWorkoutRotation() - Run rotation tests only');
     console.log('   - testRunner.runDeloadLogic() - Run deload tests only');
     console.log('   - testRunner.runUnlockSystem() - Run unlock tests only');
-    console.log('   - testRunner.runSmartProgression() - Run progression tests only\n');
+    console.log('   - testRunner.runSmartProgression() - Run progression tests only');
+    console.log('   - testRunner.runRotationSystem() - Run rotation system tests only\n');
 
     return window._allTestResults;
   },
