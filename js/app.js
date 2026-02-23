@@ -1007,9 +1007,6 @@ class App {
       exercises: []
     };
 
-    // Render warm-up section
-    const warmupHtml = this.renderWarmupProtocol(this.currentWorkout.name);
-
     const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
       const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
       const history = this.storage.getExerciseHistory(exerciseKey);
@@ -1107,12 +1104,10 @@ class App {
       `;
     }).join('');
 
-    // Combine warm-up and exercises
-    exerciseList.innerHTML = warmupHtml + exercisesHtml;
+    exerciseList.innerHTML = exercisesHtml;
 
     // Attach input listeners
     this.attachSetInputListeners();
-    this.attachWarmupListeners();
 
     // Show complete workout button
     const completeBtn = document.getElementById('complete-workout-btn');
@@ -2520,35 +2515,36 @@ class App {
     `;
   }
 
-  attachWarmupListeners() {
-    const warmupSection = document.getElementById('warmup-section');
-    if (!warmupSection) return;
-
-    // Toggle expand/collapse
-    const warmupHeader = document.getElementById('warmup-header');
-    if (warmupHeader) {
-      warmupHeader.addEventListener('click', () => {
-        warmupSection.classList.toggle('expanded');
-      });
-    }
-
-    // Handle checkbox clicks
-    const warmupItems = warmupSection.querySelectorAll('.warmup-item');
-    warmupItems.forEach(item => {
-      item.addEventListener('click', () => {
-        item.classList.toggle('completed');
-
-        // Check if all items are completed
-        const allCompleted = Array.from(warmupItems).every(i =>
-          i.classList.contains('completed')
-        );
-
-        if (allCompleted && this.workoutSession) {
-          this.workoutSession.warmupCompleted = true;
-        }
-      });
-    });
-  }
+  // DEPRECATED: Warm-up is now handled in pre-workout modal
+  // attachWarmupListeners() {
+  //   const warmupSection = document.getElementById('warmup-section');
+  //   if (!warmupSection) return;
+  //
+  //   // Toggle expand/collapse
+  //   const warmupHeader = document.getElementById('warmup-header');
+  //   if (warmupHeader) {
+  //     warmupHeader.addEventListener('click', () => {
+  //       warmupSection.classList.toggle('expanded');
+  //     });
+  //   }
+  //
+  //   // Handle checkbox clicks
+  //   const warmupItems = warmupSection.querySelectorAll('.warmup-item');
+  //   warmupItems.forEach(item => {
+  //     item.addEventListener('click', () => {
+  //       item.classList.toggle('completed');
+  //
+  //       // Check if all items are completed
+  //       const allCompleted = Array.from(warmupItems).every(i =>
+  //         i.classList.contains('completed')
+  //       );
+  //
+  //       if (allCompleted && this.workoutSession) {
+  //         this.workoutSession.warmupCompleted = true;
+  //       }
+  //     });
+  //   });
+  // }
 
   initializeNumberOverlay() {
     const overlay = document.getElementById('number-overlay');
@@ -3476,44 +3472,45 @@ class App {
 
   /**
    * Render warm-up protocol section
+   * DEPRECATED: Warm-up is now shown in pre-workout modal
    *
    * @param {string} workoutKey - Workout key
    * @returns {string} HTML for warm-up section
    */
-  renderWarmupProtocol(workoutKey) {
-    const equipmentProfile = this.storage.getEquipmentProfile();
-    const protocol = getWarmupProtocol(workoutKey, equipmentProfile);
-
-    return `
-      <div class="warmup-section">
-        <h3>🔥 Warm-Up (${protocol.estimatedDuration})</h3>
-        <div class="warmup-exercises">
-          ${protocol.exercises.map((ex, index) => `
-            <div class="warmup-exercise">
-              <span class="warmup-number">${index + 1}.</span>
-              <div class="warmup-details">
-                <div class="warmup-name">${this.escapeHtml(ex.name)}</div>
-                <div class="warmup-meta">
-                  ${this.escapeHtml(ex.duration || ex.reps)}
-                  ${ex.note ? `<span class="warmup-note">(${this.escapeHtml(ex.note)})</span>` : ''}
-                </div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="warmup-sets-info">
-          <h4>Warm-up Sets (First Exercise Only)</h4>
-          <p>Complete 3 progressive sets before working sets:</p>
-          <ul>
-            <li>Set 1: 50% weight × 8 reps (45-60s rest)</li>
-            <li>Set 2: 70% weight × 3-4 reps (45-60s rest)</li>
-            <li>Set 3: 90% weight × 1 rep (2 min rest)</li>
-          </ul>
-        </div>
-      </div>
-    `;
-  }
+  // renderWarmupProtocol(workoutKey) {
+  //   const equipmentProfile = this.storage.getEquipmentProfile();
+  //   const protocol = getWarmupProtocol(workoutKey, equipmentProfile);
+  //
+  //   return `
+  //     <div class="warmup-section">
+  //       <h3>🔥 Warm-Up (${protocol.estimatedDuration})</h3>
+  //       <div class="warmup-exercises">
+  //         ${protocol.exercises.map((ex, index) => `
+  //           <div class="warmup-exercise">
+  //             <span class="warmup-number">${index + 1}.</span>
+  //             <div class="warmup-details">
+  //               <div class="warmup-name">${this.escapeHtml(ex.name)}</div>
+  //               <div class="warmup-meta">
+  //                 ${this.escapeHtml(ex.duration || ex.reps)}
+  //                 ${ex.note ? `<span class="warmup-note">(${this.escapeHtml(ex.note)})</span>` : ''}
+  //               </div>
+  //             </div>
+  //           </div>
+  //         `).join('')}
+  //       </div>
+  //
+  //       <div class="warmup-sets-info">
+  //         <h4>Warm-up Sets (First Exercise Only)</h4>
+  //         <p>Complete 3 progressive sets before working sets:</p>
+  //         <ul>
+  //           <li>Set 1: 50% weight × 8 reps (45-60s rest)</li>
+  //           <li>Set 2: 70% weight × 3-4 reps (45-60s rest)</li>
+  //           <li>Set 3: 90% weight × 1 rep (2 min rest)</li>
+  //         </ul>
+  //       </div>
+  //     </div>
+  //   `;
+  // }
 
   showProgressDashboard(pushHistory = true) {
     console.log('[Dashboard] showProgressDashboard called');
