@@ -28,6 +28,7 @@ fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
 - Deload logic (phase-aware triggers, state management)
 - Unlock system (criteria evaluation, phase prioritization)
 - Smart progression (plateau detection, weight suggestions, decision engine)
+- Rotation system (tenure tracking, 8-week cycles, unlock proximity suppression)
 
 **Usage:**
 ```javascript
@@ -46,6 +47,7 @@ testRunner.runWorkoutRotation()  // Run rotation logic tests only
 testRunner.runDeloadLogic()      // Run deload logic tests only
 testRunner.runUnlockSystem()     // Run unlock system tests only
 testRunner.runSmartProgression() // Run smart progression tests only
+testRunner.runRotationSystem()   // Run rotation system tests only
 testRunner.stats()               // Show quick stats
 testRunner.exportResults()       // Download JSON report
 ```
@@ -415,7 +417,7 @@ Strength Milestones: 3/3 passed (100%)
 - Successful progression (top reps with RIR 2-3)
 - Weight increase suggestions (+2.5kg standard increment)
 - Adaptive pattern learning (detects user's progression pattern)
-- Main decision engine (getSuggestion with 6-priority system)
+- Main decision engine (getSuggestion with 7-priority system)
 
 **Usage:**
 ```javascript
@@ -431,7 +433,7 @@ fetch('./tests/test-smart-progression.js').then(r => r.text()).then(eval);
 - Successful progression requires: top reps (12) + good RIR (2-3)
 - Weight increase suggests +2.5kg increment
 - Adaptive learning detects large jumps (5kg) vs small steps (1kg)
-- getSuggestion priorities: pain → progression → weight gap → plateau → regression → continue
+- getSuggestion priorities: pain → progression → rotation → weight gap → plateau → regression → continue
 
 **Sample Output:**
 ```
@@ -451,6 +453,57 @@ Regression Detection: 3/3 passed (100%)
 Decision Engine: 5/5 passed (100%)
 
 🎯 OVERALL: 50/50 tests passed (100%)
+```
+
+---
+
+### 9. Rotation System Tests
+
+**`test-rotation-system.js`**
+
+**Coverage:** Exercise rotation and muscle coverage system
+- Tenure tracking (weeks on current exercise)
+- Rotation eligibility (8-week threshold)
+- Unlock proximity suppression (80%+ progress)
+- Rotation pool management (rotation variants)
+- Smart progression integration (Priority 3)
+
+**Usage:**
+```javascript
+fetch('./tests/test-rotation-system.js').then(r => r.text()).then(eval);
+// Results: window._rotationSystemTestResults
+```
+
+**What it validates:**
+- getTenure returns 0 weeks for exercises with no history
+- Calculates tenure from first workout date (e.g., 4 weeks from 28 days ago)
+- Resets tenure to 0 weeks after rotation
+- No rotation suggestion before 8 weeks
+- Rotation suggestion appears at 8 weeks
+- Suggests correct rotation variant (e.g., Tricep Pushdowns → Overhead Tricep Extension)
+- No rotation for exercises without rotation pool
+- Suppresses rotation when user 80%+ toward unlock milestone
+- Shows rotation when user <80% toward unlock
+
+**Sample Output:**
+```
+🔄 COMPREHENSIVE ROTATION SYSTEM TEST SUITE
+═══════════════════════════════════════════════════════════════
+
+✅ PASS: Returns 0 weeks for exercise with no history
+✅ PASS: Calculates 4 weeks from first workout 28 days ago
+✅ PASS: Resets tenure to 0 weeks after rotation
+✅ PASS: No rotation suggestion before 8 weeks
+✅ PASS: Rotation suggestion appears at 8 weeks
+✅ PASS: Suggests correct rotation variant
+...
+
+📊 TEST SUMMARY
+Tenure Tracking: 3/3 passed (100%)
+Rotation Eligibility: 4/4 passed (100%)
+Unlock Proximity: 2/2 passed (100%)
+
+🎯 OVERALL: 9/9 tests passed (100%)
 ```
 
 ---
