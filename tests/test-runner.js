@@ -17,6 +17,7 @@
  *    - testRunner.runUnlockSystem()
  *    - testRunner.runSmartProgression()
  *    - testRunner.runRotationSystem()
+ *    - testRunner.runModalUI()
  *    - testRunner.runAll()
  */
 
@@ -30,7 +31,8 @@ const testRunner = {
     deloadLogic: null,
     unlockSystem: null,
     smartProgression: null,
-    rotationSystem: null
+    rotationSystem: null,
+    modalUI: null
   },
 
   async loadScript(path, resultVariable, maxWaitMs = 10000) {
@@ -129,6 +131,14 @@ const testRunner = {
     }
   },
 
+  async runModalUI() {
+    console.log('\n🎨 RUNNING MODAL UI INTEGRATION TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-modal-ui-integration.js', 'modalUITestResults');
+    if (loaded) {
+      this.results.modalUI = window.modalUITestResults;
+    }
+  },
+
   async runAll() {
     console.clear();
     console.log('═══════════════════════════════════════════════════════════════');
@@ -148,6 +158,7 @@ const testRunner = {
     await this.runUnlockSystem();
     await this.runSmartProgression();
     await this.runRotationSystem();
+    await this.runModalUI();
 
     const endTime = Date.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -171,7 +182,8 @@ const testRunner = {
       { name: 'Deload Logic Tests', key: 'deloadLogic', icon: '⏸️' },
       { name: 'Unlock System Tests', key: 'unlockSystem', icon: '🔓' },
       { name: 'Smart Progression Tests', key: 'smartProgression', icon: '📈' },
-      { name: 'Rotation System Tests', key: 'rotationSystem', icon: '🔄' }
+      { name: 'Rotation System Tests', key: 'rotationSystem', icon: '🔄' },
+      { name: 'Modal UI Integration Tests', key: 'modalUI', icon: '🎨' }
     ];
 
     let totalPassed = 0;

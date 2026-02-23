@@ -29,6 +29,7 @@ fetch('./tests/test-runner.js').then(r => r.text()).then(eval);
 - Unlock system (criteria evaluation, phase prioritization)
 - Smart progression (plateau detection, weight suggestions, decision engine)
 - Rotation system (tenure tracking, 8-week cycles, unlock proximity suppression)
+- **Modal UI integration (text visibility, button functionality, null safety, user flows)**
 
 **Usage:**
 ```javascript
@@ -48,6 +49,7 @@ testRunner.runDeloadLogic()      // Run deload logic tests only
 testRunner.runUnlockSystem()     // Run unlock system tests only
 testRunner.runSmartProgression() // Run smart progression tests only
 testRunner.runRotationSystem()   // Run rotation system tests only
+testRunner.runModalUI()          // Run modal UI integration tests only
 testRunner.stats()               // Show quick stats
 testRunner.exportResults()       // Download JSON report
 ```
@@ -614,6 +616,72 @@ For comprehensive end-to-end manual testing, refer to:
 - Feature 10: Build/Maintenance Phase Integration (Tests 10.1-10.15)
 - Feature 12: Kettlebell Integration (Tests 12.1-12.28)
 - All other features with manual test scenarios
+
+---
+
+## Modal UI Integration Tests
+
+### `test-modal-ui-integration.js` 🎨 NEW
+
+**Catches real-world UI bugs that manual testing found.**
+
+**Tests specifically designed to catch:**
+- ✅ Text visibility issues (white text on white backgrounds)
+- ✅ Missing UI elements (input boxes, buttons)
+- ✅ Null safety in DOM operations
+- ✅ CSS styling completeness
+- ✅ Button functionality (onclick handlers)
+- ✅ System interaction checks (deload suppression)
+- ✅ Form cues coverage for all exercises
+- ✅ Modal element existence
+
+**26 Test Categories:**
+1. **Warm-up Modal Structure** - HTML elements exist
+2. **Warm-up Text Visibility** - CSS colors defined (not white)
+3. **Cooldown Modal Structure** - All sections present
+4. **Cooldown Text Visibility** - Stretching/foam rolling text readable
+5. **Weigh-in Section** - Input box and styling exist
+6. **App Methods** - Modal-related methods exist
+7. **Null Safety** - Summary weigh-in has null checks
+8. **Form Cues Coverage** - All exercises have form guidance
+9. **System Interactions** - Deload checks in rotation/progression
+
+**Why These Tests Matter:**
+These tests were created AFTER finding bugs in production that slipped through because:
+- No automated UI/visual testing
+- No checks for CSS completeness
+- No verification of DOM element visibility
+- No null safety validation
+
+**Usage:**
+```javascript
+// Run standalone
+fetch('./tests/test-modal-ui-integration.js').then(r => r.text()).then(eval);
+
+// Or via test runner
+testRunner.runModalUI();
+```
+
+**Expected Output:**
+```
+✅ Warm-up modal element exists
+✅ Warm-up checklist container exists
+✅ Warm-up exercise names have non-white text color defined
+✅ Stretching text has visible (non-white) color defined
+✅ setupCooldownWeighIn has null safety checks
+...
+📊 26/26 tests passed (100%)
+```
+
+**Bugs This Would Have Caught:**
+1. White text on white background (warm-up checkboxes)
+2. White text in stretching section
+3. Missing weigh-in input box
+4. Weigh-in allowing multiple saves
+5. Finish & Review button not working
+6. Null reference error on summary screen
+7. Missing form cues for Decline DB Press
+8. Deload not suppressing rotation/progression
 
 ---
 
