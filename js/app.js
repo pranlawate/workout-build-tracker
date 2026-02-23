@@ -622,41 +622,51 @@ class App {
   renderStretchingChecklist(workoutName) {
     const checklist = document.getElementById('stretching-checklist');
     const progressSpan = document.getElementById('stretching-progress');
-    const isUpper = workoutName.startsWith('UPPER');
-    const stretches = isUpper
-      ? getUpperBodyStretches()
-      : getLowerBodyStretches();
+    const finishBtn = document.getElementById('finish-review-btn');
 
-    checklist.innerHTML = stretches.map((stretch, index) => `
-      <label class="checklist-item">
-        <input type="checkbox" class="stretch-checkbox" data-index="${index}">
-        <div class="stretch-info">
-          <span class="stretch-name">${this.escapeHtml(stretch.name)}</span>
-          <span class="stretch-duration">${this.escapeHtml(stretch.duration)}</span>
-          <span class="stretch-target">Targets: ${this.escapeHtml(stretch.target)}</span>
-        </div>
-      </label>
-    `).join('');
+    if (!checklist || !progressSpan || !finishBtn) {
+      console.error('[App] Cooldown stretching elements not found');
+      return;
+    }
 
-    // Setup progress tracking
-    const checkboxes = checklist.querySelectorAll('.stretch-checkbox');
-    const total = checkboxes.length;
+    try {
+      const isUpper = workoutName.startsWith('UPPER');
+      const stretches = isUpper
+        ? getUpperBodyStretches()
+        : getLowerBodyStretches();
 
-    const updateProgress = () => {
-      const completed = Array.from(checkboxes).filter(c => c.checked).length;
-      progressSpan.textContent = `✓ ${completed} of ${total} completed`;
+      checklist.innerHTML = stretches.map((stretch, index) => `
+        <label class="checklist-item">
+          <input type="checkbox" class="stretch-checkbox" data-index="${index}">
+          <div class="stretch-info">
+            <span class="stretch-name">${this.escapeHtml(stretch.name)}</span>
+            <span class="stretch-duration">${this.escapeHtml(stretch.duration)}</span>
+            <span class="stretch-target">Targets: ${this.escapeHtml(stretch.target)}</span>
+          </div>
+        </label>
+      `).join('');
 
-      // Enable finish button when all stretches done
-      const finishBtn = document.getElementById('finish-review-btn');
-      finishBtn.disabled = completed < total;
-    };
+      // Setup progress tracking
+      const checkboxes = checklist.querySelectorAll('.stretch-checkbox');
+      const total = checkboxes.length;
 
-    checkboxes.forEach(cb => {
-      cb.addEventListener('change', updateProgress);
-    });
+      const updateProgress = () => {
+        const completed = Array.from(checkboxes).filter(c => c.checked).length;
+        progressSpan.textContent = `✓ ${completed} of ${total} completed`;
 
-    // Initialize
-    progressSpan.textContent = `✓ 0 of ${total} completed`;
+        // Enable finish button when all stretches done
+        finishBtn.disabled = completed < total;
+      };
+
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateProgress);
+      });
+
+      // Initialize
+      progressSpan.textContent = `✓ 0 of ${total} completed`;
+    } catch (error) {
+      console.error('[App] Error rendering stretching checklist:', error);
+    }
   }
 
   /**
@@ -665,21 +675,31 @@ class App {
    */
   renderFoamRollingChecklist(workoutName) {
     const checklist = document.getElementById('foam-rolling-checklist');
-    const isUpper = workoutName.startsWith('UPPER');
-    const areas = isUpper
-      ? getUpperBodyFoamRolling()
-      : getLowerBodyFoamRolling();
 
-    checklist.innerHTML = areas.map((area, index) => `
-      <label class="checklist-item">
-        <input type="checkbox" class="foam-rolling-checkbox" data-area="${this.escapeHtml(area.area)}">
-        <div class="foam-info">
-          <span class="foam-area">${this.escapeHtml(area.area)}</span>
-          <span class="foam-duration">${this.escapeHtml(area.duration)}</span>
-          <span class="foam-note">${this.escapeHtml(area.note)}</span>
-        </div>
-      </label>
-    `).join('');
+    if (!checklist) {
+      console.error('[App] Foam rolling checklist element not found');
+      return;
+    }
+
+    try {
+      const isUpper = workoutName.startsWith('UPPER');
+      const areas = isUpper
+        ? getUpperBodyFoamRolling()
+        : getLowerBodyFoamRolling();
+
+      checklist.innerHTML = areas.map((area, index) => `
+        <label class="checklist-item">
+          <input type="checkbox" class="foam-rolling-checkbox" data-area="${this.escapeHtml(area.area)}">
+          <div class="foam-info">
+            <span class="foam-area">${this.escapeHtml(area.area)}</span>
+            <span class="foam-duration">${this.escapeHtml(area.duration)}</span>
+            <span class="foam-note">${this.escapeHtml(area.note)}</span>
+          </div>
+        </label>
+      `).join('');
+    } catch (error) {
+      console.error('[App] Error rendering foam rolling checklist:', error);
+    }
   }
 
   /**
@@ -687,20 +707,46 @@ class App {
    * @param {string} workoutName - Workout key
    */
   renderLISSRecommendations(workoutName) {
-    const recommendation = getLISSRecommendation(workoutName);
     const recElement = document.getElementById('liss-recommendation');
 
-    // Update recommendation text
-    recElement.innerHTML = `
-      💡 Recommended: ${recommendation.recommended.charAt(0).toUpperCase() + recommendation.recommended.slice(1)} (10-15 min)<br>
-      <small>${this.escapeHtml(recommendation.warning)}</small>
-    `;
+    if (!recElement) {
+      console.error('[App] LISS recommendation element not found');
+      return;
+    }
 
-    // Add warning to treadmill option if needed
-    if (recommendation.treadmillNote.includes('⚠️')) {
-      const treadmillLabel = document.querySelector('input[value="treadmill"]').parentElement;
-      const treadmillText = treadmillLabel.querySelector('.radio-text');
-      treadmillText.innerHTML += ` <small class="warning">${this.escapeHtml(recommendation.treadmillNote)}</small>`;
+    try {
+      const recommendation = getLISSRecommendation(workoutName);
+
+      // Update recommendation text
+      recElement.innerHTML = `
+        💡 Recommended: ${recommendation.recommended.charAt(0).toUpperCase() + recommendation.recommended.slice(1)} ${recommendation.duration}<br>
+        <small>${this.escapeHtml(recommendation.warning)}</small>
+      `;
+
+      // Add warning to treadmill option if needed
+      if (recommendation.treadmillNote.includes('⚠️')) {
+        const treadmillInput = document.querySelector('input[value="treadmill"]');
+        if (!treadmillInput) {
+          console.error('[App] Treadmill input element not found');
+          return;
+        }
+
+        const treadmillLabel = treadmillInput.parentElement;
+        if (!treadmillLabel) {
+          console.error('[App] Treadmill label element not found');
+          return;
+        }
+
+        const treadmillText = treadmillLabel.querySelector('.radio-text');
+        if (!treadmillText) {
+          console.error('[App] Treadmill text element not found');
+          return;
+        }
+
+        treadmillText.innerHTML += ` <small class="warning">${this.escapeHtml(recommendation.treadmillNote)}</small>`;
+      }
+    } catch (error) {
+      console.error('[App] Error rendering LISS recommendations:', error);
     }
   }
 
@@ -728,6 +774,156 @@ class App {
     modal.style.display = 'flex';
 
     console.log('[App] Cooldown modal shown');
+  }
+
+  /**
+   * Collect foam rolling data from cooldown modal
+   * @returns {Object} Foam rolling completion data
+   */
+  collectFoamRollingData() {
+    const checkboxes = document.querySelectorAll('.foam-rolling-checkbox');
+    const checkedAreas = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.dataset.area);
+
+    return {
+      completed: checkedAreas.length > 0,
+      areas: checkedAreas
+    };
+  }
+
+  /**
+   * Collect LISS cardio data from cooldown modal
+   * @returns {Object} LISS cardio data
+   */
+  collectLISSData() {
+    const selectedRadio = document.querySelector('input[name="liss-type"]:checked');
+    const type = selectedRadio?.value;
+
+    if (!type || type === 'skip') {
+      return { type: null, duration: 0 };
+    }
+
+    // Get duration from corresponding input
+    const durationInput = document.getElementById(`liss-${type}-duration`);
+    const duration = durationInput ? (parseInt(durationInput.value, 10) || 10) : 10;
+
+    return { type, duration };
+  }
+
+  /**
+   * Setup weigh-in UI in cooldown modal (moved from summary)
+   */
+  setupCooldownWeighIn() {
+    const container = document.getElementById('cooldown-weighin');
+    if (!container) return;
+
+    // Copy existing weigh-in HTML structure
+    // (Find existing weigh-in code in setupSummaryWeighIn and reuse)
+    container.innerHTML = `
+      <div class="weighin-section">
+        <p class="weighin-question">Have you weighed in today?</p>
+        <div class="weighin-buttons">
+          <button id="weighin-yes-cooldown" class="btn-secondary">Yes</button>
+          <button id="weighin-skip-cooldown" class="btn-secondary">Skip</button>
+        </div>
+        <div id="weighin-input-cooldown" style="display: none;">
+          <label for="weight-input-cooldown">Weight (kg):</label>
+          <input type="number" id="weight-input-cooldown" step="0.1" min="30" max="200" placeholder="70.0">
+          <button id="weighin-save-cooldown" class="btn-primary">Save Weight</button>
+        </div>
+      </div>
+    `;
+
+    // Setup event listeners (reuse existing weigh-in logic)
+    this.setupWeighInListeners('cooldown');
+  }
+
+  /**
+   * Collect weigh-in data from cooldown modal
+   * @returns {Object} Weigh-in data
+   */
+  collectWeighInData() {
+    const weightInput = document.getElementById('weight-input-cooldown');
+    const weight = weightInput?.value ? parseFloat(weightInput.value) : null;
+
+    return {
+      completed: weight !== null && !isNaN(weight),
+      weight: (weight !== null && !isNaN(weight)) ? weight : null
+    };
+  }
+
+  /**
+   * Setup weigh-in event listeners
+   * @param {string} context - 'cooldown' or 'summary'
+   */
+  setupWeighInListeners(context) {
+    const yesBtn = document.getElementById(`weighin-yes-${context}`);
+    const skipBtn = document.getElementById(`weighin-skip-${context}`);
+    const inputDiv = document.getElementById(`weighin-input-${context}`);
+    const saveBtn = document.getElementById(`weighin-save-${context}`);
+
+    if (!yesBtn || !skipBtn || !inputDiv || !saveBtn) return;
+
+    yesBtn.onclick = () => {
+      inputDiv.style.display = 'block';
+    };
+
+    skipBtn.onclick = () => {
+      inputDiv.style.display = 'none';
+    };
+
+    saveBtn.onclick = () => {
+      const weightInput = document.getElementById(`weight-input-${context}`);
+      if (!weightInput) return;
+
+      const weight = parseFloat(weightInput.value);
+
+      if (weight && weight >= 30 && weight <= 200) {
+        // Save to localStorage
+        const today = new Date().toISOString().split('T')[0];
+        const weighIns = JSON.parse(localStorage.getItem('build_body_weight') || '[]');
+        weighIns.push({ date: today, weight });
+        localStorage.setItem('build_body_weight', JSON.stringify(weighIns));
+
+        alert(`✅ Weight saved: ${weight} kg`);
+        inputDiv.style.display = 'none';
+      } else {
+        alert('⚠️ Please enter a valid weight (30-200 kg)');
+      }
+    };
+  }
+
+  /**
+   * Setup finish review button for cooldown modal
+   * @param {Object} workoutData - Workout data to pass to summary
+   */
+  setupFinishReviewButton(workoutData) {
+    const btn = document.getElementById('finish-review-btn');
+    if (!btn) return;
+
+    // Button already has disabled state managed by stretching progress
+
+    btn.onclick = () => {
+      // Collect all cooldown data
+      this.workoutSession.cooldownData = {
+        stretchesCompleted: true,
+        foamRolling: this.collectFoamRollingData(),
+        lissCardio: this.collectLISSData(),
+        weighIn: this.collectWeighInData()
+      };
+
+      console.log('[App] Cooldown completed:', this.workoutSession.cooldownData);
+
+      // Close modal
+      const modal = document.getElementById('cooldown-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+
+      // Show summary screen
+      this.showWorkoutSummary(workoutData);
+    };
   }
 
   /**
