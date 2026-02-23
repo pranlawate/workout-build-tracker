@@ -743,6 +743,26 @@
     </div>
   </div>
 
+  <!-- Warm-up Modal -->
+  <div id="warmup-modal" class="modal" style="display: none;">
+    <div class="modal-content modal-medium">
+      <h2 class="modal-title">🔥 Warm-up (<span id="warmup-duration">5-7 min</span>)</h2>
+      <p class="modal-subtitle">Complete all before starting:</p>
+
+      <div id="warmup-checklist" class="checklist">
+        <!-- Dynamically populated from warm-up-protocols.js -->
+      </div>
+
+      <div class="progress-indicator">
+        <span id="warmup-progress">✓ 0 of 0 completed</span>
+      </div>
+
+      <button id="begin-workout-btn" class="btn-primary btn-large" disabled>
+        Begin Workout
+      </button>
+    </div>
+  </div>
+
   <script type="module" src="js/app.js"></script>
 
   <!-- Service Worker Registration -->
