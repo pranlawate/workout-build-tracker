@@ -61,6 +61,24 @@ export const EXERCISE_DEFINITIONS = {
     weightIncrement: 2.5,
     notes: 'Compound | Lower Chest (Costal Head)',
     machineOk: true
+  },
+  'Standard DB Curls': {
+    sets: 2,
+    repRange: '10-12',
+    rirTarget: '2-3',
+    startingWeight: 7.5,
+    weightIncrement: 1.25,
+    notes: 'Isolation | Biceps (Long + Short Heads)',
+    machineOk: false
+  },
+  'Overhead Tricep Extension': {
+    sets: 2,
+    repRange: '12-15',
+    rirTarget: '2-3',
+    startingWeight: 10,
+    weightIncrement: 2.5,
+    notes: 'Isolation | Triceps (Long + Medial Heads)',
+    machineOk: true
   }
 };
 
