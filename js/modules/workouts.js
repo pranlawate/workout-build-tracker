@@ -52,6 +52,15 @@ export const EXERCISE_DEFINITIONS = {
     weightIncrement: 4,
     notes: 'Compound | Glutes, Hamstrings | Ballistic hip power',
     machineOk: false
+  },
+  'Decline DB Press': {
+    sets: 3,
+    repRange: '10-12',
+    rirTarget: '2-3',
+    startingWeight: 7.5,
+    weightIncrement: 2.5,
+    notes: 'Compound | Lower Chest (Costal Head)',
+    machineOk: true
   }
 };
 
@@ -82,13 +91,13 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'Cable Chest Fly',
+        name: 'Decline DB Press',
         sets: 3,
         repRange: '10-12',
         rirTarget: '2-3',
-        startingWeight: 10,
+        startingWeight: 7.5,
         weightIncrement: 2.5,
-        notes: 'Isolation | Chest | Safer for shoulders',
+        notes: 'Compound | Lower Chest (Costal Head)',
         machineOk: true
       },
       {
