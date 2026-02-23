@@ -7,7 +7,7 @@
  * @module smart-progression
  */
 
-import { EXERCISE_METADATA, PAIN_LEVELS, SWAP_REASONS, findAlternative } from './exercise-metadata.js';
+import { EXERCISE_METADATA, PAIN_LEVELS, SWAP_REASONS, findAlternative, ROTATION_POOLS } from './exercise-metadata.js';
 import { TEMPO_PHASES, getTempoGuidance } from './tempo-guidance.js';
 import { getFormCues } from './form-cues.js';
 
@@ -799,22 +799,24 @@ export function suggestRecoveryCheck(history) {
  * Priority order:
  * 1. Safety (pain handling)
  * 2. Progression (weight increase)
- * 3. Weight gap (tempo progression)
- * 4. Plateau detection
- * 5. Regression warning
- * 6. Default (continue current approach)
+ * 3. Rotation variety (8-12 week cycles)
+ * 4. Weight gap (tempo progression)
+ * 5. Plateau detection
+ * 6. Regression warning
+ * 7. Default (continue current approach)
  *
  * @param {string} exerciseKey - Full exercise key (e.g., 'UPPER_A - DB Bench Press')
  * @param {Array} history - Exercise workout history
  * @param {object} painHistory - Pain history for exercise (optional)
+ * @param {RotationManager} rotationManager - Rotation manager instance (optional)
  * @returns {object|null} Suggestion object or null
  *
  * @example
- * getSuggestion('UPPER_A - DB Bench Press', workoutHistory, painHistory)
- * // Returns one of: pain suggestion, weight increase, tempo progression,
+ * getSuggestion('UPPER_A - DB Bench Press', workoutHistory, painHistory, rotationManager)
+ * // Returns one of: pain suggestion, weight increase, rotation variety, tempo progression,
  * // plateau alternative, regression warning, or continue message
  */
-export function getSuggestion(exerciseKey, history, painHistory = null) {
+export function getSuggestion(exerciseKey, history, painHistory = null, rotationManager = null) {
   // Validate inputs
   if (!exerciseKey || typeof exerciseKey !== 'string') {
     console.warn('[SmartProgression] getSuggestion: Invalid exercise key');
@@ -851,7 +853,20 @@ export function getSuggestion(exerciseKey, history, painHistory = null) {
     }
   }
 
-  // PRIORITY 3: Weight gap (tempo progression)
+  // PRIORITY 3: Rotation variety (8-12 week cycles)
+  if (rotationManager) {
+    const rotationSuggestion = rotationManager.checkRotationDue(exerciseKey, exerciseName);
+
+    if (rotationSuggestion) {
+      console.log(`[SmartProgression] Priority 3: Rotation variety - ${rotationSuggestion.reason}`);
+      return {
+        ...rotationSuggestion,
+        priority: 3
+      };
+    }
+  }
+
+  // PRIORITY 4: Weight gap (tempo progression)
   if (detectWeightGapFailure(history, exerciseName)) {
     const tempoSuggestion = suggestTempoProgression(exerciseKey, history);
     if (tempoSuggestion) {
@@ -859,7 +874,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null) {
     }
   }
 
-  // PRIORITY 4: Plateau detection
+  // PRIORITY 5: Plateau detection
   if (detectPlateau(history)) {
     const plateauSuggestion = suggestPlateauAlternative(exerciseKey, history);
     if (plateauSuggestion) {
@@ -867,7 +882,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null) {
     }
   }
 
-  // PRIORITY 5: Regression warning
+  // PRIORITY 6: Regression warning
   if (detectRegression(history)) {
     const regressionWarning = suggestRecoveryCheck(history);
     if (regressionWarning) {
@@ -875,7 +890,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null) {
     }
   }
 
-  // PRIORITY 6: Default (continue current approach)
+  // PRIORITY 7: Default (continue current approach)
   const latestWorkout = history[0];
   const bestSet = getBestSet(latestWorkout?.sets);
 
@@ -905,4 +920,37 @@ export function getSuggestion(exerciseKey, history, painHistory = null) {
     message: `Continue with ${bestSet.weight}kg`,
     reason: 'Keep improving form and consistency'
   };
+}
+
+/**
+ * Extract exercise name from storage key (e.g., "build_exercise_DB_Flat_Bench_Press" → "DB Flat Bench Press")
+ *
+ * @param {string} exerciseKey - Storage key or exercise key
+ * @returns {string} Exercise name with spaces
+ *
+ * @example
+ * extractExerciseName('build_exercise_DB_Flat_Bench_Press')
+ * // Returns: 'DB Flat Bench Press'
+ *
+ * extractExerciseName('UPPER_A - DB Flat Bench Press')
+ * // Returns: 'DB Flat Bench Press'
+ */
+export function extractExerciseName(exerciseKey) {
+  if (!exerciseKey || typeof exerciseKey !== 'string') {
+    return '';
+  }
+
+  // Handle workout key format: "UPPER_A - DB Flat Bench Press"
+  if (exerciseKey.includes(' - ')) {
+    return exerciseKey.split(' - ')[1];
+  }
+
+  // Handle storage key format: "build_exercise_DB_Flat_Bench_Press"
+  if (exerciseKey.startsWith('build_exercise_')) {
+    const withoutPrefix = exerciseKey.replace(/^build_exercise_/, '');
+    return withoutPrefix.replace(/_/g, ' ');
+  }
+
+  // Already just the exercise name
+  return exerciseKey;
 }
