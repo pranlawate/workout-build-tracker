@@ -1,0 +1,243 @@
+/* ========================================
+   Warmup Modal Styles
+   ======================================== */
+
+#warmup-modal .modal-content {
+  max-width: 500px;
+}
+
+#warmup-modal .modal-subtitle {
+  color: var(--color-text-secondary, #6b7280);
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+#warmup-modal .checklist {
+  margin-bottom: 1.5rem;
+}
+
+#warmup-modal .checklist-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: var(--color-background-secondary, #f9fafb);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#warmup-modal .checklist-item:hover {
+  background: var(--color-background-hover, #f3f4f6);
+}
+
+#warmup-modal .checklist-item input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+#warmup-modal .checklist-text {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+#warmup-modal .progress-indicator {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  color: var(--color-primary, #3b82f6);
+}
+
+#warmup-modal .btn-large {
+  width: 100%;
+  height: 60px;
+  font-size: 1.1rem;
+}
+
+#warmup-modal .btn-large:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Cooldown Modal Styles
+   ======================================== */
+
+#cooldown-modal .modal-content {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#cooldown-modal .cooldown-section {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  padding-bottom: 1.5rem;
+}
+
+#cooldown-modal .cooldown-section:last-of-type {
+  border-bottom: none;
+}
+
+#cooldown-modal .section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+#cooldown-modal .section-title.required-section {
+  color: var(--color-danger, #ef4444);
+}
+
+#cooldown-modal .section-title.optional-section {
+  color: var(--color-text-secondary, #6b7280);
+}
+
+#cooldown-modal .section-icon {
+  font-size: 1.2rem;
+}
+
+#cooldown-modal .toggle-icon {
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+#cooldown-modal .section-content {
+  margin-top: 1rem;
+}
+
+/* Checklist styles */
+#cooldown-modal .checklist-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  background: var(--color-background-secondary, #f9fafb);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+#cooldown-modal .checklist-item input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  margin-right: 1rem;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+#cooldown-modal .stretch-info,
+#cooldown-modal .foam-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+#cooldown-modal .stretch-name,
+#cooldown-modal .foam-area {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+#cooldown-modal .stretch-duration,
+#cooldown-modal .foam-duration {
+  font-size: 0.85rem;
+  color: var(--color-primary, #3b82f6);
+}
+
+#cooldown-modal .stretch-target,
+#cooldown-modal .foam-note {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* LISS Cardio styles */
+#cooldown-modal .recommendation {
+  padding: 1rem;
+  background: var(--color-info-bg, #eff6ff);
+  border-left: 4px solid var(--color-info, #3b82f6);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+#cooldown-modal .radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#cooldown-modal .radio-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: var(--color-background-secondary, #f9fafb);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#cooldown-modal .radio-item:hover {
+  background: var(--color-background-hover, #f3f4f6);
+}
+
+#cooldown-modal .radio-item.recommended {
+  background: var(--color-success-bg, #f0fdf4);
+  border: 2px solid var(--color-success, #10b981);
+}
+
+#cooldown-modal .radio-item input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+#cooldown-modal .radio-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#cooldown-modal .duration-input {
+  width: 60px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+#cooldown-modal .note {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #6b7280);
+  font-style: italic;
+}
+
+#cooldown-modal .warning {
+  color: var(--color-warning, #f59e0b);
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  #cooldown-modal .modal-content {
+    max-width: 95%;
+    max-height: 95vh;
+  }
+
+  #cooldown-modal .btn-large {
+    width: 100%;
+  }
+}
