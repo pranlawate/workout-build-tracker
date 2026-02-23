@@ -23,6 +23,13 @@ import { RotationManager } from './modules/rotation-manager.js';
 import { PROGRESSION_PATHS, getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
 import { COMPLEXITY_TIERS, getComplexityTier } from './modules/complexity-tiers.js';
 import { getWarmupProtocol } from './modules/warm-up-protocols.js';
+import {
+  getUpperBodyStretches,
+  getLowerBodyStretches,
+  getUpperBodyFoamRolling,
+  getLowerBodyFoamRolling,
+  getLISSRecommendation
+} from './modules/stretching-protocols.js';
 import { getOptionalFifthDay } from './modules/optional-fifth-day.js';
 
 class App {
@@ -606,6 +613,121 @@ class App {
 
     // Render exercises
     this.renderExercises();
+  }
+
+  /**
+   * Render stretching checklist in cooldown modal
+   * @param {string} workoutName - Workout key
+   */
+  renderStretchingChecklist(workoutName) {
+    const checklist = document.getElementById('stretching-checklist');
+    const progressSpan = document.getElementById('stretching-progress');
+    const isUpper = workoutName.startsWith('UPPER');
+    const stretches = isUpper
+      ? getUpperBodyStretches()
+      : getLowerBodyStretches();
+
+    checklist.innerHTML = stretches.map((stretch, index) => `
+      <label class="checklist-item">
+        <input type="checkbox" class="stretch-checkbox" data-index="${index}">
+        <div class="stretch-info">
+          <span class="stretch-name">${this.escapeHtml(stretch.name)}</span>
+          <span class="stretch-duration">${this.escapeHtml(stretch.duration)}</span>
+          <span class="stretch-target">Targets: ${this.escapeHtml(stretch.target)}</span>
+        </div>
+      </label>
+    `).join('');
+
+    // Setup progress tracking
+    const checkboxes = checklist.querySelectorAll('.stretch-checkbox');
+    const total = checkboxes.length;
+
+    const updateProgress = () => {
+      const completed = Array.from(checkboxes).filter(c => c.checked).length;
+      progressSpan.textContent = `✓ ${completed} of ${total} completed`;
+
+      // Enable finish button when all stretches done
+      const finishBtn = document.getElementById('finish-review-btn');
+      finishBtn.disabled = completed < total;
+    };
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateProgress);
+    });
+
+    // Initialize
+    progressSpan.textContent = `✓ 0 of ${total} completed`;
+  }
+
+  /**
+   * Render foam rolling checklist in cooldown modal
+   * @param {string} workoutName - Workout key
+   */
+  renderFoamRollingChecklist(workoutName) {
+    const checklist = document.getElementById('foam-rolling-checklist');
+    const isUpper = workoutName.startsWith('UPPER');
+    const areas = isUpper
+      ? getUpperBodyFoamRolling()
+      : getLowerBodyFoamRolling();
+
+    checklist.innerHTML = areas.map((area, index) => `
+      <label class="checklist-item">
+        <input type="checkbox" class="foam-rolling-checkbox" data-area="${this.escapeHtml(area.area)}">
+        <div class="foam-info">
+          <span class="foam-area">${this.escapeHtml(area.area)}</span>
+          <span class="foam-duration">${this.escapeHtml(area.duration)}</span>
+          <span class="foam-note">${this.escapeHtml(area.note)}</span>
+        </div>
+      </label>
+    `).join('');
+  }
+
+  /**
+   * Render LISS cardio recommendations in cooldown modal
+   * @param {string} workoutName - Workout key
+   */
+  renderLISSRecommendations(workoutName) {
+    const recommendation = getLISSRecommendation(workoutName);
+    const recElement = document.getElementById('liss-recommendation');
+
+    // Update recommendation text
+    recElement.innerHTML = `
+      💡 Recommended: ${recommendation.recommended.charAt(0).toUpperCase() + recommendation.recommended.slice(1)} (10-15 min)<br>
+      <small>${this.escapeHtml(recommendation.warning)}</small>
+    `;
+
+    // Add warning to treadmill option if needed
+    if (recommendation.treadmillNote.includes('⚠️')) {
+      const treadmillLabel = document.querySelector('input[value="treadmill"]').parentElement;
+      const treadmillText = treadmillLabel.querySelector('.radio-text');
+      treadmillText.innerHTML += ` <small class="warning">${this.escapeHtml(recommendation.treadmillNote)}</small>`;
+    }
+  }
+
+  /**
+   * Show cooldown modal with stretching, foam rolling, LISS, weigh-in
+   * @param {Object} workoutData - Completed workout data
+   */
+  showCooldownModal(workoutData) {
+    const modal = document.getElementById('cooldown-modal');
+
+    // Populate stretching (mandatory)
+    this.renderStretchingChecklist(workoutData.workoutName);
+
+    // Populate foam rolling (optional)
+    this.renderFoamRollingChecklist(workoutData.workoutName);
+
+    // Setup LISS recommendations (optional)
+    this.renderLISSRecommendations(workoutData.workoutName);
+
+    // Setup finish button (placeholder for now - will be completed in Task 7)
+    const finishBtn = document.getElementById('finish-review-btn');
+    finishBtn.disabled = true; // Will be enabled by stretching progress
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    console.log('[App] Cooldown modal shown');
   }
 
   /**
