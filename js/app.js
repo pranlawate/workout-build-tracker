@@ -19,6 +19,7 @@ import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/ex
 import { getAllWorkouts } from './modules/workouts.js';
 import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
 import { UnlockEvaluator } from './modules/unlock-evaluator.js';
+import { RotationManager } from './modules/rotation-manager.js';
 import { PROGRESSION_PATHS, getProgressionPath, getSlotForExercise } from './modules/progression-pathways.js';
 import { COMPLEXITY_TIERS, getComplexityTier } from './modules/complexity-tiers.js';
 import { getWarmupProtocol } from './modules/warm-up-protocols.js';
@@ -32,6 +33,7 @@ class App {
     this.deloadManager = new DeloadManager(this.storage, this.phaseManager);
     this.performanceAnalyzer = new PerformanceAnalyzer(this.storage);
     this.unlockEvaluator = new UnlockEvaluator(this.storage, this.phaseManager);
+    this.rotationManager = new RotationManager(this.storage, this.unlockEvaluator);
     this.analyticsCalculator = new AnalyticsCalculator(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
@@ -641,7 +643,7 @@ class App {
       const performanceBadge = this.getPerformanceBadge(exerciseKey, exerciseSession.sets);
 
       // Get smart progression suggestion
-      const suggestion = getSuggestion(exerciseKey, history, painHistory);
+      const suggestion = getSuggestion(exerciseKey, history, painHistory, this.rotationManager);
       const suggestionBanner = this.generateSuggestionBanner(suggestion);
 
       // Get form cues
