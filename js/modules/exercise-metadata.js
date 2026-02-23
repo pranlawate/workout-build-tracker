@@ -17,7 +17,8 @@ export const PAIN_LEVELS = {
 /** Reasons for suggesting exercise alternatives */
 export const SWAP_REASONS = {
   PAIN: 'pain',
-  PLATEAU: 'plateau'
+  PLATEAU: 'plateau',
+  ROTATION_VARIETY: 'rotation_variety'
 };
 
 /**
