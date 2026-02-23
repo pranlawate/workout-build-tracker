@@ -120,7 +120,68 @@
     logTest(category1, 'Tenure tracking tests', false, e.message);
   }
 
-  // More test sections to be added in next tasks...
+  // ========================================
+  // SECTION 3: Rotation Eligibility Tests
+  // ========================================
+  console.log('\n⏰ TESTING ROTATION ELIGIBILITY...\n');
+
+  const category2 = 'Rotation Eligibility';
+
+  try {
+    const storage = new StorageManager();
+    const unlockEval = new UnlockEvaluator(storage, null);
+    const rotationManager = new RotationManager(storage, unlockEval);
+
+    // Test: Don't trigger before 8 weeks
+    const sixWeeksAgo = new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString();
+    localStorage.setItem('build_exercise_UPPER_A - Tricep Pushdowns', JSON.stringify([
+      { date: sixWeeksAgo, sets: [{ weight: 10, reps: 12 }] }
+    ]));
+
+    const suggestion1 = rotationManager.checkRotationDue('UPPER_A - Tricep Pushdowns', 'Tricep Pushdowns');
+    logTest(
+      category2,
+      'No rotation suggestion before 8 weeks',
+      suggestion1 === null,
+      `Suggestion: ${suggestion1}`
+    );
+
+    // Test: Trigger at 8 weeks
+    const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString();
+    localStorage.setItem('build_exercise_UPPER_A - Tricep Pushdowns', JSON.stringify([
+      { date: eightWeeksAgo, sets: [{ weight: 10, reps: 12 }] }
+    ]));
+
+    const suggestion2 = rotationManager.checkRotationDue('UPPER_A - Tricep Pushdowns', 'Tricep Pushdowns');
+    logTest(
+      category2,
+      'Rotation suggestion appears at 8 weeks',
+      suggestion2?.type === 'ROTATION_DUE',
+      `Type: ${suggestion2?.type}, Suggested: ${suggestion2?.suggestedExercise}`
+    );
+
+    logTest(
+      category2,
+      'Suggests correct rotation variant',
+      suggestion2?.suggestedExercise === 'Overhead Tricep Extension',
+      `Suggested: ${suggestion2?.suggestedExercise}`
+    );
+
+    // Test: Don't suggest for exercises without rotation pool
+    const suggestion3 = rotationManager.checkRotationDue('UPPER_A - DB Flat Bench Press', 'DB Flat Bench Press');
+    logTest(
+      category2,
+      'No rotation for exercises without rotation pool',
+      suggestion3 === null,
+      `Suggestion: ${suggestion3}`
+    );
+
+    // Cleanup
+    localStorage.removeItem('build_exercise_UPPER_A - Tricep Pushdowns');
+
+  } catch (e) {
+    logTest(category2, 'Rotation eligibility tests', false, e.message);
+  }
 
   // ========================================
   // SUMMARY
