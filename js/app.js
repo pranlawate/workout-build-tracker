@@ -519,6 +519,72 @@ class App {
       return;
     }
 
+    // Show warmup modal before starting workout
+    this.showWarmupModal(workoutName);
+  }
+
+  /**
+   * Show warmup modal with protocol checklist
+   * @param {string} workoutName - Workout key (e.g., 'UPPER_A')
+   */
+  showWarmupModal(workoutName) {
+    const modal = document.getElementById('warmup-modal');
+    const checklist = document.getElementById('warmup-checklist');
+    const progressEl = document.getElementById('warmup-progress');
+    const beginBtn = document.getElementById('begin-workout-btn');
+    const durationEl = document.getElementById('warmup-duration');
+
+    // Get warm-up protocol
+    const equipmentProfile = this.storage.getEquipmentProfile();
+    const protocol = getWarmupProtocol(workoutName, equipmentProfile);
+
+    // Set duration
+    durationEl.textContent = protocol.estimatedDuration;
+
+    // Populate checklist
+    checklist.innerHTML = protocol.exercises.map((exercise, index) => `
+      <label class="checklist-item">
+        <input type="checkbox" data-index="${index}">
+        <span class="exercise-name">${exercise.name}</span>
+        <span class="exercise-detail">${exercise.reps || exercise.duration}</span>
+        ${exercise.note ? `<span class="exercise-note">${exercise.note}</span>` : ''}
+      </label>
+    `).join('');
+
+    // Initialize progress
+    const updateProgress = () => {
+      const checkboxes = checklist.querySelectorAll('input[type="checkbox"]');
+      const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+      const total = checkboxes.length;
+
+      progressEl.textContent = `✓ ${completed} of ${total} completed`;
+
+      // Enable button when all checked
+      beginBtn.disabled = completed < total;
+    };
+
+    // Add checkbox listeners
+    checklist.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', updateProgress);
+    });
+
+    // Initialize progress display
+    updateProgress();
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Begin workout button handler
+    beginBtn.onclick = () => {
+      modal.style.display = 'none';
+      this.startWorkoutAfterWarmup();
+    };
+  }
+
+  /**
+   * Start workout screen after warmup completion
+   */
+  startWorkoutAfterWarmup() {
     // Hide all screens first, then show workout screen
     this.hideAllScreens();
     const workoutScreen = document.getElementById('workout-screen');
@@ -535,7 +601,7 @@ class App {
     // Push workout state to history
     window.history.pushState({ screen: 'workout' }, '', '');
 
-    // Start timer
+    // Start timer (AFTER warmup)
     this.startTimer();
 
     // Render exercises
