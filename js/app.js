@@ -769,9 +769,8 @@ class App {
     // Setup weigh-in (optional)
     this.setupCooldownWeighIn();
 
-    // Setup finish button (placeholder for now - will be completed in Task 7)
-    const finishBtn = document.getElementById('finish-review-btn');
-    finishBtn.disabled = true; // Will be enabled by stretching progress
+    // Setup finish button with onclick handler
+    this.setupFinishReviewButton(workoutData);
 
     // Show modal
     modal.style.display = 'flex';
@@ -846,8 +845,14 @@ class App {
         weighIns.push({ date: today, weight });
         localStorage.setItem('build_body_weight', JSON.stringify(weighIns));
 
-        alert(`✅ Weight saved: ${weight} kg`);
-        weightInput.value = ''; // Clear input after save
+        // Replace section with success message (prevent multiple saves)
+        container.innerHTML = `
+          <div class="weighin-section">
+            <p style="color: #10b981; font-weight: 500; text-align: center;">
+              ✅ Weight saved: ${weight} kg
+            </p>
+          </div>
+        `;
       } else {
         alert('⚠️ Please enter a valid weight (30-200 kg)');
       }
