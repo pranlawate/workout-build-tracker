@@ -181,14 +181,15 @@ fetch('./tests/test-smart-progression.js').then(r => r.text()).then(eval);
 workout-build-tracker/
 ├── index.html          # Entry point
 ├── manifest.json       # PWA manifest
-├── sw.js              # Service worker
+├── sw.js              # Service worker (must be in root for PWA)
 ├── css/               # Stylesheets
 ├── js/                # Application code
 │   ├── app.js         # Main controller
 │   ├── modules/       # Core modules
 │   ├── screens/       # Screen components
 │   └── utils/         # Utilities
-├── tests/             # Test suite (137 tests)
+├── tests/             # Test suite (12 automated test files)
+├── scripts/           # Diagnostic & utility scripts (browser console)
 └── docs/              # Documentation
 ```
 
