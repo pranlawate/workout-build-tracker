@@ -55,10 +55,10 @@
   let RotationManager, StorageManager, UnlockEvaluator, PhaseManager;
 
   try {
-    const rotationModule = await import('./js/modules/rotation-manager.js');
-    const storageModule = await import('./js/modules/storage.js');
-    const unlockModule = await import('./js/modules/unlock-evaluator.js');
-    const phaseModule = await import('./js/modules/phase-manager.js');
+    const rotationModule = await import('../js/modules/rotation-manager.js');
+    const storageModule = await import('../js/modules/storage.js');
+    const unlockModule = await import('../js/modules/unlock-evaluator.js');
+    const phaseModule = await import('../js/modules/phase-manager.js');
     RotationManager = rotationModule.RotationManager;
     StorageManager = storageModule.StorageManager;
     UnlockEvaluator = unlockModule.UnlockEvaluator;
