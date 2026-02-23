@@ -1,8 +1,8 @@
 # Build Tracker - Master Integration Test Report
 
-**Last Updated:** 2026-02-22
-**App Version:** v1.7 (Service Worker Cache: v70)
-**Latest Feature:** Kettlebell Integration (KB Goblet Squat, KB Swings)
+**Last Updated:** 2026-02-23
+**App Version:** v1.8 (Service Worker Cache: v70)
+**Latest Feature:** Exercise Rotation & Muscle Coverage System
 
 ---
 
@@ -1838,6 +1838,296 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 
 ---
 
+## Feature 13: Exercise Rotation & Muscle Coverage System (2026-02-23)
+
+**Purpose:** Ensure complete muscle head coverage through systematic 8-12 week exercise rotations.
+
+**Key Features:**
+- Tenure tracking (weeks on current exercise)
+- Automatic rotation suggestions at 8 weeks
+- Unlock proximity suppression (80%+ progress)
+- Rotation-based unlocks (milestone twice on EACH variant)
+- Priority 3 integration in smart progression
+
+**Rotation Pools:**
+- DB Hammer Curls ↔ Standard DB Curls
+- Tricep Pushdowns ↔ Overhead Tricep Extension
+- Barbell variations (post-unlock): Bench, Squat, Deadlift
+
+---
+
+### Test 13.1: Tenure Tracking - New Exercise
+**Steps:**
+1. Clear localStorage
+2. Start UPPER_A workout
+3. Log sets for DB Hammer Curls (first time)
+4. Complete workout
+5. In console: `import('./js/modules/rotation-manager.js').then(m => { const rm = new m.RotationManager(app.storage, app.unlockEvaluator); console.log(rm.getTenure('UPPER_A - DB Hammer Curls')); })`
+
+**Expected:**
+- [ ] Tenure returns 0 weeks (new exercise)
+- [ ] startDate is set to today's date
+- [ ] exerciseName: "DB Hammer Curls"
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.2: Tenure Tracking - Multiple Weeks
+**Steps:**
+1. Inject exercise history from 6 weeks ago:
+   ```javascript
+   const sixWeeksAgo = new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString();
+   localStorage.setItem('build_exercise_UPPER_A - Tricep Pushdowns', JSON.stringify([
+     { date: sixWeeksAgo, sets: [{ weight: 10, reps: 12, rir: 2 }] }
+   ]));
+   ```
+2. Check tenure: `import('./js/modules/rotation-manager.js').then(m => { const rm = new m.RotationManager(app.storage, app.unlockEvaluator); console.log(rm.getTenure('UPPER_A - Tricep Pushdowns')); })`
+
+**Expected:**
+- [ ] Tenure returns 6 weeks
+- [ ] startDate matches sixWeeksAgo
+- [ ] exerciseName: "Tricep Pushdowns"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.3: No Rotation Before 8 Weeks
+**Steps:**
+1. Use exercise history from Test 13.2 (6 weeks ago)
+2. Check rotation suggestion: `import('./js/modules/rotation-manager.js').then(m => { const rm = new m.RotationManager(app.storage, app.unlockEvaluator); console.log(rm.checkRotationDue('UPPER_A - Tricep Pushdowns', 'Tricep Pushdowns')); })`
+
+**Expected:**
+- [ ] Returns null (no rotation suggestion)
+- [ ] Console log: "[RotationManager] Rotation check: 6 weeks < 8 week threshold"
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.4: Rotation Suggestion at 8 Weeks
+**Steps:**
+1. Inject exercise history from 8 weeks ago:
+   ```javascript
+   const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString();
+   localStorage.setItem('build_exercise_UPPER_A - Tricep Pushdowns', JSON.stringify([
+     { date: eightWeeksAgo, sets: [{ weight: 10, reps: 12, rir: 2 }] }
+   ]));
+   ```
+2. Start UPPER_A workout
+3. Navigate to Tricep Pushdowns exercise
+
+**Expected:**
+- [ ] Rotation badge appears: "⟳ Try Overhead Tricep Extension for complete muscle coverage (8 weeks on current variation)"
+- [ ] Button shows: "Switch Exercise"
+- [ ] Badge has orange/amber color scheme
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.5: Accept Rotation Suggestion
+**Steps:**
+1. Continue from Test 13.4
+2. Click "Switch Exercise" button
+
+**Expected:**
+- [ ] Exercise changes to "Overhead Tricep Extension"
+- [ ] Weight input appears for new exercise
+- [ ] Tenure resets to 0 weeks
+- [ ] Rotation suggestion disappears
+- [ ] Console log: "[App] ✓ Rotated Tricep Pushdowns → Overhead Tricep Extension"
+- [ ] UI refreshes via showHomeScreen()
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.6: Unlock Proximity Suppression
+**Steps:**
+1. Inject exercise history at 85% toward milestone (12.5kg, milestone: 15kg):
+   ```javascript
+   const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString();
+   localStorage.setItem('build_exercise_UPPER_B - DB Hammer Curls', JSON.stringify([
+     { date: eightWeeksAgo, sets: [{ weight: 12.5, reps: 12, rir: 2 }] }
+   ]));
+   ```
+2. Start UPPER_B workout
+3. Navigate to DB Hammer Curls
+
+**Expected:**
+- [ ] NO rotation suggestion appears
+- [ ] Console log: "[RotationManager] Suppressing rotation - user at 83% toward unlock"
+- [ ] User can focus on hitting milestone
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.7: Rotation After Unlock
+**Steps:**
+1. Inject history showing milestone reached (15kg × 12 reps):
+   ```javascript
+   const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString();
+   localStorage.setItem('build_exercise_UPPER_B - DB Hammer Curls', JSON.stringify([
+     { date: eightWeeksAgo, sets: [{ weight: 15, reps: 12, rir: 2 }] }
+   ]));
+   ```
+2. Start UPPER_B workout
+3. Navigate to DB Hammer Curls
+
+**Expected:**
+- [ ] Rotation suggestion appears (milestone reached, suppression lifted)
+- [ ] Suggests: "Try Standard DB Curls for complete muscle coverage"
+- [ ] User can choose to rotate or continue pushing weight
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.8: Manual Rotation Anytime
+**Steps:**
+1. Start UPPER_A workout (any tenure)
+2. Click exercise name "DB Hammer Curls"
+3. Select "Standard DB Curls" from dropdown
+
+**Expected:**
+- [ ] Exercise changes to Standard DB Curls
+- [ ] Tenure resets for that slot
+- [ ] Exercise selection saved to localStorage
+- [ ] Manual rotation works regardless of 8-week threshold
+- [ ] No rotation suggestion needed
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.9: No Rotation for Non-Pool Exercises
+**Steps:**
+1. Inject 10 weeks of history for DB Flat Bench Press (no rotation pool)
+2. Start UPPER_A workout
+3. Navigate to DB Flat Bench Press
+
+**Expected:**
+- [ ] NO rotation suggestion appears
+- [ ] Exercise doesn't have rotation pool
+- [ ] Only standard progression suggestions shown
+- [ ] No console errors
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.10: Priority 3 Integration
+**Steps:**
+1. Inject exercise at 8 weeks + top reps (eligible for both progression AND rotation):
+   ```javascript
+   const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString();
+   localStorage.setItem('build_exercise_UPPER_A - Tricep Pushdowns', JSON.stringify([
+     { date: eightWeeksAgo, sets: [{ weight: 15, reps: 12, rir: 2 }] }
+   ]));
+   ```
+2. Start UPPER_A workout
+3. Navigate to Tricep Pushdowns
+
+**Expected:**
+- [ ] Weight increase suggestion appears (Priority 2)
+- [ ] Rotation suggestion appears AFTER weight increase
+- [ ] Priority order respected: pain → progression → rotation → plateau → regression → continue
+- [ ] Both suggestions visible in UI
+- [ ] User can choose which to follow
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.11: Rotation Badge Styling
+**Steps:**
+1. Create rotation suggestion (Test 13.4)
+2. Inspect badge element in DevTools
+
+**Expected:**
+- [ ] CSS class: `.performance-badge.rotation`
+- [ ] Background: `rgba(245, 158, 11, 0.15)` (semi-transparent orange)
+- [ ] Border-left: `4px solid #f59e0b` (warning color)
+- [ ] Icon: `⟳` (rotation symbol)
+- [ ] Button: orange background with hover state
+- [ ] Mobile responsive: full-width button on mobile
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.12: Rotation-Based Unlocks
+**Steps:**
+1. Hit milestone twice on DB Hammer Curls
+2. Rotate to Standard DB Curls
+3. Hit milestone twice on Standard DB Curls
+4. Check unlock criteria for Barbell Curls
+
+**Expected:**
+- [ ] Must hit milestone on BOTH variations
+- [ ] Proves movement mastery, not single exercise proficiency
+- [ ] Unlock requires: 15kg × 12 twice on DB Hammer Curls AND 15kg × 12 twice on Standard DB Curls
+- [ ] Barbell Curls unlock after both criteria met
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.13: Rotation Tenure Persistence
+**Steps:**
+1. Start UPPER_A workout
+2. Log sets for Tricep Pushdowns
+3. Complete workout
+4. Reload page
+5. Check tenure in console
+
+**Expected:**
+- [ ] Tenure persists across page reloads
+- [ ] localStorage key: `build_exercise_tenure`
+- [ ] Tenure data includes: exerciseName, startDate, lastRotationDate
+- [ ] Data survives browser restart
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.14: Multiple Rotation Pools
+**Steps:**
+1. Create 8-week history for both Tricep Pushdowns AND DB Hammer Curls
+2. Start UPPER_A or UPPER_B workout
+
+**Expected:**
+- [ ] Both exercises show rotation suggestions
+- [ ] Suggestions are independent (one doesn't affect the other)
+- [ ] Can rotate one and keep the other
+- [ ] Tenure tracked separately per exercise
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
+### Test 13.15: Automated Test Suite
+**Steps:**
+1. Open browser console
+2. Run: `fetch('./tests/test-rotation-system.js').then(r => r.text()).then(eval);`
+
+**Expected:**
+- [ ] Test suite loads without errors
+- [ ] 9 tests run (3 tenure + 4 eligibility + 2 proximity)
+- [ ] All tests pass: "🎯 OVERALL: 9/9 tests passed (100%)"
+- [ ] Results available: `window._rotationSystemTestResults`
+- [ ] Test runner integration: `testRunner.runRotationSystem()`
+
+**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+
+---
+
 ## Performance & Responsiveness
 
 ### Test P1: Mobile UI (iPhone 12)
@@ -1920,6 +2210,7 @@ localStorage.setItem('build_body_weight', '[{"date":"invalid","weight":"abc"}]')
 - [ ] Build/Maintenance phase integration tested (Feature 10)
 - [ ] Lower workout restructure tested (Feature 11)
 - [ ] Kettlebell integration tested (Feature 12)
+- [ ] Exercise rotation & muscle coverage tested (Feature 13)
 
 **Documentation:**
 - [ ] README.md updated
