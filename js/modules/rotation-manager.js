@@ -152,11 +152,36 @@ export class RotationManager {
    * Get milestone progress toward unlock
    *
    * @param {string} exerciseName - Exercise name
+   * @param {string} exerciseKey - Exercise key for history lookup
    * @returns {number} Progress as decimal (0.0 to 1.0)
    */
-  getMilestoneProgress(exerciseName) {
-    // TODO: Implement in next task
-    return 0;
+  getMilestoneProgress(exerciseName, exerciseKey) {
+    try {
+      const milestone = getUnlockMilestone(exerciseName);
+      if (!milestone) return 0;
+
+      const history = this.storage.getExerciseHistory(exerciseKey);
+      if (!history || history.length === 0) return 0;
+
+      // Get latest workout
+      const latest = history[0];
+      if (!latest.sets || latest.sets.length === 0) return 0;
+
+      // Check best set performance
+      const bestSet = latest.sets.reduce((best, set) => {
+        if (!set.weight || !set.reps) return best;
+        if (set.weight > best.weight) return set;
+        if (set.weight === best.weight && set.reps > best.reps) return set;
+        return best;
+      }, { weight: 0, reps: 0 });
+
+      // Calculate progress (weight-based)
+      const progress = bestSet.weight / milestone.weight;
+      return Math.min(progress, 1.0);
+    } catch (e) {
+      console.error('[RotationManager] Error calculating milestone progress:', e);
+      return 0;
+    }
   }
 
   /**
