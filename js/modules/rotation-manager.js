@@ -50,8 +50,41 @@ export class RotationManager {
    * @returns {Object} Tenure info { exerciseName, startDate, weeksOnExercise, lastRotationDate }
    */
   getTenure(exerciseKey) {
-    // TODO: Implement in next task
-    return { exerciseName: '', startDate: null, weeksOnExercise: 0, lastRotationDate: null };
+    try {
+      const allTenure = JSON.parse(localStorage.getItem(this.TENURE_KEY) || '{}');
+      const tenure = allTenure[exerciseKey];
+
+      if (!tenure || !tenure.startDate) {
+        // No tenure data - check if exercise has history
+        const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length === 0) {
+          return { exerciseName: '', startDate: null, weeksOnExercise: 0, lastRotationDate: null };
+        }
+
+        // Initialize tenure from first workout
+        const firstWorkout = history[history.length - 1]; // Oldest entry
+        const startDate = firstWorkout.date;
+        const weeksOnExercise = this._calculateWeeks(startDate);
+
+        return {
+          exerciseName: this._extractExerciseName(exerciseKey),
+          startDate,
+          weeksOnExercise,
+          lastRotationDate: null
+        };
+      }
+
+      // Calculate current weeks from stored start date
+      const weeksOnExercise = this._calculateWeeks(tenure.startDate);
+
+      return {
+        ...tenure,
+        weeksOnExercise
+      };
+    } catch (e) {
+      console.error('[RotationManager] Error getting tenure:', e);
+      return { exerciseName: '', startDate: null, weeksOnExercise: 0, lastRotationDate: null };
+    }
   }
 
   /**
@@ -73,5 +106,35 @@ export class RotationManager {
   getMilestoneProgress(exerciseName) {
     // TODO: Implement in next task
     return 0;
+  }
+
+  /**
+   * Calculate weeks elapsed from start date
+   *
+   * @param {string} startDate - ISO date string
+   * @returns {number} Weeks elapsed
+   * @private
+   */
+  _calculateWeeks(startDate) {
+    if (!startDate) return 0;
+
+    const start = new Date(startDate);
+    const now = new Date();
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    const weeks = Math.floor((now - start) / msPerWeek);
+
+    return weeks >= 0 ? weeks : 0;
+  }
+
+  /**
+   * Extract exercise name from exercise key
+   *
+   * @param {string} exerciseKey - Full key like 'UPPER_A - Tricep Pushdowns'
+   * @returns {string} Exercise name like 'Tricep Pushdowns'
+   * @private
+   */
+  _extractExerciseName(exerciseKey) {
+    const parts = exerciseKey.split(' - ');
+    return parts.length > 1 ? parts.slice(1).join(' - ') : exerciseKey;
   }
 }
