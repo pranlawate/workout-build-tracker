@@ -4691,9 +4691,6 @@ class App {
     // Setup pain tracking (reuse logic, inline)
     this.setupSummaryPainTracking(workoutData);
 
-    // Setup weigh-in (conditional)
-    this.setupSummaryWeighIn();
-
     // Setup done button
     this.setupSummaryDoneButton(workoutData);
   }
