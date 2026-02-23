@@ -1,0 +1,156 @@
+/**
+ * Comprehensive Rotation System Testing Suite
+ *
+ * Tests the exercise rotation system:
+ * - Tenure tracking (weeks on exercise)
+ * - Rotation eligibility (8-week threshold)
+ * - Unlock proximity suppression (80%+ progress)
+ * - Milestone tracking (hit target twice on each variation)
+ * - Smart progression integration (Priority 3)
+ *
+ * USAGE:
+ * 1. Open app in browser
+ * 2. Open DevTools Console (F12)
+ * 3. Copy-paste this entire file
+ * 4. Results displayed with ✅ PASS / ❌ FAIL
+ */
+
+(async function testRotationSystem() {
+  console.clear();
+  console.log('🔄 COMPREHENSIVE ROTATION SYSTEM TEST SUITE\n');
+  console.log('═══════════════════════════════════════════════════════════════\n');
+
+  const results = {
+    passed: 0,
+    failed: 0,
+    categories: {},
+    tests: []
+  };
+
+  function logTest(category, name, passed, details = '') {
+    const icon = passed ? '✅' : '❌';
+    const status = passed ? 'PASS' : 'FAIL';
+    console.log(`${icon} ${status}: ${name}`);
+    if (details) console.log(`   ${details}`);
+
+    if (!results.categories[category]) {
+      results.categories[category] = { passed: 0, failed: 0 };
+    }
+
+    results.tests.push({ category, name, passed, details });
+    if (passed) {
+      results.passed++;
+      results.categories[category].passed++;
+    } else {
+      results.failed++;
+      results.categories[category].failed++;
+    }
+  }
+
+  // ========================================
+  // SECTION 1: Load Modules
+  // ========================================
+  console.log('\n📦 LOADING MODULES...\n');
+
+  let RotationManager, StorageManager, UnlockEvaluator;
+
+  try {
+    const rotationModule = await import('./js/modules/rotation-manager.js');
+    const storageModule = await import('./js/modules/storage.js');
+    const unlockModule = await import('./js/modules/unlock-evaluator.js');
+    RotationManager = rotationModule.RotationManager;
+    StorageManager = storageModule.StorageManager;
+    UnlockEvaluator = unlockModule.UnlockEvaluator;
+    console.log('✅ Modules loaded successfully\n');
+  } catch (e) {
+    console.error('❌ FATAL: Failed to load modules', e);
+    return;
+  }
+
+  // ========================================
+  // SECTION 2: Tenure Tracking Tests
+  // ========================================
+  console.log('\n📅 TESTING TENURE TRACKING...\n');
+
+  const category1 = 'Tenure Tracking';
+
+  try {
+    const storage = new StorageManager();
+    const unlockEval = new UnlockEvaluator(storage, null);
+    const rotationManager = new RotationManager(storage, unlockEval);
+
+    // Test: No history returns 0 weeks
+    const tenure1 = rotationManager.getTenure('NonExistent - Exercise');
+    logTest(
+      category1,
+      'Returns 0 weeks for exercise with no history',
+      tenure1.weeksOnExercise === 0,
+      `Weeks: ${tenure1.weeksOnExercise}`
+    );
+
+    // Test: Calculate weeks from 4 weeks ago
+    const fourWeeksAgo = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString();
+    localStorage.setItem('build_exercise_UPPER_A - Test Exercise', JSON.stringify([
+      { date: fourWeeksAgo, sets: [{ weight: 10, reps: 12 }] }
+    ]));
+
+    const tenure2 = rotationManager.getTenure('UPPER_A - Test Exercise');
+    logTest(
+      category1,
+      'Calculates 4 weeks from first workout 28 days ago',
+      tenure2.weeksOnExercise === 4,
+      `Weeks: ${tenure2.weeksOnExercise}, Expected: 4`
+    );
+
+    // Test: Reset tenure on rotation
+    rotationManager.recordRotation('UPPER_A - Test Exercise', 'New Exercise');
+    const tenure3 = rotationManager.getTenure('UPPER_A - Test Exercise');
+    logTest(
+      category1,
+      'Resets tenure to 0 weeks after rotation',
+      tenure3.weeksOnExercise === 0 && tenure3.exerciseName === 'New Exercise',
+      `Weeks: ${tenure3.weeksOnExercise}, Name: ${tenure3.exerciseName}`
+    );
+
+    // Cleanup
+    localStorage.removeItem('build_exercise_UPPER_A - Test Exercise');
+    localStorage.removeItem('build_exercise_tenure');
+
+  } catch (e) {
+    logTest(category1, 'Tenure tracking tests', false, e.message);
+  }
+
+  // More test sections to be added in next tasks...
+
+  // ========================================
+  // SUMMARY
+  // ========================================
+  console.log('\n═══════════════════════════════════════════════════════════════');
+  console.log('\n📊 TEST SUMMARY\n');
+  console.log('═══════════════════════════════════════════════════════════════\n');
+
+  Object.keys(results.categories).forEach(category => {
+    const cat = results.categories[category];
+    const total = cat.passed + cat.failed;
+    const percentage = ((cat.passed / total) * 100).toFixed(1);
+    const icon = cat.failed === 0 ? '✅' : '⚠️';
+    console.log(`${icon} ${category}: ${cat.passed}/${total} passed (${percentage}%)`);
+  });
+
+  const totalTests = results.passed + results.failed;
+  const totalPercentage = ((results.passed / totalTests) * 100).toFixed(1);
+
+  console.log('\n───────────────────────────────────────────────────────────────');
+  console.log(`\n🎯 OVERALL: ${results.passed}/${totalTests} tests passed (${totalPercentage}%)\n`);
+  console.log('═══════════════════════════════════════════════════════════════\n');
+
+  if (results.failed === 0) {
+    console.log('✨ ALL TESTS PASSED! Rotation system is working correctly.\n');
+  } else {
+    console.log(`⚠️ ${results.failed} tests failed. Review failures above.\n`);
+  }
+
+  // Export results
+  window._rotationSystemTestResults = results;
+  console.log('💡 Results available at: window._rotationSystemTestResults\n');
+})();
