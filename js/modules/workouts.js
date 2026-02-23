@@ -1,7 +1,7 @@
 const WARMUPS = {
   UPPER_A: [
     'Cat-Cow: 10 reps',
-    'Band Pull-Aparts: 15 reps',
+    'Band Pull-Aparts: 2 sets × 15-20 reps',
     'Arm Circles: 10 each direction',
     'Scapular Retractions: 10 reps',
     'Ramp-up Set: 50% weight × 10 reps (DB Flat Bench Press)'
@@ -14,8 +14,8 @@ const WARMUPS = {
     'Ramp-up Set: 50% weight × 10 reps (first exercise)'
   ],
   UPPER_B: [
-    'Dead Hang: 20-30 seconds',
-    'Band Pull-Aparts: 15 reps',
+    'Dead Hang: 30-60 seconds',
+    'Band Pull-Aparts: 2 sets × 15-20 reps',
     'Scapular Pull-Ups: 5 reps',
     'Arm Circles: 10 each direction',
     'Ramp-up Set: 50% weight × 10 reps (first exercise)'
@@ -122,14 +122,14 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'Band Pull-Aparts',
+        name: 'Tricep Pushdowns',
         sets: 2,
-        repRange: '15-20',
-        rirTarget: '3-3',
-        startingWeight: 0,
-        weightIncrement: 0,
-        notes: 'Isolation | Rotator Cuff | Activation work',
-        machineOk: false
+        repRange: '12-15',
+        rirTarget: '2-3',
+        startingWeight: 10,
+        weightIncrement: 2.5,
+        notes: 'Isolation | Triceps (lateral + long head)',
+        machineOk: true
       }
     ]
   },
@@ -257,13 +257,13 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'Band Pull-Aparts',
+        name: 'DB Hammer Curls',
         sets: 2,
-        repRange: '15-20',
-        rirTarget: '3-3',
-        startingWeight: 0,
-        weightIncrement: 0,
-        notes: 'Isolation | Rotator Cuff | Activation work',
+        repRange: '10-12',
+        rirTarget: '2-3',
+        startingWeight: 7.5,
+        weightIncrement: 1.25,
+        notes: 'Isolation | Biceps + Brachialis',
         machineOk: false
       },
       {
@@ -312,6 +312,16 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         notes: 'Isolation | Hip Abductors (Glute Medius)',
+        machineOk: true
+      },
+      {
+        name: 'Leg Adduction',
+        sets: 3,
+        repRange: '12-15',
+        rirTarget: '2-3',
+        startingWeight: 15,
+        weightIncrement: 2.5,
+        notes: 'Isolation | Hip Adductors | Pairs with abduction for balance',
         machineOk: true
       },
       {
