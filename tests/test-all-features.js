@@ -108,11 +108,11 @@
       const methods = [
         'getExerciseHistory',
         'saveExerciseHistory',
-        'getWorkoutRotation',
-        'saveWorkoutRotation',
+        'getRotation',
+        'saveRotation',
         'getExerciseSelections',
         'saveExerciseSelection',
-        'getTrainingWeeks'
+        'getTrainingPhase'
       ];
 
       methods.forEach(method => {
@@ -120,13 +120,14 @@
         logTest(category, `Has method: ${method}`, hasMethod);
       });
 
-      // Test: Can call getTrainingWeeks
+      // Test: Can call getTrainingPhase
       try {
-        const weeks = storage.getTrainingWeeks();
-        const validResult = typeof weeks === 'number' && weeks >= 0;
-        logTest(category, 'getTrainingWeeks returns valid number', validResult, `Returned: ${weeks}`);
+        const phase = storage.getTrainingPhase();
+        const validPhases = ['building', 'maintenance', 'recovery'];
+        const validResult = validPhases.includes(phase);
+        logTest(category, 'getTrainingPhase returns valid phase', validResult, `Returned: ${phase}`);
       } catch (e) {
-        logTest(category, 'getTrainingWeeks returns valid number', false, e.message);
+        logTest(category, 'getTrainingPhase returns valid phase', false, e.message);
       }
 
     } catch (e) {
@@ -194,10 +195,10 @@
       const weeksNull = deloadManager.calculateWeeksSinceDeload(null);
       logTest(deloadCategory, 'calculateWeeksSinceDeload(null) returns 0', weeksNull === 0, `Returned: ${weeksNull}`);
 
-      // Test: shouldTriggerDeload returns boolean
+      // Test: shouldTriggerDeload returns object with trigger property
       const shouldDeload = deloadManager.shouldTriggerDeload();
-      const validBool = typeof shouldDeload === 'boolean';
-      logTest(deloadCategory, 'shouldTriggerDeload returns boolean', validBool, `Returned: ${shouldDeload}`);
+      const validResult = shouldDeload && typeof shouldDeload.trigger === 'boolean';
+      logTest(deloadCategory, 'shouldTriggerDeload returns object with trigger boolean', validResult, `Returned: ${JSON.stringify(shouldDeload)}`);
 
     } catch (e) {
       logTest(deloadCategory, 'DeloadManager instantiates', false, e.message);

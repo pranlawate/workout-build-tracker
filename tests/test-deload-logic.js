@@ -159,7 +159,7 @@
   try {
     // Test Building Phase (6 week threshold)
     const storage1 = new StorageManager();
-    localStorage.setItem('build_phase', 'building');
+    localStorage.setItem('build_training_phase', 'building');
     const phaseManager1 = new PhaseManager(storage1);
     const manager1 = new DeloadManager(storage1, phaseManager1);
 
@@ -192,7 +192,7 @@
 
     // Test Maintenance Phase (4 week threshold)
     const storage2 = new StorageManager();
-    localStorage.setItem('build_phase', 'maintenance');
+    localStorage.setItem('build_training_phase', 'maintenance');
     const phaseManager2 = new PhaseManager(storage2);
     const manager2 = new DeloadManager(storage2, phaseManager2);
 
@@ -416,7 +416,7 @@
   try {
     // Test: Building phase sensitivity
     const storage1 = new StorageManager();
-    localStorage.setItem('build_phase', 'building');
+    localStorage.setItem('build_training_phase', 'building');
     const phaseManager1 = new PhaseManager(storage1);
     const manager1 = new DeloadManager(storage1, phaseManager1);
 
@@ -430,7 +430,7 @@
 
     // Test: Maintenance phase sensitivity
     const storage2 = new StorageManager();
-    localStorage.setItem('build_phase', 'maintenance');
+    localStorage.setItem('build_training_phase', 'maintenance');
     const phaseManager2 = new PhaseManager(storage2);
     const manager2 = new DeloadManager(storage2, phaseManager2);
 
