@@ -366,20 +366,20 @@
     console.log('\n📊 TEST SUMMARY\n');
     console.log('═══════════════════════════════════════════════════════════════\n');
 
-  Object.keys(results.categories).forEach(category => {
+    Object.keys(results.categories).forEach(category => {
     const cat = results.categories[category];
     const total = cat.passed + cat.failed;
     const percentage = ((cat.passed / total) * 100).toFixed(1);
     const icon = cat.failed === 0 ? '✅' : '⚠️';
     console.log(`${icon} ${category}: ${cat.passed}/${total} passed (${percentage}%)`);
-  });
+    });
 
-  const totalTests = results.passed + results.failed;
-  const totalPercentage = ((results.passed / totalTests) * 100).toFixed(1);
+    const totalTests = results.passed + results.failed;
+    const totalPercentage = ((results.passed / totalTests) * 100).toFixed(1);
 
-  console.log('\n───────────────────────────────────────────────────────────────');
-  console.log(`\n🎯 OVERALL: ${results.passed}/${totalTests} tests passed (${totalPercentage}%)\n`);
-  console.log('═══════════════════════════════════════════════════════════════\n');
+    console.log('\n───────────────────────────────────────────────────────────────');
+    console.log(`\n🎯 OVERALL: ${results.passed}/${totalTests} tests passed (${totalPercentage}%)\n`);
+    console.log('═══════════════════════════════════════════════════════════════\n');
 
     if (results.failed === 0) {
       console.log('✨ ALL TESTS PASSED! All exercises are properly configured.\n');
@@ -392,5 +392,5 @@
   window._exerciseTestResults = results;
   if (!window._TEST_ORCHESTRATED) {
     console.log('💡 Results available at: window._exerciseTestResults\n');
-  }
-})();
+    }
+    })();
