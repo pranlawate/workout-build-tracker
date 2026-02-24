@@ -514,6 +514,347 @@ export const EXERCISE_METADATA = {
       harder: ['Paused OHP', 'Slow Tempo OHP'],
       different: ['Arnold Press', 'Landmine Press']
     }
+  },
+
+  // UPPER_A - Additional Exercises
+  'Decline DB Press': {
+    muscleGroup: 'chest',
+    movementType: 'horizontal_press',
+    equipment: 'dumbbell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Flat DB Press', 'Push-Ups'],
+      harder: ['Paused Decline Press', 'Slow Tempo Decline Press'],
+      different: ['Cable Chest Press', 'Chest Dips']
+    }
+  },
+
+  'Incline DB Press': {
+    muscleGroup: 'chest',
+    movementType: 'horizontal_press',
+    equipment: 'dumbbell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Incline Push-Ups', 'Flat DB Press'],
+      harder: ['Paused Incline Press', 'Slow Tempo Incline Press'],
+      different: ['Incline Barbell Press', 'Low-to-High Cable Fly']
+    }
+  },
+
+  'DB Shoulder Press': {
+    muscleGroup: 'shoulders',
+    movementType: 'vertical_press',
+    equipment: 'dumbbell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Seated DB Press', 'Push Press'],
+      harder: ['Arnold Press', 'Paused DB Press'],
+      different: ['Barbell OHP', 'Landmine Press']
+    }
+  },
+
+  'Lat Pulldown': {
+    muscleGroup: 'back',
+    movementType: 'vertical_pull',
+    equipment: 'cable',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Assisted Pull-Ups', 'Band-Assisted Lat Pulldown'],
+      harder: ['Pull-Ups', 'Weighted Pull-Ups'],
+      different: ['Neutral Grip Pulldown', 'Wide Grip Pulldown']
+    }
+  },
+
+  'Seated Cable Row': {
+    muscleGroup: 'back',
+    movementType: 'horizontal_pull',
+    equipment: 'cable',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Band Rows', 'Light Cable Row'],
+      harder: ['Heavy Cable Row with Pause', 'Slow Tempo Row'],
+      different: ['DB Row', 'T-Bar Row']
+    }
+  },
+
+  'T-Bar Row': {
+    muscleGroup: 'back',
+    movementType: 'horizontal_pull',
+    equipment: 'barbell',
+    difficulty: 3,
+    alternatives: {
+      easier: ['Chest-Supported Row', 'Cable Row'],
+      harder: ['Paused T-Bar Row', 'Slow Tempo T-Bar Row'],
+      different: ['Barbell Row', 'Pendlay Row']
+    }
+  },
+
+  'Chest-Supported Row': {
+    muscleGroup: 'back',
+    movementType: 'horizontal_pull',
+    equipment: 'dumbbell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Cable Row', 'Light DB Row'],
+      harder: ['Heavy DB Row', 'Paused Row'],
+      different: ['T-Bar Row', 'Seal Row']
+    }
+  },
+
+  'Face Pulls': {
+    muscleGroup: 'shoulders',
+    movementType: 'isolation',
+    equipment: 'cable',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Band Face Pulls', 'Light Cable Face Pulls'],
+      harder: ['Heavy Face Pulls with Pause', 'Slow Tempo Face Pulls'],
+      different: ['Reverse Fly', 'Rear Delt Fly']
+    }
+  },
+
+  'Reverse Fly': {
+    muscleGroup: 'shoulders',
+    movementType: 'isolation',
+    equipment: 'dumbbell',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Band Reverse Fly', 'Cable Reverse Fly'],
+      harder: ['Paused Reverse Fly', 'Slow Tempo Reverse Fly'],
+      different: ['Face Pulls', 'Reverse Pec Deck']
+    }
+  },
+
+  'Tricep Pushdowns': {
+    muscleGroup: 'triceps',
+    movementType: 'extension',
+    equipment: 'cable',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Band Pushdowns', 'Light Cable Pushdowns'],
+      harder: ['Heavy Pushdowns with Pause', 'Slow Tempo Pushdowns'],
+      different: ['Overhead Extension', 'Close-Grip Bench']
+    }
+  },
+
+  'Overhead Tricep Extension': {
+    muscleGroup: 'triceps',
+    movementType: 'extension',
+    equipment: 'dumbbell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Band Overhead Extension', 'Light DB Extension'],
+      harder: ['Heavy DB Extension', 'Slow Tempo Extension'],
+      different: ['Tricep Pushdowns', 'Skull Crushers']
+    }
+  },
+
+  // UPPER_B - Additional Exercises
+  'Standard DB Curls': {
+    muscleGroup: 'biceps',
+    movementType: 'curl',
+    equipment: 'dumbbell',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Band Curls', 'Light DB Curls'],
+      harder: ['Paused Curls', 'Slow Tempo Curls'],
+      different: ['Cable Curls', 'Barbell Curls']
+    }
+  },
+
+  // LOWER_A - Additional Exercises
+  'Leg Press': {
+    muscleGroup: 'quads',
+    movementType: 'squat',
+    equipment: 'machine',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Goblet Squat', 'Bodyweight Squat'],
+      harder: ['Single-Leg Press', 'Paused Leg Press'],
+      different: ['Hack Squat', 'Front Squat']
+    }
+  },
+
+  'KB Goblet Squat': {
+    muscleGroup: 'quads',
+    movementType: 'squat',
+    equipment: 'kettlebell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Bodyweight Squat', 'Box Squat'],
+      harder: ['Pause Goblet Squat', 'Heavy Goblet Squat'],
+      different: ['Leg Press', 'Front Squat']
+    }
+  },
+
+  'Hack Squat': {
+    muscleGroup: 'quads',
+    movementType: 'squat',
+    equipment: 'machine',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Leg Press', 'Goblet Squat'],
+      harder: ['Single-Leg Hack Squat', 'Paused Hack Squat'],
+      different: ['Front Squat', 'Belt Squat']
+    }
+  },
+
+  'Leg Curl': {
+    muscleGroup: 'hamstrings',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Stability Ball Curl', 'Light Leg Curl'],
+      harder: ['Single-Leg Curl', 'Paused Leg Curl'],
+      different: ['Romanian Deadlift', 'Nordic Curl']
+    }
+  },
+
+  'DB Romanian Deadlift': {
+    muscleGroup: 'hamstrings',
+    movementType: 'hinge',
+    equipment: 'dumbbell',
+    difficulty: 3,
+    alternatives: {
+      easier: ['Bodyweight Hip Hinge', 'Light DB RDL'],
+      harder: ['Barbell RDL', 'Single-Leg RDL'],
+      different: ['Leg Curl', 'Good Mornings']
+    }
+  },
+
+  '45° Hyperextension': {
+    muscleGroup: 'lower_back',
+    movementType: 'hinge',
+    equipment: 'bodyweight',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Back Extension', 'Bodyweight Good Mornings'],
+      harder: ['Weighted Hyperextension', 'GHD Hyperextension'],
+      different: ['Romanian Deadlift', 'Good Mornings']
+    }
+  },
+
+  'Leg Adduction': {
+    muscleGroup: 'adductors',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Band Adduction', 'Light Machine Adduction'],
+      harder: ['Paused Adduction', 'Slow Tempo Adduction'],
+      different: ['Copenhagen Plank', 'Side Lunges']
+    }
+  },
+
+  'Leg Extension': {
+    muscleGroup: 'quads',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Light Leg Extension', 'Bodyweight Leg Extension'],
+      harder: ['Single-Leg Extension', 'Paused Extension'],
+      different: ['Leg Press', 'Goblet Squat']
+    }
+  },
+
+  // LOWER_B - Additional Exercises
+  'Leg Abduction': {
+    muscleGroup: 'glutes',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Band Abduction', 'Light Machine Abduction'],
+      harder: ['Paused Abduction', 'Slow Tempo Abduction'],
+      different: ['Hip Thrust', 'Glute Bridge']
+    }
+  },
+
+  'Hip Thrust': {
+    muscleGroup: 'glutes',
+    movementType: 'hip_extension',
+    equipment: 'barbell',
+    difficulty: 3,
+    alternatives: {
+      easier: ['Glute Bridge', 'Bodyweight Hip Thrust'],
+      harder: ['Single-Leg Hip Thrust', 'Paused Hip Thrust'],
+      different: ['Romanian Deadlift', 'KB Swings']
+    }
+  },
+
+  'KB Swings': {
+    muscleGroup: 'posterior_chain',
+    movementType: 'hinge',
+    equipment: 'kettlebell',
+    difficulty: 3,
+    alternatives: {
+      easier: ['Light KB Swings', 'DB Swings'],
+      harder: ['Heavy KB Swings', 'Single-Arm Swings'],
+      different: ['Romanian Deadlift', 'Good Mornings']
+    }
+  },
+
+  'Standing Calf Raise': {
+    muscleGroup: 'calves',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Bodyweight Calf Raise', 'Light Machine Raise'],
+      harder: ['Single-Leg Calf Raise', 'Paused Calf Raise'],
+      different: ['Seated Calf Raise', 'Calf Press']
+    }
+  },
+
+  'Seated Calf Raise': {
+    muscleGroup: 'calves',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Bodyweight Calf Raise', 'Light Machine Raise'],
+      harder: ['Heavy Seated Raise', 'Paused Calf Raise'],
+      different: ['Standing Calf Raise', 'Calf Press']
+    }
+  },
+
+  // Core Exercises
+  'Plank': {
+    muscleGroup: 'core',
+    movementType: 'isometric',
+    equipment: 'bodyweight',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Knee Plank', 'Incline Plank'],
+      harder: ['Weighted Plank', 'Extended Plank'],
+      different: ['Dead Bug', 'Hollow Hold']
+    }
+  },
+
+  'Side Plank': {
+    muscleGroup: 'core',
+    movementType: 'isometric',
+    equipment: 'bodyweight',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Knee Side Plank', 'Short Hold Side Plank'],
+      harder: ['Weighted Side Plank', 'Side Plank with Leg Raise'],
+      different: ['Copenhagen Plank', 'Russian Twist']
+    }
+  },
+
+  'Dead Bug': {
+    muscleGroup: 'core',
+    movementType: 'anti-extension',
+    equipment: 'bodyweight',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Single-Leg Dead Bug', 'Slow Dead Bug'],
+      harder: ['Weighted Dead Bug', 'Extended Dead Bug'],
+      different: ['Plank', 'Hollow Hold']
+    }
   }
 };
 

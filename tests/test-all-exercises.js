@@ -292,22 +292,22 @@
     );
 
     if (hasMetadata) {
-      // Test: Has movement pattern
-      const hasPattern = metadata.movementPattern !== undefined;
+      // Test: Has movement type
+      const hasMovementType = metadata.movementType !== undefined;
       logTest(
         category,
-        `${name} - Has movement pattern`,
-        hasPattern,
-        hasPattern ? `Pattern: ${metadata.movementPattern}` : 'Missing movement pattern'
+        `${name} - Has movement type`,
+        hasMovementType,
+        hasMovementType ? `Type: ${metadata.movementType}` : 'Missing movement type'
       );
 
-      // Test: Has muscle groups
-      const hasMuscles = metadata.primaryMuscles && metadata.primaryMuscles.length > 0;
+      // Test: Has muscle group
+      const hasMuscleGroup = metadata.muscleGroup !== undefined;
       logTest(
         category,
-        `${name} - Has muscle groups`,
-        hasMuscles,
-        hasMuscles ? `${metadata.primaryMuscles.length} primary muscles` : 'Missing muscle groups'
+        `${name} - Has muscle group`,
+        hasMuscleGroup,
+        hasMuscleGroup ? `Group: ${metadata.muscleGroup}` : 'Missing muscle group'
       );
     }
   });
