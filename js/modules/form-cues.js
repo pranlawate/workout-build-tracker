@@ -242,6 +242,45 @@ export const FORM_CUES = {
     setup: ['Bar at shoulders', 'Feet hip-width', 'Core braced', 'Grip shoulder-width'],
     execution: ['Press straight up', 'Tuck chin back', 'Lock arms overhead', 'Ribs down'],
     mistakes: ['Arching back', 'Pressing forward (not vertical)', 'Not locking out', 'Elbows flaring']
+  },
+
+  // UPPER_A - Triceps
+  'Tricep Pushdowns': {
+    setup: ['Cable at chest height', 'Elbows tucked at sides', 'Slight forward lean', 'Feet hip-width'],
+    execution: ['Press down to full extension', 'Keep elbows stationary', 'Squeeze triceps at bottom', 'Control return (2 sec)'],
+    mistakes: ['Elbows flaring out', 'Using momentum/swinging', 'Not achieving full extension', 'Shoulder involvement']
+  },
+
+  'Overhead Tricep Extension': {
+    setup: ['DB overhead with both hands', 'Elbows pointing forward', 'Core braced', 'Feet shoulder-width'],
+    execution: ['Lower behind head slowly (3 sec)', 'Keep elbows stationary', 'Extend to full lockout', 'Feel stretch in long head'],
+    mistakes: ['Elbows flaring out', 'Arching back excessively', 'Partial range of motion', 'Dropping weight too fast']
+  },
+
+  // UPPER_B - Biceps
+  'Standard DB Curls': {
+    setup: ['DBs at sides', 'Palms forward', 'Elbows at sides', 'Feet shoulder-width'],
+    execution: ['Curl to shoulder height', 'Keep elbows stationary', 'Squeeze biceps at top (1 sec)', 'Control descent (2 sec)'],
+    mistakes: ['Swinging/momentum', 'Elbows moving forward', 'Not achieving full ROM', 'Rushing reps']
+  },
+
+  'DB Hammer Curls': {
+    setup: ['DBs at sides', 'Palms facing each other', 'Elbows at sides', 'Feet shoulder-width'],
+    execution: ['Curl to shoulder height', 'Keep palms neutral', 'Squeeze at top (1 sec)', 'Control descent (2 sec)'],
+    mistakes: ['Swinging/momentum', 'Rotating wrists', 'Elbows moving forward', 'Partial ROM']
+  },
+
+  // LOWER_A - Leg Press and Adduction
+  'Leg Press': {
+    setup: ['Back flat against pad', 'Feet shoulder-width on platform', 'Knees aligned with toes', 'Grip handles for stability'],
+    execution: ['Lower slowly to 90° (3 sec)', 'Knees track over toes', 'Push through heels', 'Don\'t lock knees at top'],
+    mistakes: ['Knees caving in', 'Bouncing at bottom', 'Locking knees', 'Lifting hips off pad']
+  },
+
+  'Leg Adduction': {
+    setup: ['Sit with back against pad', 'Legs on outer pads', 'Adjust range of motion', 'Core engaged'],
+    execution: ['Bring legs together smoothly', 'Squeeze inner thighs (1 sec)', 'Control opening (2 sec)', 'Maintain posture'],
+    mistakes: ['Using momentum', 'Leaning forward', 'Rushing reps', 'Not achieving full contraction']
   }
 };
 

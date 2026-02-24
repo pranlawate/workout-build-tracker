@@ -65,7 +65,20 @@ export const EQUIPMENT_REQUIREMENTS = {
   // Bands (warm-up equipment)
   'Band Pull-Aparts': ['bands'],
   'Band Over-and-Backs': ['bands'],
-  'Band External Rotation': ['bands']
+  'Band External Rotation': ['bands'],
+
+  // UPPER_A - Triceps
+  'Tricep Pushdowns': ['cables', 'gym'],
+  'Overhead Tricep Extension': ['dumbbells'],
+  'Decline DB Press': ['dumbbells', 'gym'],
+
+  // UPPER_B - Biceps
+  'Standard DB Curls': ['dumbbells'],
+  'DB Hammer Curls': ['dumbbells'],
+
+  // LOWER_A - Machines
+  'Leg Press': ['gym'],
+  'Leg Adduction': ['gym']
 };
 
 /**
