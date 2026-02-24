@@ -31,6 +31,7 @@ import {
   getLISSRecommendation
 } from './modules/stretching-protocols.js';
 import { getOptionalFifthDay } from './modules/optional-fifth-day.js';
+import { getVideoByExercise, getVideoPath, searchVideos, getVideosByMuscleGroup, getVideosByCategory } from './modules/exercise-videos.js';
 
 class App {
   constructor() {
@@ -71,7 +72,16 @@ class App {
       (exerciseKey) => this.exerciseDetailScreen.render(exerciseKey)
     );
 
+    // Video modal elements
+    this.videoModal = null;
+    this.videoPlayer = null;
+    this.videoModalOverlay = null;
+    this.videoModalClose = null;
+    this.videoFormGuideToggle = null;
+    this.videoRetryBtn = null;
+
     this.initializeApp();
+    this.initializeVideoModal();
   }
 
   escapeHtml(text) {
@@ -5732,6 +5742,243 @@ class App {
 
         resolve('later');
       };
+    });
+  }
+
+  /**
+   * Initialize video modal event listeners
+   */
+  initializeVideoModal() {
+    // Get modal elements
+    this.videoModal = document.getElementById('video-modal');
+    this.videoPlayer = document.getElementById('video-player');
+    this.videoModalOverlay = document.querySelector('.video-modal-overlay');
+    this.videoModalClose = document.getElementById('video-modal-close');
+    this.videoFormGuideToggle = document.getElementById('video-form-guide-toggle');
+    this.videoRetryBtn = document.getElementById('video-retry');
+
+    if (!this.videoModal || !this.videoPlayer) {
+      console.warn('[VideoModal] Modal elements not found');
+      return;
+    }
+
+    // Close modal on overlay click
+    this.videoModalOverlay.addEventListener('click', () => {
+      this.closeVideoModal();
+    });
+
+    // Close modal on close button click
+    this.videoModalClose.addEventListener('click', () => {
+      this.closeVideoModal();
+    });
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.videoModal.style.display === 'block') {
+        this.closeVideoModal();
+      }
+    });
+
+    // Form guide toggle
+    this.videoFormGuideToggle.addEventListener('click', () => {
+      this.toggleVideoFormGuide();
+    });
+
+    // Retry button
+    this.videoRetryBtn.addEventListener('click', () => {
+      this.retryVideoLoad();
+    });
+
+    // Video error handling
+    this.videoPlayer.addEventListener('error', (e) => {
+      console.error('[VideoModal] Video load error:', e);
+      this.showVideoError();
+    });
+
+    console.log('[VideoModal] Initialized');
+  }
+
+  /**
+   * Open video modal with exercise video
+   * @param {string} exerciseName - Name of exercise to show video for
+   */
+  openVideoModal(exerciseName) {
+    try {
+      // Get video metadata
+      const videoData = getVideoByExercise(exerciseName);
+      if (!videoData) {
+        console.warn('[VideoModal] No video found for:', exerciseName);
+        return;
+      }
+
+      // Get video path
+      const videoPath = getVideoPath(exerciseName);
+      if (!videoPath) {
+        console.warn('[VideoModal] Could not construct video path for:', exerciseName);
+        return;
+      }
+
+      console.log('[VideoModal] Opening video:', exerciseName, videoPath);
+
+      // Set video source (triggers lazy load)
+      const videoElement = this.videoPlayer;
+      videoElement.src = videoPath;
+      videoElement.style.display = 'block';
+
+      // Hide error state
+      document.getElementById('video-error').style.display = 'none';
+
+      // Set exercise name
+      document.getElementById('video-exercise-name').textContent = exerciseName;
+
+      // Set metadata badges
+      const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+      document.getElementById('video-muscle-group').textContent =
+        `🏋️ ${capitalize(videoData.muscleGroup)}`;
+      document.getElementById('video-equipment').textContent =
+        `🔧 ${capitalize(videoData.equipment)}`;
+
+      // Load form guide
+      this.loadVideoFormGuide(exerciseName);
+
+      // Show modal (overlay on current screen)
+      this.videoModal.style.display = 'block';
+
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+
+      // Log for debugging
+      console.log('[VideoModal] Modal opened, video loading...');
+
+    } catch (error) {
+      console.error('[VideoModal] Error opening modal:', error);
+    }
+  }
+
+  /**
+   * Close video modal and cleanup resources
+   */
+  closeVideoModal() {
+    try {
+      const videoElement = this.videoPlayer;
+
+      // Pause and unload video
+      videoElement.pause();
+      videoElement.src = '';  // Free memory
+      videoElement.load();    // Reset video element
+
+      // Hide modal
+      this.videoModal.style.display = 'none';
+
+      // Restore body scroll
+      document.body.style.overflow = '';
+
+      // Reset form guide toggle
+      const formContent = document.getElementById('video-form-guide-content');
+      if (formContent) {
+        formContent.style.display = 'none';
+        this.videoFormGuideToggle.textContent = '📋 Form Guide ▼';
+      }
+
+      console.log('[VideoModal] Modal closed');
+
+    } catch (error) {
+      console.error('[VideoModal] Error closing modal:', error);
+    }
+  }
+
+  /**
+   * Load and render form guide for exercise
+   * @param {string} exerciseName - Name of exercise
+   */
+  loadVideoFormGuide(exerciseName) {
+    const formCues = getFormCues(exerciseName);
+    const formContent = document.getElementById('video-form-guide-content');
+
+    if (!formCues || !formContent) {
+      // Hide form guide section if no cues
+      this.videoFormGuideToggle.style.display = 'none';
+      return;
+    }
+
+    // Show form guide section
+    this.videoFormGuideToggle.style.display = 'block';
+
+    // Render form cues
+    formContent.innerHTML = `
+      <div class="form-cue-category">
+        <strong>Setup:</strong>
+        <ul>
+          ${formCues.setup.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="form-cue-category">
+        <strong>Execution:</strong>
+        <ul>
+          ${formCues.execution.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="form-cue-category">
+        <strong>Common Mistakes:</strong>
+        <ul>
+          ${formCues.mistakes.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+
+  /**
+   * Toggle form guide visibility
+   */
+  toggleVideoFormGuide() {
+    const formContent = document.getElementById('video-form-guide-content');
+
+    if (formContent.style.display === 'none') {
+      formContent.style.display = 'block';
+      this.videoFormGuideToggle.textContent = '📋 Form Guide ▲';
+    } else {
+      formContent.style.display = 'none';
+      this.videoFormGuideToggle.textContent = '📋 Form Guide ▼';
+    }
+  }
+
+  /**
+   * Show video error state
+   */
+  showVideoError() {
+    // Hide video player
+    this.videoPlayer.style.display = 'none';
+
+    // Show error message
+    const errorElement = document.getElementById('video-error');
+    errorElement.style.display = 'block';
+
+    // Update error message based on online status
+    const errorMessage = errorElement.querySelector('.error-hint');
+    if (!navigator.onLine) {
+      errorMessage.textContent =
+        "You're offline. This video hasn't been cached yet. Watch it once online to save for offline use.";
+    } else {
+      errorMessage.textContent = "Check your connection or try again later.";
+    }
+  }
+
+  /**
+   * Retry loading video after error
+   */
+  retryVideoLoad() {
+    const videoElement = this.videoPlayer;
+    const errorElement = document.getElementById('video-error');
+
+    // Hide error, show video player
+    errorElement.style.display = 'none';
+    videoElement.style.display = 'block';
+
+    // Reload video
+    videoElement.load();
+    videoElement.play().catch(error => {
+      console.error('[VideoModal] Retry failed:', error);
+      this.showVideoError();
     });
   }
 }
