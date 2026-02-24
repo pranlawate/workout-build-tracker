@@ -171,6 +171,9 @@
   const category3 = 'Streak Tracking';
 
   try {
+    // Clear rotation state for fresh test
+    localStorage.removeItem('build_workout_rotation');
+
     const storage = new StorageManager();
     const manager = new WorkoutManager(storage);
 
@@ -203,6 +206,9 @@
   const category4 = 'Sequence History';
 
   try {
+    // Clear rotation state for fresh test
+    localStorage.removeItem('build_workout_rotation');
+
     const storage = new StorageManager();
     const manager = new WorkoutManager(storage);
 
@@ -262,6 +268,9 @@
   const category5 = 'Cycle Detection';
 
   try {
+    // Clear rotation state for fresh test
+    localStorage.removeItem('build_workout_rotation');
+
     const storage = new StorageManager();
     const manager = new WorkoutManager(storage);
 
