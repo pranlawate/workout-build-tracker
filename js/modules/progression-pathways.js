@@ -57,7 +57,7 @@ export const PROGRESSION_PATHS = {
   'UPPER_A_SLOT_3': {
     slotName: 'Isolation Horizontal Push',
     easier: ['Machine Chest Fly'],
-    current: 'Cable Chest Fly',
+    current: 'Decline DB Press',
     harder: ['DB Chest Fly'],  // Requires more stability
     alternate: ['Push-up variations']
   },
