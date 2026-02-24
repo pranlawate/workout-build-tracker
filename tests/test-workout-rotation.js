@@ -20,6 +20,9 @@
   console.log('🔄 COMPREHENSIVE WORKOUT ROTATION LOGIC TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
+  // CRITICAL: Clear all rotation state before starting any tests
+  localStorage.removeItem('build_workout_rotation');
+
   const results = {
     passed: 0,
     failed: 0,
