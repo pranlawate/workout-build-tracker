@@ -855,7 +855,7 @@
     <!-- Modal content -->
     <div class="video-modal-content">
       <!-- Close button -->
-      <button class="video-modal-close" id="video-modal-close" aria-label="Close video">
+      <button type="button" class="video-modal-close" id="video-modal-close" aria-label="Close video">
         <span aria-hidden="true">×</span>
       </button>
 
@@ -882,8 +882,8 @@
 
       <!-- Form guide (embedded in modal) -->
       <div class="video-form-guide">
-        <button class="form-guide-toggle" id="video-form-guide-toggle">
-          📋 Form Guide ▼
+        <button type="button" class="form-guide-toggle" id="video-form-guide-toggle">
+          <span aria-hidden="true">📋</span> Form Guide ▼
         </button>
         <div id="video-form-guide-content" class="form-guide-content" style="display: none;">
           <!-- Form cues inserted dynamically -->
@@ -895,7 +895,7 @@
         <div class="error-icon">⚠️</div>
         <p class="error-message">Video unavailable</p>
         <p class="error-hint">Check your connection or try again later.</p>
-        <button class="btn-retry" id="video-retry">Retry</button>
+        <button type="button" class="btn-retry" id="video-retry">Retry</button>
       </div>
     </div>
   </div>
