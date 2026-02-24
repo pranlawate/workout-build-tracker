@@ -16,7 +16,6 @@
  */
 
 (async function testDeloadLogic() {
-  console.clear();
   console.log('⏸️ COMPREHENSIVE DELOAD LOGIC TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

@@ -16,7 +16,6 @@
  */
 
 (async function testAllFeatures() {
-  console.clear();
   console.log('⚙️ COMPREHENSIVE FEATURE MODULES TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

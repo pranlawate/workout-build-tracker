@@ -17,7 +17,6 @@
  */
 
 (async function testAllProgressions() {
-  console.clear();
   console.log('🔄 COMPREHENSIVE PROGRESSION PATHWAYS TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

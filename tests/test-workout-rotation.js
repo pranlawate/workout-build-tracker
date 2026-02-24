@@ -17,7 +17,6 @@
  */
 
 (async function testWorkoutRotation() {
-  console.clear();
   console.log('🔄 COMPREHENSIVE WORKOUT ROTATION LOGIC TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

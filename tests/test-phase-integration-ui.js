@@ -16,7 +16,6 @@
  */
 
 (async function runUITests() {
-  console.clear();
   console.log('🎨 PHASE INTEGRATION - UI TESTING SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

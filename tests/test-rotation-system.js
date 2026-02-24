@@ -16,7 +16,6 @@
  */
 
 (async function testRotationSystem() {
-  console.clear();
   console.log('🔄 COMPREHENSIVE ROTATION SYSTEM TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

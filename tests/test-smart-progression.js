@@ -19,7 +19,6 @@
  */
 
 (async function testSmartProgression() {
-  console.clear();
   console.log('📈 COMPREHENSIVE SMART PROGRESSION TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

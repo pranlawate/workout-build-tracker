@@ -19,7 +19,6 @@
  */
 
 (async function testUnlockSystem() {
-  console.clear();
   console.log('🔓 COMPREHENSIVE UNLOCK SYSTEM TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

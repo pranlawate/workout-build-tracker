@@ -17,7 +17,6 @@
  */
 
 (async function testAllExercises() {
-  console.clear();
   console.log('🏋️ COMPREHENSIVE EXERCISE TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

@@ -16,7 +16,6 @@
  */
 
 (async function runComprehensiveTests() {
-  console.clear();
   console.log('🔬 COMPREHENSIVE PHASE INTEGRATION TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════════════════\n');
 

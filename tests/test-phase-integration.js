@@ -9,7 +9,6 @@
  */
 
 (async function runPhaseIntegrationTests() {
-  console.clear();
   console.log('🧪 BUILD/MAINTENANCE PHASE INTEGRATION - TEST SUITE\n');
   console.log('═══════════════════════════════════════════════════\n');
 
