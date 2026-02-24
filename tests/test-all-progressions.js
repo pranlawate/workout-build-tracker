@@ -253,7 +253,8 @@
   try {
     // Test: Unlock evaluator can be instantiated
     const storage = window.app?.storage || { getTrainingWeeks: () => 0, getExerciseHistory: () => null };
-    const evaluator = new unlockEvaluator.UnlockEvaluator(storage);
+    const phaseManager = window.app?.phaseManager || { getCurrentPhase: () => 'building', getWeeksInPhase: () => 0 };
+    const evaluator = new unlockEvaluator.UnlockEvaluator(storage, phaseManager);
 
     logTest(
       unlockCategory,
