@@ -128,8 +128,11 @@
       validSets ? '' : `Sets: ${exercise.sets}`
     );
 
-    // Test: Valid starting weight
-    const validStartWeight = exercise.startingWeight > 0 && exercise.startingWeight < 200;
+    // Test: Valid starting weight (allow 0 for bodyweight exercises)
+    const isBodyweight = exercise.weightIncrement === 0;
+    const validStartWeight = isBodyweight
+      ? exercise.startingWeight === 0
+      : (exercise.startingWeight > 0 && exercise.startingWeight < 200);
     logTest(
       category,
       `${name} - Valid starting weight`,
@@ -137,8 +140,9 @@
       validStartWeight ? '' : `Starting weight: ${exercise.startingWeight}kg`
     );
 
-    // Test: Has weight increment
-    const hasIncrement = exercise.weightIncrement !== undefined && exercise.weightIncrement > 0;
+    // Test: Has weight increment defined (allow 0 for bodyweight exercises)
+    const hasIncrement = exercise.weightIncrement !== undefined &&
+      (exercise.weightIncrement >= 0);
     logTest(
       category,
       `${name} - Has weight increment`,
