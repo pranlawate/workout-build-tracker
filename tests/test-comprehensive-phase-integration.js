@@ -989,5 +989,8 @@
 
   console.log('\n═══════════════════════════════════════════════════════════════\n');
 
+  // Export results for test runner
+  window._phaseTestResults = results;
+
   return results;
 })();

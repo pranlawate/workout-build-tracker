@@ -242,9 +242,11 @@
   // ========================================
   // SUMMARY
   // ========================================
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('\n📊 TEST SUMMARY\n');
-  console.log('═══════════════════════════════════════════════════════════════\n');
+  // Suppress detailed summary when running under test orchestration
+  if (!window._TEST_ORCHESTRATED) {
+    console.log('\n═══════════════════════════════════════════════════════════════');
+    console.log('\n📊 TEST SUMMARY\n');
+    console.log('═══════════════════════════════════════════════════════════════\n');
 
   Object.keys(results.categories).forEach(category => {
     const cat = results.categories[category];
@@ -261,13 +263,16 @@
   console.log(`\n🎯 OVERALL: ${results.passed}/${totalTests} tests passed (${totalPercentage}%)\n`);
   console.log('═══════════════════════════════════════════════════════════════\n');
 
-  if (results.failed === 0) {
-    console.log('✨ ALL TESTS PASSED! Rotation system is working correctly.\n');
-  } else {
-    console.log(`⚠️ ${results.failed} tests failed. Review failures above.\n`);
-  }
+    if (results.failed === 0) {
+      console.log('✨ ALL TESTS PASSED! Rotation system is working correctly.\n');
+    } else {
+      console.log(`⚠️ ${results.failed} tests failed. Review failures above.\n`);
+    }
+  } // End orchestration check
 
   // Export results
   window._rotationSystemTestResults = results;
-  console.log('💡 Results available at: window._rotationSystemTestResults\n');
+  if (!window._TEST_ORCHESTRATED) {
+    console.log('💡 Results available at: window._rotationSystemTestResults\n');
+  }
 })();

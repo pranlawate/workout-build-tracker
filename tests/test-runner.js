@@ -44,7 +44,7 @@ const testRunner = {
       // Wait for test to complete and set global result variable
       const startTime = Date.now();
       while (!window[resultVariable] && (Date.now() - startTime) < maxWaitMs) {
-        await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
+        await new Promise(resolve => setTimeout(resolve, 10)); // Wait 10ms (faster polling)
       }
 
       if (!window[resultVariable]) {
@@ -145,6 +145,9 @@ const testRunner = {
     console.log('🧪 MASTER TEST RUNNER - COMPREHENSIVE TEST SUITE');
     console.log('═══════════════════════════════════════════════════════════════\n');
     console.log(`⏰ Started at: ${new Date().toLocaleTimeString()}\n`);
+
+    // Set orchestration flag to suppress individual test summaries
+    window._TEST_ORCHESTRATED = true;
 
     const startTime = Date.now();
 
