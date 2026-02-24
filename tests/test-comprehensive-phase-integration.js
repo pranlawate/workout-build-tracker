@@ -953,31 +953,34 @@
   // ========================================
   // FINAL CLEANUP & SUMMARY
   // ========================================
+  // FINAL CLEANUP & SUMMARY
+  // ========================================
+  // Clean up test data
+  localStorage.setItem('build_training_phase', 'building');
+  const cleanState = storage.getDeloadState();
+  cleanState.lastDeloadDate = null;
+  cleanState.active = false;
+  storage.saveDeloadState(cleanState);
+
   // Suppress detailed summary when running under test orchestration
   if (!window._TEST_ORCHESTRATED) {
     console.log('\n═══════════════════════════════════════════════════════════════');
     console.log('\n📊 COMPREHENSIVE TEST SUMMARY\n');
 
-    // Suppress detailed summary when running under test orchestration
-  if (!window._TEST_ORCHESTRATED) {
-    // Clean up test data
-    localStorage.setItem('build_training_phase', 'building');
-    const cleanState = storage.getDeloadState();
-    cleanState.lastDeloadDate = null;
-    cleanState.active = false;
-    storage.saveDeloadState(cleanState);
     const totalTests = results.passed + results.failed;
     const successRate = Math.round((results.passed / totalTests) * 100);
     console.log(`Total Tests Run: ${totalTests}`);
     console.log(`✅ Passed: ${results.passed}`);
     console.log(`❌ Failed: ${results.failed}`);
     console.log(`Success Rate: ${successRate}%\n`);
+
     // Category breakdown
     console.log('Results by Category:');
     for (const [category, stats] of Object.entries(results.categories)) {
       const categoryRate = Math.round((stats.passed / (stats.passed + stats.failed)) * 100);
       console.log(`  ${category}: ${stats.passed}/${stats.passed + stats.failed} (${categoryRate}%)`);
     }
+
     if (results.failed > 0) {
       console.log('\n❌ FAILED TESTS:');
       results.tests
@@ -986,6 +989,7 @@
     } else {
       console.log('\n🎉 ALL TESTS PASSED! System is production-ready.');
     }
+
     console.log('\n═══════════════════════════════════════════════════════════════\n');
   } // End orchestration check
 
