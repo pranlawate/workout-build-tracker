@@ -40,7 +40,8 @@ export class WorkoutManager {
     rotation.currentStreak = (rotation.currentStreak || 0) + 1;
 
     // Increment cycle count when completing full rotation
-    const fullCycle = this.detectFullCycle(rotation.sequence);
+    // Only increment when we COMPLETE a cycle (just finished LOWER_B) AND all 4 workouts present
+    const fullCycle = this.detectFullCycle(rotation.sequence, workoutName);
     if (fullCycle) {
       rotation.cycleCount = (rotation.cycleCount || 0) + 1;
     }
@@ -48,15 +49,17 @@ export class WorkoutManager {
     this.storage.saveRotation(rotation);
   }
 
-  detectFullCycle(sequence) {
+  detectFullCycle(sequence, justCompletedWorkout) {
     // Detect when user completes full A→B→C→D rotation
+    // Only count as cycle when we COMPLETE the last workout (LOWER_B)
     if (sequence.length < 4) return false;
 
     const recent4 = sequence.slice(-4);
     const uniqueWorkouts = new Set(recent4);
 
-    // Full cycle = all 4 workouts completed
-    return uniqueWorkouts.size === 4;
+    // Full cycle = all 4 workouts completed AND just finished LOWER_B (end of rotation)
+    const completedCycle = uniqueWorkouts.size === 4 && justCompletedWorkout === 'LOWER_B';
+    return completedCycle;
   }
 
   checkMuscleRecovery(proposedWorkout, currentTime = new Date()) {
