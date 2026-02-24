@@ -386,35 +386,35 @@
   // ========================================
   // SECTION 10: Summary
   // ========================================
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('\n📊 TEST SUMMARY\n');
-  console.log('═══════════════════════════════════════════════════════════════\n');
-
-  Object.keys(results.categories).forEach(category => {
-    const cat = results.categories[category];
-    const total = cat.passed + cat.failed;
-    const percentage = ((cat.passed / total) * 100).toFixed(1);
-    const icon = cat.failed === 0 ? '✅' : '⚠️';
-    console.log(`${icon} ${category}: ${cat.passed}/${total} passed (${percentage}%)`);
-  });
-
-  const totalTests = results.passed + results.failed;
-  const totalPercentage = ((results.passed / totalTests) * 100).toFixed(1);
-
-  console.log('\n───────────────────────────────────────────────────────────────');
-  console.log(`\n🎯 OVERALL: ${results.passed}/${totalTests} tests passed (${totalPercentage}%)\n`);
-  console.log('═══════════════════════════════════════════════════════════════\n');
-
-  if (results.failed === 0) {
-    console.log('✨ ALL TESTS PASSED! All progression pathways are properly configured.\n');
-  } else {
-    console.log(`⚠️ ${results.failed} tests failed. Review failures above.\n`);
-  }
-
-  console.log(`💡 Tested ${slotKeys.length} slots across ${ALL_WORKOUTS.length} workouts\n`);
-  console.log(`💡 Validated ${allProgressionExercises.size} unique exercises in progression system\n`);
+  // Suppress detailed summary when running under test orchestration
+  if (!window._TEST_ORCHESTRATED) {
+    console.log('\n═══════════════════════════════════════════════════════════════');
+    console.log('\n📊 TEST SUMMARY\n');
+    console.log('═══════════════════════════════════════════════════════════════\n');
+    Object.keys(results.categories).forEach(category => {
+      const cat = results.categories[category];
+      const total = cat.passed + cat.failed;
+      const percentage = ((cat.passed / total) * 100).toFixed(1);
+      const icon = cat.failed === 0 ? '✅' : '⚠️';
+      console.log(`${icon} ${category}: ${cat.passed}/${total} passed (${percentage}%)`);
+    });
+    const totalTests = results.passed + results.failed;
+    const totalPercentage = ((results.passed / totalTests) * 100).toFixed(1);
+    console.log('\n───────────────────────────────────────────────────────────────');
+    console.log(`\n🎯 OVERALL: ${results.passed}/${totalTests} tests passed (${totalPercentage}%)\n`);
+    console.log('═══════════════════════════════════════════════════════════════\n');
+    if (results.failed === 0) {
+      console.log('✨ ALL TESTS PASSED! All progression pathways are properly configured.\n');
+    } else {
+      console.log(`⚠️ ${results.failed} tests failed. Review failures above.\n`);
+    }
+    console.log(`💡 Tested ${slotKeys.length} slots across ${ALL_WORKOUTS.length} workouts\n`);
+    console.log(`💡 Validated ${allProgressionExercises.size} unique exercises in progression system\n`);
+  } // End orchestration check
 
   // Export results
   window._progressionTestResults = results;
-  console.log('💡 Results available at: window._progressionTestResults\n');
-})();
+  if (!window._TEST_ORCHESTRATED) {
+      console.log('💡 Results available at: window._progressionTestResults\n');
+    }
+  })();

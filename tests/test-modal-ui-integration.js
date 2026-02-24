@@ -245,22 +245,23 @@
   // =========================================
   // RESULTS SUMMARY
   // =========================================
-
-  console.log('\n' + '='.repeat(50));
-  console.log(`🎯 MODAL UI INTEGRATION TEST RESULTS`);
-  console.log('='.repeat(50));
-  console.log(`✅ Passed: ${results.passed}`);
-  console.log(`❌ Failed: ${results.failed}`);
-  console.log(`📊 Total: ${results.passed + results.failed}`);
-  console.log(`✔️  Success Rate: ${((results.passed / (results.passed + results.failed)) * 100).toFixed(1)}%`);
-  console.log('='.repeat(50));
-
-  if (results.failed > 0) {
-    console.log('\n❌ FAILED TESTS:');
-    results.tests.filter(t => t.status === 'FAIL').forEach(test => {
-      console.log(`  - ${test.name}${test.error ? ': ' + test.error : ''}`);
-    });
-  }
+  // Suppress detailed summary when running under test orchestration
+  if (!window._TEST_ORCHESTRATED) {
+    console.log('\n' + '='.repeat(50));
+    console.log(`🎯 MODAL UI INTEGRATION TEST RESULTS`);
+    console.log('='.repeat(50));
+    console.log(`✅ Passed: ${results.passed}`);
+    console.log(`❌ Failed: ${results.failed}`);
+    console.log(`📊 Total: ${results.passed + results.failed}`);
+    console.log(`✔️  Success Rate: ${((results.passed / (results.passed + results.failed)) * 100).toFixed(1)}%`);
+    console.log('='.repeat(50));
+    if (results.failed > 0) {
+      console.log('\n❌ FAILED TESTS:');
+      results.tests.filter(t => t.status === 'FAIL').forEach(test => {
+        console.log(`  - ${test.name}${test.error ? ': ' + test.error : ''}`);
+      });
+    }
+  } // End orchestration check
 
   // Store results globally for test runner
   window.modalUITestResults = results;
