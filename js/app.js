@@ -5763,14 +5763,18 @@ class App {
     }
 
     // Close modal on overlay click
-    this.videoModalOverlay.addEventListener('click', () => {
-      this.closeVideoModal();
-    });
+    if (this.videoModalOverlay) {
+      this.videoModalOverlay.addEventListener('click', () => {
+        this.closeVideoModal();
+      });
+    }
 
     // Close modal on close button click
-    this.videoModalClose.addEventListener('click', () => {
-      this.closeVideoModal();
-    });
+    if (this.videoModalClose) {
+      this.videoModalClose.addEventListener('click', () => {
+        this.closeVideoModal();
+      });
+    }
 
     // Close modal on ESC key
     document.addEventListener('keydown', (e) => {
@@ -5780,14 +5784,18 @@ class App {
     });
 
     // Form guide toggle
-    this.videoFormGuideToggle.addEventListener('click', () => {
-      this.toggleVideoFormGuide();
-    });
+    if (this.videoFormGuideToggle) {
+      this.videoFormGuideToggle.addEventListener('click', () => {
+        this.toggleVideoFormGuide();
+      });
+    }
 
     // Retry button
-    this.videoRetryBtn.addEventListener('click', () => {
-      this.retryVideoLoad();
-    });
+    if (this.videoRetryBtn) {
+      this.videoRetryBtn.addEventListener('click', () => {
+        this.retryVideoLoad();
+      });
+    }
 
     // Video error handling
     this.videoPlayer.addEventListener('error', (e) => {
