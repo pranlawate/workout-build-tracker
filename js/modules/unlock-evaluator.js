@@ -126,24 +126,12 @@ export class UnlockEvaluator {
       // Get base unlock evaluation (criteria met?)
       const baseEvaluation = this.evaluateUnlock(targetExercise, prerequisiteExercise);
 
-      // Get phase-aware priority
+      // Calculate phase-aware priority (based on TYPE and PHASE, not unlock status)
       const unlockPriority = this.phaseManager.getUnlockPriority();
       const exerciseType = this._getExerciseType(targetExercise);
 
-      // In BUILDING phase, all exercises have equal priority regardless of unlock status
-      if (unlockPriority === 'all') {
-        return {
-          ...baseEvaluation,
-          priority: 1,
-          phaseRecommended: true
-        };
-      }
-
-      // In other phases, locked exercises get low priority
-      if (!baseEvaluation.unlocked) {
-        return { ...baseEvaluation, priority: 999, phaseRecommended: false };
-      }
-
+      // Priority is independent of unlock status - it shows recommendation order
+      // Unlock status determines IF you can use it, priority determines recommendation order
       return {
         ...baseEvaluation,
         priority: this._calculatePriority(exerciseType, unlockPriority),
