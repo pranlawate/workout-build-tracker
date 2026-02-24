@@ -84,12 +84,12 @@
     const evaluator = new UnlockEvaluator(storage, phaseManager);
 
     // Test: Simple tier always unlocked
-    const result1 = evaluator.evaluateUnlock('DB Flat Bench Press', null);
+    const result1 = evaluator.evaluateUnlock('Leg Curl', null);
     logTest(
       category1,
       'Simple tier exercise is always unlocked',
       result1.unlocked === true,
-      `Exercise: DB Flat Bench Press, Unlocked: ${result1.unlocked}`
+      `Exercise: Leg Curl, Unlocked: ${result1.unlocked}`
     );
 
     logTest(
@@ -165,7 +165,7 @@
   try {
     // Test Building Phase (all exercises equal priority)
     const storage1 = new StorageManager();
-    localStorage.setItem('build_phase', 'building');
+    localStorage.setItem('build_training_phase', 'building');
     const phaseManager1 = new PhaseManager(storage1);
     const evaluator1 = new UnlockEvaluator(storage1, phaseManager1);
 
@@ -186,7 +186,7 @@
 
     // Test Maintenance Phase (bodyweight priority)
     const storage2 = new StorageManager();
-    localStorage.setItem('build_phase', 'maintenance');
+    localStorage.setItem('build_training_phase', 'maintenance');
     const phaseManager2 = new PhaseManager(storage2);
     const evaluator2 = new UnlockEvaluator(storage2, phaseManager2);
 
@@ -436,9 +436,9 @@
     const phaseManager = new PhaseManager(storage);
     const evaluator = new UnlockEvaluator(storage, phaseManager);
 
-    // Mark exercise as unlocked
-    const unlockedExercises = ['Barbell Bench Press'];
-    localStorage.setItem('build_unlocked_exercises', JSON.stringify(unlockedExercises));
+    // Mark exercise as unlocked (using correct storage format)
+    const unlocks = { 'Barbell Bench Press': { strength: true, mobility: true, painFree: true, weeks: 10 } };
+    localStorage.setItem('build_unlocks', JSON.stringify(unlocks));
 
     const result = evaluator.evaluateUnlock('Barbell Bench Press', 'DB Flat Bench Press');
 
