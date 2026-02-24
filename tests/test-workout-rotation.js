@@ -73,6 +73,9 @@
   const category1 = 'Initial State';
 
   try {
+    // Clear rotation state for fresh test
+    localStorage.removeItem('build_workout_rotation');
+
     // Create fresh storage and manager
     const storage = new StorageManager();
     const manager = new WorkoutManager(storage);
@@ -126,6 +129,9 @@
   const EXPECTED_ORDER = ['UPPER_A', 'LOWER_A', 'UPPER_B', 'LOWER_B'];
 
   try {
+    // Clear rotation state for fresh test
+    localStorage.removeItem('build_workout_rotation');
+
     const storage = new StorageManager();
     const manager = new WorkoutManager(storage);
 
