@@ -84,7 +84,7 @@ See [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for detailed progr
   - Body Weight and Barbell tabs now properly render content
   - Added dedicated render functions for each tab
 
-**Cache Version:** v71 (updated for pre/post-workout modals)
+**Cache Version:** v100 (updated for exercise video library)
 
 ## Technology Stack
 
@@ -198,6 +198,7 @@ workout-build-tracker/
 ### Core Tracking (✅ Implemented)
 - Upper/Lower Split rotation (UPPER_A → LOWER_A → UPPER_B → LOWER_B)
 - 26 exercises with starting weights and progression rules
+- **Exercise video library** - 48 videos with searchable UI and offline caching
 - Double progression algorithm (reps → weight)
 - Exercise history tracking (8 workouts retained)
 - Muscle-specific recovery tracking (48hr major muscle groups)
@@ -259,7 +260,8 @@ workout-build-tracker/
 
 **Cache Management:**
 - Service Worker caches all assets for offline use
-- Version: `build-tracker-v71` (auto-updates on new deployments)
+- Version: `build-tracker-v100` (auto-updates on new deployments)
+- Video cache: Videos cached on-demand (~100-150MB typical usage)
 - Clear cache: Browser settings → Site storage → Clear & reset
 
 ### 📊 Progress Dashboard
@@ -357,6 +359,16 @@ Post-workout: "Achievement Unlocked: Tempo Mastery - Incline Press"
 **Impact:** Solves the #1 beginner progression problem automatically
 
 See design document: [Smart Auto-Progression System](docs/plans/2026-02-10-smart-auto-progression-design.md)
+
+### Exercise Video Library (✅ v1.7.0)
+- **48 exercise videos** (38 main exercises + 10 warmups)
+- **Three access points:** Standalone library, in-workout demo, pre-workout warmup
+- **Searchable & filterable** by muscle group, equipment, category
+- **Modal overlay player** - No page navigation, instant close
+- **Offline support** - Service Worker caches videos on first view (~400MB total)
+- **Form guide integration** - Text cues embedded in video modal
+
+**Cache Version:** v100 (updated for video caching)
 
 ## License
 

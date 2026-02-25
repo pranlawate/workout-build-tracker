@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-02-24
+
+### Added - Exercise Video Library
+
+**Video Library (48 videos, ~400MB)**
+- Copied and renamed exercise videos from SHRED PWA
+- 38 main exercise videos (all BUILD exercises covered)
+- 10 warmup movement videos
+- Metadata-driven organization (muscle group, equipment, movement type)
+
+**Exercise Videos Module**
+- `js/modules/exercise-videos.js` - Video metadata and helper functions
+- Filter by muscle group, equipment, category
+- Search by exercise name (fuzzy match)
+- Get video path, enumeration functions
+
+**UI Components**
+- Video modal overlay (HTML5 video player)
+- Exercise Library screen with search and filter
+- "🎥 Watch Demo" button on exercise cards (in-workout)
+- 🎥 icons on warmup checklist (pre-workout modal)
+
+**Service Worker Enhancements**
+- Runtime caching for videos (cache-on-demand)
+- Separate video cache (`build-tracker-videos-v1`)
+- Offline playback for cached videos
+- Progressive caching (only cache what user watches)
+
+**Styling**
+- `css/video-modal.css` - Modal and player styles
+- Library screen grid layout (responsive)
+- Filter pills with active states
+- Exercise cards with hover effects
+- Mobile-optimized modal (fullscreen support)
+
+**Testing**
+- `tests/test-exercise-videos.js` - Automated module tests
+- `docs/testing/exercise-video-library-integration-test.md` - Manual test checklist
+
+### Changed
+- Cache version: v99 → v100
+- Index.html: Added video modal HTML and library screen
+- App.js: Added video modal logic and library navigation
+
+### Technical Details
+- Total video size: ~400MB
+- Service Worker: Cache-on-demand strategy (not all upfront)
+- Typical user cache: ~100-150MB (10-20 videos)
+- Lazy loading: Videos only load when modal opens
+- Memory management: Videos unload when modal closes
+- No page navigation: Modal overlay pattern preserves state
+
 ## [1.6.0] - 2026-02-24
 
 ### Fixed - Comprehensive Test Suite (943/943 tests passing)

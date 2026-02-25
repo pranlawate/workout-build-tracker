@@ -492,6 +492,40 @@ sw.js                                  (cache v71)
 **Status:** Production-ready, cache v58, all naming verified against traditional sources
 
 ---
+
+### Exercise Video Library (100% Complete) 🎉 NEW
+**Source:** `docs/plans/2026-02-24-exercise-video-library-implementation.md`
+
+**Status:** ✅ Production (v1.7.0 - 2026-02-24)
+
+**Implementation:**
+- [x] Video migration script (copy from SHRED)
+- [x] Exercise videos metadata module
+- [x] Video modal component (HTML5 player)
+- [x] Exercise Library screen (search & filter)
+- [x] In-workout "Watch Demo" button
+- [x] Pre-workout warmup video icons
+- [x] Service Worker video caching
+- [x] CSS styling (modal, library, responsive)
+- [x] Automated tests (module coverage)
+- [x] Manual test checklist
+
+**Video Coverage:**
+- 38 main exercise videos
+- 10 warmup videos
+- Total: 48 videos (~400MB)
+
+**Files Added:**
+- `videos/exercises/` (38 videos)
+- `videos/warmups/` (10 videos)
+- `scripts/copy-videos-from-shred.sh`
+- `js/modules/exercise-videos.js`
+- `js/screens/exercise-library.js`
+- `css/video-modal.css`
+- `tests/test-exercise-videos.js`
+- `docs/testing/exercise-video-library-integration-test.md`
+
+---
 ## 🎯 Implementation Complete
 
 All designed features have been successfully implemented! The BUILD Tracker now includes:
