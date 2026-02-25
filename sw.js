@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'build-tracker-v102';
+const CACHE_VERSION = 'build-tracker-v103';
 const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',

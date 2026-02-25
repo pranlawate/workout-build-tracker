@@ -5919,7 +5919,7 @@ class App {
 
       // Pause and unload video
       videoElement.pause();
-      videoElement.src = '';  // Free memory
+      videoElement.removeAttribute('src');  // Free memory without triggering error
       videoElement.load();    // Reset video element
 
       // Hide modal
