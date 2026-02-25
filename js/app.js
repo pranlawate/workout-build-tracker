@@ -2543,12 +2543,30 @@ class App {
       return '';
     }
 
-    const checklistItems = warmupExercises.map((exercise, index) => `
-      <div class="warmup-item" data-warmup-index="${index}">
-        <div class="warmup-checkbox"></div>
-        <span class="warmup-text">${this.escapeHtml(exercise)}</span>
-      </div>
-    `).join('');
+    const checklistItems = warmupExercises.map((exercise, index) => {
+      // Extract exercise name from string like "Cat-Cow: 10 reps" -> "Cat-Cow"
+      const exerciseName = exercise.split(':')[0].trim();
+
+      // Check if video exists for this warmup
+      const videoData = getVideoByExercise(exerciseName);
+      const videoIconHTML = videoData
+        ? `<button
+             type="button"
+             class="warmup-video-icon"
+             onclick="app.openVideoModal('${this.escapeHtml(exerciseName)}')"
+             aria-label="Watch ${this.escapeHtml(exerciseName)} video"
+             title="Watch video"
+           >🎥</button>`
+        : '';
+
+      return `
+        <div class="warmup-item" data-warmup-index="${index}">
+          <div class="warmup-checkbox"></div>
+          <span class="warmup-text">${this.escapeHtml(exercise)}</span>
+          ${videoIconHTML}
+        </div>
+      `;
+    }).join('');
 
     return `
       <div class="warmup-section" id="warmup-section">
