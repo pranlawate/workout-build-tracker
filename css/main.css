@@ -697,7 +697,6 @@ body {
 
 /* Watch Demo button (in workout) */
 .watch-demo-btn {
-  margin-left: var(--spacing-sm);
   padding: 6px 12px;
   background: var(--color-primary);
   color: white;
@@ -706,6 +705,7 @@ body {
   font-size: var(--font-sm);
   cursor: pointer;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
 
 .watch-demo-btn:hover {

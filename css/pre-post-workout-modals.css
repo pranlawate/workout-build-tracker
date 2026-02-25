@@ -193,6 +193,10 @@
   color: var(--color-text, #1f2937);
 }
 
+#cooldown-modal .recommendation small {
+  color: var(--color-text, #1f2937);
+}
+
 #cooldown-modal .radio-group {
   display: flex;
   flex-direction: column;

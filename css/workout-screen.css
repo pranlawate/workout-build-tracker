@@ -262,6 +262,10 @@
 /* Form Guide */
 .form-guide-section {
   margin: 12px 0;
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .form-guide-toggle {
@@ -270,10 +274,11 @@
   color: var(--color-text-dim);
   padding: 8px;
   border-radius: 4px;
-  width: 100%;
+  flex: 1;
   text-align: left;
   cursor: pointer;
   font-size: 14px;
+  min-width: 140px;
 }
 
 .form-guide-content {
