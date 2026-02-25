@@ -1067,6 +1067,9 @@ class App {
             <button class="form-guide-toggle" onclick="app.toggleFormGuide(${index})" id="form-toggle-${index}">
               📋 Form Guide ▼
             </button>
+
+            ${this.renderWatchDemoButton(exercise.name, index)}
+
             <div class="form-guide-content" id="form-guide-${index}" style="display: none;">
               <div class="form-cue-category">
                 <strong>Setup:</strong>
@@ -2509,6 +2512,28 @@ class App {
         toggle.textContent = '📋 Form Guide ▼';
       }
     }
+  }
+
+  renderWatchDemoButton(exerciseName, index) {
+    // Check if video exists for this exercise
+    const videoData = getVideoByExercise(exerciseName);
+
+    // Don't render button if no video metadata
+    if (!videoData) {
+      return '';
+    }
+
+    return `
+      <button
+        type="button"
+        class="watch-demo-btn"
+        onclick="app.openVideoModal('${this.escapeHtml(exerciseName)}')"
+        id="watch-demo-${index}"
+        aria-label="Watch ${this.escapeHtml(exerciseName)} demonstration video"
+      >
+        🎥 Watch Demo
+      </button>
+    `;
   }
 
   renderWarmupSection() {
