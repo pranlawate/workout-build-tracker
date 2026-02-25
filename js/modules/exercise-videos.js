@@ -417,7 +417,7 @@ export const EXERCISE_VIDEOS = {
   },
   'DB Shoulder Extensions': {
     filename: 'db-shoulder-extensions.mp4',
-    category: 'warmups',
+    category: 'exercise',
     muscleGroup: 'shoulders',
     equipment: 'dumbbell',
     movementType: 'mobility',
