@@ -32,6 +32,7 @@ import {
 } from './modules/stretching-protocols.js';
 import { getOptionalFifthDay } from './modules/optional-fifth-day.js';
 import { getVideoByExercise, getVideoPath, searchVideos, getVideosByMuscleGroup, getVideosByCategory } from './modules/exercise-videos.js';
+import { ExerciseLibrary } from './screens/exercise-library.js';
 
 class App {
   constructor() {
@@ -82,6 +83,9 @@ class App {
 
     this.initializeApp();
     this.initializeVideoModal();
+
+    // Initialize Exercise Library
+    this.exerciseLibrary = new ExerciseLibrary(this);
   }
 
   escapeHtml(text) {

@@ -63,6 +63,7 @@
           <div class="action-grid">
             <button class="action-btn">📊 History</button>
             <button id="progress-btn" class="action-btn">📈 Progress</button>
+            <button type="button" id="exercise-library-btn" class="action-btn">🎥 Exercise Library</button>
           </div>
         </section>
 
@@ -844,6 +845,42 @@
       <button id="finish-review-btn" class="btn-primary btn-large" disabled>
         Finish & Review
       </button>
+    </div>
+  </div>
+
+  <!-- Exercise Library Screen -->
+  <div id="exercise-library-screen" class="screen" style="display: none;">
+    <div class="screen-header">
+      <button type="button" class="btn-back" id="library-back-btn">← Back</button>
+      <h1>Exercise Library</h1>
+    </div>
+
+    <div class="library-controls">
+      <!-- Search bar -->
+      <input
+        type="search"
+        id="library-search"
+        class="library-search"
+        placeholder="Search exercises..."
+        aria-label="Search exercises"
+      >
+
+      <!-- Filter pills -->
+      <div class="filter-pills" id="library-filters">
+        <button type="button" class="filter-pill active" data-filter="all">All</button>
+        <button type="button" class="filter-pill" data-filter="chest">Chest</button>
+        <button type="button" class="filter-pill" data-filter="back">Back</button>
+        <button type="button" class="filter-pill" data-filter="legs">Legs</button>
+        <button type="button" class="filter-pill" data-filter="shoulders">Shoulders</button>
+        <button type="button" class="filter-pill" data-filter="arms">Arms</button>
+        <button type="button" class="filter-pill" data-filter="core">Core</button>
+        <button type="button" class="filter-pill" data-filter="warmups">Warmups</button>
+      </div>
+    </div>
+
+    <!-- Exercise cards container -->
+    <div id="library-exercise-list" class="library-exercise-list">
+      <!-- Rendered dynamically -->
     </div>
   </div>
 
