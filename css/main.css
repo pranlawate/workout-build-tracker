@@ -541,9 +541,7 @@ body {
  * Exercise Library Screen
  */
 
-#exercise-library-screen {
-  padding: var(--spacing-md);
-}
+/* Exercise Library uses .screen-content for padding */
 
 .library-controls {
   margin-bottom: var(--spacing-lg);
