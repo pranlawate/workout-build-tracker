@@ -1,8 +1,19 @@
 # Future Improvement Ideas
 
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-02-25
 
 This document tracks improvement ideas and potential enhancements for future development.
+
+---
+
+## Exercise Video Library
+
+### Video Mapping Accuracy
+- **Issue:** Some exercises share the same video file when they should have distinct demonstrations
+  - Example: "Decline DB Press" and "DB Flat Bench Press" both point to `db-flat-bench-press.mp4`
+- **Improvement:** Create or source unique videos for each exercise variation
+- **Priority:** Low (current shared videos still provide value, but unique videos would be more accurate)
+- **Effort:** Medium (requires sourcing/recording ~5-10 additional videos)
 
 ---
 
