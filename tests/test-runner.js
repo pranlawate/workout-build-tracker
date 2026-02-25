@@ -32,7 +32,8 @@ const testRunner = {
     unlockSystem: null,
     smartProgression: null,
     rotationSystem: null,
-    modalUI: null
+    modalUI: null,
+    exerciseVideos: null
   },
 
   async loadScript(path, resultVariable, maxWaitMs = 10000) {
@@ -139,6 +140,14 @@ const testRunner = {
     }
   },
 
+  async runExerciseVideos() {
+    console.log('\n🎥 RUNNING EXERCISE VIDEOS TESTS...\n');
+    const loaded = await this.loadScript('./tests/test-exercise-videos.js', '_exerciseVideosTestResults');
+    if (loaded) {
+      this.results.exerciseVideos = window._exerciseVideosTestResults;
+    }
+  },
+
   async runAll() {
     console.clear();
     console.log('═══════════════════════════════════════════════════════════════');
@@ -162,6 +171,7 @@ const testRunner = {
     await this.runSmartProgression();
     await this.runRotationSystem();
     await this.runModalUI();
+    await this.runExerciseVideos();
 
     const endTime = Date.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -186,7 +196,8 @@ const testRunner = {
       { name: 'Unlock System Tests', key: 'unlockSystem', icon: '🔓' },
       { name: 'Smart Progression Tests', key: 'smartProgression', icon: '📈' },
       { name: 'Rotation System Tests', key: 'rotationSystem', icon: '🔄' },
-      { name: 'Modal UI Integration Tests', key: 'modalUI', icon: '🎨' }
+      { name: 'Modal UI Integration Tests', key: 'modalUI', icon: '🎨' },
+      { name: 'Exercise Videos Tests', key: 'exerciseVideos', icon: '🎥' }
     ];
 
     let totalPassed = 0;
@@ -259,7 +270,8 @@ const testRunner = {
     console.log('   - testRunner.runDeloadLogic() - Run deload tests only');
     console.log('   - testRunner.runUnlockSystem() - Run unlock tests only');
     console.log('   - testRunner.runSmartProgression() - Run progression tests only');
-    console.log('   - testRunner.runRotationSystem() - Run rotation system tests only\n');
+    console.log('   - testRunner.runRotationSystem() - Run rotation system tests only');
+    console.log('   - testRunner.runExerciseVideos() - Run exercise videos tests only\n');
 
     return window._allTestResults;
   },
