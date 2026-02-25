@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'build-tracker-v101';
+const CACHE_VERSION = 'build-tracker-v102';
 const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',
@@ -90,8 +90,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Runtime caching for videos
-  if (url.pathname.startsWith('/videos/')) {
+  // Runtime caching for videos (handles both /videos/ and /repo-name/videos/)
+  if (url.pathname.includes('/videos/')) {
     event.respondWith(
       caches.open(VIDEO_CACHE).then(cache => {
         return cache.match(event.request).then(response => {

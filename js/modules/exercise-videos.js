@@ -498,7 +498,7 @@ export function getVideoPath(exerciseName) {
   const video = getVideoByExercise(exerciseName);
   if (!video) return null;
 
-  return `/videos/${video.category}/${video.filename}`;
+  return `videos/${video.category}/${video.filename}`;
 }
 
 /**
