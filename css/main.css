@@ -535,6 +535,10 @@ body {
     width: 100%;
   }
 
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
   .progression-card {
     padding: var(--spacing-md);
   }
