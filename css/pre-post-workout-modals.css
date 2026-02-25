@@ -190,11 +190,11 @@
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.95rem;
-  color: var(--color-text, #1f2937);
+  color: #1f2937 !important;
 }
 
 #cooldown-modal .recommendation small {
-  color: var(--color-text, #1f2937);
+  color: #1f2937 !important;
 }
 
 #cooldown-modal .radio-group {
