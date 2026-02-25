@@ -264,7 +264,7 @@
   margin: 12px 0;
   display: flex;
   gap: var(--spacing-sm);
-  align-items: center;
+  align-items: stretch;
   flex-wrap: wrap;
 }
 
@@ -274,7 +274,7 @@
   color: var(--color-text-dim);
   padding: 8px;
   border-radius: 4px;
-  flex: 1;
+  flex: 1 1 calc(50% - var(--spacing-sm) / 2);
   text-align: left;
   cursor: pointer;
   font-size: 14px;
