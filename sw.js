@@ -1,4 +1,5 @@
-const CACHE_NAME = 'build-tracker-v99';
+const CACHE_VERSION = 'build-tracker-v100';
+const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',
   './index.html',
@@ -31,6 +32,7 @@ const CACHE_URLS = [
   './js/modules/stretching-protocols.js',
   './js/modules/optional-fifth-day.js',
   './js/modules/phase-manager.js',
+  './js/modules/exercise-videos.js',
   './js/components/weight-trend-chart.js',
   './manifest.json',
   './assets/icons/icon-192.png',
@@ -42,7 +44,7 @@ self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
 
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(CACHE_VERSION)
       .then((cache) => {
         console.log('Service Worker: Caching files');
         return cache.addAll(CACHE_URLS);
@@ -68,11 +70,15 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
-          cacheNames.map((cache) => {
-            if (cache !== CACHE_NAME) {
-              console.log('Service Worker: Deleting old cache:', cache);
-              return caches.delete(cache);
+          cacheNames.map((cacheName) => {
+            // Keep current caches
+            if (cacheName === CACHE_VERSION || cacheName === VIDEO_CACHE) {
+              return null;
             }
+
+            // Delete old caches
+            console.log('[SW] Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
           })
         );
       })
@@ -82,6 +88,39 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Runtime caching for videos
+  if (url.pathname.startsWith('/videos/')) {
+    event.respondWith(
+      caches.open(VIDEO_CACHE).then(cache => {
+        return cache.match(event.request).then(response => {
+          // Return cached video if available (instant playback)
+          if (response) {
+            console.log('[SW] Serving video from cache:', url.pathname);
+            return response;
+          }
+
+          // Otherwise fetch and cache for next time
+          console.log('[SW] Fetching and caching video:', url.pathname);
+          return fetch(event.request).then(networkResponse => {
+            // Only cache successful responses
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch(error => {
+            console.error('[SW] Video fetch failed:', url.pathname, error);
+            // Let error bubble to video.onerror handler
+            throw error;
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // Existing cache-first strategy for static assets
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -101,7 +140,7 @@ self.addEventListener('fetch', (event) => {
             // Clone the response (can only be consumed once)
             const responseToCache = networkResponse.clone();
 
-            caches.open(CACHE_NAME)
+            caches.open(CACHE_VERSION)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
