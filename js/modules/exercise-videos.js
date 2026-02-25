@@ -136,7 +136,7 @@ export const EXERCISE_VIDEOS = {
   '45° Hyperextension': {
     filename: '45-hyperextension.mp4',
     category: 'exercises',
-    muscleGroup: 'back',
+    muscleGroup: 'legs',
     equipment: 'bodyweight',
     movementType: 'extension',
     duration: '0:40',
@@ -417,7 +417,7 @@ export const EXERCISE_VIDEOS = {
   },
   'DB Shoulder Extensions': {
     filename: 'db-shoulder-extensions.mp4',
-    category: 'exercise',
+    category: 'exercises',
     muscleGroup: 'shoulders',
     equipment: 'dumbbell',
     movementType: 'mobility',
