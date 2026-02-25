@@ -190,6 +190,7 @@
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.95rem;
+  color: var(--color-text, #1f2937);
 }
 
 #cooldown-modal .radio-group {
