@@ -71,11 +71,16 @@ export class ExerciseLibrary {
   }
 
   showLibrary() {
+    console.log('[ExerciseLibrary DEBUG] showLibrary called');
+
     // Hide all screens
     this.app.hideAllScreens();
+    console.log('[ExerciseLibrary DEBUG] All screens hidden');
 
     // Show library screen
     this.libraryScreen.classList.add('active');
+    console.log('[ExerciseLibrary DEBUG] Library screen classList:', this.libraryScreen.classList);
+    console.log('[ExerciseLibrary DEBUG] Library screen display:', window.getComputedStyle(this.libraryScreen).display);
 
     // Reset filters and search
     this.currentFilter = 'all';
@@ -83,6 +88,7 @@ export class ExerciseLibrary {
     this.librarySearch.value = '';
 
     // Render exercise list
+    console.log('[ExerciseLibrary DEBUG] About to render exercise list');
     this.renderExerciseList();
 
     console.log('[ExerciseLibrary] Library opened');
@@ -135,9 +141,12 @@ export class ExerciseLibrary {
   }
 
   renderExerciseList() {
+    console.log('[ExerciseLibrary DEBUG] renderExerciseList called');
     const exercises = this.getFilteredExercises();
+    console.log('[ExerciseLibrary DEBUG] Filtered exercises:', exercises.length, exercises);
 
     if (exercises.length === 0) {
+      console.log('[ExerciseLibrary DEBUG] No exercises found, showing empty state');
       this.libraryExerciseList.innerHTML = `
         <div class="library-empty">
           <p>No exercises found</p>
@@ -171,6 +180,8 @@ export class ExerciseLibrary {
       `;
     }).join('');
 
+    console.log('[ExerciseLibrary DEBUG] Generated HTML length:', cardsHTML.length);
     this.libraryExerciseList.innerHTML = cardsHTML;
+    console.log('[ExerciseLibrary DEBUG] Rendered to DOM');
   }
 }
