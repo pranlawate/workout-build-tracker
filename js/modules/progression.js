@@ -81,8 +81,8 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
     throw new Error('Invalid exercise: must be an object');
   }
 
-  if (!exercise.repRange) {
-    throw new Error('Exercise must have repRange property');
+  if (!exercise.repRange || !exercise.rirTarget) {
+    throw new Error('Exercise must have repRange and rirTarget properties');
   }
 
   // Check phase-aware progression behavior

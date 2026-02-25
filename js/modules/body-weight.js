@@ -174,7 +174,7 @@ export class BodyWeightManager {
   }
 
   /**
-   * Check if weigh-in is due (12+ hours passed OR new calendar day)
+   * Check if weigh-in is due (daily frequency - new calendar day OR 12+ hours)
    * @returns {boolean} True if weigh-in needed
    */
   isWeighInDue() {
@@ -184,12 +184,12 @@ export class BodyWeightManager {
     const lastEntry = new Date(entries[entries.length - 1].date);
     const now = new Date();
 
-    // Check if midnight crossed (new calendar day)
+    // Allow daily weigh-ins - check if it's a new calendar day
     if (lastEntry.toDateString() !== now.toDateString()) {
       return true;
     }
 
-    // Check if 12+ hours passed (same day but long gap)
+    // Same day - check if 12+ hours passed (for flexibility)
     const hoursSince = (now - lastEntry) / (1000 * 60 * 60);
     return hoursSince >= 12;
   }

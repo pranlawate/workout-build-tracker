@@ -178,21 +178,20 @@ describe('BodyWeightManager', () => {
       assert.strictEqual(bodyWeight.isWeighInDue(), true);
     });
 
-    test('should return false when last entry is recent (< 7 days)', () => {
-      const recentDate = new Date();
-      recentDate.setDate(recentDate.getDate() - 3); // 3 days ago
+    test('should return false when last entry is today (same calendar day)', () => {
+      const today = new Date();
       const data = bodyWeight.getData();
-      data.entries.push({ date: recentDate.toISOString(), weight_kg: 57.0 });
+      data.entries.push({ date: today.toISOString(), weight_kg: 57.0 });
       localStorage.setItem('build_body_weight', JSON.stringify(data));
 
       assert.strictEqual(bodyWeight.isWeighInDue(), false);
     });
 
-    test('should return true when last entry is old (> 7 days)', () => {
-      const oldDate = new Date();
-      oldDate.setDate(oldDate.getDate() - 10); // 10 days ago
+    test('should return true when last entry is from previous day', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
       const data = bodyWeight.getData();
-      data.entries.push({ date: oldDate.toISOString(), weight_kg: 57.0 });
+      data.entries.push({ date: yesterday.toISOString(), weight_kg: 57.0 });
       localStorage.setItem('build_body_weight', JSON.stringify(data));
 
       assert.strictEqual(bodyWeight.isWeighInDue(), true);
