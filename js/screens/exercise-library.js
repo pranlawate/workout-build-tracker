@@ -71,11 +71,11 @@ export class ExerciseLibrary {
   }
 
   showLibrary() {
-    // Hide home screen
-    this.app.homeScreen.style.display = 'none';
+    // Hide all screens
+    this.app.hideAllScreens();
 
     // Show library screen
-    this.libraryScreen.style.display = 'block';
+    this.libraryScreen.classList.add('active');
 
     // Reset filters and search
     this.currentFilter = 'all';
@@ -89,10 +89,7 @@ export class ExerciseLibrary {
   }
 
   hideLibrary() {
-    // Hide library screen
-    this.libraryScreen.style.display = 'none';
-
-    // Show home screen
+    // Show home screen (handles hiding library screen)
     this.app.showHomeScreen();
 
     console.log('[ExerciseLibrary] Library closed');
