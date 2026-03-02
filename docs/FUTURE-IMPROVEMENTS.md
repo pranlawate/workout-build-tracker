@@ -20,6 +20,20 @@ This document tracks improvement ideas and potential enhancements for future dev
 
 ---
 
+## PWA & Mobile Experience
+
+### Post-Workout Modal State Persistence
+- **Issue:** When user switches to another app during post-workout summary screen (pain tracking, stretching log), returning to the app causes the modal to disappear, losing ability to log stretch data
+- **Root Cause:** Mobile browsers can kill PWA pages in background to save memory, causing page reload and loss of temporary state
+- **Improvement:** Implement state persistence for post-workout modals
+  - Save modal state to localStorage before page unload
+  - Restore modal state on page load (if recent workout completion detected)
+  - Consider Page Lifecycle API for better background/foreground handling
+- **Priority:** Medium (affects user experience on mobile, but workaround is to complete post-workout logging before switching apps)
+- **Effort:** Medium (requires implementing state persistence layer and page lifecycle hooks)
+
+---
+
 ## Exercise Hints & User Guidance
 
 ---
