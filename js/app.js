@@ -5811,14 +5811,18 @@ class App {
 
     // Close modal on overlay click
     if (this.videoModalOverlay) {
-      this.videoModalOverlay.addEventListener('click', () => {
+      this.videoModalOverlay.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent click from bubbling to elements underneath
+        e.preventDefault();   // Prevent any default behavior
         this.closeVideoModal();
       });
     }
 
     // Close modal on close button click
     if (this.videoModalClose) {
-      this.videoModalClose.addEventListener('click', () => {
+      this.videoModalClose.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent click from bubbling to elements underneath
+        e.preventDefault();   // Prevent any default behavior
         this.closeVideoModal();
       });
     }

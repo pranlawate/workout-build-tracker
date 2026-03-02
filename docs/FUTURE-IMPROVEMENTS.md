@@ -9,11 +9,14 @@ This document tracks improvement ideas and potential enhancements for future dev
 ## Exercise Video Library
 
 ### Video Mapping Accuracy
-- **Issue:** Some exercises share the same video file when they should have distinct demonstrations
+- **Issue 1:** Some exercises share the same video file when they should have distinct demonstrations
   - Example: "Decline DB Press" and "DB Flat Bench Press" both point to `db-flat-bench-press.mp4`
-- **Improvement:** Create or source unique videos for each exercise variation
-- **Priority:** Low (current shared videos still provide value, but unique videos would be more accurate)
-- **Effort:** Medium (requires sourcing/recording ~5-10 additional videos)
+- **Issue 2:** Machine exercises showing dumbbell video demonstrations
+  - Example: "Chest-Supported Row" (machine) shows dumbbell chest-supported row video
+  - Machine exercises that could use machine-specific videos: Lat Pulldown, Chest-Supported Row, Seated Cable Row, Leg Extension, Leg Curl, etc.
+- **Improvement:** Create or source unique videos for each exercise variation and equipment type
+- **Priority:** Low (current videos still provide form value, but equipment-specific videos would be ideal)
+- **Effort:** Medium-High (requires sourcing/recording ~10-15 additional machine-specific videos)
 
 ---
 
