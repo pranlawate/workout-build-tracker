@@ -39,6 +39,7 @@ export const EXERCISE_DEFINITIONS = {
     sets: 3,
     repRange: '8-12',
     rirTarget: '2-3',
+    restMinutes: 3,
     startingWeight: 12,  // 12kg KB
     weightIncrement: 4,   // KB increments (8, 12, 16, 20, 24, 28, 32kg)
     notes: 'Compound | Quads, Glutes',
@@ -48,6 +49,7 @@ export const EXERCISE_DEFINITIONS = {
     sets: 3,
     repRange: '15-20',  // Higher reps for ballistic work
     rirTarget: '2-3',
+    restMinutes: 2,
     startingWeight: 12,  // Start conservative
     weightIncrement: 4,
     notes: 'Compound | Glutes, Hamstrings | Ballistic hip power',
@@ -57,6 +59,7 @@ export const EXERCISE_DEFINITIONS = {
     sets: 3,
     repRange: '10-12',
     rirTarget: '2-3',
+    restMinutes: 2,
     startingWeight: 7.5,
     weightIncrement: 2.5,
     notes: 'Compound | Lower Chest (Costal Head)',
@@ -66,6 +69,7 @@ export const EXERCISE_DEFINITIONS = {
     sets: 2,
     repRange: '10-12',
     rirTarget: '2-3',
+    restMinutes: 2,
     startingWeight: 7.5,
     weightIncrement: 1.25,
     notes: 'Isolation | Biceps (Long + Short Heads)',
@@ -75,6 +79,7 @@ export const EXERCISE_DEFINITIONS = {
     sets: 2,
     repRange: '12-15',
     rirTarget: '2-3',
+    restMinutes: 1,
     startingWeight: 10,
     weightIncrement: 2.5,
     notes: 'Isolation | Triceps (Long + Medial Heads)',
