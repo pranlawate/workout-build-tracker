@@ -2050,7 +2050,7 @@ class App {
   /**
    * Format exercise metadata for card header
    * @param {Object} exercise - Exercise definition
-   * @returns {string} Formatted string like "3 sets × 8-12 reps @ RIR 2-3" or "3 sets × 30-60s"
+   * @returns {string} Formatted string like "3 sets × 8-12 reps • 3 min rest" or "3 sets × 30-60s • 1 min rest"
    */
   formatExerciseMeta(exercise) {
     const isTimeBased = this.isTimeBasedExercise(exercise);
