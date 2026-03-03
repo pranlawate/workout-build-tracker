@@ -2054,14 +2054,14 @@ class App {
    */
   formatExerciseMeta(exercise) {
     const isTimeBased = this.isTimeBasedExercise(exercise);
+    const restText = exercise.restMinutes ? ` • ${exercise.restMinutes} min rest` : '';
 
     if (isTimeBased) {
-      // Time-based: "3 sets × 30-60s"
-      return `${exercise.sets} sets × ${exercise.repRange}`;
+      // Time-based: "3 sets × 30-60s • 1 min rest"
+      return `${exercise.sets} sets × ${exercise.repRange}${restText}`;
     } else {
-      // Rep-based: "3 sets × 8-12 reps @ RIR 2-3"
-      const rirText = exercise.rirTarget ? ` @ RIR ${exercise.rirTarget}` : '';
-      return `${exercise.sets} sets × ${exercise.repRange} reps${rirText}`;
+      // Rep-based: "3 sets × 8-12 reps • 3 min rest"
+      return `${exercise.sets} sets × ${exercise.repRange} reps${restText}`;
     }
   }
 
