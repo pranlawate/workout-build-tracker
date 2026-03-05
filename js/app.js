@@ -340,10 +340,16 @@ class App {
       startBtn.addEventListener('click', () => this.startWorkout());
     }
 
-    // Back button (from workout screen)
     const backBtn = document.getElementById('back-btn');
     if (backBtn) {
-      backBtn.addEventListener('click', () => this.showHomeScreen());
+      backBtn.addEventListener('click', () => {
+        if (this.workoutSession) {
+          if (!confirm('Leave workout? All unfinished progress will be lost.')) {
+            return;
+          }
+        }
+        this.showHomeScreen();
+      });
     }
 
     // Complete workout button
@@ -853,11 +859,14 @@ class App {
       const weight = parseFloat(weightInput.value);
 
       if (weight && weight >= 30 && weight <= 200) {
-        // Save to localStorage
-        const today = new Date().toISOString().split('T')[0];
-        const weighIns = JSON.parse(localStorage.getItem('build_body_weight') || '[]');
-        weighIns.push({ date: today, weight });
-        localStorage.setItem('build_body_weight', JSON.stringify(weighIns));
+        if (!this.bodyWeight) {
+          this.bodyWeight = new BodyWeightManager(this.storage);
+        }
+        const result = this.bodyWeight.addEntry(weight);
+        if (!result.success) {
+          alert('⚠️ Failed to save weight. Please try again.');
+          return;
+        }
 
         // Replace section with success message (prevent multiple saves)
         container.innerHTML = `
@@ -914,11 +923,14 @@ class App {
       const weight = parseFloat(weightInput.value);
 
       if (weight && weight >= 30 && weight <= 200) {
-        // Save to localStorage
-        const today = new Date().toISOString().split('T')[0];
-        const weighIns = JSON.parse(localStorage.getItem('build_body_weight') || '[]');
-        weighIns.push({ date: today, weight });
-        localStorage.setItem('build_body_weight', JSON.stringify(weighIns));
+        if (!this.bodyWeight) {
+          this.bodyWeight = new BodyWeightManager(this.storage);
+        }
+        const result = this.bodyWeight.addEntry(weight);
+        if (!result.success) {
+          alert('⚠️ Failed to save weight. Please try again.');
+          return;
+        }
 
         alert(`✅ Weight saved: ${weight} kg`);
         inputDiv.style.display = 'none';
@@ -939,12 +951,21 @@ class App {
     // Button already has disabled state managed by stretching progress
 
     btn.onclick = () => {
+      // Auto-save any unsaved weight before closing
+      const weighInData = this.collectWeighInData();
+      if (weighInData.completed && weighInData.weight) {
+        if (!this.bodyWeight) {
+          this.bodyWeight = new BodyWeightManager(this.storage);
+        }
+        this.bodyWeight.addEntry(weighInData.weight);
+      }
+
       // Collect all cooldown data
       this.workoutSession.cooldownData = {
         stretchesCompleted: true,
         foamRolling: this.collectFoamRollingData(),
         lissCardio: this.collectLISSData(),
-        weighIn: this.collectWeighInData()
+        weighIn: weighInData
       };
 
       console.log('[App] Cooldown completed:', this.workoutSession.cooldownData);
@@ -1000,12 +1021,15 @@ class App {
     }, 1000);
   }
 
-  showHomeScreen(pushHistory = true) {
-    // Stop timer (Task 9)
+  stopTimer() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+  }
+
+  showHomeScreen(pushHistory = true) {
+    this.stopTimer();
 
     // Clean up session data
     this.workoutSession = null;
@@ -2987,17 +3011,15 @@ class App {
       modal.style.display = 'none';
     };
 
-    // Tab click handlers
+    // Tab click handlers (use onclick to prevent listener stacking across opens)
     tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        // Update active tab
+      tab.onclick = () => {
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
-        // Render progression list for selected workout
         const workout = tab.dataset.workout;
         this.renderProgressionsList(workout, listContainer);
-      });
+      };
     });
 
     // Render initial list (Upper A)
@@ -3912,9 +3934,8 @@ class App {
     const analyticsContent = document.getElementById('analytics-content');
     if (!analyticsContent) return;
 
-    // Check for minimum data requirement
     const rotation = this.storage.getRotation();
-    const workoutCount = rotation?.sequence?.filter(w => w.completed).length || 0;
+    const workoutCount = rotation?.sequence?.length || 0;
 
     if (workoutCount < 4) {
       analyticsContent.innerHTML = `
@@ -5312,28 +5333,21 @@ class App {
    */
   calculatePainScore() {
     try {
-      // Get all pain report keys
-      const keys = Object.keys(localStorage).filter(k => k.startsWith('build_pain_'));
+      const allPainData = this.storage.getPainHistoryData();
+      if (!allPainData || Object.keys(allPainData).length === 0) return 0;
 
-      if (keys.length === 0) return 0;
-
-      // Find most recent pain reports
-      const reports = keys
-        .map(k => {
-          try {
-            return JSON.parse(localStorage.getItem(k));
-          } catch {
-            return null;
-          }
-        })
-        .filter(r => r !== null && r.date);
+      // Flatten all pain reports
+      const reports = Object.values(allPainData)
+        .flat()
+        .filter(r => r && r.date && r.hadPain);
 
       if (reports.length === 0) return 0;
 
-      // Check if any report has severity >= Moderate
-      const hasModerateOrWorse = reports.some(r =>
-        r.severity === 'Moderate' || r.severity === 'Severe'
-      );
+      // Check if any report has severity >= moderate (case-insensitive)
+      const hasModerateOrWorse = reports.some(r => {
+        const sev = (r.severity || '').toLowerCase();
+        return sev === 'moderate' || sev === 'significant' || sev === 'severe';
+      });
 
       return hasModerateOrWorse ? 3 : 0;
     } catch (error) {
@@ -5548,6 +5562,9 @@ class App {
 
   async completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
+    if (this._completingWorkout) return;
+    this._completingWorkout = true;
+    this.stopTimer();
 
     // Check how many exercises are completed
     const totalExercises = this.currentWorkout.exercises.length;
@@ -5643,6 +5660,8 @@ class App {
     } catch (error) {
       console.error('Failed to save workout:', error);
       alert('⚠️ Failed to save workout. Please try again or check storage.');
+    } finally {
+      this._completingWorkout = false;
     }
   }
 
@@ -5769,11 +5788,8 @@ class App {
         // Close modal
         modal.style.display = 'none';
 
-        // Refresh workout screen
-        const workoutKey = slotKey.split('_')[0] + '_' + slotKey.split('_')[1]; // e.g., "UPPER_A"
         if (this.currentWorkout) {
-          // Re-render current workout to show new exercise
-          this.renderExerciseList();
+          this.renderExercises();
         }
 
         resolve('switched');

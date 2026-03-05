@@ -19,7 +19,23 @@ export class BodyWeightManager {
     }
     try {
       const data = JSON.parse(raw);
-      return data || { entries: [] };
+      if (!data) return { entries: [] };
+      if (Array.isArray(data)) {
+        const migrated = {
+          entries: data
+            .filter(e => e && e.date)
+            .map(e => ({
+              date: e.date.includes('T') ? e.date : new Date(e.date).toISOString(),
+              weight_kg: e.weight_kg ?? e.weight ?? 0
+            }))
+        };
+        localStorage.setItem('build_body_weight', JSON.stringify(migrated));
+        return migrated;
+      }
+      if (!Array.isArray(data.entries)) {
+        return { entries: [] };
+      }
+      return data;
     } catch (error) {
       console.error('[BodyWeightManager] Failed to parse weight data:', error);
       return { entries: [] };
@@ -62,6 +78,7 @@ export class BodyWeightManager {
 
     // Check if there's already an entry for today
     const todayIndex = data.entries.findIndex(entry => {
+      if (!entry.date) return false;
       const entryDateString = entry.date.split('T')[0];
       return entryDateString === todayDateString;
     });

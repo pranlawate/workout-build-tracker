@@ -170,8 +170,7 @@ export class RotationManager {
       const history = this.storage.getExerciseHistory(exerciseKey);
       if (!history || history.length === 0) return 0;
 
-      // Get latest workout
-      const latest = history[0];
+      const latest = history[history.length - 1];
       if (!latest.sets || latest.sets.length === 0) return 0;
 
       // Check best set performance
@@ -182,7 +181,7 @@ export class RotationManager {
         return best;
       }, { weight: 0, reps: 0 });
 
-      // Calculate progress (weight-based)
+      if (!milestone.weight) return 0;
       const progress = bestSet.weight / milestone.weight;
       return Math.min(progress, 1.0);
     } catch (e) {

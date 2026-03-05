@@ -24,6 +24,32 @@ export class AnalyticsCalculator {
   }
 
   /**
+   * Get unique completed workout dates from exercise history
+   * @param {string} [cutoffStr] - ISO date string cutoff (YYYY-MM-DD), only include dates >= this
+   * @returns {string[]} Sorted array of date strings (YYYY-MM-DD)
+   * @private
+   */
+  getCompletedWorkoutDates(cutoffStr = null) {
+    try {
+      const allKeys = this.storage.getAllExerciseKeys();
+      const dates = new Set();
+      for (const key of allKeys) {
+        const history = this.storage.getExerciseHistory(key);
+        for (const entry of history) {
+          if (!entry.date) continue;
+          const dateStr = entry.date.split('T')[0];
+          if (!cutoffStr || dateStr >= cutoffStr) {
+            dates.add(dateStr);
+          }
+        }
+      }
+      return [...dates].sort();
+    } catch {
+      return [];
+    }
+  }
+
+  /**
    * Calculates total training volume and trends over a specified period
    * @param {number} [days=7] - Number of days to include in calculation
    * @returns {Object} Volume analytics with total, byWorkoutType, trend, and daily data
@@ -217,12 +243,7 @@ export class AnalyticsCalculator {
       // Calculate RIR trend (7-day rolling average)
       const rirTrend = this.calculateRIRTrend(days);
 
-      // Calculate compliance (3 workouts/week expected)
-      // Get actual workouts from rotation sequence
-      const rotation = this.storage.getRotation();
-      const actualWorkouts = rotation?.sequence?.filter(entry =>
-        entry?.completed && entry?.date && entry.date >= cutoffStr
-      ).length || 0;
+      const actualWorkouts = this.getCompletedWorkoutDates(cutoffStr).length;
 
       const expectedWorkouts = Math.floor(days / 7) * 3;
       const compliance = expectedWorkouts > 0
@@ -247,18 +268,11 @@ export class AnalyticsCalculator {
    */
   calculateRIRTrend(days) {
     try {
-      const rotation = this.storage.getRotation();
-      if (!rotation || !rotation.sequence) return [];
-
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
       const cutoffStr = cutoffDate.toISOString().split('T')[0];
 
-      // Get workout dates
-      const workoutDates = rotation.sequence
-        .filter(entry => entry && entry.completed && entry.date && entry.date >= cutoffStr)
-        .map(entry => entry.date)
-        .sort();
+      const workoutDates = this.getCompletedWorkoutDates(cutoffStr);
 
       // Calculate RIR for each workout date
       const rirByDate = workoutDates.map(date => {
@@ -273,7 +287,7 @@ export class AnalyticsCalculator {
             return;
           }
 
-          const entry = history.find(e => e && e.date === date);
+          const entry = history.find(e => e && e.date && e.date.split('T')[0] === date);
           if (entry && Array.isArray(entry.sets)) {
             entry.sets.forEach(set => {
               if (set && typeof set.rir === 'number') {
@@ -449,15 +463,9 @@ export class AnalyticsCalculator {
     try {
       const patterns = [];
 
-      // Get all workout dates
-      const rotation = this.storage.getRotation();
-      if (!rotation || !rotation.sequence) {
-        return [{ type: 'insufficient-data', confidence: 0, message: 'Not enough data yet (0/10 workouts)' }];
-      }
-
-      const completedWorkouts = rotation.sequence.filter(w => w.completed);
-      if (completedWorkouts.length < MIN_WORKOUTS_FOR_PATTERNS) {
-        return [{ type: 'insufficient-data', confidence: 0, message: `Not enough data yet (${completedWorkouts.length}/${MIN_WORKOUTS_FOR_PATTERNS} workouts)` }];
+      const completedDates = this.getCompletedWorkoutDates();
+      if (completedDates.length < MIN_WORKOUTS_FOR_PATTERNS) {
+        return [{ type: 'insufficient-data', confidence: 0, message: `Not enough data yet (${completedDates.length}/${MIN_WORKOUTS_FOR_PATTERNS} workouts)` }];
       }
 
       // Pattern 1: Sleep vs Progression
@@ -487,22 +495,20 @@ export class AnalyticsCalculator {
       if (!metricsData) return null;
 
       const allMetrics = JSON.parse(metricsData);
-      const rotation = this.storage.getRotation();
-      if (!rotation || !rotation.sequence) return null;
+      const workoutDates = this.getCompletedWorkoutDates();
+      if (workoutDates.length === 0) return null;
 
-      // Map workouts to sleep data
-      const workoutSleepData = rotation.sequence
-        .filter(w => w.completed)
-        .map(w => {
-          const metrics = allMetrics.find(m => m.date === w.date);
-          const progressed = this.didProgressOnDate(w.date);
+      const workoutSleepData = workoutDates
+        .map(date => {
+          const metrics = allMetrics.find(m => m.date === date);
+          const progressed = this.didProgressOnDate(date);
           return {
-            date: w.date,
+            date,
             sleep: metrics?.sleep || 0,
             progressed
           };
         })
-        .filter(d => d.sleep > 0); // Only include days with sleep data
+        .filter(d => d.sleep > 0);
 
       if (workoutSleepData.length < MIN_WORKOUTS_FOR_PATTERNS) return null;
 
@@ -542,18 +548,14 @@ export class AnalyticsCalculator {
    */
   detectVolumePainPattern() {
     try {
-      // Get all pain reports
-      const painKeys = Object.keys(localStorage)
-        .filter(key => key.startsWith('build_pain_'));
+      const allPainData = this.storage.getPainHistoryData();
+      if (!allPainData || Object.keys(allPainData).length === 0) return null;
 
-      if (painKeys.length === 0) return null;
-
-      // Analyze volume when pain occurred
       const painDates = new Set();
-      painKeys.forEach(key => {
-        const painData = JSON.parse(localStorage.getItem(key) || '[]');
-        painData.forEach(p => {
-          if (p.severity && p.severity !== 'none') {
+      Object.values(allPainData).forEach(reports => {
+        if (!Array.isArray(reports)) return;
+        reports.forEach(p => {
+          if (p.hadPain && p.severity && p.severity !== 'none') {
             painDates.add(p.date);
           }
         });
@@ -561,16 +563,14 @@ export class AnalyticsCalculator {
 
       if (painDates.size < MIN_PAIN_DAYS) return null;
 
-      // Calculate average volume on pain days vs pain-free days
-      const rotation = this.storage.getRotation();
-      if (!rotation || !rotation.sequence) return null;
+      const workoutDates = this.getCompletedWorkoutDates();
 
       const volumeOnPainDays = [];
       const volumeOnNormalDays = [];
 
-      rotation.sequence.filter(w => w.completed).forEach(w => {
-        const volume = this.getVolumeForDate(w.date);
-        if (painDates.has(w.date)) {
+      workoutDates.forEach(date => {
+        const volume = this.getVolumeForDate(date);
+        if (painDates.has(date)) {
           volumeOnPainDays.push(volume);
         } else {
           volumeOnNormalDays.push(volume);
@@ -618,7 +618,7 @@ export class AnalyticsCalculator {
 
       allKeys.forEach(key => {
         const history = this.storage.getExerciseHistory(key);
-        const entryIndex = history.findIndex(e => e.date === date);
+        const entryIndex = history.findIndex(e => e.date && e.date.split('T')[0] === date);
         if (entryIndex > 0) {
           const currentEntry = history[entryIndex];
           const previousEntry = history[entryIndex - 1];
@@ -653,10 +653,12 @@ export class AnalyticsCalculator {
 
       allKeys.forEach(key => {
         const history = this.storage.getExerciseHistory(key);
-        const entry = history.find(e => e.date === date);
-        if (entry) {
+        const entry = history.find(e => e.date && e.date.split('T')[0] === date);
+        if (entry && entry.sets) {
           const volume = entry.sets.reduce((sum, set) => {
-            return sum + (set.weight * set.reps);
+            const w = set.weight || 0;
+            const r = set.reps || 0;
+            return sum + (w * r);
           }, 0);
           totalVolume += volume;
         }

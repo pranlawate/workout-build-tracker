@@ -459,6 +459,8 @@ export class BarbellProgressionTracker {
     if (!history || history.length === 0) return 0;
 
     const recent = history[history.length - 1];
+    if (!recent.sets || recent.sets.length === 0) return 0;
+
     const currentWeight = recent.sets[0]?.weight || 0;
 
     // Weight progress (0-80%)
@@ -467,7 +469,7 @@ export class BarbellProgressionTracker {
 
     // Rep/RIR progress (0-20%)
     const allSetsHitReps = recent.sets.every(set => set.reps >= targetReps);
-    const avgRIR = recent.sets.reduce((sum, set) => sum + set.rir, 0) / recent.sets.length;
+    const avgRIR = recent.sets.reduce((sum, set) => sum + (set.rir || 0), 0) / recent.sets.length;
     const repProgress = (allSetsHitReps && avgRIR >= minRIR)
       ? BarbellProgressionTracker.REP_RIR_CONTRIBUTION_PERCENT
       : 0;

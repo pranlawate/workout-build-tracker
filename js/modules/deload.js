@@ -11,16 +11,34 @@ export class DeloadManager {
   }
 
   /**
+   * Check if deload is currently active, auto-ending expired deloads
+   * @returns {boolean} True if deload is active and not expired
+   */
+  isDeloadActive() {
+    const deloadState = this.storage.getDeloadState();
+    if (!deloadState.active) return false;
+
+    if (deloadState.endDate) {
+      const endDate = new Date(deloadState.endDate);
+      if (!isNaN(endDate.getTime()) && new Date() > endDate) {
+        this.endDeload();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Checks if deload should be triggered based on time, performance, or fatigue
    * Uses phase-aware sensitivity for time-based triggers
    * @returns {Object} Object with trigger status and reason
    */
   shouldTriggerDeload() {
     try {
-      const deloadState = this.storage.getDeloadState();
+      // Don't trigger if already in deload (auto-ends expired ones)
+      if (this.isDeloadActive()) return { trigger: false };
 
-      // Don't trigger if already in deload
-      if (deloadState.active) return { trigger: false };
+      const deloadState = this.storage.getDeloadState();
 
       // Get phase-aware base threshold
       const sensitivity = this.phaseManager.getDeloadSensitivity();
@@ -132,7 +150,9 @@ export class DeloadManager {
       const deloadState = this.storage.getDeloadState();
 
       deloadState.active = false;
-      deloadState.lastDeloadDate = deloadState.startDate;
+      if (deloadState.startDate) {
+        deloadState.lastDeloadDate = deloadState.startDate;
+      }
       deloadState.deloadType = null;
       deloadState.startDate = null;
       deloadState.endDate = null;
@@ -163,8 +183,10 @@ export class DeloadManager {
    * @returns {number} Days remaining (0 if not in deload or past end date)
    */
   getDaysRemaining() {
+    if (!this.isDeloadActive()) return 0;
+
     const deloadState = this.storage.getDeloadState();
-    if (!deloadState.active || !deloadState.endDate) return 0;
+    if (!deloadState.endDate) return 0;
 
     const endDate = new Date(deloadState.endDate);
     const now = new Date();

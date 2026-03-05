@@ -18,15 +18,13 @@ export class EditEntryModal {
     this.currentIndex = index;
 
     const history = this.storage.getExerciseHistory(exerciseKey);
-    const reversedIndex = history.length - 1 - index;
-    const entry = history[reversedIndex];
+    const entry = history[index];
 
     if (!entry) {
-      console.error('Entry not found');
+      console.error('Entry not found at index', index);
       return;
     }
 
-    // Populate modal
     this.renderModal(entry);
 
     // Show modal
@@ -40,12 +38,15 @@ export class EditEntryModal {
   }
 
   renderModal(entry) {
-    const date = new Date(entry.date).toISOString().split('T')[0]; // YYYY-MM-DD
+    const date = new Date(entry.date).toISOString().split('T')[0];
     const setsContainer = document.getElementById('edit-sets-container');
 
     if (!setsContainer) return;
+    if (!entry.sets || !Array.isArray(entry.sets)) {
+      setsContainer.innerHTML = '<p>No sets data available</p>';
+      return;
+    }
 
-    // Render sets
     const setsHtml = entry.sets.map((set, i) => `
       <div class="edit-set-row">
         <span class="edit-set-label">Set ${i + 1}</span>
@@ -116,13 +117,16 @@ export class EditEntryModal {
 
   save() {
     const history = this.storage.getExerciseHistory(this.currentExerciseKey);
-    const reversedIndex = history.length - 1 - this.currentIndex;
-    const entry = history[reversedIndex];
+    const entry = history[this.currentIndex];
 
-    // Read updated values
     const dateInput = document.getElementById('edit-entry-date');
     if (dateInput) {
-      entry.date = new Date(dateInput.value).toISOString();
+      const parsed = new Date(dateInput.value);
+      if (isNaN(parsed.getTime())) {
+        alert('⚠️ Please enter a valid date');
+        return;
+      }
+      entry.date = parsed.toISOString();
     }
 
     // Update sets
@@ -136,9 +140,8 @@ export class EditEntryModal {
       if (repsInput) set.reps = parseInt(repsInput.value);
       if (rirInput) set.rir = parseInt(rirInput.value);
 
-      // Validate using Number.isFinite() to catch NaN and empty strings
-      if (!Number.isFinite(set.weight) || set.weight <= 0) {
-        alert(`Invalid weight for Set ${i + 1}. Please enter a positive number.`);
+      if (!Number.isFinite(set.weight) || set.weight < 0) {
+        alert(`Invalid weight for Set ${i + 1}. Please enter a non-negative number.`);
         return;
       }
 

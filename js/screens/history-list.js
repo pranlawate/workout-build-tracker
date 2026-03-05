@@ -22,11 +22,12 @@ export class HistoryListScreen {
 
       const lastEntry = history[history.length - 1];
 
-      // Add null check for lastEntry.date
       if (!lastEntry.date) return null;
 
       const lastDate = new Date(lastEntry.date);
-      const lastWeight = lastEntry.sets[0]?.weight || 0;
+      const lastWeight = (lastEntry.sets && Array.isArray(lastEntry.sets))
+        ? (lastEntry.sets[0]?.weight || 0)
+        : 0;
 
       // Parse workout name and exercise name
       const [workoutName, exerciseName] = exerciseKey.split(' - ');

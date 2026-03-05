@@ -87,13 +87,19 @@ export class WeightTrendChart {
   drawDataPoints(ctx, entries, minWeight, maxWeight, minDate, maxDate) {
     const chartWidth = this.width - this.padding.left - this.padding.right;
     const chartHeight = this.height - this.padding.top - this.padding.bottom;
+    const dateRange = maxDate - minDate;
+    const weightRange = maxWeight - minWeight;
 
     ctx.fillStyle = '#a78bfa';
 
     entries.forEach(entry => {
       const date = new Date(entry.date);
-      const x = this.padding.left + ((date - minDate) / (maxDate - minDate)) * chartWidth;
-      const y = this.padding.top + chartHeight - ((entry.weight_kg - minWeight) / (maxWeight - minWeight)) * chartHeight;
+      const x = dateRange === 0
+        ? this.padding.left + chartWidth / 2
+        : this.padding.left + ((date - minDate) / dateRange) * chartWidth;
+      const y = weightRange === 0
+        ? this.padding.top + chartHeight / 2
+        : this.padding.top + chartHeight - ((entry.weight_kg - minWeight) / weightRange) * chartHeight;
 
       ctx.beginPath();
       ctx.arc(x, y, 3, 0, 2 * Math.PI);
@@ -114,6 +120,8 @@ export class WeightTrendChart {
   drawTrendLine(ctx, smoothed, minWeight, maxWeight, minDate, maxDate) {
     const chartWidth = this.width - this.padding.left - this.padding.right;
     const chartHeight = this.height - this.padding.top - this.padding.bottom;
+    const dateRange = maxDate - minDate;
+    const weightRange = maxWeight - minWeight;
 
     ctx.strokeStyle = '#8b5cf6';
     ctx.lineWidth = 2;
@@ -121,8 +129,12 @@ export class WeightTrendChart {
 
     smoothed.forEach((entry, i) => {
       const date = new Date(entry.date);
-      const x = this.padding.left + ((date - minDate) / (maxDate - minDate)) * chartWidth;
-      const y = this.padding.top + chartHeight - ((entry.weight_kg - minWeight) / (maxWeight - minWeight)) * chartHeight;
+      const x = dateRange === 0
+        ? this.padding.left + chartWidth / 2
+        : this.padding.left + ((date - minDate) / dateRange) * chartWidth;
+      const y = weightRange === 0
+        ? this.padding.top + chartHeight / 2
+        : this.padding.top + chartHeight - ((entry.weight_kg - minWeight) / weightRange) * chartHeight;
 
       if (i === 0) {
         ctx.moveTo(x, y);

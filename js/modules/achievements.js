@@ -103,6 +103,7 @@ function detectTempoMastery(storage) {
     const tempoState = storage.getTempoState();
 
     for (const [exerciseKey, state] of Object.entries(tempoState)) {
+      if (!state) continue;
       if (state.status === 'completed' && state.weekCount >= 3) {
         const exerciseName = exerciseKey.includes(' - ')
           ? exerciseKey.split(' - ').slice(1).join(' - ')
@@ -146,6 +147,7 @@ function detectSmartRecovery(storage) {
     const alternates = storage.getExerciseAlternates();
 
     for (const [exerciseKey, info] of Object.entries(alternates)) {
+      if (!info) continue;
       if (info.painFreeWorkouts >= 3 && info.reason && info.reason.includes('pain')) {
         const exerciseName = exerciseKey.includes(' - ')
           ? exerciseKey.split(' - ').slice(1).join(' - ')

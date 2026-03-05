@@ -97,7 +97,7 @@ export function detectPlateau(history, minWorkouts = 3) {
     return false;
   }
 
-  const recentWorkouts = history.slice(0, minWorkouts);
+  const recentWorkouts = history.slice(-minWorkouts);
 
   // Get best set from first workout (highest weight, then reps)
   const firstWorkout = recentWorkouts[0];
@@ -189,8 +189,8 @@ export function detectRegression(history) {
     return false;
   }
 
-  const currentWorkout = history[0];
-  const previousWorkout = history[1];
+  const currentWorkout = history[history.length - 1];
+  const previousWorkout = history[history.length - 2];
 
   if (!currentWorkout?.sets || currentWorkout.sets.length === 0) {
     console.warn('[SmartProgression] detectRegression: Current workout has no sets');
@@ -298,8 +298,8 @@ export function detectWeightGapFailure(history, exerciseName) {
     return false;
   }
 
-  const currentWorkout = history[0];
-  const previousWorkout = history[1];
+  const currentWorkout = history[history.length - 1];
+  const previousWorkout = history[history.length - 2];
 
   if (!currentWorkout?.sets || currentWorkout.sets.length === 0) {
     console.warn('[SmartProgression] detectWeightGapFailure: Current workout has no sets');
@@ -388,7 +388,7 @@ export function detectSuccessfulProgression(history, exerciseName) {
     return false;
   }
 
-  const latestWorkout = history[0];
+  const latestWorkout = history[history.length - 1];
 
   if (!latestWorkout?.sets || latestWorkout.sets.length === 0) {
     console.warn('[SmartProgression] detectSuccessfulProgression: Latest workout has no sets');
@@ -443,7 +443,7 @@ export function suggestWeightIncrease(history, exerciseName) {
     return null;
   }
 
-  const latestWorkout = history[0];
+  const latestWorkout = history[history.length - 1];
   if (!latestWorkout || !latestWorkout.sets || latestWorkout.sets.length === 0) {
     console.warn('[SmartProgression] suggestWeightIncrease: No sets in latest workout');
     return null;
@@ -493,9 +493,10 @@ export function detectAdaptiveWeightPattern(history) {
 
   const increments = [];
 
-  for (let i = 0; i < history.length - 1 && i < 5; i++) {
+  const start = Math.max(0, history.length - 6);
+  for (let i = history.length - 1; i > start && i > 0; i--) {
     const currentWeight = getBestSet(history[i]?.sets)?.weight;
-    const previousWeight = getBestSet(history[i + 1]?.sets)?.weight;
+    const previousWeight = getBestSet(history[i - 1]?.sets)?.weight;
 
     if (currentWeight && previousWeight && currentWeight > previousWeight) {
       increments.push(currentWeight - previousWeight);
@@ -571,8 +572,7 @@ export function suggestTempoProgression(exerciseKey, history) {
     return null;  // No weight gap issue
   }
 
-  // Get the weight before the failed attempt
-  const previousWorkout = history[1];
+  const previousWorkout = history[history.length - 2];
   const previousBestSet = getBestSet(previousWorkout?.sets);
 
   if (!previousBestSet) {
@@ -588,7 +588,7 @@ export function suggestTempoProgression(exerciseKey, history) {
     return null;
   }
 
-  const currentWorkout = history[0];
+  const currentWorkout = history[history.length - 1];
   const currentBestSet = getBestSet(currentWorkout?.sets);
   const weightGap = currentBestSet?.weight - previousBestSet.weight;
 
@@ -642,10 +642,9 @@ export function handlePainBasedSuggestion(exerciseKey, painHistory, workoutHisto
 
   const intensity = latestPain.intensity;
 
-  // Get current weight
   let currentWeight = null;
   if (workoutHistory && workoutHistory.length > 0) {
-    const latestWorkout = workoutHistory[0];
+    const latestWorkout = workoutHistory[workoutHistory.length - 1];
     const bestSet = getBestSet(latestWorkout?.sets);
     currentWeight = bestSet?.weight || null;
   }
@@ -915,7 +914,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
   }
 
   // PRIORITY 7: Default (continue current approach)
-  const latestWorkout = history[0];
+  const latestWorkout = history[history.length - 1];
   const bestSet = getBestSet(latestWorkout?.sets);
 
   if (!bestSet) {

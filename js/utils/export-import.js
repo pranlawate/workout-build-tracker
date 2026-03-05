@@ -83,8 +83,8 @@ export function validateImportData(data) {
       for (let i = 0; i < entry.sets.length; i++) {
         const set = entry.sets[i];
 
-        if (typeof set.weight !== 'number' || set.weight <= 0) {
-          throw new Error(`Invalid set in ${key}: weight must be a positive number (set ${i + 1})`);
+        if (typeof set.weight !== 'number' || set.weight < 0) {
+          throw new Error(`Invalid set in ${key}: weight must be a non-negative number (set ${i + 1})`);
         }
 
         if (typeof set.reps !== 'number' || set.reps <= 0 || !Number.isInteger(set.reps)) {

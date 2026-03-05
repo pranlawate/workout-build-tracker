@@ -190,8 +190,8 @@ export class ProgressAnalyzer {
         if (!oldSession || !oldSession.sets || oldSession.sets.length === 0) continue;
 
         // Calculate average weights
-        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + set.weight, 0) / recentSession.sets.length;
-        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + set.weight, 0) / oldSession.sets.length;
+        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / recentSession.sets.length;
+        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / oldSession.sets.length;
 
         // Count if showed progression
         if (oldAvgWeight > 0 && recentAvgWeight > oldAvgWeight) {
@@ -289,9 +289,8 @@ export class ProgressAnalyzer {
 
         if (!oldSession || !oldSession.sets || oldSession.sets.length === 0) continue;
 
-        // Calculate average weight from sets
-        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + set.weight, 0) / recentSession.sets.length;
-        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + set.weight, 0) / oldSession.sets.length;
+        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / recentSession.sets.length;
+        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / oldSession.sets.length;
 
         // Skip if no progression or division by zero
         if (oldAvgWeight === 0 || recentAvgWeight <= oldAvgWeight) continue;

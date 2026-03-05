@@ -196,6 +196,30 @@ export class UnlockEvaluator {
   }
 
   /**
+   * Resolve bare exercise name to full storage key (e.g. "UPPER_A - DB Flat Bench Press")
+   * @private
+   */
+  _resolveExerciseKey(exerciseName) {
+    try {
+      const allKeys = this.storage.getAllExerciseKeys();
+      const suffix = ` - ${exerciseName}`;
+      return allKeys.find(key => key.endsWith(suffix)) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Get exercise history by bare name, resolving to full storage key
+   * @private
+   */
+  _getHistoryByName(exerciseName) {
+    const fullKey = this._resolveExerciseKey(exerciseName);
+    if (!fullKey) return [];
+    return this.storage.getExerciseHistory(fullKey);
+  }
+
+  /**
    * Check strength milestone (internal)
    *
    * @param {string} exerciseName - Current exercise
@@ -228,8 +252,7 @@ export class UnlockEvaluator {
     const milestone = exerciseMilestones[targetExercise];
     if (!milestone) return false;
 
-    // Get exercise history
-    const history = this.storage.getExerciseHistory(exerciseName);
+    const history = this._getHistoryByName(exerciseName);
     if (!history || history.length === 0) return false;
 
     // Check recent sessions (last 3) for milestone achievement
@@ -309,8 +332,7 @@ export class UnlockEvaluator {
    */
   _getMobilityCheckHistory(criteriaKey) {
     try {
-      const stored = localStorage.getItem(`build_mobility_checks_${criteriaKey}`);
-      return stored ? JSON.parse(stored) : [];
+      return this.storage.getMobilityChecks(criteriaKey);
     } catch (error) {
       console.error('[UnlockEvaluator] Error getting mobility checks:', error);
       return [];
@@ -326,17 +348,25 @@ export class UnlockEvaluator {
    * @private
    */
   _checkPainFree(exerciseName, requiredWorkouts) {
-    const history = this.storage.getExerciseHistory(exerciseName);
-    if (!history || history.length < requiredWorkouts) return false;
+    const fullKey = this._resolveExerciseKey(exerciseName);
+    if (!fullKey) return false;
 
-    // Get last N workouts
-    const recentWorkouts = history.slice(-requiredWorkouts);
+    const painHistory = this.storage.getPainHistory(fullKey);
+    const exerciseHistory = this.storage.getExerciseHistory(fullKey);
 
-    // Check pain tracking for each workout
-    return recentWorkouts.every(workout => {
-      // Pain is tracked in workout object or post-workout modal
-      // Assuming pain level 0 = no pain
-      return !workout.painLevel || workout.painLevel === 0;
+    if (!exerciseHistory || exerciseHistory.length < requiredWorkouts) return false;
+
+    // Get dates of recent workouts
+    const recentDates = exerciseHistory.slice(-requiredWorkouts)
+      .map(w => w.date?.split('T')[0])
+      .filter(Boolean);
+
+    if (recentDates.length < requiredWorkouts) return false;
+
+    // Check if any pain was reported on those dates
+    return recentDates.every(date => {
+      const painOnDate = painHistory.find(p => p.date === date);
+      return !painOnDate || !painOnDate.hadPain;
     });
   }
 
@@ -348,7 +378,7 @@ export class UnlockEvaluator {
    * @private
    */
   _calculateTrainingWeeks(exerciseName) {
-    const history = this.storage.getExerciseHistory(exerciseName);
+    const history = this._getHistoryByName(exerciseName);
     if (!history || history.length === 0) return 0;
 
     const firstDate = new Date(history[0].date);

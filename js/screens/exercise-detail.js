@@ -115,7 +115,8 @@ export class ExerciseDetailScreen {
   }
 
   formatSets(sets) {
-    // Detect band exercise based on weight values (5/10/15/25 pattern suggests bands)
+    if (!sets || !Array.isArray(sets) || sets.length === 0) return 'No sets recorded';
+
     const isBandLike = sets.every(s => [0, 5, 10, 15, 25].includes(s.weight));
 
     if (isBandLike && sets.some(s => [5, 10, 15, 25].includes(s.weight))) {
@@ -197,19 +198,19 @@ export class ExerciseDetailScreen {
       });
     });
 
-    // Export button
+    // Export button (use onclick to prevent listener stacking across renders)
     const exportBtn = document.getElementById('export-exercise-btn');
     if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
+      exportBtn.onclick = () => {
         this.exportExercise(this.currentExerciseKey);
-      });
+      };
     }
   }
 
   handleDelete(index) {
     const history = this.storage.getExerciseHistory(this.currentExerciseKey);
-    const reversedIndex = history.length - 1 - index;
-    const entry = history[reversedIndex];
+    const entry = history[index];
+    if (!entry) return;
     const date = new Date(entry.date).toLocaleDateString();
 
     if (!confirm(`Delete workout from ${date}?\n\nThis cannot be undone.`)) {
@@ -217,8 +218,7 @@ export class ExerciseDetailScreen {
     }
 
     try {
-      // Remove entry
-      history.splice(reversedIndex, 1);
+      history.splice(index, 1);
       this.storage.saveExerciseHistory(this.currentExerciseKey, history);
 
       // Re-render
@@ -268,6 +268,7 @@ export class ExerciseDetailScreen {
    */
   getSessionBadges(entry, exerciseKey) {
     const badges = [];
+    if (!entry || !entry.sets || !Array.isArray(entry.sets)) return badges;
 
     try {
       // 1. Check performance (highest priority)
@@ -287,9 +288,9 @@ export class ExerciseDetailScreen {
       }
 
       // 3. Check pain reports
-      const painKey = `build_pain_${exerciseKey}`;
-      const painData = JSON.parse(localStorage.getItem(painKey) || '[]');
-      const hadPain = painData.some(p => p.date === entry.date);
+      const painHistory = this.storage.getPainHistory(exerciseKey);
+      const entryDateStr = entry.date?.split('T')[0];
+      const hadPain = painHistory.some(p => p.hadPain && p.date === entryDateStr);
       if (hadPain) {
         badges.push({ icon: '🩹', text: 'Pain reported', priority: 4 });
       }
