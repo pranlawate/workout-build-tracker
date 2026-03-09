@@ -246,7 +246,7 @@ export class ProgressAnalyzer {
   /**
    * Get top progressing exercises by comparing weights from 4 weeks ago to current
    * @param {number} count - Number of exercises to return (default: 3)
-   * @returns {Array<Object>} Array of { exerciseName, percentGain }
+   * @returns {Array<Object>} Array of { name, oldWeight, newWeight, percentGain }
    */
   getTopProgressingExercises(count = 3) {
     try {
@@ -305,9 +305,11 @@ export class ProgressAnalyzer {
           : exerciseKey;
 
         progressions.push({
-          exerciseName,
+          name: exerciseName,
+          oldWeight: Math.round(oldAvgWeight * 10) / 10,
+          newWeight: Math.round(recentAvgWeight * 10) / 10,
           percentGain,
-          absoluteGain // Used for sorting, removed before output
+          absoluteGain
         });
       }
 
@@ -319,12 +321,14 @@ export class ProgressAnalyzer {
         if (b.absoluteGain !== a.absoluteGain) {
           return b.absoluteGain - a.absoluteGain;
         }
-        return a.exerciseName.localeCompare(b.exerciseName);
+        return a.name.localeCompare(b.name);
       });
 
       // Return top N, removing absoluteGain from output
-      return progressions.slice(0, count).map(({ exerciseName, percentGain }) => ({
-        exerciseName,
+      return progressions.slice(0, count).map(({ name, oldWeight, newWeight, percentGain }) => ({
+        name,
+        oldWeight,
+        newWeight,
         percentGain
       }));
     } catch (error) {
