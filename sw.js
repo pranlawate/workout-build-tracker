@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'build-tracker-v105';
+const CACHE_VERSION = 'build-tracker-v106';
 const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',
@@ -120,36 +120,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Existing cache-first strategy for static assets
+  // Network-first strategy: always get fresh code when online, fall back to cache when offline
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return cached response
-        if (response) {
-          return response;
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+          return networkResponse;
         }
 
-        // Not in cache - fetch from network
-        return fetch(event.request)
-          .then((networkResponse) => {
-            // Don't cache non-GET requests or external URLs
-            if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
-              return networkResponse;
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_VERSION)
+          .then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request)
+          .then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
-
-            // Clone the response (can only be consumed once)
-            const responseToCache = networkResponse.clone();
-
-            caches.open(CACHE_VERSION)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return networkResponse;
-          })
-          .catch(() => {
-            // Network failed and not in cache
-            // Could return a custom offline page here
             return new Response('Offline', { status: 503 });
           });
       })
