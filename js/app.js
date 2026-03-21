@@ -5563,8 +5563,6 @@ class App {
   async completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
     if (this._completingWorkout) return;
-    this._completingWorkout = true;
-    this.stopTimer();
 
     // Check how many exercises are completed
     const totalExercises = this.currentWorkout.exercises.length;
@@ -5572,7 +5570,7 @@ class App {
       this.isExerciseCompleted(index)
     ).length;
 
-    // If not all exercises are completed, show warning
+    // If not all exercises are completed, show warning (before committing to completion)
     const isPartialWorkout = completedCount < totalExercises;
 
     if (isPartialWorkout) {
@@ -5587,6 +5585,9 @@ class App {
         return; // User chose to continue training
       }
     }
+
+    this._completingWorkout = true;
+    this.stopTimer();
 
     try {
       // Save each exercise's history

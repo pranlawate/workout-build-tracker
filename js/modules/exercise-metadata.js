@@ -853,7 +853,55 @@ export const EXERCISE_METADATA = {
     alternatives: {
       easier: ['Single-Leg Dead Bug', 'Slow Dead Bug'],
       harder: ['Weighted Dead Bug', 'Extended Dead Bug'],
-      different: ['Plank', 'Hollow Hold']
+      different: ['Reverse Crunch', 'Hollow Hold']
+    }
+  },
+
+  'Reverse Crunch': {
+    muscleGroup: 'core',
+    movementType: 'spinal-flexion',
+    equipment: 'bodyweight',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Knee Tucks', 'Lying Knee Raise'],
+      harder: ['Decline Reverse Crunch', 'Hanging Knee Raise'],
+      different: ['Dead Bug', 'Cable Crunch']
+    }
+  },
+
+  'Landmine Press': {
+    muscleGroup: 'shoulders',
+    movementType: 'compound',
+    equipment: 'barbell',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Light Landmine Press', 'Single-Arm Cable Press'],
+      harder: ['Heavy Landmine Press', 'Standing Landmine Press'],
+      different: ['DB Shoulder Press', 'Arnold Press']
+    }
+  },
+
+  'DB Chest Fly': {
+    muscleGroup: 'chest',
+    movementType: 'isolation',
+    equipment: 'dumbbells',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Light DB Fly', 'Machine Fly'],
+      harder: ['Incline DB Fly', 'Cable Fly'],
+      different: ['Cable Chest Fly', 'Pec Deck']
+    }
+  },
+
+  'Pallof Press': {
+    muscleGroup: 'core',
+    movementType: 'anti-rotation',
+    equipment: 'cable',
+    difficulty: 2,
+    alternatives: {
+      easier: ['Band Pallof Press', 'Light Cable Pallof Press'],
+      harder: ['Tall-Kneeling Pallof Press', 'Pallof Press with Hold'],
+      different: ['Cable Woodchop', 'Dead Bug']
     }
   }
 };

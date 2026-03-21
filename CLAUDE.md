@@ -1,5 +1,14 @@
 # Project Context for Claude Code
 
+## User Physical Profile
+
+- **Rotator cuff weakness** — avoid overhead pressing through impingement zone (no DB Shoulder Press, no behind-neck movements)
+- **Chronic mild neck pain** — from prolonged seated desk work and slouching posture
+- **Upper traps overactive/tight** — do NOT add shrugs; prioritize lower/mid trap work (Face Pulls, Reverse Fly, Rows)
+- **Core exercise rule** — no plank variations (shoulder isometric hold aggravates rotator cuff and neck). Use supine or standing core only (Dead Bug, Reverse Crunch, Pallof Press)
+- **Lower day follows upper day** — never put shoulder-loading exercises on lower days (recovery overlap)
+- **Rehab priorities** — Face Pulls (3 sets), Reverse Fly (3 sets), Chin Tucks in warmup, neck stretches in cooldown
+
 ## Git Commit Guidelines
 
 - Never include "Claude" or AI attribution in commit messages

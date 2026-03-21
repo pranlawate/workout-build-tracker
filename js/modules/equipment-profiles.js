@@ -33,6 +33,8 @@ export const EQUIPMENT_REQUIREMENTS = {
   'DB Lateral Raises': ['dumbbells'],
   'DB Shoulder Press': ['dumbbells'],
   'Incline DB Press': ['dumbbells'],
+  'DB Chest Fly': ['dumbbells'],
+  'Landmine Press': ['barbells', 'gym'],
   'Reverse Fly': ['dumbbells'],
   'DB Goblet Squat': ['dumbbells'],
   'DB Romanian Deadlift': ['dumbbells'],
@@ -59,6 +61,8 @@ export const EQUIPMENT_REQUIREMENTS = {
   'Plank': ['bodyweight'],
   'Dead Bug': ['bodyweight'],
   'Side Plank': ['bodyweight'],
+  'Reverse Crunch': ['bodyweight'],
+  'Pallof Press': ['cables', 'gym'],
   '45° Hyperextension': ['bodyweight', 'gym'],
   'Hip Thrust': ['bodyweight', 'dumbbells', 'barbells'],
 

@@ -154,16 +154,16 @@ export const PROGRESSION_PATHS = {
 
   'LOWER_A_SLOT_6': {
     slotName: 'Core Anti-extension',
-    easier: ['Partial ROM'],
-    current: 'Plank',
+    easier: ['Single-Leg Dead Bug', 'Slow Dead Bug'],
+    current: 'Dead Bug',
     harder: [
-      'RKC Plank',
-      'Weighted Plank'
+      'Weighted Dead Bug',
+      'Extended Dead Bug'
     ],
-    alternate: ['Ab Wheel Rollouts']
+    alternate: ['Reverse Crunch']
   },
 
-  // ==================== UPPER B - VERTICAL ====================
+  // ==================== UPPER B ====================
 
   'UPPER_B_SLOT_1': {
     slotName: 'Vertical Pull',
@@ -179,16 +179,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_B_SLOT_2': {
-    slotName: 'Vertical Push',
-    easier: ['Machine Shoulder Press'],
-    current: 'DB Shoulder Press',
+    slotName: 'Angled Press (Shoulder-safe)',
+    easier: ['Light Landmine Press'],
+    current: 'Landmine Press',
     harder: [
-      'Barbell Overhead Press',
-      'Pike Push-ups',
-      'Handstand Push-ups',
-      'Half-moon Push-up'
+      'Heavy Landmine Press',
+      'Single-Arm Landmine Press'
     ],
-    alternate: []
+    alternate: ['Cable Press']
   },
 
   'UPPER_B_SLOT_3': {
@@ -200,14 +198,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_B_SLOT_4': {
-    slotName: 'Upper Chest/Incline',
-    easier: ['Machine Incline Press'],
-    current: 'Incline DB Press',
+    slotName: 'Chest Isolation',
+    easier: ['Machine Fly', 'Light DB Fly'],
+    current: 'DB Chest Fly',
     harder: [
-      'Barbell Incline Press',
-      'Vrushchik Dand'
+      'Incline DB Fly',
+      'Cable Fly'
     ],
-    alternate: ['Incline Push-ups']
+    alternate: ['Pec Deck']
   },
 
   'UPPER_B_SLOT_5': {
@@ -219,14 +217,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_B_SLOT_6': {
-    slotName: 'Core Anti-rotation',
-    easier: ['Partial Dead Bug'],
-    current: 'Dead Bug',
+    slotName: 'Core Flexion',
+    easier: ['Knee Tucks', 'Lying Knee Raise'],
+    current: 'Reverse Crunch',
     harder: [
-      'Weighted Dead Bug',
-      'Bird Dog'
+      'Decline Reverse Crunch',
+      'Hanging Knee Raise'
     ],
-    alternate: ['Pallof Press']
+    alternate: ['Cable Crunch']
   },
 
   // ==================== LOWER B - UNILATERAL ====================
@@ -272,14 +270,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'LOWER_B_SLOT_6': {
-    slotName: 'Core Lateral Stability',
-    easier: ['Forearm plank'],
-    current: 'Side Plank',
+    slotName: 'Core Anti-rotation',
+    easier: ['Band Pallof Press', 'Light Cable Pallof Press'],
+    current: 'Pallof Press',
     harder: [
-      'Leg Raise Side Plank',
-      'Star Side Plank'
+      'Tall-Kneeling Pallof Press',
+      'Pallof Press with Hold'
     ],
-    alternate: []
+    alternate: ['Cable Woodchop']
   }
 };
 

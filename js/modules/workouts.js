@@ -1,5 +1,6 @@
 const WARMUPS = {
   UPPER_A: [
+    'Chin Tucks: 10 reps (hold 5 sec each)',
     'Cat-Cow: 10 reps',
     'Band Pull-Aparts: 2 sets × 15-20 reps',
     'Arm Circles: 10 each direction',
@@ -14,6 +15,7 @@ const WARMUPS = {
     'Ramp-up Set: 50% weight × 10 reps (first exercise)'
   ],
   UPPER_B: [
+    'Chin Tucks: 10 reps (hold 5 sec each)',
     'Dead Hang: 30-60 seconds',
     'Band Pull-Aparts: 2 sets × 15-20 reps',
     'Scapular Pull-Ups: 5 reps',
@@ -90,8 +92,8 @@ export const EXERCISE_DEFINITIONS = {
 export const WORKOUTS = {
   UPPER_A: {
     name: 'UPPER_A',
-    displayName: 'Upper A - Horizontal',
-    description: 'Horizontal push/pull emphasis',
+    displayName: 'Upper A',
+    description: 'Chest, back, and shoulder accessories',
     exercises: [
       {
         name: 'DB Flat Bench Press',
@@ -150,7 +152,7 @@ export const WORKOUTS = {
       },
       {
         name: 'Face Pulls',
-        sets: 2,
+        sets: 3,
         repRange: '15-20',
         rirTarget: '3-3',
         restMinutes: 1,
@@ -234,14 +236,14 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'Plank',
+        name: 'Dead Bug',
         sets: 3,
-        repRange: '30-60s',
-        rirTarget: '1-2',
+        repRange: '10-12/side',
+        rirTarget: '2-3',
         restMinutes: 1,
         startingWeight: 0,
         weightIncrement: 0,
-        notes: 'Core | Core Stability | Anti-extension hold',
+        notes: 'Core | Anti-extension | Shoulder-safe (supine)',
         machineOk: false
       }
     ]
@@ -249,8 +251,8 @@ export const WORKOUTS = {
 
   UPPER_B: {
     name: 'UPPER_B',
-    displayName: 'Upper B - Vertical',
-    description: 'Vertical push/pull emphasis',
+    displayName: 'Upper B',
+    description: 'Pull emphasis with chest and shoulder accessories',
     exercises: [
       {
         name: 'Lat Pulldown',
@@ -264,15 +266,15 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'DB Shoulder Press',
+        name: 'Landmine Press',
         sets: 3,
         repRange: '8-12',
         rirTarget: '2-3',
         restMinutes: 3,
-        startingWeight: 7.5,
-        weightIncrement: 1.25,
-        notes: 'Compound | Front & Side Delts',
-        machineOk: true
+        startingWeight: 10,
+        weightIncrement: 2.5,
+        notes: 'Compound | Front Delts, Upper Chest | Shoulder-safe angled press',
+        machineOk: false
       },
       {
         name: 'Chest-Supported Row',
@@ -286,19 +288,19 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'Incline DB Press',
+        name: 'DB Chest Fly',
         sets: 3,
-        repRange: '10-12',
+        repRange: '10-15',
         rirTarget: '2-3',
-        restMinutes: 3,
-        startingWeight: 7.5,
-        weightIncrement: 2.5,
-        notes: 'Compound | Upper Chest',
-        machineOk: true
+        restMinutes: 2,
+        startingWeight: 5,
+        weightIncrement: 1.25,
+        notes: 'Isolation | Chest stretch & squeeze | Low shoulder stress',
+        machineOk: false
       },
       {
         name: 'Reverse Fly',
-        sets: 2,
+        sets: 3,
         repRange: '12-15',
         rirTarget: '2-3',
         restMinutes: 2,
@@ -319,14 +321,14 @@ export const WORKOUTS = {
         machineOk: false
       },
       {
-        name: 'Dead Bug',
+        name: 'Reverse Crunch',
         sets: 3,
-        repRange: '10-12/side',
+        repRange: '12-15',
         rirTarget: '2-3',
         restMinutes: 1,
         startingWeight: 0,
         weightIncrement: 0,
-        notes: 'Core | Core Stability | Anti-rotation control',
+        notes: 'Core | Lower abs | Shoulder & neck safe (supine)',
         machineOk: false
       }
     ]
@@ -404,15 +406,15 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'Side Plank',
+        name: 'Pallof Press',
         sets: 3,
-        repRange: '30s/side',
-        rirTarget: '1-2',
+        repRange: '10-12/side',
+        rirTarget: '2-3',
         restMinutes: 1,
-        startingWeight: 0,
-        weightIncrement: 0,
-        notes: 'Core | Obliques, Glute Medius | Anti-lateral flexion',
-        machineOk: false
+        startingWeight: 5,
+        weightIncrement: 2.5,
+        notes: 'Core | Obliques | Anti-rotation, shoulder-safe (standing cable)',
+        machineOk: true
       }
     ]
   }

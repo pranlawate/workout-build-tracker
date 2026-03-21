@@ -66,6 +66,18 @@ export function getUpperBodyStretches() {
       duration: '30s each',
       target: 'forearms',
       instructions: 'Extend arm, pull fingers back/forward with opposite hand'
+    },
+    {
+      name: 'Upper Trap Stretch',
+      duration: '30s per side',
+      target: 'upper trapezius, neck',
+      instructions: 'Tilt ear to shoulder, gently pull head with same-side hand. Keep opposite shoulder down.'
+    },
+    {
+      name: 'Levator Scapulae Stretch',
+      duration: '30s per side',
+      target: 'levator scapulae, neck',
+      instructions: 'Turn head 45° to one side, tuck chin down toward armpit. Gently pull with same-side hand.'
     }
   ];
 }

@@ -732,21 +732,21 @@ export class StorageManager {
           'LOWER_A_SLOT_3': 'Hip Thrust',
           'LOWER_A_SLOT_4': 'Leg Extension',
           'LOWER_A_SLOT_5': 'Standing Calf Raise',
-          'LOWER_A_SLOT_6': 'Plank',
+          'LOWER_A_SLOT_6': 'Dead Bug',
           'UPPER_B_SLOT_1': 'Lat Pulldown',
-          'UPPER_B_SLOT_2': 'DB Shoulder Press',
+          'UPPER_B_SLOT_2': 'Landmine Press',
           'UPPER_B_SLOT_3': 'Chest-Supported Row',
-          'UPPER_B_SLOT_4': 'Incline DB Press',
+          'UPPER_B_SLOT_4': 'DB Chest Fly',
           'UPPER_B_SLOT_5': 'Reverse Fly',
           'UPPER_B_SLOT_6': 'DB Hammer Curls',
-          'UPPER_B_SLOT_7': 'Dead Bug',
+          'UPPER_B_SLOT_7': 'Reverse Crunch',
           'LOWER_B_SLOT_1': 'Leg Press',
           'LOWER_B_SLOT_2': 'DB Romanian Deadlift',
           'LOWER_B_SLOT_3': 'Leg Abduction',
           'LOWER_B_SLOT_4': 'Leg Adduction',
           'LOWER_B_SLOT_5': 'Leg Curl',
           'LOWER_B_SLOT_6': 'Seated Calf Raise',
-          'LOWER_B_SLOT_7': 'Side Plank'
+          'LOWER_B_SLOT_7': 'Pallof Press'
         };
       }
       return JSON.parse(stored);

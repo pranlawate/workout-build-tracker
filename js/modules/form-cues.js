@@ -54,9 +54,9 @@ export const FORM_CUES = {
   },
 
   'DB Lateral Raises': {
-    setup: ['Slight forward lean', 'Slight elbow bend', 'Dumbbells in front of thighs'],
-    execution: ['Lead with elbows', 'Raise to shoulder height', 'Control descent (3 sec)'],
-    mistakes: ['Swinging/momentum', 'Raising too high (above shoulders)', 'Shrugging shoulders']
+    setup: ['Slight forward lean', 'Slight elbow bend', 'Thumbs slightly up (not down)', 'Dumbbells in front of thighs'],
+    execution: ['Lead with elbows', 'Raise to shoulder height ONLY — never higher', 'Control descent (3 sec)'],
+    mistakes: ['Raising above shoulder height (impingement risk)', 'Thumbs pointing down', 'Swinging/momentum', 'Shrugging shoulders']
   },
 
   'Face Pulls': {
@@ -79,9 +79,9 @@ export const FORM_CUES = {
   },
 
   'Leg Curl': {
-    setup: ['Align knee with machine pivot', 'Pad at lower calf', 'Grip handles for stability'],
+    setup: ['Align knee with machine pivot', 'Pad at lower calf', 'Hips pressed into pad', 'Grip handles for stability'],
     execution: ['Curl to full contraction', 'Squeeze hamstrings (1 sec)', 'Control descent (3 sec)'],
-    mistakes: ['Lifting hips off pad', 'Jerking with momentum', 'Partial ROM']
+    mistakes: ['Lifting hips off pad (most common cheat)', 'Jerking with momentum', 'Partial ROM']
   },
 
   'Leg Extension': {
@@ -91,9 +91,9 @@ export const FORM_CUES = {
   },
 
   '45° Hyperextension': {
-    setup: ['Hips on pad', 'Feet secured', 'Arms crossed on chest'],
+    setup: ['Hips on pad', 'Feet secured', 'Arms crossed on chest', 'Chin tucked, neutral neck'],
     execution: ['Lower controlled (3 sec)', 'Maintain neutral spine', 'Rise to parallel ONLY'],
-    mistakes: ['Hyperextending back (going too high)', 'Rounding spine', 'Using momentum']
+    mistakes: ['Hyperextending back (going too high)', 'Rounding spine', 'Looking up (neck strain)', 'Using momentum']
   },
 
   'Standing Calf Raise': {
@@ -108,6 +108,12 @@ export const FORM_CUES = {
     mistakes: ['Hips sagging', 'Hips too high (pyramid)', 'Holding breath']
   },
 
+  'Reverse Crunch': {
+    setup: ['Lie on bench or floor', 'Arms at sides gripping bench/floor', 'Knees bent at 90°'],
+    execution: ['Curl hips off bench toward chest', 'Squeeze lower abs at top (1 sec)', 'Lower slowly (3 sec) — don\'t let feet touch floor'],
+    mistakes: ['Using momentum/swinging legs', 'Straightening legs (turns into leg raise)', 'Arching lower back on the way down']
+  },
+
   // UPPER_B exercises
   'Lat Pulldown': {
     setup: ['Wide grip on bar', 'Chest up, shoulders back', 'Slight lean back (15°)'],
@@ -119,6 +125,18 @@ export const FORM_CUES = {
     setup: ['Dumbbells at shoulders', 'Feet flat on floor', 'Core braced, ribs down'],
     execution: ['Controlled concentric - 2s press straight up', 'Avoid arching back', 'Slow eccentric - 2s descent'],
     mistakes: ['Excessive back arch', 'Pressing forward instead of up', 'Dumbbells drifting apart']
+  },
+
+  'Landmine Press': {
+    setup: ['Barbell in landmine or corner', 'Stand with staggered stance', 'Hold bar end at shoulder with one hand', 'Core braced, slight forward lean'],
+    execution: ['Press up and forward following the arc', 'Fully extend arm without locking', 'Control descent to shoulder (2 sec)', 'Alternate arms each set'],
+    mistakes: ['Arching lower back', 'Pressing straight up (follow the bar\'s natural arc)', 'Rotating torso excessively', 'Using too wide a stance']
+  },
+
+  'DB Chest Fly': {
+    setup: ['Flat bench', 'Dumbbells above chest, palms facing each other', 'Slight bend in elbows (locked throughout)', 'Retract shoulder blades'],
+    execution: ['Open arms wide in arc (3 sec) — feel chest stretch', 'Stop when elbows reach shoulder level', 'Squeeze chest to bring DBs back together (2 sec)'],
+    mistakes: ['Straightening arms (turns into press)', 'Going too deep (below shoulder level)', 'Losing scapular retraction', 'Bending/extending elbows during movement']
   },
 
   'Chest-Supported Row': {
@@ -153,9 +171,9 @@ export const FORM_CUES = {
   },
 
   'DB Romanian Deadlift': {
-    setup: ['Feet hip-width', 'Dumbbells at thighs', 'Slight knee bend locked'],
+    setup: ['Feet hip-width', 'Dumbbells at thighs', 'Slight knee bend locked', 'Neutral neck (don\'t look up in mirror)'],
     execution: ['Hinge at hips', 'Slow eccentric - 3s lower to shin level', 'Controlled concentric - 2s up, keep back flat'],
-    mistakes: ['Rounding back', 'Squatting down', 'Bending knees more during descent']
+    mistakes: ['Rounding back', 'Squatting down', 'Bending knees more during descent', 'Craning neck up']
   },
 
   'Leg Abduction': {
@@ -180,6 +198,12 @@ export const FORM_CUES = {
     setup: ['Forearm on floor', 'Elbow under shoulder', 'Feet stacked or staggered'],
     execution: ['Body in straight line', 'Lift hips', 'Hold stable, breathe normally'],
     mistakes: ['Hips sagging', 'Rotating torso', 'Holding breath']
+  },
+
+  'Pallof Press': {
+    setup: ['Cable or band at chest height', 'Stand sideways to anchor', 'Feet shoulder-width, knees soft', 'Hold handle at chest with both hands'],
+    execution: ['Press hands straight out from chest', 'Hold extended position (2 sec) — resist the pull', 'Return to chest slowly', 'Keep hips and shoulders square (don\'t rotate)'],
+    mistakes: ['Rotating toward the cable', 'Leaning away to compensate', 'Locking knees', 'Rushing — this is about control, not speed']
   },
 
   // Kettlebell progressions
@@ -278,7 +302,7 @@ export const FORM_CUES = {
   },
 
   'Leg Adduction': {
-    setup: ['Sit with back against pad', 'Legs on outer pads', 'Adjust range of motion', 'Core engaged'],
+    setup: ['Sit with back against pad', 'Pads on inner thighs', 'Adjust range of motion', 'Core engaged'],
     execution: ['Bring legs together smoothly', 'Squeeze inner thighs (1 sec)', 'Control opening (2 sec)', 'Maintain posture'],
     mistakes: ['Using momentum', 'Leaning forward', 'Rushing reps', 'Not achieving full contraction']
   }
