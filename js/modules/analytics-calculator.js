@@ -265,8 +265,8 @@ export class AnalyticsCalculator {
         ? (actualWorkouts / expectedWorkouts) * 100
         : 0;
 
-      // Find progressed exercises
-      const { progressedCount, topProgressors } = this.findProgressedExercises();
+      // Find progressed exercises (same window as other metrics)
+      const { progressedCount, topProgressors } = this.findProgressedExercises(days);
 
       return { avgRIR, rirTrend, compliance, progressedCount, topProgressors };
     } catch (error) {
@@ -331,14 +331,19 @@ export class AnalyticsCalculator {
   }
 
   /**
-   * Finds exercises that have progressed in weight
+   * Finds exercises that have progressed in weight within the given time window
    * @private
+   * @param {number} [days=28] - Only history entries on or after (today - days) are considered
    * @returns {Object} Progression data with count and top 5 progressors
    * @returns {number} returns.progressedCount - Total number of exercises that increased weight
    * @returns {Array<{name: string, gain: number}>} returns.topProgressors - Top 5 exercises by weight gain
    */
-  findProgressedExercises() {
+  findProgressedExercises(days = 28) {
     try {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      const cutoffStr = cutoffDate.toISOString().split('T')[0];
+
       const allKeys = this.storage.getAllExerciseKeys();
 
       const progressed = [];
@@ -347,9 +352,13 @@ export class AnalyticsCalculator {
         const history = this.storage.getExerciseHistory(key);
         if (!history || history.length < 2) return;
 
-        const recent = history.slice(-2);
-        const oldEntry = recent[0];
-        const newEntry = recent[1];
+        const inWindow = history.filter(
+          e => e && e.date && String(e.date).split('T')[0] >= cutoffStr
+        );
+        if (inWindow.length < 2) return;
+
+        const oldEntry = inWindow[inWindow.length - 2];
+        const newEntry = inWindow[inWindow.length - 1];
 
         // Check if weight increased
         if (!oldEntry || !newEntry || !Array.isArray(oldEntry.sets) || !Array.isArray(newEntry.sets)) {
@@ -360,8 +369,15 @@ export class AnalyticsCalculator {
           return;
         }
 
-        const oldWeight = oldEntry.sets[0]?.weight || 0;
-        const newWeight = newEntry.sets[0]?.weight || 0;
+        const maxW = (sets) => sets.reduce((m, s) => {
+          const w = s && typeof s.weight === 'number' ? s.weight : NaN;
+          return Number.isFinite(w) ? Math.max(m, w) : m;
+        }, -Infinity);
+
+        const oldWeight = maxW(oldEntry.sets);
+        const newWeight = maxW(newEntry.sets);
+
+        if (oldWeight === -Infinity || newWeight === -Infinity) return;
 
         if (newWeight > oldWeight) {
           const parts = key.replace('build_exercise_', '').split(' - ');

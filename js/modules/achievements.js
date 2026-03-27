@@ -36,9 +36,13 @@ export function detectAchievements(workoutData, storage) {
     const recovery = detectSmartRecovery(storage);
     if (recovery) newAchievements.push(recovery);
 
-    // Save to storage
+    // Save to storage (per-item try/catch so one failure does not drop the rest)
     for (const achievement of newAchievements) {
-      storage.addAchievement(achievement);
+      try {
+        storage.addAchievement(achievement);
+      } catch (err) {
+        console.error('[Achievements] Failed to save achievement:', achievement?.type, err);
+      }
     }
 
     return newAchievements;
@@ -67,9 +71,13 @@ function detectPersonalRecord(exerciseKey, storage) {
 
     if (!latestBest || !previousBest) return null;
 
-    // PR if weight increased OR (same weight + reps increased)
-    const weightPR = latestBest.weight > previousBest.weight;
-    const repPR = latestBest.weight === previousBest.weight && latestBest.reps > previousBest.reps;
+    // PR if weight increased OR (same weight + reps increased) — numeric compare for string/number storage
+    const lw = Number(latestBest.weight);
+    const pw = Number(previousBest.weight);
+    const lr = Number(latestBest.reps);
+    const pr = Number(previousBest.reps);
+    const weightPR = !isNaN(lw) && !isNaN(pw) && lw > pw;
+    const repPR = lw === pw && !isNaN(lr) && !isNaN(pr) && lr > pr;
 
     if (weightPR || repPR) {
       // Extract exercise name without workout prefix
@@ -98,6 +106,16 @@ function detectPersonalRecord(exerciseKey, storage) {
  * @param {object} storage - StorageManager instance
  * @returns {object|null} Achievement object or null
  */
+function hasAchievementForExercise(storage, type, exerciseKey) {
+  try {
+    const data = storage.getAchievements();
+    const list = data.achievements || [];
+    return list.some((a) => a.type === type && a.exerciseKey === exerciseKey);
+  } catch {
+    return false;
+  }
+}
+
 function detectTempoMastery(storage) {
   try {
     const tempoState = storage.getTempoState();
@@ -105,6 +123,9 @@ function detectTempoMastery(storage) {
     for (const [exerciseKey, state] of Object.entries(tempoState)) {
       if (!state) continue;
       if (state.status === 'completed' && state.weekCount >= 3) {
+        if (hasAchievementForExercise(storage, 'TEMPO_MASTERY', exerciseKey)) {
+          continue;
+        }
         const exerciseName = exerciseKey.includes(' - ')
           ? exerciseKey.split(' - ').slice(1).join(' - ')
           : exerciseKey;
@@ -131,10 +152,73 @@ function detectTempoMastery(storage) {
  * @param {object} storage - StorageManager instance
  * @returns {array} Array of streak achievements
  */
+function maxWeightFromSession(session) {
+  if (!session?.sets || !Array.isArray(session.sets) || session.sets.length === 0) return null;
+  let best = null;
+  for (const set of session.sets) {
+    if (!set) continue;
+    const w = Number(set.weight);
+    if (isNaN(w)) continue;
+    if (best === null || w > best) best = w;
+  }
+  return best;
+}
+
+function longestConsecutiveWeightIncreaseRun(history) {
+  if (!history || history.length < 2) return 0;
+  let bestRun = 0;
+  let run = 0;
+  for (let i = 1; i < history.length; i++) {
+    const prev = maxWeightFromSession(history[i - 1]);
+    const cur = maxWeightFromSession(history[i]);
+    if (prev === null || cur === null) {
+      run = 0;
+      continue;
+    }
+    if (cur > prev) {
+      run += 1;
+      if (run > bestRun) bestRun = run;
+    } else {
+      run = 0;
+    }
+  }
+  return bestRun;
+}
+
 function detectProgressionStreak(storage) {
-  // Simplified for MVP - return empty array
-  // Future enhancement: detect 3+ consecutive PRs
-  return [];
+  const out = [];
+  try {
+    const ls = storage.storage;
+    const prefix = 'build_exercise_';
+    for (let i = 0; i < ls.length; i++) {
+      const fullKey = ls.key(i);
+      if (!fullKey || !fullKey.startsWith(prefix)) continue;
+      const exerciseKey = fullKey.slice(prefix.length);
+      if (!exerciseKey.includes(' - ')) continue;
+
+      if (hasAchievementForExercise(storage, 'PROGRESSION_STREAK', exerciseKey)) continue;
+
+      const history = storage.getExerciseHistory(exerciseKey);
+      const streak = longestConsecutiveWeightIncreaseRun(history);
+      // streak = count of consecutive "session N heavier than N-1" edges; 2 edges = 3 rising sessions
+      if (streak < 2) continue;
+
+      const exerciseName = exerciseKey.includes(' - ')
+        ? exerciseKey.split(' - ').slice(1).join(' - ')
+        : exerciseKey;
+
+      out.push({
+        id: `streak_${exerciseKey}_${Date.now()}`,
+        type: 'PROGRESSION_STREAK',
+        exerciseKey,
+        badge: '⚡',
+        description: `${exerciseName}: ${streak + 1} sessions, each heavier than the last`
+      });
+    }
+  } catch (error) {
+    console.error('[Achievements] Error detecting progression streak:', error);
+  }
+  return out;
 }
 
 /**
@@ -182,8 +266,12 @@ function getBestSet(sets) {
     if (!set) return best;
     if (!best) return set;
 
-    if (set.weight > best.weight ||
-      (set.weight === best.weight && set.reps > best.reps)) {
+    const sw = Number(set.weight);
+    const bw = Number(best.weight);
+    const sr = Number(set.reps);
+    const br = Number(best.reps);
+
+    if (!isNaN(sw) && !isNaN(bw) && (sw > bw || (sw === bw && !isNaN(sr) && !isNaN(br) && sr > br))) {
       return set;
     }
     return best;

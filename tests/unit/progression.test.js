@@ -203,18 +203,30 @@ describe('Progression Engine', () => {
 
         assert.throws(
           () => shouldIncreaseWeight(sets, exercise),
-          /repRange and rirTarget/
+          /repRange/
         );
       });
 
-      test('should throw error for missing rirTarget', () => {
-        const sets = [{ weight: 20, reps: 12, rir: 2 }];
+      test('should use default RIR floor when rirTarget missing (rep-based)', () => {
+        const sets = [
+          { weight: 20, reps: 12, rir: 2 },
+          { weight: 20, reps: 12, rir: 2 },
+          { weight: 20, reps: 12, rir: 2 }
+        ];
         const exercise = { repRange: '8-12' };
 
-        assert.throws(
-          () => shouldIncreaseWeight(sets, exercise),
-          /repRange and rirTarget/
-        );
+        assert.strictEqual(shouldIncreaseWeight(sets, exercise), true);
+      });
+
+      test('should return false when rirTarget missing and RIR below default floor', () => {
+        const sets = [
+          { weight: 20, reps: 12, rir: 1 },
+          { weight: 20, reps: 12, rir: 2 },
+          { weight: 20, reps: 12, rir: 2 }
+        ];
+        const exercise = { repRange: '8-12' };
+
+        assert.strictEqual(shouldIncreaseWeight(sets, exercise), false);
       });
 
       test('should throw error for invalid repRange format', () => {

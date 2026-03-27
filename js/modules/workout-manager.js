@@ -1,4 +1,7 @@
+import { getWorkoutWithSelections } from './workouts.js';
+
 const ROTATION_ORDER = ['UPPER_A', 'LOWER_A', 'UPPER_B', 'LOWER_B'];
+const VALID_WORKOUT_NAMES = new Set(ROTATION_ORDER);
 
 const MUSCLE_GROUPS = {
   UPPER_A: ['chest', 'back', 'shoulders'],
@@ -21,12 +24,29 @@ export class WorkoutManager {
     this.storage = storage;
   }
 
+  /**
+   * Resolved workout with user slot selections (for rotation UI and slot lookups).
+   * @param {string} workoutName - e.g. UPPER_A
+   * @returns {object|null} Workout object or null if unknown
+   */
+  getWorkout(workoutName) {
+    if (!workoutName || !VALID_WORKOUT_NAMES.has(workoutName)) {
+      console.warn('[WorkoutManager] Unknown or invalid workout name:', workoutName);
+      return null;
+    }
+    return getWorkoutWithSelections(workoutName, this.storage);
+  }
+
   getNextWorkout() {
     const rotation = this.storage.getRotation();
     return rotation.nextSuggested;
   }
 
   completeWorkout(workoutName) {
+    if (!workoutName || !VALID_WORKOUT_NAMES.has(workoutName)) {
+      console.warn('[WorkoutManager] completeWorkout ignored: invalid workout name:', workoutName);
+      return;
+    }
     const rotation = this.storage.getRotation();
     const currentIndex = ROTATION_ORDER.indexOf(workoutName);
     const nextIndex = (currentIndex + 1) % ROTATION_ORDER.length;
@@ -73,6 +93,15 @@ export class WorkoutManager {
 
     const lastMuscles = MUSCLE_GROUPS[rotation.lastWorkout];
     const proposedMuscles = MUSCLE_GROUPS[proposedWorkout];
+
+    if (!lastMuscles || !Array.isArray(lastMuscles)) {
+      console.warn('[WorkoutManager] Invalid rotation.lastWorkout, skipping recovery check:', rotation.lastWorkout);
+      return { warn: false, muscles: [] };
+    }
+    if (!proposedMuscles || !Array.isArray(proposedMuscles)) {
+      console.warn('[WorkoutManager] Unknown proposed workout for recovery check:', proposedWorkout);
+      return { warn: false, muscles: [] };
+    }
 
     const problematic = [];
 

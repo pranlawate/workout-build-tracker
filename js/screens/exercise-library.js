@@ -71,6 +71,11 @@ export class ExerciseLibrary {
   }
 
   showLibrary() {
+    if (!this.libraryScreen) {
+      console.warn('[ExerciseLibrary] Cannot open library: screen element missing');
+      return;
+    }
+
     // Hide all screens
     this.app.hideAllScreens();
 
@@ -80,7 +85,9 @@ export class ExerciseLibrary {
     // Reset filters and search
     this.currentFilter = 'all';
     this.currentSearch = '';
-    this.librarySearch.value = '';
+    if (this.librarySearch) {
+      this.librarySearch.value = '';
+    }
 
     // Render exercise list
     this.renderExerciseList();

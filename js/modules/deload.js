@@ -102,10 +102,43 @@ export class DeloadManager {
    * @description To be implemented in Task 29
    */
   detectRegressions() {
-    // Check last 2 workouts for weight/rep decreases
-    // This would need access to exercise history
-    // For now, return 0 (implement in next task)
-    return 0;
+    try {
+      const ls = this.storage.storage;
+      const prefix = 'build_exercise_';
+      let count = 0;
+
+      const bestSessionWeight = (session) => {
+        if (!session?.sets || !Array.isArray(session.sets)) return null;
+        let best = null;
+        for (const set of session.sets) {
+          if (!set) continue;
+          const w = Number(set.weight);
+          if (isNaN(w)) continue;
+          if (best === null || w > best) best = w;
+        }
+        return best;
+      };
+
+      for (let i = 0; i < ls.length; i++) {
+        const fullKey = ls.key(i);
+        if (!fullKey || !fullKey.startsWith(prefix)) continue;
+        const exerciseKey = fullKey.slice(prefix.length);
+        if (!exerciseKey.includes(' - ')) continue;
+
+        const history = this.storage.getExerciseHistory(exerciseKey);
+        if (!history || history.length < 2) continue;
+
+        const prev = bestSessionWeight(history[history.length - 2]);
+        const latest = bestSessionWeight(history[history.length - 1]);
+        if (prev === null || latest === null) continue;
+        if (latest < prev) count += 1;
+      }
+
+      return count;
+    } catch (error) {
+      console.error('[DeloadManager] detectRegressions:', error);
+      return 0;
+    }
   }
 
   /**
@@ -114,10 +147,25 @@ export class DeloadManager {
    * @description To be implemented in Task 29
    */
   checkFatigueScore() {
-    // Check if last 2 workouts had fatigue score ≥8
-    // This would need session metrics tracking
-    // For now, return null (implement in next task)
-    return null;
+    try {
+      const raw = this.storage.storage.getItem('build_recovery_metrics');
+      if (!raw) return null;
+      const entries = JSON.parse(raw);
+      if (!Array.isArray(entries) || entries.length < 2) return null;
+
+      const last = entries[entries.length - 1];
+      const prev = entries[entries.length - 2];
+      const a = Number(last.fatigueScore);
+      const b = Number(prev.fatigueScore);
+      const threshold = 8;
+      if (!isNaN(a) && !isNaN(b) && a >= threshold && b >= threshold) {
+        return { score: Math.max(a, b) };
+      }
+      return null;
+    } catch (error) {
+      console.error('[DeloadManager] checkFatigueScore:', error);
+      return null;
+    }
   }
 
   /**
@@ -142,6 +190,11 @@ export class DeloadManager {
     }
   }
 
+  /** Alias for app flows that enable the standard deload window */
+  enableDeload() {
+    this.startDeload('standard');
+  }
+
   /**
    * Ends the current deload period
    */
@@ -150,8 +203,11 @@ export class DeloadManager {
       const deloadState = this.storage.getDeloadState();
 
       deloadState.active = false;
-      if (deloadState.startDate) {
-        deloadState.lastDeloadDate = deloadState.startDate;
+      const endRef = deloadState.endDate ? new Date(deloadState.endDate) : null;
+      if (endRef && !isNaN(endRef.getTime())) {
+        deloadState.lastDeloadDate = deloadState.endDate;
+      } else if (deloadState.startDate) {
+        deloadState.lastDeloadDate = new Date().toISOString();
       }
       deloadState.deloadType = null;
       deloadState.startDate = null;

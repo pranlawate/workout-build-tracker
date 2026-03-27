@@ -156,6 +156,13 @@ export class WeightTrendChart {
       return null;
     }
 
+    const normalized = weightEntries
+      .map(e => ({ date: e.date, weight_kg: parseFloat(e.weight_kg) }))
+      .filter(e => Number.isFinite(e.weight_kg));
+    if (normalized.length === 0) {
+      return null;
+    }
+
     const canvas = document.createElement('canvas');
     canvas.width = this.width;
     canvas.height = this.height;
@@ -167,19 +174,18 @@ export class WeightTrendChart {
     ctx.fillStyle = '#1f2937';
     ctx.fillRect(0, 0, this.width, this.height);
 
-    // Calculate ranges
-    const weights = weightEntries.map(e => e.weight_kg);
+    const weights = normalized.map(e => e.weight_kg);
     const minWeight = Math.min(...weights) - 0.5;
     const maxWeight = Math.max(...weights) + 0.5;
-    const dates = weightEntries.map(e => new Date(e.date));
+    const dates = normalized.map(e => new Date(e.date));
     const minDate = new Date(Math.min(...dates));
     const maxDate = new Date(Math.max(...dates));
 
     // Draw chart
     this.drawAxes(ctx, minWeight, maxWeight);
-    this.drawDataPoints(ctx, weightEntries, minWeight, maxWeight, minDate, maxDate);
+    this.drawDataPoints(ctx, normalized, minWeight, maxWeight, minDate, maxDate);
 
-    const smoothed = this.smooth8Week(weightEntries);
+    const smoothed = this.smooth8Week(normalized);
     this.drawTrendLine(ctx, smoothed, minWeight, maxWeight, minDate, maxDate);
 
     return canvas;

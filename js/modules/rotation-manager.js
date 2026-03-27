@@ -68,9 +68,16 @@ export class RotationManager {
         }
       }
 
-      // 5. Get next rotation variant
+      // 5. Get next rotation variant (cycle through pool; avoid always using rotations[0])
       const pool = ROTATION_POOLS[currentExerciseName];
-      const nextVariation = pool.rotations[0]; // Simple: alternate between 2
+      const rotations = pool.rotations || [];
+      const candidates = rotations.filter((r) => r !== currentExerciseName);
+      const poolPick = candidates.length > 0 ? candidates : rotations.slice();
+      const idx =
+        poolPick.length > 0
+          ? Math.abs(tenure.weeksOnExercise) % poolPick.length
+          : 0;
+      const nextVariation = poolPick[idx] || rotations[0];
 
       // 6. Return rotation suggestion
       return {

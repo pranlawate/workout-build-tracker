@@ -33,15 +33,22 @@ export class ProgressChart {
    * @returns {boolean} True if entry is valid
    * @private
    */
+  _sessionMaxWeight(sets) {
+    if (!Array.isArray(sets) || sets.length === 0) return null;
+    let max = null;
+    for (const set of sets) {
+      if (!set || typeof set.weight !== 'number' || !isFinite(set.weight) || set.weight <= 0) {
+        continue;
+      }
+      max = max === null ? set.weight : Math.max(max, set.weight);
+    }
+    return max;
+  }
+
   _validateEntry(entry) {
     if (!entry || !entry.date) return false;
     if (!Array.isArray(entry.sets) || entry.sets.length === 0) return false;
-
-    const firstSet = entry.sets[0];
-    if (!firstSet || typeof firstSet.weight !== 'number') return false;
-    if (firstSet.weight <= 0 || !isFinite(firstSet.weight)) return false;
-
-    return true;
+    return this._sessionMaxWeight(entry.sets) !== null;
   }
 
   /**
@@ -68,7 +75,7 @@ export class ProgressChart {
 
     const data = validEntries.map(entry => ({
       date: new Date(entry.date),
-      weight: entry.sets[0].weight
+      weight: this._sessionMaxWeight(entry.sets)
     }));
 
     if (data.length === 1) {
@@ -168,14 +175,13 @@ export class ProgressChart {
     this.ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
     this.ctx.textAlign = 'center';
 
-    // X-axis labels (dates) - show first, middle, last
-    const indices = [0, Math.floor(data.length / 2), data.length - 1];
+    // X-axis labels (dates) - show first, middle, last (dedupe when e.g. only 2 points)
+    const rawIndices = [0, Math.floor(data.length / 2), data.length - 1];
+    const indices = [...new Set(rawIndices.filter(i => i >= 0 && i < data.length))].sort((a, b) => a - b);
     indices.forEach(i => {
-      if (i < data.length) {
-        const x = padding + (i / (data.length - 1)) * width;
-        const label = data[i].date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        this.ctx.fillText(label, x, this.height - 10);
-      }
+      const x = padding + (i / (data.length - 1)) * width;
+      const label = data[i].date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      this.ctx.fillText(label, x, this.height - 10);
     });
 
     // Y-axis labels (weights)

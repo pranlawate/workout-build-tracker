@@ -12,7 +12,7 @@
  * DETECTION RULES:
  * - Red Alert (regression): Weight dropped OR reps dropped 25%+
  * - Yellow Warning (form breakdown): Reps vary 50%+ OR all sets RIR 0-1
- * - Requires 2+ previous workouts for regression detection
+ * - Regression compares the current session (in progress or last saved) to the previous session only
  * - Can detect form breakdown with just current session data
  *
  * @example
@@ -31,11 +31,10 @@ export class PerformanceAnalyzer {
    * CONSERVATIVE DETECTION PHILOSOPHY
    *
    * This analyzer uses high thresholds to avoid false positives:
-   * - Requires 2+ previous workouts before flagging regression
-   * - Weight regression: Must decrease vs 2 sessions ago (not just 1)
+   * - Weight regression: vs previous session (or in-progress vs last saved), using best weight in session
    * - Rep drop: Must be 25%+ decline (not minor fluctuation)
    * - Intra-set variance: Must be 50%+ difference (allows normal fatigue)
-   * - Low RIR: Must be ALL sets at 0-1 (not just one hard set)
+   * - Low RIR: Must be ALL logged sets at 0-1 (RIR not recorded is ignored)
    * - Skips analysis during deload (prevents false alarms)
    *
    * Design goal: Warn only on clear patterns, not normal variation.
@@ -53,25 +52,71 @@ export class PerformanceAnalyzer {
   }
 
   /**
-   * Check if weight decreased compared to 2 sessions ago
+   * Max weight across sets (valid numeric weights only)
+   * @param {Array} sets
+   * @returns {number|undefined}
+   */
+  _bestWeight(sets) {
+    if (!Array.isArray(sets) || sets.length === 0) return undefined;
+    let max = undefined;
+    for (const set of sets) {
+      if (!set || typeof set.weight !== 'number' || !isFinite(set.weight)) continue;
+      max = max === undefined ? set.weight : Math.max(max, set.weight);
+    }
+    return max;
+  }
+
+  /**
+   * Average reps across sets with reps > 0
+   * @param {Array} sets
+   * @returns {number|undefined}
+   */
+  _avgReps(sets) {
+    if (!Array.isArray(sets) || sets.length === 0) return undefined;
+    const reps = sets.map(s => (s && typeof s.reps === 'number' ? s.reps : 0)).filter(r => r > 0);
+    if (reps.length === 0) return undefined;
+    return reps.reduce((a, b) => a + b, 0) / reps.length;
+  }
+
+  /**
+   * Check if weight decreased vs previous session (not vs all-time best)
    * @param {Array} history - Exercise history array (sorted oldest to newest)
+   * @param {Array} currentSets - In-progress sets for this session (optional)
    * @returns {Object|null} Alert object if regression detected, null otherwise
    */
-  detectWeightRegression(history) {
-    if (!history || history.length < 2) return null;
+  detectWeightRegression(history, currentSets = []) {
+    if (!history || history.length < 1) return null;
 
-    const twoSessionsAgo = history[history.length - 2];
-    const lastSession = history[history.length - 1];
+    const hasCurrentWork = Array.isArray(currentSets) && currentSets.some(s => s && s.reps > 0);
 
-    // Guard against missing sets
-    if (!twoSessionsAgo?.sets?.length || !lastSession?.sets?.length) {
+    if (hasCurrentWork && history.length >= 1) {
+      const previousSession = history[history.length - 1];
+      if (!previousSession?.sets?.length) return null;
+
+      const prevW = this._bestWeight(previousSession.sets);
+      const curW = this._bestWeight(currentSets);
+      if (prevW !== undefined && curW !== undefined && curW < prevW) {
+        return {
+          status: 'alert',
+          message: `⚠️ Weight below last session (${prevW}kg → ${curW}kg) - check recovery or form`,
+          pattern: 'regression'
+        };
+      }
       return null;
     }
 
-    const oldWeight = twoSessionsAgo.sets[0]?.weight;
-    const newWeight = lastSession.sets[0]?.weight;
+    if (history.length < 2) return null;
 
-    // Only flag if we have valid weight data
+    const previousSession = history[history.length - 2];
+    const lastSession = history[history.length - 1];
+
+    if (!previousSession?.sets?.length || !lastSession?.sets?.length) {
+      return null;
+    }
+
+    const oldWeight = this._bestWeight(previousSession.sets);
+    const newWeight = this._bestWeight(lastSession.sets);
+
     if (oldWeight === undefined || newWeight === undefined) {
       return null;
     }
@@ -79,7 +124,7 @@ export class PerformanceAnalyzer {
     if (newWeight < oldWeight) {
       return {
         status: 'alert',
-        message: `⚠️ Weight regressed from ${oldWeight}kg to ${newWeight}kg - check if recovering from illness/deload`,
+        message: `⚠️ Weight below previous session (${oldWeight}kg → ${newWeight}kg) - check if recovering from illness/deload`,
         pattern: 'regression'
       };
     }
@@ -88,34 +133,57 @@ export class PerformanceAnalyzer {
   }
 
   /**
-   * Check if average reps dropped 25%+ compared to 2 sessions ago
+   * Check if average reps dropped 25%+ vs previous session
    * @param {Array} history - Exercise history array
+   * @param {Array} currentSets - In-progress sets (optional)
    * @returns {Object|null} Alert object if rep drop detected, null otherwise
    */
-  detectRepDrop(history) {
-    if (!history || history.length < 2) return null;
+  detectRepDrop(history, currentSets = []) {
+    if (!history || history.length < 1) return null;
 
-    const twoSessionsAgo = history[history.length - 2];
-    const lastSession = history[history.length - 1];
+    const hasCurrentWork = Array.isArray(currentSets) && currentSets.some(s => s && s.reps > 0);
 
-    if (!twoSessionsAgo?.sets?.length || !lastSession?.sets?.length) {
+    if (hasCurrentWork && history.length >= 1) {
+      const previousSession = history[history.length - 1];
+      if (!previousSession?.sets?.length) return null;
+
+      const avgRepsOld = this._avgReps(previousSession.sets);
+      const avgRepsNew = this._avgReps(currentSets);
+      if (avgRepsOld === undefined || avgRepsNew === undefined) return null;
+      if (avgRepsOld === 0) return null;
+
+      const dropPercentage = (avgRepsOld - avgRepsNew) / avgRepsOld;
+      if (dropPercentage >= 0.25) {
+        return {
+          status: 'alert',
+          message: `⚠️ Rep performance dropped ${Math.round(dropPercentage * 100)}% vs last session - possible overtraining`,
+          pattern: 'regression'
+        };
+      }
       return null;
     }
 
-    // Calculate average reps per session
-    const avgRepsOld = twoSessionsAgo.sets.reduce((sum, set) => sum + (set.reps || 0), 0) / twoSessionsAgo.sets.length;
-    const avgRepsNew = lastSession.sets.reduce((sum, set) => sum + (set.reps || 0), 0) / lastSession.sets.length;
+    if (history.length < 2) return null;
 
-    // Avoid division by zero
+    const previousSession = history[history.length - 2];
+    const lastSession = history[history.length - 1];
+
+    if (!previousSession?.sets?.length || !lastSession?.sets?.length) {
+      return null;
+    }
+
+    const avgRepsOld = this._avgReps(previousSession.sets);
+    const avgRepsNew = this._avgReps(lastSession.sets);
+
+    if (avgRepsOld === undefined || avgRepsNew === undefined) return null;
     if (avgRepsOld === 0) return null;
 
-    // Check if reps dropped by 25% or more
     const dropPercentage = (avgRepsOld - avgRepsNew) / avgRepsOld;
 
     if (dropPercentage >= 0.25) {
       return {
         status: 'alert',
-        message: `⚠️ Rep performance dropped ${Math.round(dropPercentage * 100)}% - possible overtraining`,
+        message: `⚠️ Rep performance dropped ${Math.round(dropPercentage * 100)}% vs previous session - possible overtraining`,
         pattern: 'regression'
       };
     }
@@ -171,13 +239,14 @@ export class PerformanceAnalyzer {
       return null;
     }
 
-    // Check if ALL sets have RIR 0 or 1
-    const allLowRIR = setsToAnalyze.every(set => {
-      const rir = set.rir !== undefined ? set.rir : 999; // Default high if missing
-      return rir <= 1;
-    });
+    const withRecordedRir = setsToAnalyze.filter(set => set && typeof set.rir === 'number');
+    if (withRecordedRir.length === 0) {
+      return null;
+    }
 
-    if (allLowRIR && setsToAnalyze.length > 0) {
+    const allLowRIR = withRecordedRir.every(set => set.rir <= 1);
+
+    if (allLowRIR) {
       return {
         status: 'warning',
         message: '⚠️ Training too close to failure - leave 2-3 reps in reserve',
@@ -207,8 +276,7 @@ export class PerformanceAnalyzer {
         };
       }
 
-      // Minimum data requirement: need at least 2 previous workouts for regression
-      // But can still check form breakdown on current session with just 1 workout in history
+      // Minimum data requirement: need at least 1 previous workout for regression when in session
       if (history.length < 1) {
         return {
           status: 'good',
@@ -217,12 +285,15 @@ export class PerformanceAnalyzer {
         };
       }
 
-      // Check for regression patterns first (red alerts) - requires 2+ sessions
-      if (history.length >= 2) {
-        const weightRegression = this.detectWeightRegression(history);
+      const hasCurrentWork = Array.isArray(currentSets) && currentSets.some(s => s && s.reps > 0);
+      const canCompareRegression =
+        hasCurrentWork || history.length >= 2;
+
+      if (canCompareRegression) {
+        const weightRegression = this.detectWeightRegression(history, currentSets);
         if (weightRegression) return weightRegression;
 
-        const repDrop = this.detectRepDrop(history);
+        const repDrop = this.detectRepDrop(history, currentSets);
         if (repDrop) return repDrop;
       }
 

@@ -45,6 +45,8 @@ class App {
     this.analyticsCalculator = new AnalyticsCalculator(this.storage);
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
+    this.setInputHandler = null;
+    this.logSetClickHandler = null;
 
     // Workout reference expanded state (0-3 = workout index, null = none)
     const stored = sessionStorage.getItem('expandedWorkout');
@@ -88,14 +90,9 @@ class App {
   }
 
   escapeHtml(text) {
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    };
-    return (text ?? '').replace(/[&<>"']/g, m => map[m]);
+    const str = String(text ?? '');
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return str.replace(/[&<>"']/g, m => map[m]);
   }
 
   /**
@@ -442,14 +439,18 @@ class App {
         this.storage.saveTrainingPhase('building');
         buildingBtn.classList.add('active');
         maintenanceBtn.classList.remove('active');
-        phaseInfo.textContent = 'Building: Focus on progressive overload and strength gains';
+        if (phaseInfo) {
+          phaseInfo.textContent = 'Building: Focus on progressive overload and strength gains';
+        }
       });
 
       maintenanceBtn.addEventListener('click', () => {
         this.storage.saveTrainingPhase('maintenance');
         maintenanceBtn.classList.add('active');
         buildingBtn.classList.remove('active');
-        phaseInfo.textContent = 'Maintenance: Sustain strength with varied accessories';
+        if (phaseInfo) {
+          phaseInfo.textContent = 'Maintenance: Sustain strength with varied accessories';
+        }
       });
 
       // Set initial state
@@ -457,7 +458,9 @@ class App {
       if (currentPhase === 'maintenance') {
         maintenanceBtn.classList.add('active');
         buildingBtn.classList.remove('active');
-        phaseInfo.textContent = 'Maintenance: Sustain strength with varied accessories';
+        if (phaseInfo) {
+          phaseInfo.textContent = 'Maintenance: Sustain strength with varied accessories';
+        }
       }
     }
   }
@@ -681,8 +684,9 @@ class App {
         cb.addEventListener('change', updateProgress);
       });
 
-      // Initialize
-      progressSpan.textContent = `✓ 0 of ${total} completed`;
+      // Initialize (reset button; avoids stale enabled state from a prior cooldown)
+      finishBtn.disabled = true;
+      updateProgress();
     } catch (error) {
       console.error('[App] Error rendering stretching checklist:', error);
     }
@@ -762,7 +766,11 @@ class App {
           return;
         }
 
-        treadmillText.innerHTML += ` <small class="warning">${this.escapeHtml(recommendation.treadmillNote)}</small>`;
+        treadmillText.querySelectorAll('small.warning').forEach(el => el.remove());
+        treadmillText.insertAdjacentHTML(
+          'beforeend',
+          ` <small class="warning">${this.escapeHtml(recommendation.treadmillNote)}</small>`
+        );
       }
     } catch (error) {
       console.error('[App] Error rendering LISS recommendations:', error);
@@ -775,6 +783,10 @@ class App {
    */
   showCooldownModal(workoutData) {
     const modal = document.getElementById('cooldown-modal');
+    if (!modal) {
+      console.warn('[App] Cooldown modal element not found');
+      return;
+    }
 
     // Populate stretching (mandatory)
     this.renderStretchingChecklist(workoutData.workoutName);
@@ -956,7 +968,10 @@ class App {
         if (!this.bodyWeight) {
           this.bodyWeight = new BodyWeightManager(this.storage);
         }
-        this.bodyWeight.addEntry(weighInData.weight);
+        const weighResult = this.bodyWeight.addEntry(weighInData.weight);
+        if (!weighResult.success) {
+          alert('⚠️ Failed to save body weight. You can try again from the progress screen.');
+        }
       }
 
       // Collect all cooldown data
@@ -1193,7 +1208,11 @@ class App {
     const sessionExercise = this.workoutSession?.exercises[exerciseIndex];
     if (sessionExercise) {
       currentSetIndex = sessionExercise.sets.findIndex(s =>
-        !s || s.reps === 0 || !s.weight || s.rir === undefined
+        !s ||
+        s.reps === 0 ||
+        s.weight === undefined ||
+        s.weight === null ||
+        typeof s.rir !== 'number'
       );
       if (currentSetIndex === -1) currentSetIndex = 0;
     }
@@ -1203,7 +1222,11 @@ class App {
 
       // Check if we have session data for this set (from current workout)
       const sessionSet = sessionExercise?.sets?.[setIndex];
-      const hasSessionData = sessionSet && sessionSet.weight > 0;
+      const hasSessionData =
+        sessionSet &&
+        sessionSet.weight !== undefined &&
+        sessionSet.weight !== null &&
+        sessionSet.reps > 0;
 
       // Use session data if available, otherwise check previous set in current session, then last workout data
       const prevSessionSet = sessionExercise?.sets?.[setIndex - 1]; // Previous set in current workout
@@ -1214,12 +1237,14 @@ class App {
       const defaultReps = hasSessionData ? sessionSet.reps : (lastSet?.reps || '');
 
       // Default RIR to minimum of target range (per design spec)
-      // Time-based exercises don't have RIR
-      const defaultRir = hasSessionData ? sessionSet.rir : (lastSet?.rir ?? (() => {
-        if (!exercise.rirTarget) return 0; // Time-based exercises
-        const [min] = exercise.rirTarget.split('-').map(Number);
-        return min;
-      })());
+      // Time-based exercises don't have RIR; null/undefined last RIR uses target min
+      const defaultRir = hasSessionData && typeof sessionSet.rir === 'number'
+        ? sessionSet.rir
+        : (typeof lastSet?.rir === 'number' ? lastSet.rir : (() => {
+          if (!exercise.rirTarget) return 0; // Time-based exercises
+          const [min] = exercise.rirTarget.split('-').map(Number);
+          return min;
+        })());
 
       // Determine set state
       const isCurrent = setIndex === currentSetIndex;
@@ -1536,12 +1561,15 @@ class App {
 
     exerciseList.addEventListener('change', this.setInputHandler);
 
-    // Add LOG SET button handler
-    exerciseList.addEventListener('click', (e) => {
+    if (this.logSetClickHandler) {
+      exerciseList.removeEventListener('click', this.logSetClickHandler);
+    }
+    this.logSetClickHandler = (e) => {
       if (e.target.classList.contains('log-set-btn')) {
         this.handleLogSet(e);
       }
-    });
+    };
+    exerciseList.addEventListener('click', this.logSetClickHandler);
   }
 
   handleSetInput(event) {
@@ -1549,7 +1577,10 @@ class App {
     const exerciseIndex = parseInt(input.dataset.exercise);
     const setIndex = parseInt(input.dataset.set);
     const field = input.dataset.field;
-    const value = parseFloat(input.value);
+    const value =
+      field === 'reps' || field === 'rir'
+        ? parseInt(input.value, 10)
+        : parseFloat(input.value);
 
     // Validate input
     if (isNaN(value) || value < 0) return;
@@ -1575,8 +1606,8 @@ class App {
     const isTimeBased = this.isTimeBasedExercise(exerciseDef);
     // For bodyweight exercises, weight can be 0
     const hasValidWeight = typeof set.weight === 'number' && set.weight >= 0;
-    // Time-based exercises don't have RIR
-    const hasValidRir = isTimeBased || (set.rir >= 0);
+    // Time-based exercises don't have RIR; null/undefined RIR is not "0 RIR"
+    const hasValidRir = isTimeBased || (typeof set.rir === 'number' && set.rir >= 0);
     if (hasValidWeight && set.reps > 0 && hasValidRir) {
       this.checkSetProgression(exerciseIndex, setIndex);
 
@@ -1738,15 +1769,17 @@ class App {
     let message = '';
     let colorClass = 'info';
 
+    const rirRecorded = typeof set.rir === 'number';
+
     // Check if hitting progression criteria
-    if (set.reps >= maxReps && set.rir >= minRir) {
+    if (set.reps >= maxReps && rirRecorded && set.rir >= minRir) {
       message = `🟢 Great set! Hitting max reps with good reserve.`;
       colorClass = 'success';
 
       // Check if this could trigger progression
       const allSetsMaxReps = sessionExercise.sets
         .filter(s => s && s.reps > 0)
-        .every(s => s.reps >= maxReps && s.rir >= minRir);
+        .every(s => s.reps >= maxReps && typeof s.rir === 'number' && s.rir >= minRir);
 
       if (allSetsMaxReps && setIndex === exerciseDef.sets - 1) {
         message = `🟢 All sets hit ${maxReps} reps! Increase weight next workout.`;
@@ -1757,8 +1790,8 @@ class App {
       message = `🔴 Below target range. Consider reducing weight next set.`;
       colorClass = 'danger';
     }
-    // Check if RIR too low
-    else if (set.rir < minRir) {
+    // Check if RIR too low (only when RIR was logged)
+    else if (rirRecorded && set.rir < minRir) {
       message = `🟡 Too close to failure (RIR ${set.rir}). Aim for RIR ${minRir}-${maxRir}.`;
       colorClass = 'warning';
     }
@@ -1936,7 +1969,8 @@ class App {
         return;
       }
       const [rirMin] = exerciseDef.rirTarget.split('-').map(Number);
-      if (set.reps >= max && set.rir >= rirMin) {
+      const rirOk = typeof set.rir === 'number' && set.rir >= rirMin;
+      if (set.reps >= max && rirOk) {
         setRow.style.borderLeft = '4px solid var(--color-success)';
       } else if (set.reps < min) {
         setRow.style.borderLeft = '4px solid var(--color-danger)';
@@ -2018,7 +2052,7 @@ class App {
     } else {
       // For regular exercises, set input value
       const weightInput = nextSetRow.querySelector('[data-field="weight"]');
-      if (weightInput && completedSet.weight) {
+      if (weightInput && typeof completedSet.weight === 'number') {
         weightInput.value = completedSet.weight;
       }
     }
@@ -2231,7 +2265,11 @@ class App {
     exercises.forEach(exercise => {
       if (exercise.sets && Array.isArray(exercise.sets)) {
         exercise.sets.forEach(set => {
-          if (set.reps && set.weight) {
+          if (
+            set.reps > 0 &&
+            typeof set.weight === 'number' &&
+            !Number.isNaN(set.weight)
+          ) {
             totalVolume += set.reps * set.weight;
           }
         });
@@ -2286,7 +2324,11 @@ class App {
       previousWorkout.exercises.forEach(exercise => {
         if (exercise.sets) {
           exercise.sets.forEach(set => {
-            if (set.reps && set.weight) {
+            if (
+              set.reps > 0 &&
+              typeof set.weight === 'number' &&
+              !Number.isNaN(set.weight)
+            ) {
               previousVolume += set.reps * set.weight;
             }
           });
@@ -2663,6 +2705,11 @@ class App {
     const confirmBtn = document.getElementById('overlay-confirm');
     const numPad = document.querySelector('.number-pad');
 
+    if (!overlay || !closeBtn || !confirmBtn || !numPad) {
+      console.warn('[App] Number overlay elements not found; overlay disabled');
+      return;
+    }
+
     let currentValue = '0';
     let targetInput = null;
 
@@ -2701,7 +2748,8 @@ class App {
         currentValue = currentValue === '0' ? value : currentValue + value;
       }
 
-      document.getElementById('overlay-value').textContent = currentValue;
+      const overlayValueEl = document.getElementById('overlay-value');
+      if (overlayValueEl) overlayValueEl.textContent = currentValue;
     });
 
     // Confirm button
@@ -2733,15 +2781,18 @@ class App {
 
         // Set initial value
         currentValue = targetInput.value || '0';
-        document.getElementById('overlay-value').textContent = currentValue;
+        const overlayValueEl = document.getElementById('overlay-value');
+        if (overlayValueEl) overlayValueEl.textContent = currentValue;
 
         // Set title
         const title = field === 'weight' ? 'Edit Weight' : 'Edit Reps';
-        document.getElementById('overlay-title').textContent = title;
+        const overlayTitleEl = document.getElementById('overlay-title');
+        if (overlayTitleEl) overlayTitleEl.textContent = title;
 
         // Set unit
         const unit = field === 'weight' ? 'kg' : 'reps';
-        document.getElementById('overlay-unit').textContent = unit;
+        const overlayUnitEl = document.getElementById('overlay-unit');
+        if (overlayUnitEl) overlayUnitEl.textContent = unit;
 
         // Show overlay
         overlay.classList.add('active');
@@ -2793,15 +2844,15 @@ class App {
   deleteEntry(exerciseKey, index) {
     const history = this.storage.getExerciseHistory(exerciseKey);
 
-    // Calculate reversed index (index passed is display index, not array index)
-    const reversedIndex = history.length - 1 - index;
-    const entry = history[reversedIndex];
+    // Index is the storage array index (same as history list data-index)
+    const entry = history[index];
+    if (!entry) return;
     const deletedDate = entry.date;
     const date = new Date(deletedDate).toLocaleDateString();
 
     if (confirm(`Delete workout from ${date}?\n\nThis cannot be undone.`)) {
       // Remove the entry
-      history.splice(reversedIndex, 1);
+      history.splice(index, 1);
       this.storage.saveExerciseHistory(exerciseKey, history);
 
       // Check if we need to roll back rotation state
@@ -2809,6 +2860,7 @@ class App {
 
       // Re-render detail screen
       this.exerciseDetailScreen.render(exerciseKey);
+      this.exerciseDetailScreen.showToast('✅ Workout deleted');
     }
   }
 
@@ -2875,8 +2927,12 @@ class App {
 
       // Check if removing this workout affects cycle count
       // (If the sequence no longer contains a full cycle)
-      const hadFullCycle = this.workoutManager.detectFullCycle([...rotation.sequence, removedWorkout]);
-      const hasFullCycleNow = this.workoutManager.detectFullCycle(rotation.sequence);
+      const seqBeforeRemoval = [...rotation.sequence, removedWorkout];
+      const hadFullCycle = this.workoutManager.detectFullCycle(seqBeforeRemoval, removedWorkout);
+      const lastNow = rotation.sequence.length > 0
+        ? rotation.sequence[rotation.sequence.length - 1]
+        : undefined;
+      const hasFullCycleNow = this.workoutManager.detectFullCycle(rotation.sequence, lastNow);
 
       if (hadFullCycle && !hasFullCycleNow && rotation.cycleCount > 0) {
         rotation.cycleCount--;
@@ -3767,6 +3823,20 @@ class App {
    * @returns {string} HTML for blocks
    */
   renderFifthDayBlocks(blocks) {
+    const volumeLabel = (ex) => {
+      const hasSets = ex.sets != null && ex.sets !== '';
+      const vol =
+        ex.reps != null && ex.reps !== ''
+          ? ex.reps
+          : ex.duration != null && ex.duration !== ''
+            ? ex.duration
+            : null;
+      if (hasSets && vol != null) return `${ex.sets} sets × ${vol}`;
+      if (hasSets) return `${ex.sets} sets`;
+      if (vol != null) return String(vol);
+      return '—';
+    };
+
     return blocks.map((block, index) => {
       if (index === 2) {
         // Block 3: User Choice (array of options)
@@ -3784,14 +3854,14 @@ class App {
                   ${choice.options ? `
                     <ul style="margin-top: 8px; font-size: 0.85rem;">
                       ${choice.options.map(opt => `
-                        <li>${this.escapeHtml(opt.name)}: ${this.escapeHtml(opt.format)}</li>
+                        <li>${this.escapeHtml(opt.name)}: ${this.escapeHtml(opt.format != null && opt.format !== '' ? String(opt.format) : '—')}</li>
                       `).join('')}
                     </ul>
                   ` : ''}
                   ${choice.exercises ? `
                     <ul style="margin-top: 8px; font-size: 0.85rem;">
                       ${choice.exercises.map(ex => `
-                        <li>${this.escapeHtml(ex.name)}: ${ex.sets ? this.escapeHtml(ex.sets + ' sets × ') : ''}${ex.reps ? this.escapeHtml(ex.reps) : this.escapeHtml(ex.duration || '')}${ex.note ? ` (${this.escapeHtml(ex.note)})` : ''}</li>
+                        <li>${this.escapeHtml(ex.name)}: ${this.escapeHtml(volumeLabel(ex))}${ex.note ? ` (${this.escapeHtml(ex.note)})` : ''}</li>
                       `).join('')}
                     </ul>
                   ` : ''}
@@ -3816,7 +3886,7 @@ class App {
                     <div class="block-exercise">
                       <div class="exercise-info">
                         <h4>${this.escapeHtml(ex.name)}</h4>
-                        <div class="exercise-meta">${this.escapeHtml(ex.sets + ' sets × ' + ex.reps)}</div>
+                        <div class="exercise-meta">${this.escapeHtml(volumeLabel(ex))}</div>
                       </div>
                     </div>
                   `).join('')}
@@ -3838,7 +3908,7 @@ class App {
                 <div class="block-exercise">
                   <div class="exercise-info">
                     <h4>${this.escapeHtml(ex.name)}</h4>
-                    <div class="exercise-meta">${this.escapeHtml(ex.sets + ' sets × ' + ex.reps)} • Rest: ${this.escapeHtml(ex.rest)}</div>
+                    <div class="exercise-meta">${this.escapeHtml(volumeLabel(ex))}${ex.rest != null && ex.rest !== '' ? ` • Rest: ${this.escapeHtml(ex.rest)}` : ''}</div>
                   </div>
                 </div>
               `).join('')}
@@ -3851,7 +3921,7 @@ class App {
                     <div class="block-exercise">
                       <div class="exercise-info">
                         <h4>${this.escapeHtml(ex.name)}</h4>
-                        <div class="exercise-meta">${this.escapeHtml(ex.sets + ' sets × ' + ex.reps)} • ${this.escapeHtml(ex.note)}</div>
+                        <div class="exercise-meta">${this.escapeHtml(volumeLabel(ex))}${ex.note ? ` • ${this.escapeHtml(ex.note)}` : ''}</div>
                       </div>
                     </div>
                   `).join('')}
@@ -4071,7 +4141,7 @@ class App {
             </div>
             <div class="metric">
               <span class="metric-label">Avg Fatigue:</span>
-              <span class="metric-value">${recovery.avgFatigue.toFixed(1)}/9</span>
+              <span class="metric-value">${recovery.avgFatigue.toFixed(1)}/10</span>
             </div>
             <div class="metric">
               <span class="metric-label">High Fatigue Days:</span>
@@ -4934,14 +5004,13 @@ class App {
     exerciseSelection.style.display = 'none';
     painDetails.style.display = 'none';
 
-    // Pre-select "No pain"
-    painNoBtn.classList.remove('btn-secondary');
-    painNoBtn.classList.add('btn-primary');
+    // Require explicit choice: do not default to "no pain" (avoids saving on incomplete wizard)
+    painNoBtn.classList.remove('btn-primary');
+    painNoBtn.classList.add('btn-secondary');
     painYesBtn.classList.remove('btn-primary');
     painYesBtn.classList.add('btn-secondary');
 
-    // Store default: no pain
-    this.summaryPainSelection = 'no';
+    this.summaryPainSelection = null;
 
     // "No pain" button
     painNoBtn.onclick = () => {
@@ -5004,7 +5073,7 @@ class App {
       }));
 
       if (painfulExercises.length === 0) {
-        alert('Please select at least one exercise, or click "No Pain"');
+        alert('Please select at least one exercise, or tap "No pain" if you had none.');
         return;
       }
 
@@ -5152,6 +5221,11 @@ class App {
    * @returns {boolean} True if successful, false if validation failed
    */
   saveSummaryPainData(workoutData) {
+    if (this.summaryPainSelection !== 'no' && this.summaryPainSelection !== 'yes') {
+      alert('Please tap "No pain" to confirm, or use "Yes, I had pain" and finish all steps.');
+      return false;
+    }
+
     if (this.summaryPainSelection === 'no') {
       // Save pain-free status for all exercises
       workoutData.exercises.forEach(exercise => {
@@ -5162,13 +5236,20 @@ class App {
     }
 
     // User selected "Yes, I had pain"
+    const checkboxes = document.querySelectorAll('#pain-exercise-list-summary input[type="checkbox"]:checked');
+    if (checkboxes.length === 0) {
+      alert('Please select exercises with pain, or tap "No pain" if you had none.');
+      return false;
+    }
+
     if (!this.summaryPainfulExercises || this.summaryPainfulExercises.length === 0) {
-      // Check if they selected exercises
-      const checkboxes = document.querySelectorAll('#pain-exercise-list-summary input[type="checkbox"]:checked');
-      if (checkboxes.length === 0) {
-        alert('Please select exercises with pain, or click "No Pain"');
-        return false;
-      }
+      alert('Please complete pain details for every exercise you selected.');
+      return false;
+    }
+
+    if (this.summaryPainfulExercises.length !== checkboxes.length) {
+      alert('Please complete pain details for every exercise you selected.');
+      return false;
     }
 
     // Validate pain details completed
@@ -5303,33 +5384,35 @@ class App {
   }
 
   /**
-   * Calculate pre-workout fatigue score (0-6 points)
+   * Calculate pre-workout fatigue score (0-7 points: sleep + stress + energy + soreness)
    * @param {Object} metrics - Recovery metrics
    * @returns {number} Points from pre-workout data
    */
   calculatePreWorkoutScore(metrics) {
     let score = 0;
 
-    // Sleep scoring
-    if (metrics.sleepHours < 6) {
-      score += 2;
-    } else if (metrics.sleepHours < 7) {
-      score += 1;
+    const sleepH = Number(metrics.sleepHours);
+    if (Number.isFinite(sleepH)) {
+      if (sleepH < 6) {
+        score += 2;
+      } else if (sleepH < 7) {
+        score += 1;
+      }
     }
 
-    // Stress scoring
     if (metrics.stressLevel === 'High') {
       score += 1;
     }
 
-    // Energy scoring
-    if (metrics.energyLevel <= 2) {
-      score += 2;
-    } else if (metrics.energyLevel === 3) {
-      score += 1;
+    const energy = Number(metrics.energyLevel);
+    if (Number.isFinite(energy)) {
+      if (energy <= 2) {
+        score += 2;
+      } else if (energy === 3) {
+        score += 1;
+      }
     }
 
-    // Soreness scoring
     if (metrics.muscleSoreness === 'Severe') {
       score += 2;
     } else if (metrics.muscleSoreness === 'Moderate') {
@@ -5340,7 +5423,7 @@ class App {
   }
 
   /**
-   * Calculate pain score from last workout (0-3 points)
+   * Calculate pain score from recent pain reports only (0-3 points)
    * @returns {number} Points from pain data
    */
   calculatePainScore() {
@@ -5348,10 +5431,16 @@ class App {
       const allPainData = this.storage.getPainHistoryData();
       if (!allPainData || Object.keys(allPainData).length === 0) return 0;
 
-      // Flatten all pain reports
+      const cutoffMs = Date.now() - 42 * 24 * 60 * 60 * 1000;
+
+      // Flatten pain reports from roughly the last 6 weeks
       const reports = Object.values(allPainData)
         .flat()
-        .filter(r => r && r.date && r.hadPain);
+        .filter(r => {
+          if (!r || !r.date || !r.hadPain) return false;
+          const t = new Date(r.date).getTime();
+          return Number.isFinite(t) && t >= cutoffMs;
+        });
 
       if (reports.length === 0) return 0;
 
@@ -5369,7 +5458,7 @@ class App {
   }
 
   /**
-   * Calculate total fatigue score (0-9 points)
+   * Calculate total fatigue score (0-10 points: pre-workout up to 7 + pain up to 3)
    * @param {Object} metrics - Recovery metrics
    * @returns {Object} Score breakdown
    */
@@ -5452,10 +5541,12 @@ class App {
    * Handle recovery metrics submission
    */
   handleRecoverySubmit() {
+    const sleepRaw = parseFloat(document.getElementById('sleep-hours').value);
+    const energyRaw = parseInt(document.getElementById('energy-level').value, 10);
     const metrics = {
-      sleepHours: parseInt(document.getElementById('sleep-hours').value, 10),
+      sleepHours: Number.isFinite(sleepRaw) ? sleepRaw : 7,
       stressLevel: document.getElementById('stress-level').value,
-      energyLevel: parseInt(document.getElementById('energy-level').value, 10),
+      energyLevel: Number.isFinite(energyRaw) ? energyRaw : 3,
       muscleSoreness: document.getElementById('muscle-soreness').value
     };
 
@@ -5497,7 +5588,7 @@ class App {
     if (!banner || !scoreText) return;
 
     // Update score text
-    scoreText.textContent = `Your recovery score is ${scoreData.totalScore}/9. Consider:`;
+    scoreText.textContent = `Your recovery score is ${scoreData.totalScore}/10. Consider:`;
 
     // Show banner
     banner.style.display = 'block';
@@ -5575,6 +5666,7 @@ class App {
   async completeWorkout() {
     if (!this.workoutSession || !this.currentWorkout) return;
     if (this._completingWorkout) return;
+    this._completingWorkout = true;
 
     // Check how many exercises are completed
     const totalExercises = this.currentWorkout.exercises.length;
@@ -5594,11 +5686,11 @@ class App {
       const confirmMessage = `⚠️ Incomplete Workout\n\nYou've completed ${completedCount} of ${totalExercises} exercises.\n\nIncomplete exercises:\n${incompleteExercises.map(name => `• ${name}`).join('\n')}\n\nDo you want to save this partial workout?\n\nNote: This will save your progress but won't:\n• Advance to next workout\n• Update recovery tracking\n• Count toward your streak\n\n✅ YES - Save partial workout\n❌ NO - Continue training`;
 
       if (!confirm(confirmMessage)) {
+        this._completingWorkout = false;
         return; // User chose to continue training
       }
     }
 
-    this._completingWorkout = true;
     this.stopTimer();
 
     try {
@@ -5858,7 +5950,11 @@ class App {
 
     // Close modal on ESC key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.videoModal.style.display === 'block') {
+      if (
+        e.key === 'Escape' &&
+        this.videoModal &&
+        this.videoModal.style.display !== 'none'
+      ) {
         this.closeVideoModal();
       }
     });
@@ -5892,10 +5988,17 @@ class App {
    */
   openVideoModal(exerciseName) {
     try {
+      if (!this.videoModal || !this.videoPlayer) {
+        console.warn('[VideoModal] Modal not initialized');
+        alert('Video player is not available.');
+        return;
+      }
+
       // Get video metadata
       const videoData = getVideoByExercise(exerciseName);
       if (!videoData) {
         console.warn('[VideoModal] No video found for:', exerciseName);
+        alert(`No video is available for "${exerciseName}".`);
         return;
       }
 
@@ -5903,6 +6006,7 @@ class App {
       const videoPath = getVideoPath(exerciseName);
       if (!videoPath) {
         console.warn('[VideoModal] Could not construct video path for:', exerciseName);
+        alert(`Could not load video for "${exerciseName}".`);
         return;
       }
 
@@ -5910,27 +6014,34 @@ class App {
 
       // Set video source (triggers lazy load)
       const videoElement = this.videoPlayer;
-      videoElement.src = videoPath;
-      videoElement.style.display = 'block';
+      videoElement.style.display = '';
 
-      // Hide error state
-      document.getElementById('video-error').style.display = 'none';
+      const errorEl = document.getElementById('video-error');
+      if (errorEl) errorEl.style.display = 'none';
 
       // Set exercise name
-      document.getElementById('video-exercise-name').textContent = exerciseName;
+      const nameEl = document.getElementById('video-exercise-name');
+      if (nameEl) nameEl.textContent = exerciseName;
 
       // Set metadata badges
       const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
-      document.getElementById('video-muscle-group').textContent =
-        `🏋️ ${capitalize(videoData.muscleGroup)}`;
-      document.getElementById('video-equipment').textContent =
-        `🔧 ${capitalize(videoData.equipment)}`;
+      const muscleEl = document.getElementById('video-muscle-group');
+      if (muscleEl) {
+        muscleEl.textContent = `🏋️ ${capitalize(videoData.muscleGroup)}`;
+      }
+      const equipEl = document.getElementById('video-equipment');
+      if (equipEl) {
+        equipEl.textContent = `🔧 ${capitalize(videoData.equipment)}`;
+      }
+
+      videoElement.src = videoPath;
+      videoElement.load();
 
       // Load form guide
       this.loadVideoFormGuide(exerciseName);
 
-      // Show modal (overlay on current screen)
-      this.videoModal.style.display = 'block';
+      // Show modal (flex matches .video-modal CSS; avoid display:block override)
+      this.videoModal.style.display = 'flex';
 
       // Prevent body scroll
       document.body.style.overflow = 'hidden';
@@ -5940,6 +6051,7 @@ class App {
 
     } catch (error) {
       console.error('[VideoModal] Error opening modal:', error);
+      alert('Something went wrong opening the video. Please try again.');
     }
   }
 
@@ -5948,6 +6060,8 @@ class App {
    */
   closeVideoModal() {
     try {
+      if (!this.videoPlayer || !this.videoModal) return;
+
       const videoElement = this.videoPlayer;
 
       // Pause and unload video
@@ -5965,6 +6079,8 @@ class App {
       const formContent = document.getElementById('video-form-guide-content');
       if (formContent) {
         formContent.style.display = 'none';
+      }
+      if (this.videoFormGuideToggle) {
         this.videoFormGuideToggle.textContent = '📋 Form Guide ▼';
       }
 
@@ -5984,13 +6100,15 @@ class App {
     const formContent = document.getElementById('video-form-guide-content');
 
     if (!formCues || !formContent) {
-      // Hide form guide section if no cues
-      this.videoFormGuideToggle.style.display = 'none';
+      if (this.videoFormGuideToggle) {
+        this.videoFormGuideToggle.style.display = 'none';
+      }
       return;
     }
 
-    // Show form guide section
-    this.videoFormGuideToggle.style.display = 'block';
+    if (this.videoFormGuideToggle) {
+      this.videoFormGuideToggle.style.display = 'block';
+    }
 
     // Render form cues
     formContent.innerHTML = `
@@ -6032,6 +6150,7 @@ class App {
    */
   toggleVideoFormGuide() {
     const formContent = document.getElementById('video-form-guide-content');
+    if (!formContent || !this.videoFormGuideToggle) return;
 
     if (formContent.style.display === 'none') {
       formContent.style.display = 'block';
@@ -6046,20 +6165,26 @@ class App {
    * Show video error state
    */
   showVideoError() {
-    // Hide video player
-    this.videoPlayer.style.display = 'none';
+    if (this.videoPlayer) {
+      this.videoPlayer.style.display = 'none';
+    }
 
-    // Show error message
     const errorElement = document.getElementById('video-error');
+    if (!errorElement) {
+      alert('Video failed to load. Check your connection or try again later.');
+      return;
+    }
+
     errorElement.style.display = 'block';
 
-    // Update error message based on online status
     const errorMessage = errorElement.querySelector('.error-hint');
-    if (!navigator.onLine) {
-      errorMessage.textContent =
-        "You're offline. This video hasn't been cached yet. Watch it once online to save for offline use.";
-    } else {
-      errorMessage.textContent = "Check your connection or try again later.";
+    if (errorMessage) {
+      if (!navigator.onLine) {
+        errorMessage.textContent =
+          "You're offline. This video hasn't been cached yet. Watch it once online to save for offline use.";
+      } else {
+        errorMessage.textContent = 'Check your connection or try again later.';
+      }
     }
   }
 
@@ -6070,11 +6195,11 @@ class App {
     const videoElement = this.videoPlayer;
     const errorElement = document.getElementById('video-error');
 
-    // Hide error, show video player
-    errorElement.style.display = 'none';
+    if (!videoElement) return;
+
+    if (errorElement) errorElement.style.display = 'none';
     videoElement.style.display = 'block';
 
-    // Reload video
     videoElement.load();
     videoElement.play().catch(error => {
       console.error('[VideoModal] Retry failed:', error);

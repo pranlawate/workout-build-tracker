@@ -9,6 +9,23 @@
 // Plateau detection threshold (number of sessions at same weight)
 const PLATEAU_THRESHOLD = 3;
 
+/** Best set in a session for regression compare: highest weight, then highest reps */
+function getBestSetFromSession(sets) {
+  if (!sets || !Array.isArray(sets) || sets.length === 0) {
+    return null;
+  }
+  return sets.reduce((best, set) => {
+    if (!set || set.weight === undefined || set.weight === null || set.reps === undefined || set.reps === null) {
+      return best;
+    }
+    if (!best) return set;
+    if (set.weight > best.weight || (set.weight === best.weight && set.reps > best.reps)) {
+      return set;
+    }
+    return best;
+  }, null);
+}
+
 /**
  * Parse rep range to extract min and max values
  * Handles formats: '8-12', '30-60s', '10-12/side', '30s/side'
@@ -85,8 +102,8 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
     throw new Error('Invalid exercise: must be an object');
   }
 
-  if (!exercise.repRange || !exercise.rirTarget) {
-    throw new Error('Exercise must have repRange and rirTarget properties');
+  if (!exercise.repRange) {
+    throw new Error('Exercise must have repRange');
   }
 
   // Check phase-aware progression behavior
@@ -107,10 +124,21 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
   // Building phase - existing logic unchanged
   const { max } = parseRepRange(exercise.repRange);
 
-  // Time-based exercises (no rirTarget): just check if all sets hit max duration
+  // Time-based exercises: duration targets only (rep field holds seconds)
   const isTimeBased = /\d+s\b/.test(exercise.repRange);
-  if (isTimeBased || !exercise.rirTarget) {
+  if (isTimeBased) {
     return sets.every(set => set.reps >= max);
+  }
+
+  // Rep-based without RIR metadata: do not silently skip quality checks; warn and use conservative default
+  if (!exercise.rirTarget) {
+    console.warn(
+      '[Progression] Missing rirTarget for rep-based exercise; using default RIR floor of 2 for progression check'
+    );
+    const rirMin = 2;
+    const allSetsMaxReps = sets.every(set => set.reps >= max);
+    const allSetsGoodRIR = sets.every(set => typeof set.rir === 'number' && set.rir >= rirMin);
+    return allSetsMaxReps && allSetsGoodRIR;
   }
 
   // Rep-based exercises: check reps AND RIR
@@ -119,8 +147,8 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
   // All sets must hit max reps
   const allSetsMaxReps = sets.every(set => set.reps >= max);
 
-  // All sets must have RIR >= minimum target
-  const allSetsGoodRIR = sets.every(set => set.rir >= rirMin);
+  // All sets must have RIR >= minimum target (numeric RIR only; null/undefined do not count as met)
+  const allSetsGoodRIR = sets.every(set => typeof set.rir === 'number' && set.rir >= rirMin);
 
   return allSetsMaxReps && allSetsGoodRIR;
 }
@@ -133,13 +161,30 @@ export function getProgressionStatus(history, exercise, phaseManager) {
 
   if (readyToProgress) return 'ready';
 
+  // Regression vs previous session only (best set per session)
+  if (history.length >= 2) {
+    const currentWorkout = history[history.length - 1];
+    const previousWorkout = history[history.length - 2];
+    const current = getBestSetFromSession(currentWorkout?.sets);
+    const previous = getBestSetFromSession(previousWorkout?.sets);
+    if (current && previous) {
+      const weightDropped = current.weight < previous.weight;
+      const repDropPercent = previous.reps > 0 ? (previous.reps - current.reps) / previous.reps : 0;
+      const significantRepDrop = current.weight === previous.weight && repDropPercent >= 0.25;
+      if (weightDropped || significantRepDrop) {
+        return 'regressed';
+      }
+    }
+  }
+
   // Check for plateau (sessions at same weight)
   if (history.length >= PLATEAU_THRESHOLD) {
     const lastN = history.slice(-PLATEAU_THRESHOLD);
     // Add null safety check before accessing sets array
     const weights = lastN.map(w => {
       if (!w.sets || w.sets.length === 0) return null;
-      return w.sets[0].weight;
+      const best = getBestSetFromSession(w.sets);
+      return best?.weight ?? null;
     }).filter(w => w !== null);
 
     // Only check for plateau if we have valid weights

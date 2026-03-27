@@ -419,7 +419,8 @@ export function getWorkoutWithSelections(workoutName, storage) {
     ...baseWorkout,
     exercises: baseWorkout.exercises.map((exercise, index) => {
       const slotKey = `${workoutName}_SLOT_${index + 1}`;
-      const selectedName = selections[slotKey];
+      const rawSelection = selections[slotKey];
+      const selectedName = typeof rawSelection === 'string' ? rawSelection.trim() : '';
 
       // If user selected a different exercise for this slot
       if (selectedName && selectedName !== exercise.name) {
@@ -435,6 +436,9 @@ export function getWorkoutWithSelections(workoutName, storage) {
           const found = workout.exercises.find(ex => ex.name === selectedName);
           if (found) return { ...found };
         }
+
+        // Unknown selection: keep default slot exercise (avoid incomplete / bogus entries)
+        console.warn('[workouts] Unknown exercise selection for slot:', slotKey, rawSelection);
       }
 
       // Return original exercise if no selection or selection not found

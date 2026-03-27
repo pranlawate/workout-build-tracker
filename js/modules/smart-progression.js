@@ -991,6 +991,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     ? exerciseKey.split(' - ')[1]
     : exerciseKey;
 
+  try {
   // PRIORITY 0: Deload week (suppress all suggestions during recovery)
   if (rotationManager) {
     const deloadState = rotationManager.storage.getDeloadState();
@@ -1096,6 +1097,14 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     message: `Continue with ${bestSet.weight}kg`,
     reason: 'Keep improving form and consistency'
   };
+  } catch (error) {
+    console.error('[SmartProgression] getSuggestion failed:', error);
+    return {
+      type: 'CONTINUE',
+      message: 'Continue with current approach',
+      reason: 'Suggestion unavailable; training data may be incomplete'
+    };
+  }
 }
 
 /**

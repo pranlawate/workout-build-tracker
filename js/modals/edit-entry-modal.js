@@ -119,6 +119,15 @@ export class EditEntryModal {
     const history = this.storage.getExerciseHistory(this.currentExerciseKey);
     const entry = history[this.currentIndex];
 
+    if (!entry) {
+      console.error('Entry not found at index', this.currentIndex);
+      return;
+    }
+    if (!entry.sets || !Array.isArray(entry.sets)) {
+      alert('Cannot save: this entry has no set data.');
+      return;
+    }
+
     const dateInput = document.getElementById('edit-entry-date');
     if (dateInput) {
       const parsed = new Date(dateInput.value);

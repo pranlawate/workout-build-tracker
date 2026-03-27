@@ -210,6 +210,11 @@ export class ExerciseDetailScreen {
   }
 
   handleDelete(index) {
+    if (this.onDelete) {
+      this.onDelete(this.currentExerciseKey, index);
+      return;
+    }
+
     const history = this.storage.getExerciseHistory(this.currentExerciseKey);
     const entry = history[index];
     if (!entry) return;
@@ -223,10 +228,8 @@ export class ExerciseDetailScreen {
       history.splice(index, 1);
       this.storage.saveExerciseHistory(this.currentExerciseKey, history);
 
-      // Re-render
       this.render(this.currentExerciseKey);
 
-      // Show success message
       this.showToast('✅ Workout deleted');
     } catch (error) {
       console.error('Failed to delete workout:', error);
