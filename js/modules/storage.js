@@ -11,6 +11,117 @@ const MAX_HISTORY_LENGTH = 8;
 export class StorageManager {
   constructor() {
     this.storage = globalThis.localStorage;
+    this._runMigrations();
+  }
+
+  /**
+   * One-time migrations keyed by build_migration_version
+   */
+  _runMigrations() {
+    try {
+      const version = parseInt(this.storage.getItem('build_migration_version') || '0', 10);
+      if (version >= 2) return;
+
+      if (version < 2) {
+        this._migrateExerciseKeysV2();
+      }
+
+      this.storage.setItem('build_migration_version', '2');
+      console.log('[Storage] Migrations complete, now at version 2');
+    } catch (error) {
+      console.error('[Storage] Migration failed:', error);
+    }
+  }
+
+  _migrateExerciseKeysV2() {
+    console.log('[Storage] Running migration v2: rekey exercise history');
+
+    const historyFullKeys = [];
+    if (this.storage.data) {
+      for (const k of Object.keys(this.storage.data)) {
+        if (k.startsWith(KEYS.EXERCISE_HISTORY_PREFIX)) historyFullKeys.push(k);
+      }
+    } else {
+      for (let i = 0; i < this.storage.length; i++) {
+        const k = this.storage.key(i);
+        if (k && k.startsWith(KEYS.EXERCISE_HISTORY_PREFIX)) historyFullKeys.push(k);
+      }
+    }
+
+    const migratedCount = { history: 0, pain: 0 };
+
+    for (const fullKey of historyFullKeys) {
+      const exerciseKey = fullKey.replace(KEYS.EXERCISE_HISTORY_PREFIX, '');
+      if (!exerciseKey.includes(' - ')) continue;
+
+      const parts = exerciseKey.split(' - ');
+      const exerciseName = parts.slice(1).join(' - ');
+      if (!exerciseName) continue;
+
+      const oldData = this.getExerciseHistory(exerciseKey);
+      const existingData = this.getExerciseHistory(exerciseName);
+
+      const merged = [...existingData, ...oldData];
+      const seen = new Set();
+      const deduped = merged.filter(entry => {
+        const dedupeKey = entry.date + JSON.stringify(entry.sets);
+        if (seen.has(dedupeKey)) return false;
+        seen.add(dedupeKey);
+        return true;
+      });
+      deduped.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      this.saveExerciseHistory(exerciseName, deduped);
+      this.storage.removeItem(fullKey);
+      migratedCount.history++;
+    }
+
+    const painData = this._getRawPainHistory();
+    if (painData && typeof painData === 'object') {
+      const newPainData = {};
+      let painMigrated = false;
+
+      for (const [key, entries] of Object.entries(painData)) {
+        if (!Array.isArray(entries)) continue;
+
+        if (key.includes(' - ')) {
+          const parts = key.split(' - ');
+          const exerciseName = parts.slice(1).join(' - ');
+          if (!exerciseName) continue;
+
+          if (newPainData[exerciseName]) {
+            newPainData[exerciseName] = [...newPainData[exerciseName], ...entries];
+          } else {
+            newPainData[exerciseName] = entries.slice();
+          }
+          painMigrated = true;
+          migratedCount.pain++;
+        } else if (newPainData[key]) {
+          newPainData[key] = [...newPainData[key], ...entries];
+        } else {
+          newPainData[key] = entries.slice();
+        }
+      }
+
+      if (painMigrated) {
+        this.storage.setItem('exercise_pain_history', JSON.stringify(newPainData));
+      }
+    }
+
+    console.log(
+      `[Storage] Migration v2 complete: ${migratedCount.history} history keys, ${migratedCount.pain} pain keys migrated`
+    );
+  }
+
+  _getRawPainHistory() {
+    try {
+      const data = this.storage.getItem('exercise_pain_history');
+      if (!data) return {};
+      const parsed = JSON.parse(data);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch {
+      return {};
+    }
   }
 
   /**
@@ -364,29 +475,38 @@ export class StorageManager {
   /**
    * Get workout history by reconstructing from exercise histories
    * @param {string} workoutName - Workout name (e.g., 'UPPER_A')
+   * @param {string[]|null} exerciseNames - Exercise names for this workout (required after v2 key migration)
    * @param {number} limit - Maximum number of workout sessions to return
    * @returns {Array} Array of workout session objects, sorted by date (most recent first)
    */
-  getWorkoutHistory(workoutName, limit = 10) {
+  getWorkoutHistory(workoutName, exerciseNames = null, limit = 10) {
     if (!workoutName || typeof workoutName !== 'string') {
       return [];
     }
 
     try {
-      // Get all exercise keys that belong to this workout
       const allKeys = this.getAllExerciseKeys();
-      const workoutExerciseKeys = allKeys.filter(key => key.startsWith(workoutName + ' - '));
+      let workoutExerciseKeys;
+      if (exerciseNames && Array.isArray(exerciseNames) && exerciseNames.length > 0) {
+        workoutExerciseKeys = exerciseNames;
+      } else {
+        workoutExerciseKeys = allKeys.filter(key => key.startsWith(workoutName + ' - '));
+      }
 
       if (workoutExerciseKeys.length === 0) {
         return [];
       }
+
+      const prefix = workoutName + ' - ';
 
       // Collect all workout sessions by date
       const sessionsByDate = new Map();
 
       workoutExerciseKeys.forEach(exerciseKey => {
         const history = this.getExerciseHistory(exerciseKey);
-        const exerciseName = exerciseKey.replace(workoutName + ' - ', '');
+        const exerciseName = exerciseKey.startsWith(prefix)
+          ? exerciseKey.slice(prefix.length)
+          : exerciseKey;
 
         history.forEach(entry => {
           const dateKey = new Date(entry.date).toISOString().split('T')[0];

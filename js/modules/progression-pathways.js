@@ -90,18 +90,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_A_SLOT_7': {
-    slotName: 'Scapular Retraction/Rear Delts',
-    easier: [
-      'Cable Reverse Fly',
-      'Machine Reverse Fly'
-    ],
-    current: 'Reverse Fly',
+    slotName: 'Tricep Isolation',
+    easier: ['Light Tricep Pushdowns'],
+    current: 'Tricep Pushdowns',
     harder: [
-      'Y-Raises',        // MODERATE tier - requires shoulder mobility
-      'Prone Y-Raises'
+      'Close-Grip Bench Press',
+      'Overhead Tricep Extension'
     ],
-    alternate: ['Cable Face Pulls variant'],
-    notes: 'Intentional duplication with UPPER_B_SLOT_5 for shoulder stability (2×/week)'
+    alternate: ['Cable Overhead Extension', 'Dips (machine-assisted)']
   },
 
   // ==================== LOWER A - BILATERAL ====================
@@ -217,6 +213,17 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_B_SLOT_6': {
+    slotName: 'Bicep Isolation',
+    easier: ['Machine Curls'],
+    current: 'DB Hammer Curls',
+    harder: [
+      'Barbell Curls',
+      'EZ Bar Curls'
+    ],
+    alternate: ['Standard DB Curls', 'Incline DB Curls']
+  },
+
+  'UPPER_B_SLOT_7': {
     slotName: 'Core Flexion',
     easier: ['Knee Tucks', 'Lying Knee Raise'],
     current: 'Reverse Crunch',
@@ -254,6 +261,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'LOWER_B_SLOT_4': {
+    slotName: 'Hip Adduction',
+    easier: ['Bodyweight Side-lying Adduction'],
+    current: 'Leg Adduction',
+    harder: ['Weighted Cable Adduction'],
+    alternate: ['Copenhagen Plank (modified)']
+  },
+
+  'LOWER_B_SLOT_5': {
     slotName: 'Hamstring Isolation',
     easier: ['Nordic Curls (assisted)'],
     current: 'Leg Curl',
@@ -261,7 +276,7 @@ export const PROGRESSION_PATHS = {
     alternate: ['Sliding Leg Curl']
   },
 
-  'LOWER_B_SLOT_5': {
+  'LOWER_B_SLOT_6': {
     slotName: 'Soleus (Calf)',
     easier: ['Lighter weight'],
     current: 'Seated Calf Raise',
@@ -269,7 +284,7 @@ export const PROGRESSION_PATHS = {
     alternate: []
   },
 
-  'LOWER_B_SLOT_6': {
+  'LOWER_B_SLOT_7': {
     slotName: 'Core Anti-rotation',
     easier: ['Band Pallof Press', 'Light Cable Pallof Press'],
     current: 'Pallof Press',

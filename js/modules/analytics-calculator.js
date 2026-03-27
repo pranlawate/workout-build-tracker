@@ -14,6 +14,8 @@ const MIN_WORKOUTS_FOR_PATTERNS = 10;
 const MIN_SAMPLE_SIZE = 5;
 const MIN_PAIN_DAYS = 3;
 
+import { WORKOUTS } from './workouts.js';
+
 export class AnalyticsCalculator {
   /**
    * Creates an AnalyticsCalculator instance
@@ -21,6 +23,19 @@ export class AnalyticsCalculator {
    */
   constructor(storage) {
     this.storage = storage;
+    this._exerciseToWorkoutMap = null;
+  }
+
+  _getWorkoutTypeForExercise(exerciseName) {
+    if (!this._exerciseToWorkoutMap) {
+      this._exerciseToWorkoutMap = {};
+      for (const [key, workout] of Object.entries(WORKOUTS)) {
+        for (const ex of workout.exercises) {
+          this._exerciseToWorkoutMap[ex.name] = key;
+        }
+      }
+    }
+    return this._exerciseToWorkoutMap[exerciseName];
   }
 
   /**
@@ -79,10 +94,10 @@ export class AnalyticsCalculator {
           return; // Skip if no history
         }
 
-        const [workoutType] = exerciseKey.split(' - ');
-        if (!workoutType) {
-          return; // Skip if invalid format
-        }
+        const exerciseName = exerciseKey.includes(' - ')
+          ? exerciseKey.split(' - ').slice(1).join(' - ')
+          : exerciseKey;
+        const workoutType = this._getWorkoutTypeForExercise(exerciseName) || exerciseName;
 
         history.forEach(entry => {
           if (!entry || !entry.date || !Array.isArray(entry.sets)) {

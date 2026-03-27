@@ -1,9 +1,22 @@
 // src/js/screens/history-list.js
 
+import { WORKOUTS } from '../modules/workouts.js';
+
 export class HistoryListScreen {
   constructor(storage, onExerciseSelect) {
     this.storage = storage;
     this.onExerciseSelect = onExerciseSelect;
+    this._exerciseToWorkout = this._buildExerciseWorkoutMap();
+  }
+
+  _buildExerciseWorkoutMap() {
+    const map = {};
+    for (const [workoutKey, workout] of Object.entries(WORKOUTS)) {
+      for (const exercise of workout.exercises) {
+        map[exercise.name] = workout.displayName || workoutKey;
+      }
+    }
+    return map;
   }
 
   /**
@@ -29,8 +42,10 @@ export class HistoryListScreen {
         ? (lastEntry.sets[0]?.weight || 0)
         : 0;
 
-      // Parse workout name and exercise name
-      const [workoutName, exerciseName] = exerciseKey.split(' - ');
+      const exerciseName = exerciseKey.includes(' - ')
+        ? exerciseKey.split(' - ').slice(1).join(' - ')
+        : exerciseKey;
+      const workoutName = this._exerciseToWorkout[exerciseName] || 'Other';
 
       return {
         exerciseKey,

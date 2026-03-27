@@ -83,16 +83,16 @@ describe('Data Integrity', () => {
       );
     });
 
-    test('LOWER_B should have exactly one Side Plank', () => {
+    test('LOWER_B should have exactly one Pallof Press', () => {
       const storage = new StorageManager();
       const workout = getWorkoutWithSelections('LOWER_B', storage);
       const exerciseNames = workout.exercises.map(e => e.name);
-      const sidePlankCount = exerciseNames.filter(name => name === 'Side Plank').length;
+      const pallofCount = exerciseNames.filter(name => name === 'Pallof Press').length;
 
       assert.strictEqual(
-        sidePlankCount,
+        pallofCount,
         1,
-        `LOWER_B should have exactly 1 Side Plank, found ${sidePlankCount}`
+        `LOWER_B should have exactly 1 Pallof Press, found ${pallofCount}`
       );
     });
 
@@ -112,11 +112,11 @@ describe('Data Integrity', () => {
       const workout = getWorkoutWithSelections('UPPER_A', storage);
 
       const expected = [
-        'DB Flat Bench Press',
+        'Incline DB Press',
         'Seated Cable Row',
         'Decline DB Press',
         'T-Bar Row',
-        'DB Lateral Raises',
+        'Machine Fly',
         'Face Pulls',
         'Tricep Pushdowns'
       ];

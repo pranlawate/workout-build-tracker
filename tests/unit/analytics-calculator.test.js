@@ -33,7 +33,7 @@ describe('AnalyticsCalculator', () => {
 
     test('should calculate total volume from exercise history', () => {
       // Add workout data
-      const exercises = ['UPPER_A - DB Bench Press', 'UPPER_A - DB Row'];
+      const exercises = ['Incline DB Press', 'Seated Cable Row'];
       const today = new Date().toISOString().split('T')[0];
 
       exercises.forEach(exerciseKey => {
@@ -66,7 +66,7 @@ describe('AnalyticsCalculator', () => {
       previousPeriodDate.setDate(previousPeriodDate.getDate() - 10);
 
       // Previous period: 1000kg
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         {
           date: previousPeriodDate.toISOString().split('T')[0],
           sets: [
@@ -80,7 +80,7 @@ describe('AnalyticsCalculator', () => {
       ]);
 
       // Current period: 1500kg
-      storage.saveExerciseHistory('UPPER_A - DB Row', [
+      storage.saveExerciseHistory('Seated Cable Row', [
         {
           date: currentPeriodDate.toISOString().split('T')[0],
           sets: [
@@ -107,7 +107,7 @@ describe('AnalyticsCalculator', () => {
       const yesterdayStr = yesterday.toISOString().split('T')[0];
 
       // Two UPPER_A workouts on different days
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         {
           date: today,
           sets: [{ weight: 20, reps: 10, rir: 2 }]
@@ -118,7 +118,7 @@ describe('AnalyticsCalculator', () => {
         }
       ]);
 
-      storage.saveExerciseHistory('UPPER_A - DB Row', [
+      storage.saveExerciseHistory('Seated Cable Row', [
         {
           date: today,
           sets: [{ weight: 20, reps: 10, rir: 2 }]
@@ -142,7 +142,7 @@ describe('AnalyticsCalculator', () => {
       day2Date.setDate(day2Date.getDate() - 2);
       const day2 = day2Date.toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         {
           date: day1,
           sets: [{ weight: 20, reps: 10, rir: 2 }] // 200kg
@@ -153,7 +153,7 @@ describe('AnalyticsCalculator', () => {
         }
       ]);
 
-      storage.saveExerciseHistory('UPPER_A - DB Row', [
+      storage.saveExerciseHistory('Seated Cable Row', [
         {
           date: day1,
           sets: [{ weight: 15, reps: 10, rir: 2 }] // 150kg
@@ -177,7 +177,7 @@ describe('AnalyticsCalculator', () => {
       const oldDate = new Date(today);
       oldDate.setDate(oldDate.getDate() - 10);
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         {
           date: recentDate.toISOString().split('T')[0],
           sets: [{ weight: 20, reps: 10, rir: 2 }] // 200kg - should count
@@ -197,14 +197,14 @@ describe('AnalyticsCalculator', () => {
     test('should handle multiple workout types separately', () => {
       const today = new Date().toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         {
           date: today,
           sets: [{ weight: 20, reps: 10, rir: 2 }] // 200kg
         }
       ]);
 
-      storage.saveExerciseHistory('LOWER_A - Squat', [
+      storage.saveExerciseHistory('Hack Squat', [
         {
           date: today,
           sets: [{ weight: 40, reps: 10, rir: 2 }] // 400kg
@@ -223,7 +223,7 @@ describe('AnalyticsCalculator', () => {
     test('should handle malformed data gracefully', () => {
       const today = new Date().toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         {
           date: today,
           sets: [
@@ -278,13 +278,13 @@ describe('AnalyticsCalculator', () => {
       localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
 
       // Add exercise history for these dates
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: today, sets: [{ weight: 20, reps: 10, rir: 2 }] }
       ]);
-      storage.saveExerciseHistory('LOWER_A - Squat', [
+      storage.saveExerciseHistory('Hack Squat', [
         { date: day2, sets: [{ weight: 40, reps: 10, rir: 2 }] }
       ]);
-      storage.saveExerciseHistory('UPPER_B - DB Incline Press', [
+      storage.saveExerciseHistory('Lat Pulldown', [
         { date: day3, sets: [{ weight: 20, reps: 10, rir: 2 }] }
       ]);
 
@@ -298,7 +298,7 @@ describe('AnalyticsCalculator', () => {
       // Add exercise data with known RIR values
       const today = new Date().toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [{
+      storage.saveExerciseHistory('Incline DB Press', [{
         date: today,
         sets: [
           { weight: 20, reps: 10, rir: 2 },
@@ -316,7 +316,7 @@ describe('AnalyticsCalculator', () => {
     test('should calculate avgRIR across multiple exercises', () => {
       const today = new Date().toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [{
+      storage.saveExerciseHistory('Incline DB Press', [{
         date: today,
         sets: [
           { weight: 20, reps: 10, rir: 2 },
@@ -324,7 +324,7 @@ describe('AnalyticsCalculator', () => {
         ]
       }]);
 
-      storage.saveExerciseHistory('UPPER_A - DB Row', [{
+      storage.saveExerciseHistory('Seated Cable Row', [{
         date: today,
         sets: [
           { weight: 20, reps: 10, rir: 4 },
@@ -352,7 +352,7 @@ describe('AnalyticsCalculator', () => {
       localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
 
       // Add exercise history for these dates
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: today, sets: [{ weight: 20, reps: 10, rir: 2 }] },
         { date: day2, sets: [{ weight: 20, reps: 10, rir: 3 }] }
       ]);
@@ -375,7 +375,7 @@ describe('AnalyticsCalculator', () => {
       const date1 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       const date2 = new Date().toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 22.5, reps: 10, rir: 2 }] }
       ]);
@@ -384,7 +384,7 @@ describe('AnalyticsCalculator', () => {
 
       assert.strictEqual(result.progressedCount, 1);
       assert.strictEqual(result.topProgressors.length, 1);
-      assert.strictEqual(result.topProgressors[0].name, 'DB Bench Press');
+      assert.strictEqual(result.topProgressors[0].name, 'Incline DB Press');
       assert.strictEqual(result.topProgressors[0].gain, 2.5);
     });
 
@@ -393,19 +393,19 @@ describe('AnalyticsCalculator', () => {
       const date2 = new Date().toISOString().split('T')[0];
 
       // Exercise 1: progressed 5kg
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 25, reps: 10, rir: 2 }] }
       ]);
 
       // Exercise 2: progressed 2.5kg
-      storage.saveExerciseHistory('UPPER_A - DB Row', [
+      storage.saveExerciseHistory('Seated Cable Row', [
         { date: date1, sets: [{ weight: 15, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 17.5, reps: 10, rir: 2 }] }
       ]);
 
       // Exercise 3: no progression
-      storage.saveExerciseHistory('LOWER_A - Squat', [
+      storage.saveExerciseHistory('Hack Squat', [
         { date: date1, sets: [{ weight: 40, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 40, reps: 10, rir: 2 }] }
       ]);
@@ -421,19 +421,19 @@ describe('AnalyticsCalculator', () => {
       const date2 = new Date().toISOString().split('T')[0];
 
       // Exercise 1: gained 2.5kg
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 22.5, reps: 10, rir: 2 }] }
       ]);
 
       // Exercise 2: gained 5kg (should be first)
-      storage.saveExerciseHistory('UPPER_A - DB Row', [
+      storage.saveExerciseHistory('Seated Cable Row', [
         { date: date1, sets: [{ weight: 15, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 20, reps: 10, rir: 2 }] }
       ]);
 
       // Exercise 3: gained 1kg
-      storage.saveExerciseHistory('LOWER_A - Squat', [
+      storage.saveExerciseHistory('Hack Squat', [
         { date: date1, sets: [{ weight: 40, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 41, reps: 10, rir: 2 }] }
       ]);
@@ -442,11 +442,11 @@ describe('AnalyticsCalculator', () => {
 
       assert.strictEqual(result.topProgressors.length, 3);
       // Should be sorted by gain descending: 5kg, 2.5kg, 1kg
-      assert.strictEqual(result.topProgressors[0].name, 'DB Row');
+      assert.strictEqual(result.topProgressors[0].name, 'Seated Cable Row');
       assert.strictEqual(result.topProgressors[0].gain, 5);
-      assert.strictEqual(result.topProgressors[1].name, 'DB Bench Press');
+      assert.strictEqual(result.topProgressors[1].name, 'Incline DB Press');
       assert.strictEqual(result.topProgressors[1].gain, 2.5);
-      assert.strictEqual(result.topProgressors[2].name, 'Squat');
+      assert.strictEqual(result.topProgressors[2].name, 'Hack Squat');
       assert.strictEqual(result.topProgressors[2].gain, 1);
     });
 
@@ -466,7 +466,7 @@ describe('AnalyticsCalculator', () => {
       ];
 
       exercises.forEach(ex => {
-        storage.saveExerciseHistory(`UPPER_A - ${ex.name}`, [
+        storage.saveExerciseHistory(ex.name, [
           { date: date1, sets: [{ weight: ex.oldWeight, reps: 10, rir: 2 }] },
           { date: date2, sets: [{ weight: ex.newWeight, reps: 10, rir: 2 }] }
         ]);
@@ -486,7 +486,7 @@ describe('AnalyticsCalculator', () => {
       const date2 = new Date().toISOString().split('T')[0];
 
       // Exercise stayed at same weight
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: date1, sets: [{ weight: 20, reps: 10, rir: 2 }] },
         { date: date2, sets: [{ weight: 20, reps: 10, rir: 2 }] }
       ]);
@@ -500,7 +500,7 @@ describe('AnalyticsCalculator', () => {
     test('should ignore exercises with less than 2 workouts', () => {
       const today = new Date().toISOString().split('T')[0];
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: today, sets: [{ weight: 20, reps: 10, rir: 2 }] }
       ]);
 
@@ -646,7 +646,9 @@ describe('AnalyticsCalculator', () => {
         exerciseHistory.push({ date, sets: [{ weight: currentWeight, reps: 10, rir: 2 }] });
       }
 
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', exerciseHistory);
+      // Per-exercise history is capped at 8 entries; split so getCompletedWorkoutDates sees ≥10 unique dates
+      storage.saveExerciseHistory('Incline DB Press', exerciseHistory.slice(0, 6));
+      storage.saveExerciseHistory('Seated Cable Row', exerciseHistory.slice(6));
       localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
       localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
 
@@ -658,14 +660,19 @@ describe('AnalyticsCalculator', () => {
 
     test('should return empty array when exactly 10 workouts but no patterns found', () => {
       const rotation = { sequence: [] };
+      const historyEntries = [];
       for (let i = 0; i < 10; i++) {
+        const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         rotation.sequence.push({
           workout: 'UPPER_A',
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          date,
           completed: true
         });
+        historyEntries.push({ date, sets: [{ weight: 20, reps: 10, rir: 2 }] });
       }
       localStorage.setItem('build_workout_rotation', JSON.stringify(rotation));
+      storage.saveExerciseHistory('Incline DB Press', historyEntries.slice(0, 5));
+      storage.saveExerciseHistory('Seated Cable Row', historyEntries.slice(5));
 
       const result = calculator.detectPatterns();
 
@@ -711,7 +718,7 @@ describe('AnalyticsCalculator', () => {
       const date = new Date().toISOString().split('T')[0];
 
       // Add progression data
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [
+      storage.saveExerciseHistory('Incline DB Press', [
         { date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], sets: [{ weight: 20, reps: 10, rir: 2 }] },
         { date, sets: [{ weight: 22.5, reps: 10, rir: 2 }] }
       ]);
@@ -727,7 +734,7 @@ describe('AnalyticsCalculator', () => {
       const date = new Date().toISOString().split('T')[0];
 
       // Add exercise data
-      storage.saveExerciseHistory('UPPER_A - DB Bench Press', [{
+      storage.saveExerciseHistory('Incline DB Press', [{
         date,
         sets: [
           { weight: 20, reps: 10, rir: 2 }, // 200kg

@@ -12,16 +12,16 @@ describe('Workout Definitions', () => {
     const workout = getWorkout('UPPER_A');
 
     assert.strictEqual(workout.name, 'UPPER_A');
-    assert.strictEqual(workout.displayName, 'Upper A - Horizontal');
+    assert.strictEqual(workout.displayName, 'Upper A');
     assert.strictEqual(workout.exercises.length, 7);
-    assert.strictEqual(workout.exercises[0].name, 'DB Flat Bench Press');
+    assert.strictEqual(workout.exercises[0].name, 'Incline DB Press');
   });
 
   test('UPPER_A first exercise should have correct structure', () => {
     const workout = getWorkout('UPPER_A');
     const exercise = workout.exercises[0];
 
-    assert.strictEqual(exercise.name, 'DB Flat Bench Press');
+    assert.strictEqual(exercise.name, 'Incline DB Press');
     assert.strictEqual(exercise.sets, 3);
     assert.strictEqual(exercise.repRange, '8-12');
     assert.strictEqual(exercise.rirTarget, '2-3');

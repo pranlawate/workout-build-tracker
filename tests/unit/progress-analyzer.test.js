@@ -34,13 +34,10 @@ describe('ProgressAnalyzer', () => {
     });
 
     test('should count workouts in last 4 weeks', () => {
-      // Add workout history for 3 workouts in last 4 weeks
-      const exercises = ['UPPER_A - Exercise 1', 'UPPER_A - Exercise 2'];
-      const dates = [
-        new Date('2026-02-05'),
-        new Date('2026-02-03'),
-        new Date('2026-01-30')
-      ];
+      // Add workout history for 3 workouts in last 4 weeks (dates relative to now)
+      const exercises = ['Exercise 1', 'Exercise 2'];
+      const dayMs = 24 * 60 * 60 * 1000;
+      const dates = [1, 3, 7].map(d => new Date(Date.now() - d * dayMs));
 
       exercises.forEach(exerciseKey => {
         const history = dates.map(date => ({
@@ -62,27 +59,29 @@ describe('ProgressAnalyzer', () => {
   describe('calculateAvgSessionTime', () => {
     test('should return 0 when no sessions have time data', () => {
       const history = [
-        { date: '2026-02-05', sets: [{ weight: 10, reps: 10, rir: 2 }] }
+        { date: new Date().toISOString().split('T')[0], sets: [{ weight: 10, reps: 10, rir: 2 }] }
       ];
-      storage.saveExerciseHistory('UPPER_A - Exercise 1', history);
+      storage.saveExerciseHistory('Exercise 1', history);
 
       const avgMinutes = analyzer.calculateAvgSessionTime();
       assert.strictEqual(avgMinutes, 0);
     });
 
     test('should calculate average session time from multiple exercises', () => {
-      // Workout 1: 30 minutes (2 exercises with same start/end)
-      const workout1Date = new Date('2026-02-05T10:00:00Z');
-      const workout1End = new Date('2026-02-05T10:30:00Z');
+      const dayMs = 24 * 60 * 60 * 1000;
+      // Workout 1: 30 minutes (2 exercises with same start/end), within last 4 weeks
+      const workout1Date = new Date(Date.now() - 2 * dayMs);
+      workout1Date.setUTCHours(10, 0, 0, 0);
+      const workout1End = new Date(workout1Date.getTime() + 30 * 60 * 1000);
 
-      storage.saveExerciseHistory('UPPER_A - Exercise 1', [{
+      storage.saveExerciseHistory('Exercise 1', [{
         date: workout1Date.toISOString().split('T')[0],
         sets: [{ weight: 10, reps: 10, rir: 2 }],
         startTime: workout1Date.toISOString(),
         endTime: workout1End.toISOString()
       }]);
 
-      storage.saveExerciseHistory('UPPER_A - Exercise 2', [{
+      storage.saveExerciseHistory('Exercise 2', [{
         date: workout1Date.toISOString().split('T')[0],
         sets: [{ weight: 20, reps: 8, rir: 3 }],
         startTime: workout1Date.toISOString(),
@@ -90,10 +89,11 @@ describe('ProgressAnalyzer', () => {
       }]);
 
       // Workout 2: 45 minutes (different date)
-      const workout2Date = new Date('2026-02-03T14:00:00Z');
-      const workout2End = new Date('2026-02-03T14:45:00Z');
+      const workout2Date = new Date(Date.now() - 5 * dayMs);
+      workout2Date.setUTCHours(14, 0, 0, 0);
+      const workout2End = new Date(workout2Date.getTime() + 45 * 60 * 1000);
 
-      storage.saveExerciseHistory('UPPER_A - Exercise 1', [
+      storage.saveExerciseHistory('Exercise 1', [
         {
           date: workout1Date.toISOString().split('T')[0],
           sets: [{ weight: 10, reps: 10, rir: 2 }],
@@ -114,10 +114,14 @@ describe('ProgressAnalyzer', () => {
     });
 
     test('should handle sessions with missing endTime gracefully', () => {
-      const workout1Date = new Date('2026-02-05T10:00:00Z');
-      const workout1End = new Date('2026-02-05T10:30:00Z');
+      const dayMs = 24 * 60 * 60 * 1000;
+      const workout1Date = new Date(Date.now() - 2 * dayMs);
+      workout1Date.setUTCHours(10, 0, 0, 0);
+      const workout1End = new Date(workout1Date.getTime() + 30 * 60 * 1000);
+      const workout2Date = new Date(Date.now() - 5 * dayMs);
+      workout2Date.setUTCHours(14, 0, 0, 0);
 
-      storage.saveExerciseHistory('UPPER_A - Exercise 1', [
+      storage.saveExerciseHistory('Exercise 1', [
         {
           date: workout1Date.toISOString().split('T')[0],
           sets: [{ weight: 10, reps: 10, rir: 2 }],
@@ -125,9 +129,9 @@ describe('ProgressAnalyzer', () => {
           endTime: workout1End.toISOString()
         },
         {
-          date: '2026-02-03',
+          date: workout2Date.toISOString().split('T')[0],
           sets: [{ weight: 12, reps: 9, rir: 2 }],
-          startTime: new Date('2026-02-03T14:00:00Z').toISOString()
+          startTime: workout2Date.toISOString()
           // No endTime
         }
       ]);
@@ -152,7 +156,7 @@ describe('ProgressAnalyzer', () => {
       const today = new Date();
 
       // Exercise 1: 100 lbs -> 120 lbs = 20% gain
-      storage.saveExerciseHistory('UPPER_A - Bench Press', [
+      storage.saveExerciseHistory('Bench Press', [
         {
           date: fourWeeksAgo.toISOString().split('T')[0],
           sets: [
@@ -170,7 +174,7 @@ describe('ProgressAnalyzer', () => {
       ]);
 
       // Exercise 2: 50 lbs -> 65 lbs = 30% gain
-      storage.saveExerciseHistory('LOWER_A - Squat', [
+      storage.saveExerciseHistory('Squat', [
         {
           date: fourWeeksAgo.toISOString().split('T')[0],
           sets: [
@@ -186,7 +190,7 @@ describe('ProgressAnalyzer', () => {
       ]);
 
       // Exercise 3: 80 lbs -> 88 lbs = 10% gain
-      storage.saveExerciseHistory('UPPER_B - Row', [
+      storage.saveExerciseHistory('Row', [
         {
           date: fourWeeksAgo.toISOString().split('T')[0],
           sets: [
@@ -205,11 +209,11 @@ describe('ProgressAnalyzer', () => {
 
       // Should be sorted by percentage gain: Squat (30%), Bench Press (20%), Row (10%)
       assert.strictEqual(result.length, 3);
-      assert.strictEqual(result[0].exerciseName, 'Squat');
+      assert.strictEqual(result[0].name, 'Squat');
       assert.strictEqual(result[0].percentGain, 30);
-      assert.strictEqual(result[1].exerciseName, 'Bench Press');
+      assert.strictEqual(result[1].name, 'Bench Press');
       assert.strictEqual(result[1].percentGain, 20);
-      assert.strictEqual(result[2].exerciseName, 'Row');
+      assert.strictEqual(result[2].name, 'Row');
       assert.strictEqual(result[2].percentGain, 10);
 
       // Should not include absoluteGain in output
@@ -222,7 +226,7 @@ describe('ProgressAnalyzer', () => {
       const today = new Date();
 
       // Exercise 1: 100 lbs -> 120 lbs = 20% gain, +20 lbs
-      storage.saveExerciseHistory('UPPER_A - Bench Press', [
+      storage.saveExerciseHistory('Bench Press', [
         {
           date: fourWeeksAgo.toISOString().split('T')[0],
           sets: [{ weight: 100, reps: 10, rir: 2 }]
@@ -234,7 +238,7 @@ describe('ProgressAnalyzer', () => {
       ]);
 
       // Exercise 2: 50 lbs -> 60 lbs = 20% gain, +10 lbs (same % but lower absolute)
-      storage.saveExerciseHistory('LOWER_A - Squat', [
+      storage.saveExerciseHistory('Squat', [
         {
           date: fourWeeksAgo.toISOString().split('T')[0],
           sets: [{ weight: 50, reps: 8, rir: 2 }]
@@ -249,9 +253,9 @@ describe('ProgressAnalyzer', () => {
 
       // Should be sorted by absolute gain when percentages are tied
       assert.strictEqual(result.length, 2);
-      assert.strictEqual(result[0].exerciseName, 'Bench Press'); // +20 lbs
+      assert.strictEqual(result[0].name, 'Bench Press'); // +20 lbs
       assert.strictEqual(result[0].percentGain, 20);
-      assert.strictEqual(result[1].exerciseName, 'Squat'); // +10 lbs
+      assert.strictEqual(result[1].name, 'Squat'); // +10 lbs
       assert.strictEqual(result[1].percentGain, 20);
     });
   });

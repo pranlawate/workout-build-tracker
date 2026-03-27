@@ -395,21 +395,6 @@
   }
 }
 
-/* Machine Badge */
-.machine-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  font-size: 12px;
-  background: rgba(33, 150, 243, 0.2);
-  border: 1px solid rgba(33, 150, 243, 0.5);
-  border-radius: 4px;
-  color: var(--color-info);
-  cursor: help;
-}
-
-.machine-badge:hover {
-  background: rgba(33, 150, 243, 0.3);
-}
 
 /* Locked set styling */
 .set-row.locked {

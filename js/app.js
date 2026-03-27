@@ -8,7 +8,7 @@ import { BodyWeightManager } from './modules/body-weight.js';
 import { ProgressAnalyzer } from './modules/progress-analyzer.js';
 import { AnalyticsCalculator } from './modules/analytics-calculator.js';
 import { WeightTrendChart } from './components/weight-trend-chart.js';
-import { getWorkout, getWorkoutWithSelections, getWarmup } from './modules/workouts.js';
+import { getWorkout, getWorkoutWithSelections, getWarmup, getAllWorkouts } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { getSuggestion } from './modules/smart-progression.js';
 import { getFormCues } from './modules/form-cues.js';
@@ -16,7 +16,6 @@ import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
 import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/export-import.js';
-import { getAllWorkouts } from './modules/workouts.js';
 import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
 import { UnlockEvaluator } from './modules/unlock-evaluator.js';
 import { RotationManager } from './modules/rotation-manager.js';
@@ -130,7 +129,7 @@ class App {
     if (!this.currentWorkout || !this.workoutSession) return;
 
     const exercise = this.currentWorkout.exercises[exerciseIndex];
-    const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+    const exerciseKey = exercise.name;
     const exerciseSession = this.workoutSession.exercises[exerciseIndex];
 
     // Get fresh analysis
@@ -1066,7 +1065,7 @@ class App {
     };
 
     const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
-      const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+      const exerciseKey = exercise.name;
       const history = this.storage.getExerciseHistory(exerciseKey);
       const painHistory = this.storage.getPainHistory(exerciseKey);
       const lastWorkout = history.length > 0 ? history[history.length - 1] : null;
@@ -1138,7 +1137,6 @@ class App {
             <h3 class="exercise-name">${this.escapeHtml(exercise.name)}</h3>
             <div class="exercise-badges">
               ${this.renderProgressionBadge(exercise, history)}
-              ${exercise.machineOk ? '<span class="machine-badge" title="Machine version OK when fatigued">ℹ️ Machine OK</span>' : ''}
             </div>
           </div>
 
@@ -2263,7 +2261,9 @@ class App {
    * @returns {Object|null} Comparison object or null
    */
   getVolumeComparison(workoutName, currentVolume) {
-    const history = this.storage.getWorkoutHistory(workoutName, 2);
+    const workoutDef = getWorkoutWithSelections(workoutName, this.storage);
+    const exerciseNames = workoutDef?.exercises?.map(ex => ex.name) ?? null;
+    const history = this.storage.getWorkoutHistory(workoutName, exerciseNames, 2);
     if (history.length < 2) return null; // Need previous workout for comparison
 
     // Calculate previous volume (second most recent, since most recent is current)
@@ -2306,7 +2306,7 @@ class App {
     workoutData.exercises.forEach(exercise => {
       if (!exercise.sets || !Array.isArray(exercise.sets)) return;
 
-      const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+      const exerciseKey = exercise.name;
       const history = this.storage.getExerciseHistory(exerciseKey);
 
       // Get max weight used today
@@ -2422,7 +2422,7 @@ class App {
     // Get completed exercise info FIRST (before early return)
     const justCompletedIndex = this.currentExerciseIndex;
     const justCompletedExercise = this.currentWorkout.exercises[justCompletedIndex];
-    const exerciseKey = `${this.currentWorkout.name} - ${justCompletedExercise.name}`;
+    const exerciseKey = justCompletedExercise.name;
 
     // ALWAYS show mobility check for completed exercises
     this.showMobilityCheckIfNeeded(exerciseKey);
@@ -2822,20 +2822,20 @@ class App {
     }
 
     // Step 2: Determine which workout this exercise belonged to
-    const workoutName = deletedExerciseKey.split(' - ')[0]; // e.g., "UPPER_A"
+    const allWorkouts = getAllWorkouts();
+    const workout = allWorkouts.find(w => w.exercises.some(e => e.name === deletedExerciseKey));
+    const workoutName = workout?.name;
     console.log('[ROLLBACK DEBUG] Workout name:', workoutName);
-    const workout = getWorkout(workoutName);
 
     if (!workout) {
-      console.log('[ROLLBACK DEBUG] Early exit: Workout not found');
+      console.log('[ROLLBACK DEBUG] Early exit: Workout not found for exercise:', deletedExerciseKey);
       return;
     }
 
     // Step 3: Check if ANY exercises from that workout still have history for that date
     console.log('[ROLLBACK DEBUG] Checking for remaining exercises from this workout...');
     const hasRemainingExercises = workout.exercises.some(exercise => {
-      const key = `${workoutName} - ${exercise.name}`;
-      const history = this.storage.getExerciseHistory(key);
+      const history = this.storage.getExerciseHistory(exercise.name);
       const hasMatch = history.some(h =>
         new Date(h.date).toDateString() === deletedDateObj.toDateString()
       );
@@ -4234,7 +4234,7 @@ class App {
     document.getElementById('pain-no-btn').onclick = () => {
       // Save pain-free status for all exercises
       this.currentWorkout.exercises.forEach((exercise) => {
-        const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+        const exerciseKey = exercise.name;
         this.storage.savePainReport(exerciseKey, false, null, null);
       });
 
@@ -4254,7 +4254,7 @@ class App {
       exerciseList.innerHTML = '';
 
       this.currentWorkout.exercises.forEach((exercise, index) => {
-        const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+        const exerciseKey = exercise.name;
         const item = document.createElement('div');
         item.className = 'pain-exercise-checkbox-item';
         item.innerHTML = `
@@ -4299,7 +4299,7 @@ class App {
     if (index >= painfulExercises.length) {
       // All done, save pain-free status for non-painful exercises
       this.currentWorkout.exercises.forEach((exercise) => {
-        const exerciseKey = `${this.currentWorkout.name} - ${exercise.name}`;
+        const exerciseKey = exercise.name;
         const isPainful = painfulExercises.some(p => p.key === exerciseKey);
         if (!isPainful) {
           this.storage.savePainReport(exerciseKey, false, null, null);
@@ -4961,7 +4961,7 @@ class App {
       exerciseList.innerHTML = '';
 
       workoutData.exercises.forEach((exercise, index) => {
-        const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+        const exerciseKey = exercise.name;
         const item = document.createElement('div');
         item.className = 'pain-exercise-checkbox-item';
         item.innerHTML = `
@@ -5143,7 +5143,7 @@ class App {
     if (this.summaryPainSelection === 'no') {
       // Save pain-free status for all exercises
       workoutData.exercises.forEach(exercise => {
-        const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+        const exerciseKey = exercise.name;
         this.storage.savePainReport(exerciseKey, false, null, null);
       });
       return true;
@@ -5178,7 +5178,7 @@ class App {
 
     // Save pain-free for non-painful exercises
     workoutData.exercises.forEach(exercise => {
-      const exerciseKey = `${workoutData.workoutName} - ${exercise.name}`;
+      const exerciseKey = exercise.name;
       const isPainful = this.summaryPainfulExercises.some(p => p.key === exerciseKey);
       if (!isPainful) {
         this.storage.savePainReport(exerciseKey, false, null, null);
@@ -5593,7 +5593,7 @@ class App {
       // Save each exercise's history
       this.workoutSession.exercises.forEach((exerciseSession, index) => {
         const exerciseDef = this.currentWorkout.exercises[index];
-        const exerciseKey = `${this.currentWorkout.name} - ${exerciseDef.name}`;
+        const exerciseKey = exerciseDef.name;
 
         // Get existing history
         const history = this.storage.getExerciseHistory(exerciseKey);

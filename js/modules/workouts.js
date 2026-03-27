@@ -5,7 +5,7 @@ const WARMUPS = {
     'Band Pull-Aparts: 2 sets × 15-20 reps',
     'Arm Circles: 10 each direction',
     'Scapular Retractions: 10 reps',
-    'Ramp-up Set: 50% weight × 10 reps (DB Flat Bench Press)'
+    'Ramp-up Set: 50% weight × 10 reps (first exercise)'
   ],
   LOWER_A: [
     'Cat-Cow: 10 reps',
@@ -45,7 +45,6 @@ export const EXERCISE_DEFINITIONS = {
     startingWeight: 12,  // 12kg KB
     weightIncrement: 4,   // KB increments (8, 12, 16, 20, 24, 28, 32kg)
     notes: 'Compound | Quads, Glutes',
-    machineOk: false
   },
   'KB Swings': {
     sets: 3,
@@ -55,7 +54,6 @@ export const EXERCISE_DEFINITIONS = {
     startingWeight: 12,  // Start conservative
     weightIncrement: 4,
     notes: 'Compound | Glutes, Hamstrings | Ballistic hip power',
-    machineOk: false
   },
   'Decline DB Press': {
     sets: 3,
@@ -65,7 +63,6 @@ export const EXERCISE_DEFINITIONS = {
     startingWeight: 7.5,
     weightIncrement: 2.5,
     notes: 'Compound | Lower Chest (Costal Head)',
-    machineOk: true
   },
   'Standard DB Curls': {
     sets: 2,
@@ -75,7 +72,6 @@ export const EXERCISE_DEFINITIONS = {
     startingWeight: 7.5,
     weightIncrement: 1.25,
     notes: 'Isolation | Biceps (Long + Short Heads)',
-    machineOk: false
   },
   'Overhead Tricep Extension': {
     sets: 2,
@@ -85,7 +81,6 @@ export const EXERCISE_DEFINITIONS = {
     startingWeight: 10,
     weightIncrement: 2.5,
     notes: 'Isolation | Triceps (Long + Medial Heads)',
-    machineOk: true
   }
 };
 
@@ -104,7 +99,6 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 2.5,
         notes: 'Compound | Upper Chest (Clavicular) | Keep bench at 30° or lower',
-        machineOk: true
       },
       {
         name: 'Seated Cable Row',
@@ -115,7 +109,6 @@ export const WORKOUTS = {
         startingWeight: 22.5,
         weightIncrement: 2.5,
         notes: 'Compound | Mid Back (Lats, Rhomboids)',
-        machineOk: true
       },
       {
         name: 'Decline DB Press',
@@ -126,7 +119,6 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 2.5,
         notes: 'Compound | Lower Chest (Costal Head)',
-        machineOk: true
       },
       {
         name: 'T-Bar Row',
@@ -137,7 +129,6 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 2.5,
         notes: 'Compound | Back Thickness (Lats, Traps)',
-        machineOk: true
       },
       {
         name: 'Machine Fly',
@@ -148,7 +139,6 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         notes: 'Isolation | Mid Chest | Pec deck stretch & squeeze',
-        machineOk: true
       },
       {
         name: 'Face Pulls',
@@ -159,7 +149,6 @@ export const WORKOUTS = {
         startingWeight: 12.5,
         weightIncrement: 2.5,
         notes: 'Isolation | Rear Delts, Rotator Cuff | External rotation focus',
-        machineOk: true
       },
       {
         name: 'Tricep Pushdowns',
@@ -170,7 +159,6 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         notes: 'Isolation | Triceps (lateral + long head)',
-        machineOk: true
       }
     ]
   },
@@ -189,7 +177,6 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         notes: 'Compound | Quads',
-        machineOk: true
       },
       {
         name: '45° Hyperextension',
@@ -200,7 +187,6 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         notes: 'Isolation | Lower Back | Bodyweight only',
-        machineOk: false
       },
       {
         name: 'Hip Thrust',
@@ -211,7 +197,6 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         notes: 'Isolation | Glutes',
-        machineOk: true
       },
       {
         name: 'Leg Extension',
@@ -222,7 +207,6 @@ export const WORKOUTS = {
         startingWeight: 17.5,
         weightIncrement: 2.5,
         notes: 'Isolation | Quads',
-        machineOk: true
       },
       {
         name: 'Standing Calf Raise',
@@ -233,7 +217,6 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         notes: 'Isolation | Gastrocnemius',
-        machineOk: true
       },
       {
         name: 'Dead Bug',
@@ -244,7 +227,6 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         notes: 'Core | Anti-extension | Shoulder-safe (supine)',
-        machineOk: false
       }
     ]
   },
@@ -263,7 +245,6 @@ export const WORKOUTS = {
         startingWeight: 22.5,
         weightIncrement: 2.5,
         notes: 'Compound | Lats (Back Width)',
-        machineOk: true
       },
       {
         name: 'Landmine Press',
@@ -274,7 +255,6 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         notes: 'Compound | Front Delts, Upper Chest | Shoulder-safe angled press',
-        machineOk: false
       },
       {
         name: 'Chest-Supported Row',
@@ -285,7 +265,6 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         notes: 'Compound | Back Thickness',
-        machineOk: true
       },
       {
         name: 'DB Lateral Raises',
@@ -296,7 +275,6 @@ export const WORKOUTS = {
         startingWeight: 3.5,
         weightIncrement: 1.25,
         notes: 'Isolation | Side Delts | Thumbs up, never above shoulder height',
-        machineOk: false
       },
       {
         name: 'Reverse Fly',
@@ -307,7 +285,6 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 1.25,
         notes: 'Isolation | Rear Delts, Rotator Cuff',
-        machineOk: true
       },
       {
         name: 'DB Hammer Curls',
@@ -318,7 +295,6 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 1.25,
         notes: 'Isolation | Biceps + Brachialis',
-        machineOk: false
       },
       {
         name: 'Reverse Crunch',
@@ -329,7 +305,6 @@ export const WORKOUTS = {
         startingWeight: 0,
         weightIncrement: 0,
         notes: 'Core | Lower abs | Shoulder & neck safe (supine)',
-        machineOk: false
       }
     ]
   },
@@ -348,7 +323,6 @@ export const WORKOUTS = {
         startingWeight: 20,
         weightIncrement: 5,
         notes: 'Compound | Quads, Glutes',
-        machineOk: true
       },
       {
         name: 'DB Romanian Deadlift',
@@ -359,7 +333,6 @@ export const WORKOUTS = {
         startingWeight: 10,
         weightIncrement: 2.5,
         notes: 'Compound | Hamstrings, Glutes, Lower Back',
-        machineOk: false
       },
       {
         name: 'Leg Abduction',
@@ -370,7 +343,6 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         notes: 'Isolation | Hip Abductors (Glute Medius)',
-        machineOk: true
       },
       {
         name: 'Leg Adduction',
@@ -381,7 +353,6 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         notes: 'Isolation | Hip Adductors | Pairs with abduction for balance',
-        machineOk: true
       },
       {
         name: 'Leg Curl',
@@ -392,7 +363,6 @@ export const WORKOUTS = {
         startingWeight: 17.5,
         weightIncrement: 2.5,
         notes: 'Isolation | Hamstrings',
-        machineOk: true
       },
       {
         name: 'Seated Calf Raise',
@@ -403,7 +373,6 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 5,
         notes: 'Isolation | Soleus',
-        machineOk: true
       },
       {
         name: 'Pallof Press',
@@ -414,7 +383,6 @@ export const WORKOUTS = {
         startingWeight: 5,
         weightIncrement: 2.5,
         notes: 'Core | Obliques | Anti-rotation, shoulder-safe (standing cable)',
-        machineOk: true
       }
     ]
   }

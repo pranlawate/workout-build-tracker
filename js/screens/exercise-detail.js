@@ -23,7 +23,9 @@ export class ExerciseDetailScreen {
   render(exerciseKey) {
     this.currentExerciseKey = exerciseKey;
     const history = this.storage.getExerciseHistory(exerciseKey);
-    const [, exerciseName] = exerciseKey.split(' - ');
+    const exerciseName = exerciseKey.includes(' - ')
+      ? exerciseKey.split(' - ').slice(1).join(' - ')
+      : exerciseKey;
 
     // Update header
     const titleEl = document.getElementById('exercise-detail-title');
@@ -298,10 +300,12 @@ export class ExerciseDetailScreen {
       // 4. Progression status (only if no issues)
       if (badges.length === 0) {
         const history = this.storage.getExerciseHistory(exerciseKey);
-        const [workoutType, exerciseName] = exerciseKey.split(' - ');
+        const exerciseName = exerciseKey.includes(' - ')
+          ? exerciseKey.split(' - ').slice(1).join(' - ')
+          : exerciseKey;
 
         // Find exercise definition from workout structure
-        const exercise = this.findExerciseDefinition(workoutType, exerciseName);
+        const exercise = this.findExerciseDefinition(null, exerciseName);
 
         if (exercise && history && history.length > 0) {
           const status = getProgressionStatus(history, exercise);
@@ -353,12 +357,16 @@ export class ExerciseDetailScreen {
    */
   findExerciseDefinition(workoutType, exerciseName) {
     try {
-      // Get workout from imported WORKOUTS object
-      const workout = WORKOUTS[workoutType];
-      if (!workout || !workout.exercises) return null;
+      const workoutsToSearch = workoutType && WORKOUTS[workoutType]
+        ? [WORKOUTS[workoutType]]
+        : Object.values(WORKOUTS);
 
-      // Find exercise by name
-      const exercise = workout.exercises.find(ex => ex.name === exerciseName);
+      let exercise = null;
+      for (const workout of workoutsToSearch) {
+        if (!workout || !workout.exercises) continue;
+        exercise = workout.exercises.find(ex => ex.name === exerciseName);
+        if (exercise) break;
+      }
       if (!exercise) return null;
 
       // Map to expected format (workouts.js uses different property names)
@@ -383,10 +391,12 @@ export class ExerciseDetailScreen {
   exportExercise(exerciseKey) {
     try {
       const history = this.storage.getExerciseHistory(exerciseKey);
-      const [, exerciseName] = exerciseKey.split(' - ');
+      const exerciseName = exerciseKey.includes(' - ')
+        ? exerciseKey.split(' - ').slice(1).join(' - ')
+        : exerciseKey;
 
       const exportData = {
-        exercise: exerciseKey,
+        exercise: exerciseName,
         exportDate: new Date().toISOString(),
         totalSessions: history.length,
         dateRange: {
