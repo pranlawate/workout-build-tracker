@@ -178,7 +178,7 @@ export class RotationManager {
 
       // Check best set performance
       const bestSet = latest.sets.reduce((best, set) => {
-        if (!set.weight || !set.reps) return best;
+        if (set.weight === undefined || set.weight === null || !set.reps) return best;
         if (set.weight > best.weight) return set;
         if (set.weight === best.weight && set.reps > best.reps) return set;
         return best;

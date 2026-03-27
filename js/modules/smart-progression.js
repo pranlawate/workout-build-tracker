@@ -42,6 +42,19 @@ function buildExerciseDefinitionLookup() {
 const EXERCISE_DEFINITION_LOOKUP = buildExerciseDefinitionLookup();
 
 /**
+ * @param {string} exerciseKey - Plain name or legacy `WORKOUT - Exercise Name`
+ * @returns {string} Exercise display name
+ */
+function exerciseNameFromKey(exerciseKey) {
+  if (!exerciseKey || typeof exerciseKey !== 'string') {
+    return '';
+  }
+  return exerciseKey.includes(' - ')
+    ? exerciseKey.split(' - ').slice(1).join(' - ')
+    : exerciseKey;
+}
+
+/**
  * @param {string} exerciseName
  * @returns {object|null} Exercise definition or null
  */
@@ -706,10 +719,7 @@ export function suggestTempoProgression(exerciseKey, history) {
     return null;
   }
 
-  // Extract exercise name from key (remove workout prefix)
-  const exerciseName = exerciseKey.includes(' - ')
-    ? exerciseKey.split(' - ')[1]
-    : exerciseKey;
+  const exerciseName = exerciseNameFromKey(exerciseKey);
 
   // Detect weight gap failure
   const failed = detectWeightGapFailure(history, exerciseName);
@@ -776,9 +786,7 @@ export function handlePainBasedSuggestion(exerciseKey, painHistory, workoutHisto
     return null;
   }
 
-  const exerciseName = exerciseKey.includes(' - ')
-    ? exerciseKey.split(' - ')[1]
-    : exerciseKey;
+  const exerciseName = exerciseNameFromKey(exerciseKey);
 
   const latestPain = painHistory.latestPain;
   if (!latestPain || !latestPain.intensity) {
@@ -881,9 +889,7 @@ export function suggestPlateauAlternative(exerciseKey, history) {
     return null;  // No plateau detected
   }
 
-  const exerciseName = exerciseKey.includes(' - ')
-    ? exerciseKey.split(' - ')[1]
-    : exerciseKey;
+  const exerciseName = exerciseNameFromKey(exerciseKey);
 
   const alternative = findAlternative(exerciseName, SWAP_REASONS.PLATEAU);
 
@@ -986,10 +992,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     };
   }
 
-  // Extract exercise name from key
-  const exerciseName = exerciseKey.includes(' - ')
-    ? exerciseKey.split(' - ')[1]
-    : exerciseKey;
+  const exerciseName = exerciseNameFromKey(exerciseKey);
 
   try {
   // PRIORITY 0: Deload week (suppress all suggestions during recovery)
@@ -1125,7 +1128,7 @@ export function extractExerciseName(exerciseKey) {
 
   // Handle workout key format: "UPPER_A - DB Flat Bench Press"
   if (exerciseKey.includes(' - ')) {
-    return exerciseKey.split(' - ')[1];
+    return exerciseKey.split(' - ').slice(1).join(' - ');
   }
 
   // Handle storage key format: "build_exercise_DB_Flat_Bench_Press"

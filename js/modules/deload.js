@@ -103,8 +103,6 @@ export class DeloadManager {
    */
   detectRegressions() {
     try {
-      const ls = this.storage.storage;
-      const prefix = 'build_exercise_';
       let count = 0;
 
       const bestSessionWeight = (session) => {
@@ -119,12 +117,8 @@ export class DeloadManager {
         return best;
       };
 
-      for (let i = 0; i < ls.length; i++) {
-        const fullKey = ls.key(i);
-        if (!fullKey || !fullKey.startsWith(prefix)) continue;
-        const exerciseKey = fullKey.slice(prefix.length);
-        if (!exerciseKey.includes(' - ')) continue;
-
+      const keys = this.storage.getAllExerciseKeys();
+      for (const exerciseKey of keys) {
         const history = this.storage.getExerciseHistory(exerciseKey);
         if (!history || history.length < 2) continue;
 

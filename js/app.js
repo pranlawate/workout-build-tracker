@@ -1205,7 +1205,23 @@ class App {
     const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
       const exerciseKey = exercise.name;
       const history = this.storage.getExerciseHistory(exerciseKey);
-      const painHistory = this.storage.getPainHistory(exerciseKey);
+      const rawPain = this.storage.getPainHistory(exerciseKey);
+      let painData = null;
+      if (rawPain && rawPain.length > 0) {
+        const painEntries = rawPain.filter(p => p.hadPain);
+        if (painEntries.length > 0) {
+          const latest = painEntries[painEntries.length - 1];
+          const severityMap = { minor: 'mild', significant: 'moderate' };
+          painData = {
+            latestPain: {
+              intensity: severityMap[latest.severity] || latest.severity || 'mild',
+              location: latest.location,
+              date: latest.date
+            },
+            count: painEntries.length
+          };
+        }
+      }
       const lastWorkout = history.length > 0 ? history[history.length - 1] : null;
 
       // Initialize session data for this exercise
@@ -1219,7 +1235,7 @@ class App {
       const performanceBadge = this.getPerformanceBadge(exerciseKey, exerciseSession.sets);
 
       // Get smart progression suggestion
-      const suggestion = getSuggestion(exerciseKey, history, painHistory, this.rotationManager);
+      const suggestion = getSuggestion(exerciseKey, history, painData, this.rotationManager);
       const suggestionBanner = this.generateSuggestionBanner(suggestion);
 
       // Get form cues
@@ -2644,13 +2660,12 @@ class App {
       }
 
       const oldExerciseName = workoutObj.exercises[slotIndex].name;
-      const exerciseKey = `${workout} - ${oldExerciseName}`;
 
       // Save exercise selection
       this.storage.saveExerciseSelection(slotKey, newExerciseName);
 
-      // Record rotation in rotation manager
-      this.rotationManager.recordRotation(exerciseKey, newExerciseName);
+      // Record rotation in rotation manager (v2 keys: exercise name only)
+      this.rotationManager.recordRotation(oldExerciseName, newExerciseName);
 
       // Refresh UI
       this.showHomeScreen();

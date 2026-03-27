@@ -7,7 +7,7 @@
 }
 
 #warmup-modal .modal-subtitle {
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
   margin-bottom: 1rem;
   font-size: 0.95rem;
 }
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: var(--color-background-secondary, #f9fafb);
+  background: var(--color-surface-light);
   border-radius: 8px;
   margin-bottom: 0.5rem;
   cursor: pointer;
@@ -28,7 +28,7 @@
 }
 
 #warmup-modal .checklist-item:hover {
-  background: var(--color-background-hover, #f3f4f6);
+  background: var(--color-background-hover);
 }
 
 #warmup-modal .checklist-item input[type="checkbox"] {
@@ -47,21 +47,21 @@
 #warmup-modal .exercise-name {
   display: block;
   font-weight: 500;
-  color: #1f2937;
+  color: var(--color-text);
   margin-bottom: 0.25rem;
 }
 
 #warmup-modal .exercise-detail {
   display: block;
   font-size: 0.85rem;
-  color: #3b82f6;
+  color: var(--color-primary);
   margin-bottom: 0.25rem;
 }
 
 #warmup-modal .exercise-note {
   display: block;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--color-text-dim);
   font-style: italic;
 }
 
@@ -69,7 +69,7 @@
   text-align: center;
   margin-bottom: 1.5rem;
   font-weight: 500;
-  color: var(--color-primary, #3b82f6);
+  color: var(--color-primary);
 }
 
 #warmup-modal .btn-large {
@@ -95,7 +95,7 @@
 
 #cooldown-modal .cooldown-section {
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 1.5rem;
 }
 
@@ -115,11 +115,11 @@
 }
 
 #cooldown-modal .section-title.required-section {
-  color: var(--color-danger, #ef4444);
+  color: var(--color-danger);
 }
 
 #cooldown-modal .section-title.optional-section {
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 
 #cooldown-modal .section-icon {
@@ -140,7 +140,7 @@
   display: flex;
   align-items: flex-start;
   padding: 1rem;
-  background: var(--color-background-secondary, #f9fafb);
+  background: var(--color-background-secondary);
   border-radius: 8px;
   margin-bottom: 0.5rem;
   cursor: pointer;
@@ -167,34 +167,34 @@
 #cooldown-modal .foam-area {
   font-weight: 500;
   font-size: 0.95rem;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 #cooldown-modal .stretch-duration,
 #cooldown-modal .foam-duration {
   font-size: 0.85rem;
-  color: var(--color-primary, #3b82f6);
+  color: var(--color-primary);
 }
 
 #cooldown-modal .stretch-target,
 #cooldown-modal .foam-note {
   font-size: 0.8rem;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 
 /* LISS Cardio styles */
 #cooldown-modal .recommendation {
   padding: 1rem;
-  background: var(--color-info-bg, #eff6ff);
-  border-left: 4px solid var(--color-info, #3b82f6);
+  background: var(--color-info-bg);
+  border-left: 4px solid var(--color-info);
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.95rem;
-  color: #1f2937 !important;
+  color: var(--color-text) !important;
 }
 
 #cooldown-modal .recommendation small {
-  color: #1f2937 !important;
+  color: var(--color-text) !important;
 }
 
 #cooldown-modal .radio-group {
@@ -208,19 +208,19 @@
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: var(--color-background-secondary, #f9fafb);
+  background: var(--color-background-secondary);
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 #cooldown-modal .radio-item:hover {
-  background: var(--color-background-hover, #f3f4f6);
+  background: var(--color-background-hover);
 }
 
 #cooldown-modal .radio-item.recommended {
-  background: var(--color-success-bg, #f0fdf4);
-  border: 2px solid var(--color-success, #10b981);
+  background: var(--color-success-bg);
+  border: 2px solid var(--color-success);
 }
 
 #cooldown-modal .radio-item input[type="radio"] {
@@ -236,32 +236,32 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 #cooldown-modal .duration-input {
   width: 60px;
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--color-border, #d1d5db);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   font-size: 0.9rem;
 }
 
 #cooldown-modal .note {
   font-size: 0.85rem;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 
 #cooldown-modal .warning {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning);
   font-weight: 500;
 }
 
 /* Weigh-in section styles (simplified) */
 #cooldown-modal .weighin-section {
   padding: 1rem;
-  background: var(--color-background-secondary, #f9fafb);
+  background: var(--color-background-secondary);
   border-radius: 8px;
 }
 
@@ -270,23 +270,23 @@
   font-size: 0.95rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #1f2937;
+  color: var(--color-text);
 }
 
 #cooldown-modal #weight-input-cooldown {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  border: 2px solid var(--color-border, #d1d5db);
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   background: white;
-  color: #1f2937;
+  color: var(--color-text);
   margin-bottom: 1rem;
 }
 
 #cooldown-modal #weight-input-cooldown:focus {
   outline: none;
-  border-color: var(--color-primary, #3b82f6);
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 

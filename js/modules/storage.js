@@ -12,6 +12,9 @@ const LEGACY_MOBILITY_CHECKS = 'barbell_mobility_checks';
 
 const MAX_HISTORY_LENGTH = 8;
 
+/** Suffixes under `build_exercise_*` that are not per-exercise history arrays */
+const NON_HISTORY_SUFFIXES = new Set(['pain_history', 'alternates', 'selections', 'tenure']);
+
 function defaultRotationState() {
   return {
     lastWorkout: null,
@@ -295,7 +298,8 @@ export class StorageManager {
       const allKeys = storage.data ? Object.keys(storage.data) : Object.keys(storage);
       return allKeys
         .filter(key => key.startsWith(KEYS.EXERCISE_HISTORY_PREFIX))
-        .map(key => key.replace(KEYS.EXERCISE_HISTORY_PREFIX, ''));
+        .map(key => key.replace(KEYS.EXERCISE_HISTORY_PREFIX, ''))
+        .filter(suffix => !NON_HISTORY_SUFFIXES.has(suffix));
     } catch (error) {
       console.error('Failed to get exercise keys, returning empty array:', error);
       return [];
@@ -535,13 +539,14 @@ export class StorageManager {
     }
 
     try {
-      const allKeys = this.getAllExerciseKeys();
-      let workoutExerciseKeys;
-      if (exerciseNames && Array.isArray(exerciseNames) && exerciseNames.length > 0) {
-        workoutExerciseKeys = exerciseNames;
-      } else {
-        workoutExerciseKeys = allKeys.filter(key => key.startsWith(workoutName + ' - '));
+      if (!exerciseNames || !Array.isArray(exerciseNames) || exerciseNames.length === 0) {
+        console.warn(
+          '[Storage] getWorkoutHistory: exerciseNames is required after v2 key migration'
+        );
+        return [];
       }
+
+      const workoutExerciseKeys = exerciseNames;
 
       if (workoutExerciseKeys.length === 0) {
         return [];
