@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#06b6d4">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -535,9 +535,6 @@
             <input type="file" id="import-file-input" accept=".json" style="display: none;" />
           </div>
 
-          <div id="data-summary" class="data-summary" style="display: none;">
-            <!-- Populated when showing import preview -->
-          </div>
         </section>
 
         <section class="settings-section">
@@ -972,13 +969,15 @@
   <script>
     if ('serviceWorker' in navigator) {
       let refreshing = false;
+      const hadController = !!navigator.serviceWorker.controller;
 
-      // Reload page when new Service Worker takes control
+      // Reload once when an updated Service Worker takes control (skip first install)
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
+        if (!hadController || refreshing) {
+          return;
         }
+        refreshing = true;
+        window.location.reload();
       });
 
       window.addEventListener('load', () => {

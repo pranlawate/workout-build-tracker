@@ -1,42 +1,72 @@
-const CACHE_VERSION = 'build-tracker-v106';
+const CACHE_VERSION = 'build-tracker-v107';
 const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',
   './index.html',
-  './css/main.css',
-  './css/components.css',
-  './css/screens.css',
-  './css/workout-screen.css',
-  './css/progress-dashboard.css',
-  './css/summary-screen.css',
-  './css/recovery-modal.css',
+  './manifest.json',
+  './assets/icons/icon.svg',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './css/achievements.css',
   './css/analytics.css',
-  './css/workout-reference.css',
-  './css/unlock-notifications.css',
+  './css/components.css',
+  './css/deload-modal.css',
+  './css/edit-entry-modal.css',
+  './css/exercise-detail.css',
   './css/exercise-progressions.css',
-  './css/warm-up-protocols.css',
+  './css/export-import.css',
+  './css/history-screen.css',
+  './css/main.css',
+  './css/number-overlay.css',
   './css/optional-fifth-day.css',
+  './css/post-set-feedback.css',
+  './css/pre-post-workout-modals.css',
+  './css/progress-chart.css',
+  './css/progress-dashboard.css',
+  './css/progressive-disclosure.css',
+  './css/recovery-modal.css',
+  './css/screens.css',
+  './css/sticky-input.css',
+  './css/summary-screen.css',
+  './css/unlock-notifications.css',
+  './css/video-modal.css',
+  './css/warm-up-protocols.css',
+  './css/warm-up.css',
+  './css/workout-reference.css',
+  './css/workout-screen.css',
   './js/app.js',
-  './js/modules/storage.js',
-  './js/modules/workouts.js',
-  './js/modules/progression.js',
-  './js/modules/workout-manager.js',
-  './js/modules/progress-analyzer.js',
-  './js/modules/body-weight.js',
+  './js/components/progress-chart.js',
+  './js/components/weight-trend-chart.js',
+  './js/modals/edit-entry-modal.js',
+  './js/modules/achievements.js',
   './js/modules/analytics-calculator.js',
-  './js/modules/progression-pathways.js',
+  './js/modules/barbell-progression-tracker.js',
+  './js/modules/body-weight.js',
   './js/modules/complexity-tiers.js',
-  './js/modules/equipment-profiles.js',
+  './js/modules/deload.js',
+  './js/modules/exercise-metadata.js',
+  './js/modules/exercise-videos.js',
+  './js/modules/form-cues.js',
+  './js/modules/optional-fifth-day.js',
+  './js/modules/performance-analyzer.js',
+  './js/modules/phase-manager.js',
+  './js/modules/progression-pathways.js',
+  './js/modules/progression.js',
+  './js/modules/progress-analyzer.js',
+  './js/modules/rotation-manager.js',
+  './js/modules/smart-progression.js',
+  './js/modules/storage.js',
+  './js/modules/stretching-protocols.js',
+  './js/modules/tempo-guidance.js',
+  './js/modules/unlock-criteria.js',
   './js/modules/unlock-evaluator.js',
   './js/modules/warm-up-protocols.js',
-  './js/modules/stretching-protocols.js',
-  './js/modules/optional-fifth-day.js',
-  './js/modules/phase-manager.js',
-  './js/modules/exercise-videos.js',
-  './js/components/weight-trend-chart.js',
-  './manifest.json',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png'
+  './js/modules/workout-manager.js',
+  './js/modules/workouts.js',
+  './js/screens/exercise-detail.js',
+  './js/screens/exercise-library.js',
+  './js/screens/history-list.js',
+  './js/utils/export-import.js'
 ];
 
 // Install event - cache static assets
@@ -105,7 +135,7 @@ self.addEventListener('fetch', (event) => {
           console.log('[SW] Fetching and caching video:', url.pathname);
           return fetch(event.request).then(networkResponse => {
             // Only cache successful responses
-            if (networkResponse && networkResponse.status === 200) {
+            if (networkResponse && networkResponse.ok) {
               cache.put(event.request, networkResponse.clone());
             }
             return networkResponse;
@@ -128,11 +158,13 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         }
 
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_VERSION)
-          .then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+        if (networkResponse.ok) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_VERSION)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+        }
 
         return networkResponse;
       })

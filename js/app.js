@@ -49,6 +49,9 @@ class App {
     this.unlockEvaluator = new UnlockEvaluator(this.storage, this.phaseManager);
     this.rotationManager = new RotationManager(this.storage, this.unlockEvaluator);
     this.analyticsCalculator = new AnalyticsCalculator(this.storage);
+    this._importInProgress = false;
+    this._workoutTimerStart = null;
+    this._timerVisibilityBound = null;
     this.currentWorkout = null;
     this.currentExerciseIndex = 0;
     this.setInputHandler = null;
@@ -162,6 +165,7 @@ class App {
 
   initializeApp() {
     this.setupBrowserHistory();
+    this.setupCrossTabStorageSync();
     this.updateHomeScreen();
     this.attachEventListeners();
     this.initializeNumberOverlay();
@@ -201,6 +205,25 @@ class App {
 
       // Handle browser back/forward buttons
     window.addEventListener('popstate', (event) => {
+      if (this._importInProgress) {
+        window.history.pushState({ screen: 'modal' }, '', '');
+        const modal = document.getElementById('settings-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+        }
+        alert('Import in progress. Please wait until it finishes.');
+        return;
+      }
+
+      const settingsModal = document.getElementById('settings-modal');
+      const settingsOpen = settingsModal && settingsModal.style.display === 'flex';
+      if (settingsOpen && event.state && event.state.screen !== 'modal') {
+        if (!confirm('Leave settings?')) {
+          window.history.pushState({ screen: 'modal' }, '', '');
+          return;
+        }
+      }
+
       if (!event.state) {
         // Trying to go back beyond app's initial state
         // Push home state to keep user in the app
@@ -214,6 +237,30 @@ class App {
     });
   }
 
+  /**
+   * Refresh visible UI when another tab changes localStorage
+   */
+  setupCrossTabStorageSync() {
+    window.addEventListener('storage', (e) => {
+      if (e.storageArea !== localStorage) return;
+      if (!e.key || !e.key.startsWith('build_')) return;
+
+      try {
+        if (document.getElementById('home-screen')?.classList.contains('active')) {
+          this.updateHomeScreen();
+        }
+        if (document.getElementById('progress-screen')?.classList.contains('active')) {
+          this.showProgressDashboard(false);
+        }
+        if (document.getElementById('history-screen')?.classList.contains('active')) {
+          this.historyListScreen.render();
+        }
+      } catch (err) {
+        console.error('[App] Cross-tab storage sync failed:', err);
+      }
+    });
+  }
+
   navigateToScreen(screen, data = {}) {
     // Always close modal when navigating (modals are overlays, not screens)
     this.closeSettingsModal();
@@ -223,9 +270,18 @@ class App {
         this.showHomeScreen(false); // false = don't push to history
         break;
       case 'workout':
-        // Navigating TO workout screen (e.g., back from modal)
-        // Workout screen is already visible, modal already closed above
-        // Do nothing - just stay on workout screen
+        if (this.currentWorkout && this.workoutSession) {
+          this.hideAllScreens();
+          const workoutScreen = document.getElementById('workout-screen');
+          if (workoutScreen) {
+            workoutScreen.classList.add('active');
+          }
+          const titleEl = document.getElementById('workout-title');
+          if (titleEl) {
+            titleEl.textContent = this.currentWorkout.displayName;
+          }
+          this.startTimer();
+        }
         break;
       case 'history':
         this.showHistoryScreen(false);
@@ -234,6 +290,12 @@ class App {
         if (data.exerciseKey) {
           this.showExerciseDetail(data.exerciseKey, false);
         }
+        break;
+      case 'exercise-library':
+        this.exerciseLibrary.showLibrary(false);
+        break;
+      case 'summary':
+        this.showHomeScreen(false);
         break;
       case 'progress':
         this.showProgressDashboard(false);
@@ -350,7 +412,7 @@ class App {
             return;
           }
         }
-        this.showHomeScreen();
+        window.history.back();
       });
     }
 
@@ -384,19 +446,19 @@ class App {
     // History back button
     const historyBackBtn = document.getElementById('history-back-btn');
     if (historyBackBtn) {
-      historyBackBtn.addEventListener('click', () => this.showHomeScreen());
+      historyBackBtn.addEventListener('click', () => window.history.back());
     }
 
     // Exercise detail back button
     const detailBackBtn = document.getElementById('exercise-detail-back-btn');
     if (detailBackBtn) {
-      detailBackBtn.addEventListener('click', () => this.showHistoryScreen());
+      detailBackBtn.addEventListener('click', () => window.history.back());
     }
 
     // Summary back button
     const summaryBackBtn = document.getElementById('summary-back-btn');
     if (summaryBackBtn) {
-      summaryBackBtn.addEventListener('click', () => this.showHomeScreen());
+      summaryBackBtn.addEventListener('click', () => window.history.back());
     }
 
     // Settings button
@@ -420,7 +482,7 @@ class App {
     // Fifth day back button
     const fifthDayBackBtn = document.getElementById('fifth-day-back-btn');
     if (fifthDayBackBtn) {
-      fifthDayBackBtn.addEventListener('click', () => this.showHomeScreen());
+      fifthDayBackBtn.addEventListener('click', () => window.history.back());
     }
 
     // Workout settings button
@@ -1030,15 +1092,29 @@ class App {
     const timerEl = document.getElementById('timer');
     if (!timerEl) return;
 
-    const startTime = Date.now();
+    this.stopTimer();
+    this._workoutTimerStart = Date.now();
 
-    this.timerInterval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const updateDisplay = () => {
+      const el = document.getElementById('timer');
+      if (!el || this._workoutTimerStart == null) return;
+      const elapsed = Math.floor((Date.now() - this._workoutTimerStart) / 1000);
       const minutes = Math.floor(elapsed / 60);
       const seconds = elapsed % 60;
+      el.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
 
-      timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }, 1000);
+    this.timerInterval = setInterval(updateDisplay, 1000);
+    updateDisplay();
+
+    if (!this._timerVisibilityBound) {
+      this._timerVisibilityBound = () => {
+        if (document.visibilityState === 'visible') {
+          updateDisplay();
+        }
+      };
+      document.addEventListener('visibilitychange', this._timerVisibilityBound);
+    }
   }
 
   stopTimer() {
@@ -1046,6 +1122,7 @@ class App {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    this._workoutTimerStart = null;
   }
 
   showHomeScreen(pushHistory = true) {
@@ -2985,7 +3062,7 @@ class App {
     const closeBtn = document.getElementById('settings-close-btn');
     if (closeBtn) {
       closeBtn.onclick = () => {
-        this.closeSettingsModal();
+        if (!this.closeSettingsModal()) return;
         window.history.back(); // Go back in history when closing via button
       };
     }
@@ -3025,6 +3102,11 @@ class App {
   }
 
   closeSettingsModal() {
+    if (this._importInProgress) {
+      alert('Import in progress. Please wait until it finishes.');
+      return false;
+    }
+
     const modal = document.getElementById('settings-modal');
     const fileInput = document.getElementById('import-file-input');
 
@@ -3036,6 +3118,8 @@ class App {
     if (fileInput) {
       fileInput.value = '';
     }
+
+    return true;
   }
 
   /**
@@ -3457,6 +3541,7 @@ class App {
     const file = event.target.files[0];
     if (!file) return;
 
+    this._importInProgress = true;
     try {
       const text = await file.text();
       const data = parseWorkoutBackupJson(text);
@@ -3487,6 +3572,8 @@ class App {
 
       alert('✅ Data imported successfully');
 
+      this._importInProgress = false;
+
       // Close modal and refresh home screen
       this.closeSettingsModal();
       window.history.back(); // Go back in history
@@ -3497,6 +3584,7 @@ class App {
       console.error('Import failed:', error);
       alert(`❌ Import failed: ${error.message}`);
     } finally {
+      this._importInProgress = false;
       // Reset file input
       event.target.value = '';
     }
@@ -3715,7 +3803,7 @@ class App {
     // Attach back button
     const progressBackBtn = document.getElementById('progress-back-btn');
     if (progressBackBtn) {
-      progressBackBtn.onclick = () => this.showHomeScreen();
+      progressBackBtn.onclick = () => window.history.back();
     }
 
     // Attach settings button

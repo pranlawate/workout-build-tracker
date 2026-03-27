@@ -70,7 +70,7 @@ export class ExerciseLibrary {
     }
   }
 
-  showLibrary() {
+  showLibrary(pushHistory = true) {
     if (!this.libraryScreen) {
       console.warn('[ExerciseLibrary] Cannot open library: screen element missing');
       return;
@@ -92,12 +92,15 @@ export class ExerciseLibrary {
     // Render exercise list
     this.renderExerciseList();
 
+    if (pushHistory && window.history.state?.screen !== 'exercise-library') {
+      window.history.pushState({ screen: 'exercise-library' }, '', '');
+    }
+
     console.log('[ExerciseLibrary] Library opened');
   }
 
   hideLibrary() {
-    // Show home screen (handles hiding library screen)
-    this.app.showHomeScreen();
+    window.history.back();
 
     console.log('[ExerciseLibrary] Library closed');
   }
