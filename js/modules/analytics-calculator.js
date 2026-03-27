@@ -16,6 +16,26 @@ const MIN_PAIN_DAYS = 3;
 
 import { WORKOUTS } from './workouts.js';
 
+/**
+ * Canonical sleep hours for analytics: app stores `sleepHours`; older/test data may use `sleep`.
+ * @param {{ sleepHours?: unknown, sleep?: unknown }|null|undefined} m
+ * @returns {number}
+ */
+function sleepHoursFromMetric(m) {
+  if (!m || typeof m !== 'object') return 0;
+  const raw = m.sleepHours != null ? m.sleepHours : m.sleep;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * @param {unknown} rir
+ * @returns {boolean}
+ */
+function isUsableRir(rir) {
+  return typeof rir === 'number' && Number.isFinite(rir);
+}
+
 export class AnalyticsCalculator {
   /**
    * Creates an AnalyticsCalculator instance
@@ -242,7 +262,7 @@ export class AnalyticsCalculator {
           if (entry.date >= cutoffStr) {
             workoutDates.add(entry.date);
             entry.sets.forEach(set => {
-              if (set && typeof set.rir === 'number') {
+              if (set && isUsableRir(set.rir)) {
                 allSets.push({ ...set, date: entry.date });
               }
             });
@@ -415,13 +435,10 @@ export class AnalyticsCalculator {
       cutoffDate.setDate(cutoffDate.getDate() - days);
       const cutoffStr = cutoffDate.toISOString().split('T')[0];
 
-      // Get recovery metrics from localStorage
-      const metricsData = localStorage.getItem('build_recovery_metrics');
-      if (!metricsData) {
+      const allMetrics = this.storage.getRecoveryMetrics();
+      if (allMetrics.length === 0) {
         return { avgSleep: 0, avgFatigue: 0, highFatigueDays: 0, weeklyTrend: [] };
       }
-
-      const allMetrics = JSON.parse(metricsData);
       const recentMetrics = allMetrics.filter(m => m.date >= cutoffStr);
 
       if (recentMetrics.length === 0) {
@@ -429,7 +446,8 @@ export class AnalyticsCalculator {
       }
 
       // Calculate averages
-      const avgSleep = recentMetrics.reduce((sum, m) => sum + (m.sleep || 0), 0) / recentMetrics.length;
+      const avgSleep =
+        recentMetrics.reduce((sum, m) => sum + sleepHoursFromMetric(m), 0) / recentMetrics.length;
       const avgFatigue = recentMetrics.reduce((sum, m) => sum + (m.fatigueScore || 0), 0) / recentMetrics.length;
 
       // Count high fatigue days (≥4 points)
@@ -466,7 +484,7 @@ export class AnalyticsCalculator {
           weekMap.set(weekKey, { sleep: [], fatigue: [] });
         }
 
-        weekMap.get(weekKey).sleep.push(m.sleep || 0);
+        weekMap.get(weekKey).sleep.push(sleepHoursFromMetric(m));
         weekMap.get(weekKey).fatigue.push(m.fatigueScore || 0);
       });
 
@@ -522,10 +540,8 @@ export class AnalyticsCalculator {
    */
   detectSleepProgressionPattern() {
     try {
-      const metricsData = localStorage.getItem('build_recovery_metrics');
-      if (!metricsData) return null;
-
-      const allMetrics = JSON.parse(metricsData);
+      const allMetrics = this.storage.getRecoveryMetrics();
+      if (allMetrics.length === 0) return null;
       const workoutDates = this.getCompletedWorkoutDates();
       if (workoutDates.length === 0) return null;
 
@@ -535,7 +551,7 @@ export class AnalyticsCalculator {
           const progressed = this.didProgressOnDate(date);
           return {
             date,
-            sleep: metrics?.sleep || 0,
+            sleep: sleepHoursFromMetric(metrics),
             progressed
           };
         })

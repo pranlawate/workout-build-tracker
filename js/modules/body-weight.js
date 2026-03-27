@@ -3,9 +3,9 @@
  */
 export class BodyWeightManager {
   constructor(storage) {
-    // Keep storage parameter for future use (testing/mocking)
-    // Currently using localStorage directly since StorageManager doesn't expose raw getItem/setItem
     this.storage = storage;
+    this._ls =
+      storage && storage.storage !== undefined ? storage.storage : globalThis.localStorage;
   }
 
   /**
@@ -13,7 +13,7 @@ export class BodyWeightManager {
    * @returns {Object} { entries: Array<{date: string, weight_kg: number}> }
    */
   getData() {
-    const raw = localStorage.getItem('build_body_weight');
+    const raw = this._ls.getItem('build_body_weight');
     if (!raw) {
       return { entries: [] };
     }
@@ -29,7 +29,7 @@ export class BodyWeightManager {
               weight_kg: e.weight_kg ?? e.weight ?? 0
             }))
         };
-        localStorage.setItem('build_body_weight', JSON.stringify(migrated));
+        this._ls.setItem('build_body_weight', JSON.stringify(migrated));
         return migrated;
       }
       if (!Array.isArray(data.entries)) {
@@ -107,7 +107,7 @@ export class BodyWeightManager {
     // Trim to 8 weeks
     data.entries = this.trimTo8Weeks(data.entries);
 
-    localStorage.setItem('build_body_weight', JSON.stringify(data));
+    this._ls.setItem('build_body_weight', JSON.stringify(data));
     return { success: true, replaced };
   }
 
@@ -200,9 +200,11 @@ export class BodyWeightManager {
 
     const lastEntry = new Date(entries[entries.length - 1].date);
     const now = new Date();
+    const lastDay = lastEntry.toISOString().split('T')[0];
+    const todayDay = now.toISOString().split('T')[0];
 
-    // Allow daily weigh-ins - check if it's a new calendar day
-    if (lastEntry.toDateString() !== now.toDateString()) {
+    // Allow daily weigh-ins - check if it's a new calendar day (UTC date key)
+    if (lastDay !== todayDay) {
       return true;
     }
 

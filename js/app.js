@@ -15,7 +15,13 @@ import { getFormCues } from './modules/form-cues.js';
 import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
-import { exportWorkoutData, importWorkoutData, getDataSummary } from './utils/export-import.js';
+import {
+  exportWorkoutData,
+  importValidatedWorkoutData,
+  getDataSummary,
+  parseWorkoutBackupJson,
+  validateImportData
+} from './utils/export-import.js';
 import { detectAchievements, formatAchievementType, getAllAchievements } from './modules/achievements.js';
 import { UnlockEvaluator } from './modules/unlock-evaluator.js';
 import { RotationManager } from './modules/rotation-manager.js';
@@ -2876,11 +2882,13 @@ class App {
 
     const deletedDateObj = new Date(deletedDate);
     const lastWorkoutDateObj = new Date(rotation.lastDate);
-    console.log('[ROLLBACK DEBUG] Deleted date:', deletedDateObj.toDateString());
-    console.log('[ROLLBACK DEBUG] Last workout date:', lastWorkoutDateObj.toDateString());
+    console.log('[ROLLBACK DEBUG] Deleted date:', deletedDateObj.toISOString().split('T')[0]);
+    console.log('[ROLLBACK DEBUG] Last workout date:', lastWorkoutDateObj.toISOString().split('T')[0]);
 
-    // Compare dates (same day)
-    if (deletedDateObj.toDateString() !== lastWorkoutDateObj.toDateString()) {
+    // Compare dates (same calendar day, UTC key)
+    if (
+      deletedDateObj.toISOString().split('T')[0] !== lastWorkoutDateObj.toISOString().split('T')[0]
+    ) {
       console.log('[ROLLBACK DEBUG] Early exit: Date mismatch (deleted from older workout)');
       return; // Deleted entry is from an older workout, don't roll back
     }
@@ -2900,8 +2908,9 @@ class App {
     console.log('[ROLLBACK DEBUG] Checking for remaining exercises from this workout...');
     const hasRemainingExercises = workout.exercises.some(exercise => {
       const history = this.storage.getExerciseHistory(exercise.name);
-      const hasMatch = history.some(h =>
-        new Date(h.date).toDateString() === deletedDateObj.toDateString()
+      const deletedDay = deletedDateObj.toISOString().split('T')[0];
+      const hasMatch = history.some(
+        h => new Date(h.date).toISOString().split('T')[0] === deletedDay
       );
       if (hasMatch) {
         console.log('[ROLLBACK DEBUG] Found remaining exercise:', exercise.name);
@@ -3365,9 +3374,7 @@ class App {
 
     if (!doubleConfirm) return;
 
-    // Clear all exercise history
-    const allKeys = Object.keys(localStorage).filter(k => k.startsWith('build_exercise_'));
-    allKeys.forEach(key => localStorage.removeItem(key));
+    this.storage.clearExerciseHistoryKeys();
 
     alert('✅ Exercise history cleared!\n\nYour rotation state is preserved.');
 
@@ -3399,9 +3406,7 @@ class App {
 
     if (!doubleConfirm) return;
 
-    // Clear all app data
-    const allKeys = Object.keys(localStorage).filter(k => k.startsWith('build_'));
-    allKeys.forEach(key => localStorage.removeItem(key));
+    this.storage.clearAllBuildKeys();
 
     alert('✅ App reset complete!\n\nReloading...');
 
@@ -3454,15 +3459,19 @@ class App {
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text);
+      const data = parseWorkoutBackupJson(text);
+      validateImportData(data);
 
-      // Show preview
       const summary = getDataSummary(data);
+      const extraLine = summary.extraStorageKeyCount > 0
+        ? `App state keys: ${summary.extraStorageKeyCount}\n`
+        : '';
       const confirmed = confirm(
         `Import Data Preview:\n\n` +
         `Exercises: ${summary.exerciseCount}\n` +
         `Total Workouts: ${summary.totalWorkouts}\n` +
         `Date Range: ${summary.dateRange}\n` +
+        extraLine +
         `Size: ${(summary.storageSize / 1024).toFixed(1)} KB\n\n` +
         `⚠️ This will replace all existing data.\n\n` +
         `Continue with import?`
@@ -3474,8 +3483,7 @@ class App {
         return;
       }
 
-      // Import
-      importWorkoutData(text, this.storage);
+      importValidatedWorkoutData(data, this.storage);
 
       alert('✅ Data imported successfully');
 
@@ -5323,7 +5331,7 @@ class App {
   }
 
   /**
-   * Save recovery metrics to localStorage
+   * Save recovery metrics via StorageManager
    * @param {Object} metrics - Recovery data
    */
   saveRecoveryMetrics(metrics) {
@@ -5348,24 +5356,18 @@ class App {
       const cutoffDate = ninetyDaysAgo.toISOString().split('T')[0];
       const filtered = entries.filter(e => e.date >= cutoffDate);
 
-      localStorage.setItem('build_recovery_metrics', JSON.stringify(filtered));
+      this.storage.saveRecoveryMetrics(filtered);
     } catch (error) {
       console.error('[Recovery Metrics] Save failed:', error);
     }
   }
 
   /**
-   * Get recovery metrics from localStorage
+   * Get recovery metrics from storage
    * @returns {Array} Array of recovery entries
    */
   getRecoveryMetrics() {
-    try {
-      const data = localStorage.getItem('build_recovery_metrics');
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('[Recovery Metrics] Retrieval failed:', error);
-      return [];
-    }
+    return this.storage.getRecoveryMetrics();
   }
 
   /**
@@ -5377,8 +5379,8 @@ class App {
     if (entries.length === 0) return true;
 
     const lastEntry = entries[entries.length - 1];
-    const today = new Date().toDateString();
-    const lastDate = new Date(lastEntry.date).toDateString();
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = new Date(lastEntry.date).toISOString().split('T')[0];
 
     return today !== lastDate;
   }
@@ -5598,7 +5600,7 @@ class App {
     if (entries.length > 0) {
       const lastEntry = entries[entries.length - 1];
       lastEntry.warningShown = true;
-      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+      this.storage.saveRecoveryMetrics(entries);
     }
   }
 
@@ -5612,7 +5614,7 @@ class App {
       const lastEntry = entries[entries.length - 1];
       lastEntry.warningDismissed = true;
       lastEntry.workoutCompleted = false; // User chose not to work out
-      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+      this.storage.saveRecoveryMetrics(entries);
     }
 
     // Hide banner
@@ -5631,7 +5633,7 @@ class App {
     if (entries.length > 0) {
       const lastEntry = entries[entries.length - 1];
       lastEntry.deloadChosen = true;
-      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+      this.storage.saveRecoveryMetrics(entries);
     }
 
     // Enable deload mode
@@ -5653,7 +5655,7 @@ class App {
     if (entries.length > 0) {
       const lastEntry = entries[entries.length - 1];
       lastEntry.warningDismissed = true;
-      localStorage.setItem('build_recovery_metrics', JSON.stringify(entries));
+      this.storage.saveRecoveryMetrics(entries);
     }
 
     // Hide banner
@@ -5743,7 +5745,7 @@ class App {
             todayEntry.painScore = painScore;
             todayEntry.fatigueScore = todayEntry.preWorkoutScore + painScore;
 
-            localStorage.setItem('build_recovery_metrics', JSON.stringify(recoveryEntries));
+            this.storage.saveRecoveryMetrics(recoveryEntries);
           }
         }
 

@@ -101,7 +101,7 @@ export class RotationManager {
    */
   getTenure(exerciseKey) {
     try {
-      const allTenure = JSON.parse(localStorage.getItem(this.TENURE_KEY) || '{}');
+      const allTenure = this.storage.getExerciseTenureMap();
       const tenure = allTenure[exerciseKey];
 
       if (!tenure || !tenure.startDate) {
@@ -145,7 +145,7 @@ export class RotationManager {
    */
   recordRotation(exerciseKey, newExerciseName) {
     try {
-      const allTenure = JSON.parse(localStorage.getItem(this.TENURE_KEY) || '{}');
+      const allTenure = this.storage.getExerciseTenureMap();
 
       // Reset tenure for new exercise
       allTenure[exerciseKey] = {
@@ -154,7 +154,7 @@ export class RotationManager {
         lastRotationDate: new Date().toISOString()
       };
 
-      localStorage.setItem(this.TENURE_KEY, JSON.stringify(allTenure));
+      this.storage.saveExerciseTenureMap(allTenure);
 
       console.log(`[RotationManager] Recorded rotation: ${exerciseKey} → ${newExerciseName}`);
     } catch (e) {

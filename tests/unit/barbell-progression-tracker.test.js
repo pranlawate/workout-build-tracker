@@ -4,6 +4,29 @@ import './setup.js';
 import { BarbellProgressionTracker } from '../../js/modules/barbell-progression-tracker.js';
 import { StorageManager } from '../../js/modules/storage.js';
 
+function runWithSyntheticCalendar(apply) {
+  const RealDate = global.Date;
+  let dayOffset = 0;
+  function FakeDate(...args) {
+    if (args.length === 0) {
+      return new RealDate(RealDate.UTC(2025, 0, 1 + dayOffset, 12, 0, 0));
+    }
+    return new RealDate(...args);
+  }
+  FakeDate.now = () => new RealDate(RealDate.UTC(2025, 0, 1 + dayOffset, 12, 0, 0)).getTime();
+  FakeDate.parse = RealDate.parse;
+  FakeDate.UTC = RealDate.UTC;
+  global.Date = FakeDate;
+
+  try {
+    apply(() => {
+      dayOffset++;
+    });
+  } finally {
+    global.Date = RealDate;
+  }
+}
+
 describe('BarbellProgressionTracker', () => {
   let storage;
   let tracker;
@@ -49,10 +72,13 @@ describe('BarbellProgressionTracker', () => {
         storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
       }
 
-      // Add pain history: no pain in last 5 workouts
-      for (let i = 0; i < 5; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      // Add pain history: no pain in last 5 workouts (one entry per calendar day)
+      runWithSyntheticCalendar(bump => {
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const result = tracker.getBarbellBenchReadiness();
 
@@ -88,9 +114,12 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Pain free
-      for (let i = 0; i < 5; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const result = tracker.getBarbellBenchReadiness();
 
@@ -141,11 +170,17 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Pain in 3 out of last 5 workouts (should fail)
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+      });
 
       const result = tracker.getBarbellBenchReadiness();
 
@@ -161,11 +196,17 @@ describe('BarbellProgressionTracker', () => {
       const exerciseKey = 'Incline DB Press';
 
       // Pain in 1 out of last 5 workouts (should pass)
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+      });
 
       const result = tracker.getBarbellBenchReadiness();
 
@@ -202,9 +243,12 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Add pain history: no knee/back pain in last 5 workouts
-      for (let i = 0; i < 5; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const result = tracker.getBarbellSquatReadiness();
 
@@ -245,11 +289,17 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Knee pain in 2 out of last 5 workouts (should fail)
-      storage.savePainReport(exerciseKey, true, 'knee', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, true, 'knee', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'knee', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, true, 'knee', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+      });
 
       const result = tracker.getBarbellSquatReadiness();
 
@@ -286,9 +336,12 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Add pain history: no back pain in last 5 workouts
-      for (let i = 0; i < 5; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const result = tracker.getBarbellDeadliftReadiness();
 
@@ -329,11 +382,17 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Back pain in 3 out of last 5 workouts (should fail)
-      storage.savePainReport(exerciseKey, true, 'lower_back', 'significant');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, true, 'lower_back', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, true, 'lower_back', 'minor');
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'lower_back', 'significant');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, true, 'lower_back', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, true, 'lower_back', 'minor');
+      });
 
       const result = tracker.getBarbellDeadliftReadiness();
 
@@ -530,9 +589,12 @@ describe('BarbellProgressionTracker', () => {
 
     test('should return true when 0 painful sessions in last 5', () => {
       const exerciseKey = 'Incline DB Press';
-      for (let i = 0; i < 5; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
@@ -540,10 +602,14 @@ describe('BarbellProgressionTracker', () => {
 
     test('should return true when 1 painful session in last 5', () => {
       const exerciseKey = 'Incline DB Press';
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      for (let i = 0; i < 4; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        for (let i = 0; i < 4; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
@@ -551,11 +617,17 @@ describe('BarbellProgressionTracker', () => {
 
     test('should return false when 2 painful sessions in last 5', () => {
       const exerciseKey = 'Incline DB Press';
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, true, 'elbow', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, true, 'elbow', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+      });
 
       const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, false);
@@ -563,13 +635,19 @@ describe('BarbellProgressionTracker', () => {
 
     test('should only count pain in relevant locations', () => {
       const exerciseKey = 'Incline DB Press';
-      // 3 wrist pain instances (not relevant)
-      storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
-      storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
-      storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
-      // 1 shoulder pain instance (relevant)
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
+      runWithSyntheticCalendar(bump => {
+        // 3 wrist pain instances (not relevant)
+        storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
+        bump();
+        // 1 shoulder pain instance (relevant)
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+      });
 
       const painFree = tracker._isPainFree([exerciseKey], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true); // Only 1 relevant painful session
@@ -579,18 +657,26 @@ describe('BarbellProgressionTracker', () => {
       const exerciseKey1 = 'Incline DB Press';
       const exerciseKey2 = 'Landmine Press';
 
-      // Exercise 1: 1 painful session (ok)
-      storage.savePainReport(exerciseKey1, true, 'shoulder', 'minor');
-      for (let i = 0; i < 4; i++) {
-        storage.savePainReport(exerciseKey1, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        // Exercise 1: 1 painful session (ok)
+        storage.savePainReport(exerciseKey1, true, 'shoulder', 'minor');
+        bump();
+        for (let i = 0; i < 4; i++) {
+          storage.savePainReport(exerciseKey1, false, null, null);
+          bump();
+        }
 
-      // Exercise 2: 2 painful sessions (fail)
-      storage.savePainReport(exerciseKey2, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey2, false, null, null);
-      storage.savePainReport(exerciseKey2, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey2, false, null, null);
-      storage.savePainReport(exerciseKey2, false, null, null);
+        // Exercise 2: 2 painful sessions (fail)
+        storage.savePainReport(exerciseKey2, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey2, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey2, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey2, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey2, false, null, null);
+      });
 
       const painFree = tracker._isPainFree([exerciseKey1, exerciseKey2], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, false);
@@ -619,9 +705,12 @@ describe('BarbellProgressionTracker', () => {
       }
 
       // Pain: 100% (pain free)
-      for (let i = 0; i < 5; i++) {
-        storage.savePainReport(exerciseKey, false, null, null);
-      }
+      runWithSyntheticCalendar(bump => {
+        for (let i = 0; i < 5; i++) {
+          storage.savePainReport(exerciseKey, false, null, null);
+          bump();
+        }
+      });
 
       const result = tracker.getBarbellBenchReadiness();
 
@@ -648,11 +737,17 @@ describe('BarbellProgressionTracker', () => {
       // Weeks: 0% (only 1 workout)
       // Mobility: 0% (no checks)
       // Pain: 0% (pain present)
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
-      storage.savePainReport(exerciseKey, false, null, null);
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+        bump();
+        storage.savePainReport(exerciseKey, false, null, null);
+      });
 
       const result = tracker.getBarbellBenchReadiness();
 

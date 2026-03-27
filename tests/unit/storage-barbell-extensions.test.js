@@ -3,6 +3,30 @@ import { test, describe, beforeEach } from 'node:test';
 import './setup.js';
 import { StorageManager } from '../../js/modules/storage.js';
 
+/** Advance calendar day between saves (savePainReport uses `new Date()` for the entry date). */
+function runWithSyntheticCalendar(apply) {
+  const RealDate = global.Date;
+  let dayOffset = 0;
+  function FakeDate(...args) {
+    if (args.length === 0) {
+      return new RealDate(RealDate.UTC(2025, 0, 1 + dayOffset, 12, 0, 0));
+    }
+    return new RealDate(...args);
+  }
+  FakeDate.now = () => new RealDate(RealDate.UTC(2025, 0, 1 + dayOffset, 12, 0, 0)).getTime();
+  FakeDate.parse = RealDate.parse;
+  FakeDate.UTC = RealDate.UTC;
+  global.Date = FakeDate;
+
+  try {
+    apply(() => {
+      dayOffset++;
+    });
+  } finally {
+    global.Date = RealDate;
+  }
+}
+
 describe('StorageManager - Barbell Progression Extensions', () => {
   let storage;
 
@@ -15,7 +39,7 @@ describe('StorageManager - Barbell Progression Extensions', () => {
     test('should save mobility check response', () => {
       storage.saveMobilityCheck('bench_overhead_mobility', 'yes');
 
-      const allChecks = JSON.parse(localStorage.getItem('barbell_mobility_checks'));
+      const allChecks = JSON.parse(localStorage.getItem('build_barbell_mobility_checks'));
       assert.ok(allChecks['bench_overhead_mobility']);
       assert.strictEqual(allChecks['bench_overhead_mobility'].length, 1);
       assert.strictEqual(allChecks['bench_overhead_mobility'][0].response, 'yes');
@@ -69,7 +93,7 @@ describe('StorageManager - Barbell Progression Extensions', () => {
     });
 
     test('should handle corrupt mobility checks data gracefully', () => {
-      localStorage.setItem('barbell_mobility_checks', 'invalid{json}');
+      localStorage.setItem('build_barbell_mobility_checks', 'invalid{json}');
       const checks = storage.getMobilityChecks('bench_overhead_mobility');
 
       // Should return empty array instead of crashing
@@ -159,7 +183,7 @@ describe('StorageManager - Barbell Progression Extensions', () => {
     test('should save pain report with all details', () => {
       storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor');
 
-      const allPain = JSON.parse(localStorage.getItem('exercise_pain_history'));
+      const allPain = JSON.parse(localStorage.getItem('build_exercise_pain_history'));
       assert.ok(allPain['UPPER_A - DB Bench Press']);
       assert.strictEqual(allPain['UPPER_A - DB Bench Press'].length, 1);
 
@@ -180,21 +204,23 @@ describe('StorageManager - Barbell Progression Extensions', () => {
       assert.strictEqual(history[0].severity, null);
     });
 
-    test('should append multiple pain reports for same exercise', () => {
+    test('should replace same-day pain report for same exercise', () => {
       storage.savePainReport('UPPER_A - DB Bench Press', false, null, null);
       storage.savePainReport('UPPER_A - DB Bench Press', true, 'elbow', 'significant');
 
       const history = storage.getPainHistory('UPPER_A - DB Bench Press');
-      assert.strictEqual(history.length, 2);
-      assert.strictEqual(history[0].hadPain, false);
-      assert.strictEqual(history[1].hadPain, true);
-      assert.strictEqual(history[1].location, 'elbow');
-      assert.strictEqual(history[1].severity, 'significant');
+      assert.strictEqual(history.length, 1);
+      assert.strictEqual(history[0].hadPain, true);
+      assert.strictEqual(history[0].location, 'elbow');
+      assert.strictEqual(history[0].severity, 'significant');
     });
 
-    test('should retrieve pain history for an exercise', () => {
-      storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor');
-      storage.savePainReport('UPPER_A - DB Bench Press', false, null, null);
+    test('should retrieve pain history for an exercise across distinct days', () => {
+      runWithSyntheticCalendar(bump => {
+        storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor');
+        bump();
+        storage.savePainReport('UPPER_A - DB Bench Press', false, null, null);
+      });
 
       const history = storage.getPainHistory('UPPER_A - DB Bench Press');
       assert.strictEqual(history.length, 2);
@@ -227,7 +253,7 @@ describe('StorageManager - Barbell Progression Extensions', () => {
     });
 
     test('should handle corrupt pain history data gracefully', () => {
-      localStorage.setItem('exercise_pain_history', 'not{valid]json');
+      localStorage.setItem('build_exercise_pain_history', 'not{valid]json');
       const history = storage.getPainHistory('UPPER_A - DB Bench Press');
 
       // Should return empty array instead of crashing
@@ -295,31 +321,32 @@ describe('StorageManager - Barbell Progression Extensions', () => {
 
     describe('History Size Limiting', () => {
       test('should limit pain reports to 10 entries per exercise', () => {
-        // Add 11 entries
-        for (let i = 0; i < 11; i++) {
-          const severity = i % 2 === 0 ? 'minor' : 'significant';
-          storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', severity);
-        }
+        runWithSyntheticCalendar(bump => {
+          for (let i = 0; i < 11; i++) {
+            const severity = i % 2 === 0 ? 'minor' : 'significant';
+            storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', severity);
+            bump();
+          }
+        });
 
         const history = storage.getPainHistory('UPPER_A - DB Bench Press');
         assert.strictEqual(history.length, 10, 'Should only keep last 10 entries');
 
-        // First entry should be the second one we added (index 1, which is odd)
         assert.strictEqual(history[0].severity, 'significant');
-        // Last entry should be the 11th one we added (index 10, which is even)
         assert.strictEqual(history[9].severity, 'minor');
       });
 
       test('should not affect other exercises when limiting one', () => {
-        // Add 11 entries to first exercise
-        for (let i = 0; i < 11; i++) {
-          storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor');
-        }
-
-        // Add 5 entries to second exercise
-        for (let i = 0; i < 5; i++) {
-          storage.savePainReport('LOWER_A - Squat', true, 'knee', 'significant');
-        }
+        runWithSyntheticCalendar(bump => {
+          for (let i = 0; i < 11; i++) {
+            storage.savePainReport('UPPER_A - DB Bench Press', true, 'shoulder', 'minor');
+            bump();
+          }
+          for (let i = 0; i < 5; i++) {
+            storage.savePainReport('LOWER_A - Squat', true, 'knee', 'significant');
+            bump();
+          }
+        });
 
         const benchHistory = storage.getPainHistory('UPPER_A - DB Bench Press');
         const squatHistory = storage.getPainHistory('LOWER_A - Squat');

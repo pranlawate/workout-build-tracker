@@ -1,9 +1,28 @@
 const KEYS = {
   ROTATION: 'build_workout_rotation',
-  EXERCISE_HISTORY_PREFIX: 'build_exercise_'
+  EXERCISE_HISTORY_PREFIX: 'build_exercise_',
+  PAIN_HISTORY: 'build_exercise_pain_history',
+  MOBILITY_CHECKS: 'build_barbell_mobility_checks',
+  RECOVERY_METRICS: 'build_recovery_metrics'
 };
 
+/** Legacy keys (pre build_ prefix); migrated in _migratePainMobilityKeysV3 */
+const LEGACY_PAIN_HISTORY = 'exercise_pain_history';
+const LEGACY_MOBILITY_CHECKS = 'barbell_mobility_checks';
+
 const MAX_HISTORY_LENGTH = 8;
+
+function defaultRotationState() {
+  return {
+    lastWorkout: null,
+    lastDate: null,
+    nextSuggested: 'UPPER_A',
+    sequence: [],
+    cycleCount: 0,
+    currentStreak: 0,
+    lastDeloadDate: null
+  };
+}
 
 /**
  * Manages localStorage operations for workout rotation and exercise history
@@ -20,16 +39,38 @@ export class StorageManager {
   _runMigrations() {
     try {
       const version = parseInt(this.storage.getItem('build_migration_version') || '0', 10);
-      if (version >= 2) return;
+      if (version >= 3) return;
 
       if (version < 2) {
         this._migrateExerciseKeysV2();
       }
+      if (version < 3) {
+        this._migratePainMobilityKeysV3();
+      }
 
-      this.storage.setItem('build_migration_version', '2');
-      console.log('[Storage] Migrations complete, now at version 2');
+      this.storage.setItem('build_migration_version', '3');
+      console.log('[Storage] Migrations complete, now at version 3');
     } catch (error) {
       console.error('[Storage] Migration failed:', error);
+    }
+  }
+
+  /**
+   * Copy pain/mobility blobs from legacy keys to build_* keys and remove legacy.
+   */
+  _migratePainMobilityKeysV3() {
+    const painNew = this.storage.getItem(KEYS.PAIN_HISTORY);
+    const painOld = this.storage.getItem(LEGACY_PAIN_HISTORY);
+    if (!painNew && painOld) {
+      this.storage.setItem(KEYS.PAIN_HISTORY, painOld);
+      this.storage.removeItem(LEGACY_PAIN_HISTORY);
+    }
+
+    const mobNew = this.storage.getItem(KEYS.MOBILITY_CHECKS);
+    const mobOld = this.storage.getItem(LEGACY_MOBILITY_CHECKS);
+    if (!mobNew && mobOld) {
+      this.storage.setItem(KEYS.MOBILITY_CHECKS, mobOld);
+      this.storage.removeItem(LEGACY_MOBILITY_CHECKS);
     }
   }
 
@@ -104,7 +145,7 @@ export class StorageManager {
       }
 
       if (painMigrated) {
-        this.storage.setItem('exercise_pain_history', JSON.stringify(newPainData));
+        this.storage.setItem(KEYS.PAIN_HISTORY, JSON.stringify(newPainData));
       }
     }
 
@@ -115,7 +156,8 @@ export class StorageManager {
 
   _getRawPainHistory() {
     try {
-      const data = this.storage.getItem('exercise_pain_history');
+      const data =
+        this.storage.getItem(KEYS.PAIN_HISTORY) || this.storage.getItem(LEGACY_PAIN_HISTORY);
       if (!data) return {};
       const parsed = JSON.parse(data);
       return typeof parsed === 'object' && parsed !== null ? parsed : {};
@@ -150,46 +192,44 @@ export class StorageManager {
    * @returns {Object} Rotation object with lastWorkout, lastDate, nextSuggested
    */
   getRotation() {
+    const defaults = defaultRotationState();
     const data = this.storage.getItem(KEYS.ROTATION);
     if (!data) {
-      return {
-        lastWorkout: null,
-        lastDate: null,
-        nextSuggested: 'UPPER_A',
-        sequence: [],
-        cycleCount: 0,
-        currentStreak: 0,
-        lastDeloadDate: null
-      };
+      return { ...defaults };
     }
 
     try {
       const parsed = JSON.parse(data);
-      // Add new fields only if they don't exist (backward compatibility)
-      if (parsed.sequence === undefined) {
-        parsed.sequence = [];
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { ...defaults };
       }
-      if (parsed.cycleCount === undefined) {
-        parsed.cycleCount = 0;
-      }
-      if (parsed.currentStreak === undefined) {
-        parsed.currentStreak = 0;
-      }
-      if (parsed.lastDeloadDate === undefined) {
-        parsed.lastDeloadDate = null;
-      }
-      return parsed;
+
+      const nextSuggested =
+        typeof parsed.nextSuggested === 'string' && parsed.nextSuggested
+          ? parsed.nextSuggested
+          : defaults.nextSuggested;
+      const sequence = Array.isArray(parsed.sequence) ? parsed.sequence : defaults.sequence;
+      const cycleCount =
+        typeof parsed.cycleCount === 'number' && Number.isFinite(parsed.cycleCount)
+          ? parsed.cycleCount
+          : defaults.cycleCount;
+      const currentStreak =
+        typeof parsed.currentStreak === 'number' && Number.isFinite(parsed.currentStreak)
+          ? parsed.currentStreak
+          : defaults.currentStreak;
+
+      return {
+        lastWorkout: parsed.lastWorkout ?? defaults.lastWorkout,
+        lastDate: parsed.lastDate ?? defaults.lastDate,
+        nextSuggested,
+        sequence,
+        cycleCount,
+        currentStreak,
+        lastDeloadDate: parsed.lastDeloadDate ?? defaults.lastDeloadDate
+      };
     } catch (error) {
       console.error('Failed to parse rotation data, returning default:', error);
-      return {
-        lastWorkout: null,
-        lastDate: null,
-        nextSuggested: 'UPPER_A',
-        sequence: [],
-        cycleCount: 0,
-        currentStreak: 0,
-        lastDeloadDate: null
-      };
+      return { ...defaults };
     }
   }
 
@@ -363,9 +403,12 @@ export class StorageManager {
 
     try {
       const serialized = JSON.stringify(allChecks);
-      this.storage.setItem('barbell_mobility_checks', serialized);
+      this.storage.setItem(KEYS.MOBILITY_CHECKS, serialized);
     } catch (error) {
-      console.error('Failed to save mobility check:', error);
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save mobility check: ${error.message}`);
     }
   }
 
@@ -385,7 +428,8 @@ export class StorageManager {
    * @returns {Object} Parsed mobility checks data or empty object
    */
   getMobilityChecksData() {
-    const data = this.storage.getItem('barbell_mobility_checks');
+    const data =
+      this.storage.getItem(KEYS.MOBILITY_CHECKS) || this.storage.getItem(LEGACY_MOBILITY_CHECKS);
     if (!data) {
       return {};
     }
@@ -422,23 +466,34 @@ export class StorageManager {
     if (!allPain[exerciseKey]) {
       allPain[exerciseKey] = [];
     }
-    allPain[exerciseKey].push({
-      date: new Date().toISOString().split('T')[0],
+    const today = new Date().toISOString().split('T')[0];
+    const list = allPain[exerciseKey];
+    const existingIdx = list.findIndex(e => e && e.date === today);
+    const entry = {
+      date: today,
       hadPain: hadPain,
       location: location,
       severity: severity
-    });
+    };
+    if (existingIdx >= 0) {
+      list[existingIdx] = entry;
+    } else {
+      list.push(entry);
+    }
 
     // Limit to last 10 entries
-    if (allPain[exerciseKey].length > 10) {
-      allPain[exerciseKey] = allPain[exerciseKey].slice(-10);
+    if (list.length > 10) {
+      allPain[exerciseKey] = list.slice(-10);
     }
 
     try {
       const serialized = JSON.stringify(allPain);
-      this.storage.setItem('exercise_pain_history', serialized);
+      this.storage.setItem(KEYS.PAIN_HISTORY, serialized);
     } catch (error) {
-      console.error('Failed to save pain report:', error);
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save pain report: ${error.message}`);
     }
   }
 
@@ -458,7 +513,8 @@ export class StorageManager {
    * @returns {Object} Parsed pain history data or empty object
    */
   getPainHistoryData() {
-    const data = this.storage.getItem('exercise_pain_history');
+    const data =
+      this.storage.getItem(KEYS.PAIN_HISTORY) || this.storage.getItem(LEGACY_PAIN_HISTORY);
     if (!data) {
       return {};
     }
@@ -786,7 +842,7 @@ export class StorageManager {
    */
   getEquipmentProfile() {
     try {
-      const stored = localStorage.getItem('build_equipment_profile');
+      const stored = this.storage.getItem('build_equipment_profile');
       if (!stored) {
         // Default: all equipment available
         return {
@@ -822,14 +878,17 @@ export class StorageManager {
    * @param {Object} profile - Equipment profile object
    */
   saveEquipmentProfile(profile) {
+    if (!profile || typeof profile !== 'object') {
+      console.error('[Storage] Invalid equipment profile');
+      return;
+    }
     try {
-      if (!profile || typeof profile !== 'object') {
-        console.error('[Storage] Invalid equipment profile');
-        return;
-      }
-      localStorage.setItem('build_equipment_profile', JSON.stringify(profile));
+      this.storage.setItem('build_equipment_profile', JSON.stringify(profile));
     } catch (error) {
-      console.error('[Storage] Error saving equipment profile:', error);
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save equipment profile: ${error.message}`);
     }
   }
 
@@ -840,7 +899,7 @@ export class StorageManager {
    */
   getExerciseSelections() {
     try {
-      const stored = localStorage.getItem('build_exercise_selections');
+      const stored = this.storage.getItem('build_exercise_selections');
       if (!stored) {
         // Default: all current exercises from progression paths
         return {
@@ -890,9 +949,12 @@ export class StorageManager {
     try {
       const selections = this.getExerciseSelections();
       selections[slotKey] = exerciseName;
-      localStorage.setItem('build_exercise_selections', JSON.stringify(selections));
+      this.storage.setItem('build_exercise_selections', JSON.stringify(selections));
     } catch (error) {
-      console.error('[Storage] Error saving exercise selection:', error);
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save exercise selection: ${error.message}`);
     }
   }
 
@@ -903,7 +965,7 @@ export class StorageManager {
    */
   getUnlocks() {
     try {
-      const stored = localStorage.getItem('build_unlocks');
+      const stored = this.storage.getItem('build_unlocks');
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       console.error('[Storage] Error getting unlocks:', error);
@@ -924,9 +986,12 @@ export class StorageManager {
         unlockedDate: new Date().toISOString(),
         criteria: criteria
       };
-      localStorage.setItem('build_unlocks', JSON.stringify(unlocks));
+      this.storage.setItem('build_unlocks', JSON.stringify(unlocks));
     } catch (error) {
-      console.error('[Storage] Error saving unlock:', error);
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save unlock: ${error.message}`);
     }
   }
 
@@ -948,7 +1013,7 @@ export class StorageManager {
    */
   getTrainingPhase() {
     try {
-      const stored = localStorage.getItem('build_training_phase');
+      const stored = this.storage.getItem('build_training_phase');
       return stored || 'building'; // Default to building phase
     } catch (error) {
       console.error('[Storage] Error getting training phase:', error);
@@ -962,15 +1027,117 @@ export class StorageManager {
    * @param {string} phase - 'building' or 'maintenance'
    */
   saveTrainingPhase(phase) {
-    try {
-      if (phase !== 'building' && phase !== 'maintenance') {
-        console.error('[Storage] Invalid training phase:', phase);
-        return;
-      }
-      localStorage.setItem('build_training_phase', phase);
-    } catch (error) {
-      console.error('[Storage] Error saving training phase:', error);
+    if (phase !== 'building' && phase !== 'maintenance') {
+      console.error('[Storage] Invalid training phase:', phase);
+      return;
     }
+    try {
+      this.storage.setItem('build_training_phase', phase);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save training phase: ${error.message}`);
+    }
+  }
+
+  /**
+   * Exercise tenure map for rotation (weeks on variation).
+   * @returns {Object<string, Object>}
+   */
+  getExerciseTenureMap() {
+    try {
+      const raw = this.storage.getItem('build_exercise_tenure');
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed) ? parsed : {};
+    } catch (error) {
+      console.error('[Storage] Error reading exercise tenure:', error);
+      return {};
+    }
+  }
+
+  /**
+   * @param {Object<string, Object>} map
+   */
+  saveExerciseTenureMap(map) {
+    if (!map || typeof map !== 'object' || Array.isArray(map)) {
+      throw new Error('Invalid tenure map: must be a non-array object');
+    }
+    try {
+      this.storage.setItem('build_exercise_tenure', JSON.stringify(map));
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save exercise tenure: ${error.message}`);
+    }
+  }
+
+  /**
+   * Recovery metrics (pre-workout / fatigue tracking)
+   * @returns {Array<Object>}
+   */
+  getRecoveryMetrics() {
+    try {
+      const data = this.storage.getItem(KEYS.RECOVERY_METRICS);
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error('[Storage] Error getting recovery metrics:', error);
+      return [];
+    }
+  }
+
+  /**
+   * @param {Array<Object>} entries
+   */
+  saveRecoveryMetrics(entries) {
+    if (!Array.isArray(entries)) {
+      throw new Error('Invalid recovery metrics: must be an array');
+    }
+    try {
+      this.storage.setItem(KEYS.RECOVERY_METRICS, JSON.stringify(entries));
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error('Storage quota exceeded');
+      }
+      throw new Error(`Failed to save recovery metrics: ${error.message}`);
+    }
+  }
+
+  /**
+   * Removes all `build_exercise_*` history keys (rotation and other build_ keys preserved).
+   */
+  clearExerciseHistoryKeys() {
+    const keys = this.getAllExerciseKeys();
+    for (const k of keys) {
+      this.storage.removeItem(`${KEYS.EXERCISE_HISTORY_PREFIX}${k}`);
+    }
+  }
+
+  /**
+   * Removes every localStorage key starting with `build_` plus legacy pain/mobility keys.
+   */
+  clearAllBuildKeys() {
+    const s = this.storage;
+    const toRemove = [];
+    if (s.data) {
+      for (const k of Object.keys(s.data)) {
+        if (k.startsWith('build_')) toRemove.push(k);
+      }
+    } else {
+      for (let i = 0; i < s.length; i++) {
+        const k = s.key(i);
+        if (k && k.startsWith('build_')) toRemove.push(k);
+      }
+    }
+    for (const k of toRemove) {
+      s.removeItem(k);
+    }
+    s.removeItem(LEGACY_PAIN_HISTORY);
+    s.removeItem(LEGACY_MOBILITY_CHECKS);
   }
 
   /**

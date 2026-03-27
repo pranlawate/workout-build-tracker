@@ -338,6 +338,22 @@ describe('AnalyticsCalculator', () => {
       assert.strictEqual(result.avgRIR, 3);
     });
 
+    test('should exclude non-finite RIR from average (e.g. missing rir)', () => {
+      const today = new Date().toISOString().split('T')[0];
+
+      storage.saveExerciseHistory('Incline DB Press', [{
+        date: today,
+        sets: [
+          { weight: 20, reps: 10, rir: 2 },
+          { weight: 20, reps: 10 }
+        ]
+      }]);
+
+      const result = calculator.calculatePerformanceMetrics(7);
+
+      assert.strictEqual(result.avgRIR, 2);
+    });
+
     test('should return correct rirTrend data structure', () => {
       const today = new Date().toISOString().split('T')[0];
       const day2 = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -535,6 +551,20 @@ describe('AnalyticsCalculator', () => {
       assert.strictEqual(result.avgSleep, 7); // (7+8+6)/3
       assert.strictEqual(Math.round(result.avgFatigue * 10) / 10, 2.7); // (2+1+5)/3
       assert.strictEqual(result.highFatigueDays, 1); // Only 5 ≥ 4
+    });
+
+    test('should use sleepHours from recovery metrics (app save format)', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const metrics = [
+        { date: today, sleepHours: 7.5, fatigueScore: 2 },
+        { date: yesterday, sleepHours: 8.5, fatigueScore: 1 }
+      ];
+      localStorage.setItem('build_recovery_metrics', JSON.stringify(metrics));
+
+      const result = calculator.calculateRecoveryTrends(7);
+
+      assert.strictEqual(result.avgSleep, 8);
     });
 
     test('should return correct weeklyTrend structure', () => {

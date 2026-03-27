@@ -40,6 +40,26 @@ describe('StorageManager', () => {
     assert.strictEqual(rotation.nextSuggested, 'UPPER_A');
   });
 
+  test('should normalize corrupt rotation sequence to empty array', () => {
+    localStorage.setItem(
+      'build_workout_rotation',
+      JSON.stringify({
+        lastWorkout: 'UPPER_A',
+        lastDate: '2026-02-03',
+        nextSuggested: 'LOWER_A',
+        sequence: 'not-an-array',
+        cycleCount: 'bad',
+        currentStreak: null
+      })
+    );
+    const rotation = storage.getRotation();
+    assert.deepStrictEqual(rotation.sequence, []);
+    assert.strictEqual(rotation.cycleCount, 0);
+    assert.strictEqual(rotation.currentStreak, 0);
+    assert.strictEqual(rotation.lastWorkout, 'UPPER_A');
+    assert.strictEqual(rotation.nextSuggested, 'LOWER_A');
+  });
+
   test('should save exercise history', () => {
     const exerciseKey = 'UPPER_A - DB Bench Press';
     const history = [{
