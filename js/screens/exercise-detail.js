@@ -18,7 +18,7 @@ export class ExerciseDetailScreen {
 
   /**
    * Render exercise detail screen
-   * @param {string} exerciseKey - Exercise key (e.g., "UPPER_A - Goblet Squat")
+   * @param {string} exerciseKey - Exercise key (e.g., "Incline DB Press")
    */
   render(exerciseKey) {
     this.currentExerciseKey = exerciseKey;

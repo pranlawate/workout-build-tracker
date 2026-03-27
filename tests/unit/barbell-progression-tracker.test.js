@@ -23,7 +23,7 @@ describe('BarbellProgressionTracker', () => {
 
   describe('getBarbellBenchReadiness', () => {
     test('should return 100% when all criteria are met', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // Add strength history: 20kg × 3×12 @ RIR 2-3
       // Storage limits to 8 workouts, so spread them over 12+ weeks (every ~2 weeks)
@@ -35,9 +35,9 @@ describe('BarbellProgressionTracker', () => {
         workoutHistory.push({
           date: date.toISOString().split('T')[0],
           sets: [
-            { weight: 20, reps: 12, rir: 3 },
-            { weight: 20, reps: 12, rir: 2 },
-            { weight: 20, reps: 12, rir: 2 }
+            { weight: 100, reps: 12, rir: 3 },
+            { weight: 100, reps: 12, rir: 2 },
+            { weight: 100, reps: 12, rir: 2 }
           ],
           progressionStatus: 'ready'
         });
@@ -68,7 +68,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return partial percentage with some criteria unmet', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // Add strength history: 15kg (not yet 20kg)
       storage.saveExerciseHistory(exerciseKey, [{
@@ -104,19 +104,19 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should report clear blockers for unmet criteria', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // Minimal data - no history
       const result = tracker.getBarbellBenchReadiness();
 
       assert.ok(result.blockers.length > 0);
-      assert.ok(result.blockers.some(b => b.includes('DB')));
+      assert.ok(result.blockers.some(b => b.includes('Incline')));
       assert.ok(result.blockers.some(b => b.includes('weeks')));
       assert.ok(result.blockers.some(b => b.includes('mobility')));
     });
 
     test('should fail pain check if shoulder pain in recent workouts', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // All other criteria met - spread 8 workouts over 12+ weeks
       const workoutHistory = [];
@@ -127,9 +127,9 @@ describe('BarbellProgressionTracker', () => {
         workoutHistory.push({
           date: date.toISOString().split('T')[0],
           sets: [
-            { weight: 20, reps: 12, rir: 3 },
-            { weight: 20, reps: 12, rir: 2 },
-            { weight: 20, reps: 12, rir: 2 }
+            { weight: 100, reps: 12, rir: 3 },
+            { weight: 100, reps: 12, rir: 2 },
+            { weight: 100, reps: 12, rir: 2 }
           ],
           progressionStatus: 'ready'
         });
@@ -158,7 +158,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should allow max 1 painful session in last 5', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // Pain in 1 out of last 5 workouts (should pass)
       storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
@@ -175,9 +175,9 @@ describe('BarbellProgressionTracker', () => {
 
   describe('getBarbellSquatReadiness', () => {
     test('should return 100% when all criteria are met', () => {
-      const exerciseKey = 'LOWER_B - DB Goblet Squat';
+      const exerciseKey = 'Leg Press';
 
-      // Add strength history: 20kg × 3×12 @ RIR 2-3
+      // Add strength history: 100kg × 3×12 @ RIR 2-3
       // Storage limits to 8 workouts, so spread them over 16+ weeks (every ~2.5 weeks)
       const workoutHistory = [];
       const startDate = new Date('2026-01-01');
@@ -187,9 +187,9 @@ describe('BarbellProgressionTracker', () => {
         workoutHistory.push({
           date: date.toISOString().split('T')[0],
           sets: [
-            { weight: 20, reps: 12, rir: 3 },
-            { weight: 20, reps: 12, rir: 2 },
-            { weight: 20, reps: 12, rir: 2 }
+            { weight: 100, reps: 12, rir: 3 },
+            { weight: 100, reps: 12, rir: 2 },
+            { weight: 100, reps: 12, rir: 2 }
           ],
           progressionStatus: 'ready'
         });
@@ -220,7 +220,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should fail with knee pain in recent workouts', () => {
-      const exerciseKey = 'LOWER_B - DB Goblet Squat';
+      const exerciseKey = 'Leg Press';
 
       // All other criteria met - spread 8 workouts over 16+ weeks
       const workoutHistory = [];
@@ -231,9 +231,9 @@ describe('BarbellProgressionTracker', () => {
         workoutHistory.push({
           date: date.toISOString().split('T')[0],
           sets: [
-            { weight: 20, reps: 12, rir: 3 },
-            { weight: 20, reps: 12, rir: 2 },
-            { weight: 20, reps: 12, rir: 2 }
+            { weight: 100, reps: 12, rir: 3 },
+            { weight: 100, reps: 12, rir: 2 },
+            { weight: 100, reps: 12, rir: 2 }
           ],
           progressionStatus: 'ready'
         });
@@ -259,7 +259,7 @@ describe('BarbellProgressionTracker', () => {
 
   describe('getBarbellDeadliftReadiness', () => {
     test('should return 100% when all criteria are met', () => {
-      const exerciseKey = 'LOWER_B - DB Romanian Deadlift';
+      const exerciseKey = 'DB Romanian Deadlift';
 
       // Add strength history: 25kg × 3×12 @ RIR 2-3
       // Storage limits to 8 workouts, so spread them over 20+ weeks (every ~3 weeks)
@@ -304,7 +304,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should fail with back pain in recent workouts', () => {
-      const exerciseKey = 'LOWER_B - DB Romanian Deadlift';
+      const exerciseKey = 'DB Romanian Deadlift';
 
       // All other criteria met - spread 8 workouts over 20+ weeks
       const workoutHistory = [];
@@ -343,12 +343,12 @@ describe('BarbellProgressionTracker', () => {
 
   describe('_calculateStrengthProgress helper', () => {
     test('should return 0 when no history exists', () => {
-      const progress = tracker._calculateStrengthProgress('UPPER_A - DB Flat Bench Press', 20, 12, 3, 2);
+      const progress = tracker._calculateStrengthProgress('Incline DB Press', 20, 12, 3, 2);
       assert.strictEqual(progress, 0);
     });
 
     test('should return 100 when at target weight with reps and RIR', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.saveExerciseHistory(exerciseKey, [{
         date: '2026-02-01',
         sets: [
@@ -364,7 +364,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return 60 when at 15kg targeting 20kg (75% of 80% = 60%)', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.saveExerciseHistory(exerciseKey, [{
         date: '2026-02-01',
         sets: [
@@ -380,7 +380,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return 80 when at target weight but missing reps', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.saveExerciseHistory(exerciseKey, [{
         date: '2026-02-01',
         sets: [
@@ -398,12 +398,12 @@ describe('BarbellProgressionTracker', () => {
 
   describe('_calculateWeeksProgress helper', () => {
     test('should return 0 when no history exists', () => {
-      const progress = tracker._calculateWeeksProgress('UPPER_A - DB Flat Bench Press', 12);
+      const progress = tracker._calculateWeeksProgress('Incline DB Press', 12);
       assert.strictEqual(progress, 0);
     });
 
     test('should return 0 when only one workout exists', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.saveExerciseHistory(exerciseKey, [{
         date: '2026-02-01',
         sets: [{ weight: 10, reps: 10, rir: 2 }],
@@ -415,7 +415,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return 50 when 6 weeks out of 12 completed', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       const startDate = new Date('2026-01-01');
       const workoutHistory = [];
 
@@ -436,7 +436,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should cap at 100% when exceeding target weeks', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       const startDate = new Date('2026-01-01');
       const workoutHistory = [];
 
@@ -515,12 +515,12 @@ describe('BarbellProgressionTracker', () => {
 
   describe('_isPainFree helper', () => {
     test('should return true when no pain history exists', () => {
-      const painFree = tracker._isPainFree(['UPPER_A - DB Flat Bench Press'], ['shoulder', 'elbow'], 5);
+      const painFree = tracker._isPainFree(['Incline DB Press'], ['shoulder', 'elbow'], 5);
       assert.strictEqual(painFree, true);
     });
 
     test('should return true when less than 5 sessions recorded', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.savePainReport(exerciseKey, false, null, null);
       storage.savePainReport(exerciseKey, false, null, null);
 
@@ -529,7 +529,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return true when 0 painful sessions in last 5', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       for (let i = 0; i < 5; i++) {
         storage.savePainReport(exerciseKey, false, null, null);
       }
@@ -539,7 +539,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return true when 1 painful session in last 5', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
       for (let i = 0; i < 4; i++) {
         storage.savePainReport(exerciseKey, false, null, null);
@@ -550,7 +550,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should return false when 2 painful sessions in last 5', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       storage.savePainReport(exerciseKey, true, 'shoulder', 'minor');
       storage.savePainReport(exerciseKey, false, null, null);
       storage.savePainReport(exerciseKey, true, 'elbow', 'minor');
@@ -562,7 +562,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should only count pain in relevant locations', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
       // 3 wrist pain instances (not relevant)
       storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
       storage.savePainReport(exerciseKey, true, 'wrist', 'minor');
@@ -576,8 +576,8 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should check multiple exercises', () => {
-      const exerciseKey1 = 'UPPER_A - DB Flat Bench Press';
-      const exerciseKey2 = 'UPPER_A - DB Shoulder Press';
+      const exerciseKey1 = 'Incline DB Press';
+      const exerciseKey2 = 'Landmine Press';
 
       // Exercise 1: 1 painful session (ok)
       storage.savePainReport(exerciseKey1, true, 'shoulder', 'minor');
@@ -599,7 +599,7 @@ describe('BarbellProgressionTracker', () => {
 
   describe('Percentage calculation', () => {
     test('should use weighted formula: 40% strength, 20% weeks, 30% mobility, 10% pain', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // Strength: 50% progress (15kg out of 20kg)
       storage.saveExerciseHistory(exerciseKey, [{
@@ -632,7 +632,7 @@ describe('BarbellProgressionTracker', () => {
     });
 
     test('should calculate partial percentages correctly', () => {
-      const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+      const exerciseKey = 'Incline DB Press';
 
       // Strength: 10kg out of 20kg = 50% weight progress
       storage.saveExerciseHistory(exerciseKey, [{

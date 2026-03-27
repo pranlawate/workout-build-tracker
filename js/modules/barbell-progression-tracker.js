@@ -22,7 +22,7 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getBarbellBenchReadiness() {
-    const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+    const exerciseKey = 'Incline DB Press';
 
     // Strength check: 20kg × 3×12 @ RIR 2-3
     const strengthProgress = this._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
@@ -50,7 +50,7 @@ export class BarbellProgressionTracker {
     // Build blockers array
     const blockers = [];
     if (!strengthMet) {
-      blockers.push(`DB Flat Bench: Need 20kg × 3×12 @ RIR 2-3`);
+      blockers.push(`Incline DB Press: Need 20kg × 3×12 @ RIR 2-3`);
     }
     if (!weeksMet) {
       const currentWeeks = Math.floor(weeksProgress * 12 / 100);
@@ -62,7 +62,7 @@ export class BarbellProgressionTracker {
       blockers.push(`Overhead mobility: ${currentConfirmations}/5 confirmations`);
     }
     if (!painFree) {
-      blockers.push(`Resolve recurring shoulder/elbow pain in DB Flat Bench`);
+      blockers.push(`Resolve recurring shoulder/elbow pain in Incline DB Press`);
     }
 
     return {
@@ -83,10 +83,10 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getBarbellSquatReadiness() {
-    const exerciseKey = 'LOWER_B - DB Goblet Squat';
+    const exerciseKey = 'Leg Press';
 
-    // Strength check: 20kg × 3×12 @ RIR 2-3
-    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 20, 12, 3, 2);
+    // Strength check: 100kg × 3×12 @ RIR 2-3 (total load, squat-pattern compound on Lower B)
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 100, 12, 3, 2);
     const strengthMet = strengthProgress >= 100;
 
     // Weeks check: 16+ weeks
@@ -111,7 +111,7 @@ export class BarbellProgressionTracker {
     // Build blockers array
     const blockers = [];
     if (!strengthMet) {
-      blockers.push(`DB Goblet Squat: Need 20kg × 3×12 @ RIR 2-3`);
+      blockers.push(`Leg Press: Need 100kg × 3×12 @ RIR 2-3`);
     }
     if (!weeksMet) {
       const currentWeeks = Math.floor(weeksProgress * 16 / 100);
@@ -123,7 +123,7 @@ export class BarbellProgressionTracker {
       blockers.push(`Heels flat mobility: ${currentConfirmations}/5 confirmations`);
     }
     if (!painFree) {
-      blockers.push(`Resolve recurring knee/lower back pain in Goblet Squat`);
+      blockers.push(`Resolve recurring knee/lower back pain in Leg Press`);
     }
 
     return {
@@ -144,7 +144,7 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getBarbellDeadliftReadiness() {
-    const exerciseKey = 'LOWER_B - DB Romanian Deadlift';
+    const exerciseKey = 'DB Romanian Deadlift';
 
     // Strength check: 25kg × 3×12 @ RIR 2-3
     const strengthProgress = this._calculateStrengthProgress(exerciseKey, 25, 12, 3, 2);
@@ -205,7 +205,7 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getSadharanDandReadiness() {
-    const exerciseKey = 'UPPER_A - DB Flat Bench Press';
+    const exerciseKey = 'Incline DB Press';
 
     // Strength check: 15kg × 3×12 @ RIR 2-3 (lower than barbell since bodyweight is the challenge)
     const strengthProgress = this._calculateStrengthProgress(exerciseKey, 15, 12, 3, 2);
@@ -233,7 +233,7 @@ export class BarbellProgressionTracker {
     // Build blockers array
     const blockers = [];
     if (!strengthMet) {
-      blockers.push(`DB Flat Bench: Need 15kg × 3×12 @ RIR 2-3`);
+      blockers.push(`Incline DB Press: Need 15kg × 3×12 @ RIR 2-3`);
     }
     if (!weeksMet) {
       const currentWeeks = Math.floor(weeksProgress * 8 / 100);
@@ -245,7 +245,7 @@ export class BarbellProgressionTracker {
       blockers.push(`Plank hold mobility: ${currentConfirmations}/5 confirmations`);
     }
     if (!painFree) {
-      blockers.push(`Resolve recurring shoulder/elbow/wrist pain in DB Flat Bench`);
+      blockers.push(`Resolve recurring shoulder/elbow/wrist pain in Incline DB Press`);
     }
 
     return {
@@ -266,10 +266,10 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getSadharanBaithakReadiness() {
-    const exerciseKey = 'LOWER_B - DB Goblet Squat';
+    const exerciseKey = 'Leg Press';
 
-    // Strength check: 15kg × 3×12 @ RIR 2-3 (bodyweight is the challenge)
-    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 15, 12, 3, 2);
+    // Strength check: 75kg × 3×12 @ RIR 2-3 (total load; bodyweight squat is the challenge)
+    const strengthProgress = this._calculateStrengthProgress(exerciseKey, 75, 12, 3, 2);
     const strengthMet = strengthProgress >= 100;
 
     // Weeks check: 8+ weeks (COMPLEX tier requirement)
@@ -294,7 +294,7 @@ export class BarbellProgressionTracker {
     // Build blockers array
     const blockers = [];
     if (!strengthMet) {
-      blockers.push(`DB Goblet Squat: Need 15kg × 3×12 @ RIR 2-3`);
+      blockers.push(`Leg Press: Need 75kg × 3×12 @ RIR 2-3`);
     }
     if (!weeksMet) {
       const currentWeeks = Math.floor(weeksProgress * 8 / 100);
@@ -306,7 +306,7 @@ export class BarbellProgressionTracker {
       blockers.push(`Full depth squat mobility: ${currentConfirmations}/5 confirmations`);
     }
     if (!painFree) {
-      blockers.push(`Resolve recurring knee/ankle pain in Goblet Squat`);
+      blockers.push(`Resolve recurring knee/ankle pain in Leg Press`);
     }
 
     return {
@@ -327,7 +327,7 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getMudgalReadiness() {
-    const exerciseKey = 'UPPER_A - DB Shoulder Press';
+    const exerciseKey = 'Landmine Press';
 
     // Strength check: 15kg × 3×10 @ RIR 2-3 (shoulder stability and endurance for rotational movements)
     const strengthProgress = this._calculateStrengthProgress(exerciseKey, 15, 10, 3, 2);
@@ -355,7 +355,7 @@ export class BarbellProgressionTracker {
     // Build blockers array
     const blockers = [];
     if (!strengthMet) {
-      blockers.push(`DB Shoulder Press: Need 15kg × 3×10 @ RIR 2-3`);
+      blockers.push(`Landmine Press: Need 15kg × 3×10 @ RIR 2-3`);
     }
     if (!weeksMet) {
       const currentWeeks = Math.floor(weeksProgress * 10 / 100);
@@ -367,7 +367,7 @@ export class BarbellProgressionTracker {
       blockers.push(`Overhead rotation mobility: ${currentConfirmations}/5 confirmations`);
     }
     if (!painFree) {
-      blockers.push(`Resolve recurring shoulder/elbow/wrist pain in DB Shoulder Press`);
+      blockers.push(`Resolve recurring shoulder/elbow/wrist pain in Landmine Press`);
     }
 
     return {
@@ -388,7 +388,7 @@ export class BarbellProgressionTracker {
    * @returns {Object} Readiness analysis with percentage, criteria status, blockers
    */
   getPullUpReadiness() {
-    const exerciseKey = 'UPPER_B - Lat Pulldown';
+    const exerciseKey = 'Lat Pulldown';
 
     // Strength check: 40kg × 3×10 @ RIR 2-3 (significant strength needed for bodyweight pull-ups)
     const strengthProgress = this._calculateStrengthProgress(exerciseKey, 40, 10, 3, 2);

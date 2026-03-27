@@ -174,7 +174,7 @@
     );
 
     // Test: Don't suggest for exercises without rotation pool
-    const suggestion3 = rotationManager.checkRotationDue('UPPER_A - DB Flat Bench Press', 'DB Flat Bench Press');
+    const suggestion3 = rotationManager.checkRotationDue('Incline DB Press', 'Incline DB Press');
     logTest(
       category2,
       'No rotation for exercises without rotation pool',

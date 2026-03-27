@@ -25,9 +25,9 @@ export const TEMPO_PHASES = {
  */
 export const TEMPO_GUIDANCE = {
   // UPPER_A exercises
-  'DB Flat Bench Press': {
+  'Incline DB Press': {
     phase: 'eccentric',
-    instruction: 'Lower dumbbells slowly over 3 seconds',
+    instruction: 'Lower dumbbells slowly over 3 seconds (incline)',
     why: 'Chest stretch under load = more growth',
     cue: 'Normal speed up ↑ | Slow controlled down ↓ (3 sec)'
   },
@@ -234,7 +234,7 @@ export const TEMPO_GUIDANCE = {
  * @returns {TempoGuidanceData|null} Tempo guidance or null if not found
  *
  * @example
- * getTempoGuidance('DB Flat Bench Press')
+ * getTempoGuidance('Incline DB Press')
  * // Returns: { phase: 'eccentric', instruction: '...', why: '...', cue: '...' }
  */
 export function getTempoGuidance(exerciseName) {
@@ -254,7 +254,7 @@ export function getTempoGuidance(exerciseName) {
  *
  * @example
  * getExercisesByPhase(TEMPO_PHASES.ECCENTRIC)
- * // Returns: ['DB Flat Bench Press', 'DB Lateral Raises', ...]
+ * // Returns: ['Incline DB Press', 'DB Lateral Raises', ...]
  */
 export function getExercisesByPhase(phase) {
   // Validate input

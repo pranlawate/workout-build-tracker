@@ -258,7 +258,7 @@
 
       // Test: evaluateUnlockWithPhasePriority handles valid inputs
       try {
-        const priorityResult = evaluator.evaluateUnlockWithPhasePriority('DB Flat Bench Press', 'DB Flat Bench Press');
+        const priorityResult = evaluator.evaluateUnlockWithPhasePriority('Barbell Bench Press', 'Incline DB Press');
         const validPriority = priorityResult && typeof priorityResult.priority === 'number';
         logTest(unlockCategory, 'evaluateUnlockWithPhasePriority returns priority', validPriority);
       } catch (e) {

@@ -92,18 +92,60 @@ export const EQUIPMENT_REQUIREMENTS = {
  * @type {Object.<string, Object.<string, string>>}
  */
 export const BODYWEIGHT_REGRESSIONS = {
-  'DB Flat Bench Press': {
+  'Incline DB Press': {
     '0-10kg': 'Incline Push-ups',     // Hands elevated on bench
     '10-15kg': 'Sadharan Dand',       // Basic traditional push-up
     '15kg+': 'Sadharan Dand'          // Standard (user ready)
   },
-  'DB Goblet Squat': {
-    '0-10kg': 'Ardha Baithak',        // Half squat (partial ROM)
-    '10-15kg': 'Sadharan Baithak',    // Full traditional squat
-    '15kg+': 'Sadharan Baithak'       // Standard (user ready)
+  'Hack Squat': {
+    '0-45kg': 'Ardha Baithak',        // Light machine load, partial pattern
+    '45-80kg': 'Sadharan Baithak',    // Building toward full pattern
+    '80kg+': 'Sadharan Baithak'       // Standard (user ready)
   }
   // Add more as needed during implementation
 };
+
+/**
+ * Map user load to bodyweight substitute using bracket keys (e.g. "0-10kg", "15kg+").
+ * @param {Object.<string, string>} regressionMap
+ * @param {number} userWeight
+ * @returns {string|null}
+ */
+function pickSubstituteFromBrackets(regressionMap, userWeight) {
+  const ranges = [];
+  const pluses = [];
+  for (const key of Object.keys(regressionMap)) {
+    const rangeMatch = key.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)kg$/);
+    if (rangeMatch) {
+      ranges.push({
+        lo: Number(rangeMatch[1]),
+        hi: Number(rangeMatch[2]),
+        sub: regressionMap[key]
+      });
+      continue;
+    }
+    const plusMatch = key.match(/^(\d+(?:\.\d+)?)kg\+$/);
+    if (plusMatch) {
+      pluses.push({ lo: Number(plusMatch[1]), sub: regressionMap[key] });
+    }
+  }
+  if (ranges.length === 0 && pluses.length === 0) {
+    return null;
+  }
+  ranges.sort((a, b) => a.lo - b.lo);
+  for (const r of ranges) {
+    if (userWeight >= r.lo && userWeight < r.hi) {
+      return r.sub;
+    }
+  }
+  pluses.sort((a, b) => b.lo - a.lo);
+  for (const p of pluses) {
+    if (userWeight >= p.lo) {
+      return p.sub;
+    }
+  }
+  return null;
+}
 
 /**
  * Filter exercises by equipment profile
@@ -143,7 +185,7 @@ export function filterExercisesByProfile(exercises, profile) {
  * @param {number} userWeight - Current DB weight user is using (kg)
  * @returns {string|null} Bodyweight substitute or null if none available
  * @example
- * getBodyweightSubstitute('DB Flat Bench Press', 12) // Returns 'Sadharan Dand'
+ * getBodyweightSubstitute('Incline DB Press', 12) // Returns 'Sadharan Dand'
  * getBodyweightSubstitute('Seated Cable Row', 20) // Returns null (no bodyweight substitute)
  */
 export function getBodyweightSubstitute(exerciseName, userWeight) {
@@ -159,14 +201,23 @@ export function getBodyweightSubstitute(exerciseName, userWeight) {
     return null;
   }
 
-  // Determine weight bracket
-  if (userWeight < 10) {
-    return regressionMap['0-10kg'];
-  } else if (userWeight < 15) {
-    return regressionMap['10-15kg'];
-  } else {
+  const fromBrackets = pickSubstituteFromBrackets(regressionMap, userWeight);
+  if (fromBrackets !== null) {
+    return fromBrackets;
+  }
+
+  // Legacy fixed thresholds if map uses only classic dumbbell brackets
+  if (regressionMap['0-10kg'] && regressionMap['10-15kg'] && regressionMap['15kg+']) {
+    if (userWeight < 10) {
+      return regressionMap['0-10kg'];
+    }
+    if (userWeight < 15) {
+      return regressionMap['10-15kg'];
+    }
     return regressionMap['15kg+'];
   }
+
+  return null;
 }
 
 /**

@@ -795,7 +795,9 @@ export class StorageManager {
           barbells: true,
           mudgal: true,
           bodyweight: true,
-          bands: true
+          bands: true,
+          kettlebells: true,
+          cables: true
         };
       }
       return JSON.parse(stored);
@@ -807,7 +809,9 @@ export class StorageManager {
         barbells: true,
         mudgal: true,
         bodyweight: true,
-        bands: true
+        bands: true,
+        kettlebells: true,
+        cables: true
       };
     }
   }

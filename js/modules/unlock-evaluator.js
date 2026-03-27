@@ -196,27 +196,34 @@ export class UnlockEvaluator {
   }
 
   /**
-   * Resolve bare exercise name to full storage key (e.g. "UPPER_A - DB Flat Bench Press")
+   * Resolve exercise name to storage key (bare name, or legacy "DAY - Name" if present)
    * @private
    */
   _resolveExerciseKey(exerciseName) {
+    if (!exerciseName || typeof exerciseName !== 'string') {
+      return null;
+    }
     try {
       const allKeys = this.storage.getAllExerciseKeys();
+      if (allKeys.includes(exerciseName)) {
+        return exerciseName;
+      }
       const suffix = ` - ${exerciseName}`;
-      return allKeys.find(key => key.endsWith(suffix)) || null;
+      const legacy = allKeys.find(key => key.endsWith(suffix));
+      return legacy ?? exerciseName;
     } catch {
-      return null;
+      return exerciseName;
     }
   }
 
   /**
-   * Get exercise history by bare name, resolving to full storage key
+   * Get exercise history by exercise name (bare key preferred)
    * @private
    */
   _getHistoryByName(exerciseName) {
-    const fullKey = this._resolveExerciseKey(exerciseName);
-    if (!fullKey) return [];
-    return this.storage.getExerciseHistory(fullKey);
+    const key = this._resolveExerciseKey(exerciseName);
+    if (!key) return [];
+    return this.storage.getExerciseHistory(key);
   }
 
   /**
@@ -230,7 +237,7 @@ export class UnlockEvaluator {
   _checkStrengthMilestone(exerciseName, targetExercise) {
     // Define milestones per progression
     const MILESTONES = {
-      'DB Flat Bench Press': {
+      'Incline DB Press': {
         'Barbell Bench Press': { weight: 15, reps: 12, sets: 3 },
         'Sadharan Dand': { weight: 15, reps: 12, sets: 3 }
       },

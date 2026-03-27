@@ -19,10 +19,10 @@
  * - prerequisiteExercise: Specific exercise that must be trained first
  */
 export const EXERCISE_UNLOCK_CRITERIA = {
-  // Barbell Bench Press (from DB Flat Bench Press)
+  // Barbell Bench Press (from Incline DB Press)
   'Barbell Bench Press': {
     strengthMilestone: {
-      exercise: 'DB Flat Bench Press',
+      exercise: 'Incline DB Press',
       threshold: { weight: 15, reps: 12, sets: 3 }
     },
     mobilityCheck: 'Scapular retraction proficiency',
@@ -30,10 +30,10 @@ export const EXERCISE_UNLOCK_CRITERIA = {
     trainingWeeks: 8
   },
 
-  // Sadharan Dand (from DB Flat Bench Press)
+  // Sadharan Dand (from Incline DB Press)
   'Sadharan Dand': {
     strengthMilestone: {
-      exercise: 'DB Flat Bench Press',
+      exercise: 'Incline DB Press',
       threshold: { weight: 15, reps: 12, sets: 3 }
     },
     mobilityCheck: 'Thoracic mobility proficiency',

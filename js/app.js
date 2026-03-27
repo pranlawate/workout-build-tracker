@@ -1110,6 +1110,18 @@ class App {
                   ${formCues.execution.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
                 </ul>
               </div>
+              ${formCues.breathing ? `
+              <div class="form-cue-category">
+                <strong>Breathing:</strong>
+                <p class="form-cue-paragraph">${this.escapeHtml(formCues.breathing)}</p>
+              </div>` : ''}
+              ${formCues.safetyTips && formCues.safetyTips.length ? `
+              <div class="form-cue-category">
+                <strong>Safety:</strong>
+                <ul>
+                  ${formCues.safetyTips.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+                </ul>
+              </div>` : ''}
               <div class="form-cue-category">
                 <strong>⚠️ Avoid:</strong>
                 <ul>
@@ -2968,7 +2980,7 @@ class App {
     const profile = this.storage.getEquipmentProfile();
 
     // Equipment types (excluding bodyweight - always enabled)
-    const equipmentTypes = ['gym', 'dumbbells', 'barbells', 'mudgal', 'bands'];
+    const equipmentTypes = ['gym', 'dumbbells', 'barbells', 'mudgal', 'bands', 'kettlebells', 'cables'];
 
     equipmentTypes.forEach(type => {
       const checkbox = document.getElementById(`equipment-${type}`);
@@ -5994,6 +6006,18 @@ class App {
           ${formCues.execution.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
         </ul>
       </div>
+      ${formCues.breathing ? `
+      <div class="form-cue-category">
+        <strong>Breathing:</strong>
+        <p class="form-cue-paragraph">${this.escapeHtml(formCues.breathing)}</p>
+      </div>` : ''}
+      ${formCues.safetyTips && formCues.safetyTips.length ? `
+      <div class="form-cue-category">
+        <strong>Safety:</strong>
+        <ul>
+          ${formCues.safetyTips.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
+        </ul>
+      </div>` : ''}
       <div class="form-cue-category">
         <strong>Common Mistakes:</strong>
         <ul>

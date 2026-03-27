@@ -11,15 +11,19 @@
 export const FORM_CUE_CATEGORIES = {
   SETUP: 'setup',
   EXECUTION: 'execution',
-  MISTAKES: 'mistakes'
+  MISTAKES: 'mistakes',
+  BREATHING: 'breathing',
+  SAFETY_TIPS: 'safetyTips'
 };
 
 /**
  * Form cues for each exercise
  *
- * setup: Pre-movement positioning and preparation
- * execution: Key points during the movement
- * mistakes: Common errors to avoid
+ * setup: Pre-movement positioning and preparation (string or string[])
+ * execution: Key points during the movement (string or string[])
+ * mistakes or commonMistakes: Common errors to avoid (string[])
+ * breathing: Optional breathing pattern (string)
+ * safetyTips: Optional safety notes (string[])
  */
 export const FORM_CUES = {
   // UPPER_A exercises
@@ -315,10 +319,167 @@ export const FORM_CUES = {
 };
 
 /**
+ * Breathing and safety for default-workout + EXERCISE_DEFINITIONS exercises (merged in getFormCues).
+ */
+export const FORM_CUE_SUPPLEMENT = {
+  'Incline DB Press': {
+    breathing: 'Exhale on the press, inhale on the lowering phase. Do not hold your breath through sticking points.',
+    safetyTips: ['Keep bench at 30° or less to reduce shoulder stress', 'Stop if you feel sharp anterior shoulder pain']
+  },
+  'Seated Cable Row': {
+    breathing: 'Inhale at the start of the release, exhale as you pull the handle to your torso.',
+    safetyTips: ['Keep spine neutral; avoid max flexion under load', 'Reduce weight if you cannot finish without torso swing']
+  },
+  'Decline DB Press': {
+    breathing: 'Exhale as you press away from the chest, inhale as the dumbbells come down under control.',
+    safetyTips: ['Secure ankle pads before loading', 'Use a controlled path toward the lower chest, not the neck']
+  },
+  'T-Bar Row': {
+    breathing: 'Exhale on the pull, inhale while lowering. Brace your core lightly before each pull.',
+    safetyTips: ['Stop if lower-back rounding increases with fatigue', 'Keep neck neutral; avoid yanking with legs']
+  },
+  'Machine Fly': {
+    breathing: 'Exhale as handles come together, inhale as they open with control.',
+    safetyTips: ['Adjust seat so elbows track comfortably; avoid deep overstretch at the back', 'Do not let the stack slam between reps']
+  },
+  'Face Pulls': {
+    breathing: 'Exhale as you pull and externally rotate, inhale as you return.',
+    safetyTips: ['Use moderate weight to keep rear delts and rotator cuff in charge', 'Stop if you feel pinching at the front of the shoulder']
+  },
+  'Tricep Pushdowns': {
+    breathing: 'Exhale on the push down, inhale on the controlled return.',
+    safetyTips: ['Keep elbows fixed at your sides', 'Avoid leaning heavily over the bar to move more weight']
+  },
+  'Hack Squat': {
+    breathing: 'Inhale on the descent, exhale through the hardest part of the ascent.',
+    safetyTips: ['Keep full foot contact on the platform', 'Use a depth you can control without butt rounding off the pad']
+  },
+  '45° Hyperextension': {
+    breathing: 'Exhale as you rise to neutral, inhale as you hinge forward under control.',
+    safetyTips: ['Stop at parallel; avoid snapping into hyperextension', 'Chin tucked to reduce neck extension']
+  },
+  'Hip Thrust': {
+    breathing: 'Exhale at the top glute squeeze, inhale as you lower the hips.',
+    safetyTips: ['Drive the movement from glutes, not lumbar hyperextension', 'Secure the bar or load so it cannot slip']
+  },
+  'Leg Extension': {
+    breathing: 'Exhale as you extend, inhale as you lower the weight smoothly.',
+    safetyTips: ['Avoid violent lockouts that slam the knees', 'Reduce range if you feel patellar discomfort']
+  },
+  'Standing Calf Raise': {
+    breathing: 'Exhale at the top pause, inhale on the controlled stretch at the bottom.',
+    safetyTips: ['Use a full but pain-free range', 'Avoid bouncing out of the bottom']
+  },
+  'Dead Bug': {
+    breathing: 'Match breath to movement: exhale as the limb extends, inhale as it returns.',
+    safetyTips: ['Keep ribs down; stop if the low back arches off the floor', 'Move slowly when adding load or slower tempos']
+  },
+  'Lat Pulldown': {
+    breathing: 'Exhale as you pull the bar down, inhale as it rises with control.',
+    safetyTips: ['Pull to the upper chest, not behind the neck', 'Reduce weight if you must lean far back to complete reps']
+  },
+  'Landmine Press': {
+    breathing: 'Exhale as you press along the arc, inhale as you return to the shoulder.',
+    safetyTips: ['Brace the core to limit low-back arching', 'Use a weight you can control without twisting the torso']
+  },
+  'Chest-Supported Row': {
+    breathing: 'Exhale on the pull, inhale on the release while keeping the chest on the pad.',
+    safetyTips: ['Do not lift the chest to cheat the range', 'Stop if you feel sharp mid-back pain']
+  },
+  'DB Lateral Raises': {
+    breathing: 'Exhale as you lift, inhale as you lower for a slow count.',
+    safetyTips: ['Do not raise above shoulder height', 'Use light loads; momentum defeats the side delts']
+  },
+  'Reverse Fly': {
+    breathing: 'Exhale as you raise the weights, inhale as you lower with control.',
+    safetyTips: ['Keep neck neutral; avoid cranking the head up', 'Reduce weight if traps take over']
+  },
+  'DB Hammer Curls': {
+    breathing: 'Exhale on the curl, inhale on the descent.',
+    safetyTips: ['Keep elbows under shoulders; avoid swinging', 'Stop if elbow or forearm pain appears']
+  },
+  'Reverse Crunch': {
+    breathing: 'Exhale as you curl the hips up, inhale as you lower slowly.',
+    safetyTips: ['Press low back into the bench or floor', 'Avoid jerking with the hip flexors']
+  },
+  'Leg Press': {
+    breathing: 'Inhale on the way down, exhale as you press without locking out aggressively.',
+    safetyTips: ['Keep knees tracking over toes', 'Do not allow hips to round or lift from the pad']
+  },
+  'DB Romanian Deadlift': {
+    breathing: 'Brace before you hinge; exhale as you return to standing, inhale during the controlled lowering phase.',
+    safetyTips: ['Stop if back rounds; reduce range or load', 'Keep the bar or dumbbells close to the legs']
+  },
+  'Leg Abduction': {
+    breathing: 'Exhale as legs press apart, inhale as they return.',
+    safetyTips: ['Sit tall without collapsing the lower back', 'Use a controlled speed; avoid snapping into end range']
+  },
+  'Leg Adduction': {
+    breathing: 'Exhale as legs squeeze together, inhale as they open.',
+    safetyTips: ['Avoid bouncing the weight stack', 'Stop if you feel groin strain']
+  },
+  'Leg Curl': {
+    breathing: 'Exhale as you curl, inhale on the extension.',
+    safetyTips: ['Keep hips pressed into the pad', 'Do not lift the hips to shorten the range']
+  },
+  'Seated Calf Raise': {
+    breathing: 'Exhale during the long pause on top, inhale on the controlled descent.',
+    safetyTips: ['Emphasize soleus with bent knees; avoid cutting depth', 'Reduce load if Achilles irritation appears']
+  },
+  'Pallof Press': {
+    breathing: 'Breathe steadily; exhale gently as you reach full extension, inhale as you return.',
+    safetyTips: ['Anti-rotation is the goal; reduce cable tension if you twist off line', 'Keep knees soft, not locked']
+  },
+  'KB Goblet Squat': {
+    breathing: 'Inhale on the way down, exhale as you drive up while keeping the kettlebell close.',
+    safetyTips: ['Hold the bell tight to the chest', 'Stop if wrists or elbows complain under load']
+  },
+  'KB Swings': {
+    breathing: 'Power breathe: sharp exhale at hip extension, inhale as the bell floats back down.',
+    safetyTips: ['Hinge, do not squat the bell up', 'Stop immediately if the lower back rounds']
+  },
+  'Standard DB Curls': {
+    breathing: 'Exhale on the curl, inhale on the lowering phase.',
+    safetyTips: ['Keep elbows fixed; avoid leaning back', 'Use a full range without shoulder pain']
+  },
+  'Overhead Tricep Extension': {
+    breathing: 'Exhale as you extend the elbows, inhale as you lower behind the head.',
+    safetyTips: ['Keep elbows pointing forward, not flared wide', 'Reduce load if elbows or neck feel strained']
+  }
+};
+
+function toCueLines(value) {
+  if (value == null) return [];
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (typeof value === 'string') {
+    const t = value.trim();
+    return t ? [t] : [];
+  }
+  return [];
+}
+
+/**
+ * Merge raw cue object (from FORM_CUES + optional supplement) into a consistent shape for UI.
+ *
+ * @param {Object} raw
+ * @returns {{ setup: string[], execution: string[], mistakes: string[], breathing: string, safetyTips: string[] }}
+ */
+export function normalizeFormCueData(raw) {
+  const mistakes = toCueLines(raw.mistakes ?? raw.commonMistakes);
+  const setup = toCueLines(raw.setup);
+  const execution = toCueLines(raw.execution);
+  const breathing = typeof raw.breathing === 'string' ? raw.breathing.trim() : '';
+  const safetyTips = toCueLines(raw.safetyTips);
+  return { setup, execution, mistakes, breathing, safetyTips };
+}
+
+/**
  * @typedef {Object} FormCueData
  * @property {string[]} setup - Pre-movement positioning and preparation cues
  * @property {string[]} execution - Key points during the movement
  * @property {string[]} mistakes - Common errors to avoid
+ * @property {string} [breathing] - Breathing pattern (empty string if none)
+ * @property {string[]} [safetyTips] - Safety notes
  */
 
 /**
@@ -338,12 +499,13 @@ export function getFormCues(exerciseName) {
     return null;
   }
 
-  const cues = FORM_CUES[exerciseName];
-  if (!cues) {
+  const base = FORM_CUES[exerciseName];
+  if (!base) {
     console.warn(`[FormCues] No form cues found for: ${exerciseName}`);
     return null;
   }
-  return cues;
+  const extra = FORM_CUE_SUPPLEMENT[exerciseName] || {};
+  return normalizeFormCueData({ ...base, ...extra });
 }
 
 /**
@@ -382,14 +544,23 @@ export function getFormCuesByCategory(exerciseName, category) {
     return null;
   }
 
-  const cues = FORM_CUES[exerciseName];
-  if (!cues) {
+  const base = FORM_CUES[exerciseName];
+  if (!base) {
     console.warn(`[FormCues] No form cues found for: ${exerciseName}`);
     return null;
   }
+  const extra = FORM_CUE_SUPPLEMENT[exerciseName] || {};
+  const normalized = normalizeFormCueData({ ...base, ...extra });
 
-  const categoryCues = cues[category];
-  if (!categoryCues) {
+  if (category === FORM_CUE_CATEGORIES.BREATHING) {
+    return normalized.breathing ? [normalized.breathing] : null;
+  }
+  if (category === FORM_CUE_CATEGORIES.SAFETY_TIPS) {
+    return normalized.safetyTips.length ? normalized.safetyTips : null;
+  }
+
+  const categoryCues = normalized[category];
+  if (!categoryCues || !categoryCues.length) {
     console.warn(`[FormCues] No cues found for category '${category}' in exercise: ${exerciseName}`);
     return null;
   }

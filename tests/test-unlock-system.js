@@ -169,7 +169,7 @@
     const phaseManager1 = new PhaseManager(storage1);
     const evaluator1 = new UnlockEvaluator(storage1, phaseManager1);
 
-    const result1 = evaluator1.evaluateUnlockWithPhasePriority('Barbell Bench Press', 'DB Flat Bench Press');
+    const result1 = evaluator1.evaluateUnlockWithPhasePriority('Barbell Bench Press', 'Incline DB Press');
     logTest(
       category3,
       'Building phase: All exercises have priority 1',
@@ -205,7 +205,7 @@
       `Recommended: ${result2.phaseRecommended}`
     );
 
-    const result3 = evaluator2.evaluateUnlockWithPhasePriority('Barbell Bench Press', 'DB Flat Bench Press');
+    const result3 = evaluator2.evaluateUnlockWithPhasePriority('Barbell Bench Press', 'Incline DB Press');
     logTest(
       category3,
       'Maintenance phase: Barbell exercise has priority 2 (lower)',
@@ -282,7 +282,7 @@
     );
 
     // Test: Equipment default
-    const type6 = evaluator._getExerciseType('DB Flat Bench Press');
+    const type6 = evaluator._getExerciseType('Incline DB Press');
     logTest(
       category4,
       'Detects dumbbell exercise as equipment type',
@@ -307,7 +307,7 @@
     const evaluator = new UnlockEvaluator(storage, phaseManager);
 
     // Test: No history fails milestone
-    const met1 = evaluator._checkStrengthMilestone('DB Flat Bench Press', 'Barbell Bench Press');
+    const met1 = evaluator._checkStrengthMilestone('Incline DB Press', 'Barbell Bench Press');
     logTest(
       category5,
       'Fails milestone with no exercise history',
@@ -326,9 +326,9 @@
         ]
       }
     ];
-    localStorage.setItem('build_exercise_DB Flat Bench Press', JSON.stringify(weakHistory));
+    localStorage.setItem('build_exercise_Incline DB Press', JSON.stringify(weakHistory));
 
-    const met2 = evaluator._checkStrengthMilestone('DB Flat Bench Press', 'Barbell Bench Press');
+    const met2 = evaluator._checkStrengthMilestone('Incline DB Press', 'Barbell Bench Press');
     logTest(
       category5,
       'Fails milestone with insufficient performance',
@@ -347,9 +347,9 @@
         ]
       }
     ];
-    localStorage.setItem('build_exercise_DB Flat Bench Press', JSON.stringify(strongHistory));
+    localStorage.setItem('build_exercise_Incline DB Press', JSON.stringify(strongHistory));
 
-    const met3 = evaluator._checkStrengthMilestone('DB Flat Bench Press', 'Barbell Bench Press');
+    const met3 = evaluator._checkStrengthMilestone('Incline DB Press', 'Barbell Bench Press');
     logTest(
       category5,
       'Passes milestone with sufficient performance',
@@ -358,7 +358,7 @@
     );
 
     // Cleanup
-    localStorage.removeItem('build_exercise_DB Flat Bench Press');
+    localStorage.removeItem('build_exercise_Incline DB Press');
 
   } catch (e) {
     logTest(category5, 'Strength milestone tests', false, e.message);
@@ -440,7 +440,7 @@
     const unlocks = { 'Barbell Bench Press': { strength: true, mobility: true, painFree: true, weeks: 10 } };
     localStorage.setItem('build_unlocks', JSON.stringify(unlocks));
 
-    const result = evaluator.evaluateUnlock('Barbell Bench Press', 'DB Flat Bench Press');
+    const result = evaluator.evaluateUnlock('Barbell Bench Press', 'Incline DB Press');
 
     logTest(
       category7,
@@ -524,7 +524,7 @@
     const evaluator = new UnlockEvaluator(storage, phaseManager);
 
     // Test: Invalid exercise name doesn't crash
-    const result1 = evaluator.evaluateUnlock(null, 'DB Flat Bench Press');
+    const result1 = evaluator.evaluateUnlock(null, 'Incline DB Press');
     const validResult1 = result1 !== null && typeof result1 === 'object';
     logTest(
       category9,
