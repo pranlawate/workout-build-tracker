@@ -172,10 +172,10 @@
   const category3 = 'Regression Detection';
 
   try {
-    // Test: Weight dropped
+    // Test: Weight dropped (history is chronological: oldest first, newest last)
     const weightDropHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 12, rir: 2 }] },
-      { date: '2026-02-07', sets: [{ weight: 12.5, reps: 10, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 12.5, reps: 10, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 12, rir: 2 }] }
     ];
     const regression1 = SmartProgression.detectRegression(weightDropHistory);
     logTest(
@@ -187,8 +187,8 @@
 
     // Test: Significant rep drop (25%+)
     const repDropHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 8, rir: 2 }] },  // 33% drop from 12
-      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 8, rir: 2 }] }
     ];
     const regression2 = SmartProgression.detectRegression(repDropHistory);
     logTest(
@@ -200,8 +200,8 @@
 
     // Test: No regression with progress
     const progressHistory = [
-      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 10, rir: 2 }] },
-      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 10, rir: 2 }] }
     ];
     const regression3 = SmartProgression.detectRegression(progressHistory);
     logTest(
@@ -225,34 +225,34 @@
   try {
     // Test: Weight gap failure (increased weight, failed min reps, RIR 0)
     const failureHistory = [
-      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 6, rir: 0 }] },  // Failed (below min 8)
-      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 6, rir: 0 }] }
     ];
     const failure1 = SmartProgression.detectWeightGapFailure(failureHistory, 'DB Lateral Raises');
     logTest(
       category4,
       'Detects weight gap failure (increased weight, < min reps, RIR 0)',
       failure1 === true,
-      `10kg×12 → 12.5kg×6 (min: 8), Failure: ${failure1}`
+      `10kg×12 → 12.5kg×6 (min: 12 for DB Lateral Raises), Failure: ${failure1}`
     );
 
     // Test: No failure with sufficient reps
     const successHistory = [
-      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 10, rir: 2 }] },  // Success (met min 8)
-      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 10, rir: 2 }] }
     ];
     const failure2 = SmartProgression.detectWeightGapFailure(successHistory, 'DB Lateral Raises');
     logTest(
       category4,
       'No failure when min reps are met',
       failure2 === false,
-      `10kg×12 → 12.5kg×10 (min: 8), Failure: ${failure2}`
+      `10kg×12 → 12.5kg×10 (min: 12), Failure: ${failure2}`
     );
 
     // Test: No failure with RIR > 0
     const rirHistory = [
-      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 6, rir: 2 }] },  // Had reps in reserve
-      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 12.5, reps: 6, rir: 2 }] }
     ];
     const failure3 = SmartProgression.detectWeightGapFailure(rirHistory, 'DB Lateral Raises');
     logTest(
@@ -276,14 +276,14 @@
   try {
     // Test: Successful progression (top reps with good RIR)
     const successHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 15, rir: 2 }] }
     ];
     const success1 = SmartProgression.detectSuccessfulProgression(successHistory, 'DB Lateral Raises');
     logTest(
       category5,
-      'Detects success with 12 reps and RIR 2',
+      'Detects success at top of workout rep range with RIR 2',
       success1 === true,
-      `Reps: 12 (top of range), RIR: 2, Success: ${success1}`
+      `Reps: 15 (top of 12-15 range), RIR: 2, Success: ${success1}`
     );
 
     // Test: Not successful - below top reps
@@ -295,19 +295,19 @@
       category5,
       'Not successful with reps below top of range',
       success2 === false,
-      `Reps: 10 (need 12), Success: ${success2}`
+      `Reps: 10 (need 15), Success: ${success2}`
     );
 
     // Test: Not successful - poor RIR
     const poorRIRHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 12, rir: 0 }] }
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 15, rir: 0 }] }
     ];
     const success3 = SmartProgression.detectSuccessfulProgression(poorRIRHistory, 'DB Lateral Raises');
     logTest(
       category5,
       'Not successful with RIR 0 (need RIR 2-3)',
       success3 === false,
-      `Reps: 12, RIR: 0, Success: ${success3}`
+      `Reps: 15, RIR: 0, Success: ${success3}`
     );
 
   } catch (e) {
@@ -324,7 +324,7 @@
   try {
     // Test: Suggest weight increase
     const history = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 15, rir: 2 }] }
     ];
     const suggestion = SmartProgression.suggestWeightIncrease(history, 'DB Lateral Raises');
 
@@ -337,8 +337,8 @@
 
     logTest(
       category6,
-      'Suggests +2.5kg increment',
-      suggestion?.suggestedWeight === 12.5,
+      'Suggests increment from exercise definition (1.25kg for DB Lateral Raises)',
+      suggestion?.suggestedWeight === 11.25,
       `Current: 10kg, Suggested: ${suggestion?.suggestedWeight}kg`
     );
 
@@ -372,9 +372,9 @@
   try {
     // Test: Detect large jumps (5kg increments)
     const largeJumpHistory = [
-      { date: '2026-02-10', sets: [{ weight: 25, reps: 10 }] },
+      { date: '2026-02-04', sets: [{ weight: 15, reps: 10 }] },
       { date: '2026-02-07', sets: [{ weight: 20, reps: 10 }] },
-      { date: '2026-02-04', sets: [{ weight: 15, reps: 10 }] }
+      { date: '2026-02-10', sets: [{ weight: 25, reps: 10 }] }
     ];
     const pattern1 = SmartProgression.detectAdaptiveWeightPattern(largeJumpHistory);
     logTest(
@@ -386,9 +386,9 @@
 
     // Test: Detect small steps (1kg increments)
     const smallStepHistory = [
-      { date: '2026-02-10', sets: [{ weight: 12, reps: 10 }] },
+      { date: '2026-02-04', sets: [{ weight: 10, reps: 10 }] },
       { date: '2026-02-07', sets: [{ weight: 11, reps: 10 }] },
-      { date: '2026-02-04', sets: [{ weight: 10, reps: 10 }] }
+      { date: '2026-02-10', sets: [{ weight: 12, reps: 10 }] }
     ];
     const pattern2 = SmartProgression.detectAdaptiveWeightPattern(smallStepHistory);
     logTest(
@@ -440,9 +440,9 @@
 
     // Test: Priority 2 - Weight increase after successful progression
     const successHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 15, rir: 2 }] }
     ];
-    const suggestion2 = SmartProgression.getSuggestion('UPPER_A - DB Lateral Raises', successHistory);
+    const suggestion2 = SmartProgression.getSuggestion('UPPER_B - DB Lateral Raises', successHistory);
     logTest(
       category8,
       'Priority 2: Suggests weight increase after successful progression',
@@ -452,9 +452,9 @@
 
     // Test: Priority 5 - Plateau alternative
     const plateauHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 10, rir: 2 }] },
+      { date: '2026-02-04', sets: [{ weight: 10, reps: 10, rir: 2 }] },
       { date: '2026-02-07', sets: [{ weight: 10, reps: 10, rir: 2 }] },
-      { date: '2026-02-04', sets: [{ weight: 10, reps: 10, rir: 2 }] }
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 10, rir: 2 }] }
     ];
     const suggestion3 = SmartProgression.getSuggestion('UPPER_A - DB Lateral Raises', plateauHistory);
     const isPlateauWarning = suggestion3?.type === 'TRY_ALTERNATIVE' || suggestion3?.type === 'PLATEAU_WARNING';
@@ -467,8 +467,8 @@
 
     // Test: Priority 6 - Regression warning
     const regressionHistory = [
-      { date: '2026-02-10', sets: [{ weight: 10, reps: 8, rir: 2 }] },
-      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] }
+      { date: '2026-02-07', sets: [{ weight: 10, reps: 12, rir: 2 }] },
+      { date: '2026-02-10', sets: [{ weight: 10, reps: 8, rir: 2 }] }
     ];
     const suggestion4 = SmartProgression.getSuggestion('UPPER_A - DB Lateral Raises', regressionHistory);
     logTest(
@@ -546,8 +546,9 @@
   // ========================================
   // SECTION 11: Summary
   // ========================================
-  // Suppress detailed summary when running under test orchestration
-  if (!window._TEST_ORCHESTRATED) {
+  // Suppress detailed summary when running under test orchestration (browser only)
+  const g = globalThis;
+  if (typeof g.window === 'undefined' || !g.window._TEST_ORCHESTRATED) {
     console.log('\n═══════════════════════════════════════════════════════════════');
     console.log('\n📊 TEST SUMMARY\n');
     console.log('═══════════════════════════════════════════════════════════════\n');
@@ -570,9 +571,10 @@
     }
   } // End orchestration check
 
-  // Export results
-  window._smartProgressionTestResults = results;
-  if (!window._TEST_ORCHESTRATED) {
+  if (typeof g.window !== 'undefined') {
+    g.window._smartProgressionTestResults = results;
+    if (!g.window._TEST_ORCHESTRATED) {
       console.log('💡 Results available at: window._smartProgressionTestResults\n');
     }
-    })();
+  }
+})();

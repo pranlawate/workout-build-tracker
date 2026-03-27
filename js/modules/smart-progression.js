@@ -8,20 +8,88 @@
  */
 
 import { EXERCISE_METADATA, PAIN_LEVELS, SWAP_REASONS, findAlternative, ROTATION_POOLS } from './exercise-metadata.js';
-import { TEMPO_PHASES, getTempoGuidance } from './tempo-guidance.js';
+import { TEMPO_PHASES, getTempoGuidance, TEMPO_GUIDANCE } from './tempo-guidance.js';
 import { getFormCues } from './form-cues.js';
+import { WORKOUTS, EXERCISE_DEFINITIONS } from './workouts.js';
 
 /**
- * Rep range configuration per exercise
- * (from BUILD workout specification)
+ * Fallback rep ranges when an exercise is not in WORKOUTS / EXERCISE_DEFINITIONS
  */
-const REP_RANGES = {
-  // Most exercises: 8-12 reps
+const REP_RANGE_FALLBACK = {
   default: { min: 8, max: 12 },
-  // Time-based exercises
-  planks: { min: 30, max: 60 }, // seconds
-  // Add more specific ranges as needed
+  planks: { min: 30, max: 60 }
 };
+
+/**
+ * Build name → definition map from all workouts plus pathway-only definitions
+ */
+function buildExerciseDefinitionLookup() {
+  const lookup = Object.create(null);
+  for (const workout of Object.values(WORKOUTS)) {
+    if (!workout?.exercises) continue;
+    for (const ex of workout.exercises) {
+      if (ex?.name) lookup[ex.name] = ex;
+    }
+  }
+  for (const [name, def] of Object.entries(EXERCISE_DEFINITIONS)) {
+    if (!lookup[name]) {
+      lookup[name] = { name, ...def };
+    }
+  }
+  return lookup;
+}
+
+const EXERCISE_DEFINITION_LOOKUP = buildExerciseDefinitionLookup();
+
+/**
+ * @param {string} exerciseName
+ * @returns {object|null} Exercise definition or null
+ */
+function getWorkoutExerciseDefinition(exerciseName) {
+  if (!exerciseName || typeof exerciseName !== 'string') {
+    return null;
+  }
+  return EXERCISE_DEFINITION_LOOKUP[exerciseName] || null;
+}
+
+/**
+ * Parse repRange string from workout definitions (e.g. "15-20", "10-12/side", "30-60s")
+ *
+ * @param {string} repRange
+ * @returns {{min: number, max: number}|null}
+ */
+function parseWorkoutRepRangeString(repRange) {
+  if (!repRange || typeof repRange !== 'string') {
+    return null;
+  }
+  try {
+    let cleanRange = repRange.replace(/\/side/g, '').replace(/s/g, '');
+    const parts = cleanRange.split('-');
+
+    if (parts.length === 1) {
+      const value = Number(parts[0]);
+      if (Number.isNaN(value)) {
+        return null;
+      }
+      return { min: value, max: value };
+    }
+
+    const min = Number(parts[0]);
+    const max = Number(parts[1]);
+
+    if (Number.isNaN(min) || Number.isNaN(max)) {
+      return null;
+    }
+
+    if (min > max) {
+      return { min: max, max: min };
+    }
+
+    return { min, max };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Get rep range for an exercise
@@ -30,10 +98,23 @@ const REP_RANGES = {
  * @returns {{min: number, max: number}} Rep range
  */
 function getRepRange(exerciseName) {
-  if (exerciseName.toLowerCase().includes('plank')) {
-    return REP_RANGES.planks;
+  if (!exerciseName || typeof exerciseName !== 'string') {
+    return REP_RANGE_FALLBACK.default;
   }
-  return REP_RANGES.default;
+
+  if (exerciseName.toLowerCase().includes('plank')) {
+    return REP_RANGE_FALLBACK.planks;
+  }
+
+  const def = getWorkoutExerciseDefinition(exerciseName);
+  if (def?.repRange) {
+    const parsed = parseWorkoutRepRangeString(def.repRange);
+    if (parsed) {
+      return parsed;
+    }
+  }
+
+  return REP_RANGE_FALLBACK.default;
 }
 
 /**
@@ -455,15 +536,79 @@ export function suggestWeightIncrease(history, exerciseName) {
     return null;
   }
 
-  // Standard increment: 2.5kg for dumbbells
-  const increment = 2.5;
-  const suggestedWeight = bestSet.weight + increment;
+  const exerciseDef = getWorkoutExerciseDefinition(exerciseName);
+  const incrementFromDef = exerciseDef?.weightIncrement;
+  if (incrementFromDef === 0) {
+    return null;
+  }
+
+  const increment = incrementFromDef != null && incrementFromDef > 0 ? incrementFromDef : 2.5;
+  const suggestedWeight = Math.round((bestSet.weight + increment) * 1000) / 1000;
+  const incLabel = Number.isInteger(increment) ? String(increment) : String(Number(increment.toFixed(2)));
 
   return {
     type: 'INCREASE_WEIGHT',
     suggestedWeight: suggestedWeight,
-    message: `Try ${suggestedWeight}kg today (+${increment}kg)`,
+    message: `Try ${suggestedWeight}kg today (+${incLabel}kg)`,
     reason: 'You hit top of rep range with good RIR'
+  };
+}
+
+const BODYWEIGHT_TECHNIQUE_FALLBACK = {
+  phase: TEMPO_PHASES.ECCENTRIC,
+  instruction: 'Add a 3-second slow eccentric, a 1-2 second pause at the hardest position, or slightly longer holds where it counts',
+  why: 'Load is fixed; tempo, pauses, and holds progress bodyweight work',
+  cue: 'Slow the hard phase | brief pause | stay controlled'
+};
+
+/**
+ * @param {string} exerciseName
+ * @returns {object}
+ */
+function resolveBodyweightTempoGuidance(exerciseName) {
+  if (!exerciseName) {
+    return BODYWEIGHT_TECHNIQUE_FALLBACK;
+  }
+  const direct = TEMPO_GUIDANCE[exerciseName];
+  if (direct) {
+    return direct;
+  }
+  if (exerciseName === 'Reverse Crunch' && TEMPO_GUIDANCE['Reverse Crunches']) {
+    return TEMPO_GUIDANCE['Reverse Crunches'];
+  }
+  return BODYWEIGHT_TECHNIQUE_FALLBACK;
+}
+
+/**
+ * Progression for exercises with no load increment (bodyweight / fixed load)
+ *
+ * @param {string} exerciseName
+ * @param {Array} history
+ * @returns {{type: string, weight: number, tempoGuidance: object, message: string, reason: string}|null}
+ */
+function suggestBodyweightTechniqueProgression(exerciseName, history) {
+  if (!history || history.length === 0) {
+    return null;
+  }
+
+  const latestWorkout = history[history.length - 1];
+  if (!latestWorkout?.sets || latestWorkout.sets.length === 0) {
+    return null;
+  }
+
+  const bestSet = getBestSet(latestWorkout.sets);
+  if (!bestSet) {
+    return null;
+  }
+
+  const tempoGuidance = resolveBodyweightTempoGuidance(exerciseName);
+
+  return {
+    type: 'TRY_TEMPO',
+    weight: bestSet.weight ?? 0,
+    tempoGuidance,
+    message: 'You hit the top of your rep range. Progress with tempo, pauses, or holds',
+    reason: 'Bodyweight or fixed load: add difficulty without more weight'
   };
 }
 
@@ -868,11 +1013,19 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 2: Progression (weight increase)
+  // PRIORITY 2: Progression (weight increase or bodyweight tempo / technique)
   if (detectSuccessfulProgression(history, exerciseName)) {
     const weightSuggestion = suggestWeightIncrease(history, exerciseName);
     if (weightSuggestion) {
       return weightSuggestion;
+    }
+
+    const exerciseDef = getWorkoutExerciseDefinition(exerciseName);
+    if (exerciseDef && Number(exerciseDef.weightIncrement) === 0) {
+      const techniqueSuggestion = suggestBodyweightTechniqueProgression(exerciseName, history);
+      if (techniqueSuggestion) {
+        return techniqueSuggestion;
+      }
     }
   }
 
@@ -933,7 +1086,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
       type: 'CONTINUE',
       weight: bestSet.weight,
       message: `Continue with ${bestSet.weight}kg`,
-      reason: 'Build reps toward top of range (aim for 12 reps)'
+      reason: `Build reps toward top of range (aim for ${range.max} reps)`
     };
   }
 

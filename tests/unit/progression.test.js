@@ -32,6 +32,18 @@ describe('Progression Engine', () => {
       assert.strictEqual(result, false);
     });
 
+    test('should normalize inverted rep range (max before min in string)', () => {
+      const sets = [
+        { weight: 20, reps: 12, rir: 2 },
+        { weight: 20, reps: 12, rir: 2 },
+        { weight: 20, reps: 12, rir: 3 }
+      ];
+      const exercise = { repRange: '12-8', rirTarget: '2-3' };
+
+      const result = shouldIncreaseWeight(sets, exercise);
+      assert.strictEqual(result, true);
+    });
+
     test('should return false when RIR too low', () => {
       const sets = [
         { weight: 20, reps: 12, rir: 1 },

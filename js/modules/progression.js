@@ -38,6 +38,10 @@ function parseRepRange(repRange) {
     throw new Error(`Invalid rep range format: ${repRange}`);
   }
 
+  if (min > max) {
+    return { min: max, max: min };
+  }
+
   return { min, max };
 }
 
