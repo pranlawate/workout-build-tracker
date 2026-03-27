@@ -139,6 +139,12 @@ export const FORM_CUES = {
     mistakes: ['Straightening arms (turns into press)', 'Going too deep (below shoulder level)', 'Losing scapular retraction', 'Bending/extending elbows during movement']
   },
 
+  'Machine Fly': {
+    setup: ['Adjust seat so handles align with mid-chest', 'Back flat against pad', 'Feet flat on floor', 'Grip handles with slight elbow bend'],
+    execution: ['Bring handles together in front of chest (2 sec)', 'Squeeze chest at the center (1 sec)', 'Open slowly until gentle chest stretch (3 sec)'],
+    mistakes: ['Letting weight slam back', 'Going too far back (overstretching shoulder)', 'Shrugging shoulders up', 'Using momentum']
+  },
+
   'Chest-Supported Row': {
     setup: ['Chest on pad', 'Neutral spine', 'Dumbbells hanging'],
     execution: ['Controlled concentric - 2s pull to sides of ribs', 'Squeeze shoulder blades', 'Slow eccentric - 2s descent'],
@@ -146,9 +152,9 @@ export const FORM_CUES = {
   },
 
   'Incline DB Press': {
-    setup: ['Bench at 30-45°', 'Retract shoulder blades', 'Feet flat on floor'],
+    setup: ['Bench at 30° MAX (lower is safer for rotator cuff)', 'Retract shoulder blades', 'Feet flat on floor'],
     execution: ['Elbows at 45°', 'Slow eccentric - 2s down', 'Explosive concentric - 1s up to lockout'],
-    mistakes: ['Dumbbells drifting apart', 'Bench too steep (>45°)', 'Shoulders rolling forward']
+    mistakes: ['Bench too steep (>30° increases shoulder strain)', 'Dumbbells drifting apart', 'Shoulders rolling forward']
   },
 
   'Reverse Fly': {

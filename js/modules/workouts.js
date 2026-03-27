@@ -93,17 +93,17 @@ export const WORKOUTS = {
   UPPER_A: {
     name: 'UPPER_A',
     displayName: 'Upper A',
-    description: 'Chest, back, and shoulder accessories',
+    description: 'Push-biased: chest angles + back',
     exercises: [
       {
-        name: 'DB Flat Bench Press',
+        name: 'Incline DB Press',
         sets: 3,
         repRange: '8-12',
         rirTarget: '2-3',
         restMinutes: 3,
         startingWeight: 7.5,
         weightIncrement: 2.5,
-        notes: 'Compound | Chest, Front Delts, Triceps',
+        notes: 'Compound | Upper Chest (Clavicular) | Keep bench at 30° or lower',
         machineOk: true
       },
       {
@@ -140,15 +140,15 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'DB Lateral Raises',
-        sets: 2,
-        repRange: '12-15',
+        name: 'Machine Fly',
+        sets: 3,
+        repRange: '10-15',
         rirTarget: '2-3',
-        restMinutes: 1,
-        startingWeight: 3.5,
-        weightIncrement: 1.25,
-        notes: 'Isolation | Side Delts',
-        machineOk: false
+        restMinutes: 2,
+        startingWeight: 15,
+        weightIncrement: 2.5,
+        notes: 'Isolation | Mid Chest | Pec deck stretch & squeeze',
+        machineOk: true
       },
       {
         name: 'Face Pulls',
@@ -252,7 +252,7 @@ export const WORKOUTS = {
   UPPER_B: {
     name: 'UPPER_B',
     displayName: 'Upper B',
-    description: 'Pull emphasis with chest and shoulder accessories',
+    description: 'Pull-biased: back, shoulders + arms',
     exercises: [
       {
         name: 'Lat Pulldown',
@@ -288,14 +288,14 @@ export const WORKOUTS = {
         machineOk: true
       },
       {
-        name: 'DB Chest Fly',
-        sets: 3,
-        repRange: '10-15',
+        name: 'DB Lateral Raises',
+        sets: 2,
+        repRange: '12-15',
         rirTarget: '2-3',
-        restMinutes: 2,
-        startingWeight: 5,
+        restMinutes: 1,
+        startingWeight: 3.5,
         weightIncrement: 1.25,
-        notes: 'Isolation | Chest stretch & squeeze | Low shoulder stress',
+        notes: 'Isolation | Side Delts | Thumbs up, never above shoulder height',
         machineOk: false
       },
       {

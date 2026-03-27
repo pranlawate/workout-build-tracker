@@ -34,6 +34,7 @@ export const EQUIPMENT_REQUIREMENTS = {
   'DB Shoulder Press': ['dumbbells'],
   'Incline DB Press': ['dumbbells'],
   'DB Chest Fly': ['dumbbells'],
+  'Machine Fly': ['gym'],
   'Landmine Press': ['barbells', 'gym'],
   'Reverse Fly': ['dumbbells'],
   'DB Goblet Squat': ['dumbbells'],

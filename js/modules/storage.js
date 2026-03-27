@@ -720,11 +720,11 @@ export class StorageManager {
       if (!stored) {
         // Default: all current exercises from progression paths
         return {
-          'UPPER_A_SLOT_1': 'DB Flat Bench Press',
+          'UPPER_A_SLOT_1': 'Incline DB Press',
           'UPPER_A_SLOT_2': 'Seated Cable Row',
           'UPPER_A_SLOT_3': 'Decline DB Press',
           'UPPER_A_SLOT_4': 'T-Bar Row',
-          'UPPER_A_SLOT_5': 'DB Lateral Raises',
+          'UPPER_A_SLOT_5': 'Machine Fly',
           'UPPER_A_SLOT_6': 'Face Pulls',
           'UPPER_A_SLOT_7': 'Tricep Pushdowns',
           'LOWER_A_SLOT_1': 'Hack Squat',
@@ -736,7 +736,7 @@ export class StorageManager {
           'UPPER_B_SLOT_1': 'Lat Pulldown',
           'UPPER_B_SLOT_2': 'Landmine Press',
           'UPPER_B_SLOT_3': 'Chest-Supported Row',
-          'UPPER_B_SLOT_4': 'DB Chest Fly',
+          'UPPER_B_SLOT_4': 'DB Lateral Raises',
           'UPPER_B_SLOT_5': 'Reverse Fly',
           'UPPER_B_SLOT_6': 'DB Hammer Curls',
           'UPPER_B_SLOT_7': 'Reverse Crunch',

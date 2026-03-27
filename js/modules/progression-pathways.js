@@ -19,26 +19,26 @@ export const PROGRESSION_PATHS = {
   // ==================== UPPER A - HORIZONTAL ====================
 
   'UPPER_A_SLOT_1': {
-    slotName: 'Compound Horizontal Push',
+    slotName: 'Incline Chest (Upper)',
     easier: [
-      'Machine Chest Press'
+      'Machine Incline Press'
     ],
-    current: 'DB Flat Bench Press',
+    current: 'Incline DB Press',
     harder: [
-      'Barbell Bench Press',    // Load progression
-      'Sadharan Dand',          // Basic traditional push-up with hip bridge
-      'Rammurti Dand',          // Flowing sweep - down-forward, reverse through hands, push up
-      'Hanuman Dand',           // Dips position with leg forward lunge
-      'Vrushchik Dand',         // Scorpion - leg crossing over in plank
-      'Vrushchik Dand 2',       // Scorpion - forearm stand with backbend
-      'Parshava Dand',          // Lateral - leg crossing under in plank
-      'Chakra Dand',            // Circular leg movements in plank
-      'Advance Hanuman Dand',   // Explosive variation with leg thrust
-      'Vaksh vikasak Dand',     // Chest expansion - elbows flared, palms inward
-      'Palat Dand',             // Rotation to side plank
-      'Sher Dand',              // Lion - handstand push-up
-      'Sarp Dand',              // Snake - pulsing torso or flowing dog↔cobra
-      'Mishr Dand'              // Mixed - plyometric jumping variation
+      'Barbell Incline Press',
+      'Sadharan Dand',
+      'Rammurti Dand',
+      'Hanuman Dand',
+      'Vrushchik Dand',
+      'Vrushchik Dand 2',
+      'Parshava Dand',
+      'Chakra Dand',
+      'Advance Hanuman Dand',
+      'Vaksh vikasak Dand',
+      'Palat Dand',
+      'Sher Dand',
+      'Sarp Dand',
+      'Mishr Dand'
     ],
     alternate: ['Cable Chest Press']
   },
@@ -71,15 +71,12 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_A_SLOT_5': {
-    slotName: 'Lateral Deltoids',
-    easier: [
-      'Cable Lateral Raises',
-      'Seated DB Lateral Raises'
-    ],
-    current: 'DB Lateral Raises',
+    slotName: 'Mid Chest Isolation',
+    easier: ['Light Machine Fly'],
+    current: 'Machine Fly',
     harder: [
-      'Lean-Away Cable Laterals',
-      'Single-arm variations'
+      'Cable Fly',
+      'DB Chest Fly'
     ],
     alternate: ['Upright Rows']
   },
@@ -198,14 +195,17 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_B_SLOT_4': {
-    slotName: 'Chest Isolation',
-    easier: ['Machine Fly', 'Light DB Fly'],
-    current: 'DB Chest Fly',
-    harder: [
-      'Incline DB Fly',
-      'Cable Fly'
+    slotName: 'Lateral Deltoids',
+    easier: [
+      'Cable Lateral Raises',
+      'Seated DB Lateral Raises'
     ],
-    alternate: ['Pec Deck']
+    current: 'DB Lateral Raises',
+    harder: [
+      'Lean-Away Cable Laterals',
+      'Single-arm variations'
+    ],
+    alternate: ['Machine Lateral Raises']
   },
 
   'UPPER_B_SLOT_5': {

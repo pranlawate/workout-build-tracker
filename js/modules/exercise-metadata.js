@@ -893,6 +893,18 @@ export const EXERCISE_METADATA = {
     }
   },
 
+  'Machine Fly': {
+    muscleGroup: 'chest',
+    movementType: 'isolation',
+    equipment: 'machine',
+    difficulty: 1,
+    alternatives: {
+      easier: ['Light Machine Fly'],
+      harder: ['Cable Fly', 'DB Chest Fly'],
+      different: ['Pec Deck', 'Cable Chest Fly']
+    }
+  },
+
   'Pallof Press': {
     muscleGroup: 'core',
     movementType: 'anti-rotation',
