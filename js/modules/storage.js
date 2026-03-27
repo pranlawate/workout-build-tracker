@@ -42,7 +42,7 @@ export class StorageManager {
   _runMigrations() {
     try {
       const version = parseInt(this.storage.getItem('build_migration_version') || '0', 10);
-      if (version >= 3) return;
+      if (version >= 4) return;
 
       if (version < 2) {
         this._migrateExerciseKeysV2();
@@ -50,8 +50,11 @@ export class StorageManager {
       if (version < 3) {
         this._migratePainMobilityKeysV3();
       }
+      if (version < 4) {
+        this._migrateRenamedExercisesV4();
+      }
 
-      this.storage.setItem('build_migration_version', '3');
+      this.storage.setItem('build_migration_version', '4');
     } catch (error) {
       console.error('[Storage] Migration failed:', error);
     }
@@ -73,6 +76,51 @@ export class StorageManager {
     if (!mobNew && mobOld) {
       this.storage.setItem(KEYS.MOBILITY_CHECKS, mobOld);
       this.storage.removeItem(LEGACY_MOBILITY_CHECKS);
+    }
+  }
+
+  /**
+   * Merge orphaned old exercise history into their current replacements.
+   * Exercises were renamed during the Upper A/B restructure.
+   */
+  _migrateRenamedExercisesV4() {
+    const RENAMES = {
+      'DB Flat Bench Press': 'Decline DB Press',
+      'DB Chest Fly': 'Machine Fly',
+      'DB Goblet Squat': 'Hack Squat',
+      'DB Shoulder Press': 'Landmine Press',
+    };
+
+    let migratedCount = 0;
+
+    for (const [oldName, newName] of Object.entries(RENAMES)) {
+      const oldKey = `${KEYS.EXERCISE_HISTORY_PREFIX}${oldName}`;
+      const raw = this.storage.getItem(oldKey);
+      if (!raw) continue;
+
+      let oldData;
+      try { oldData = JSON.parse(raw); } catch { continue; }
+      if (!Array.isArray(oldData) || oldData.length === 0) continue;
+
+      const existingData = this.getExerciseHistory(newName);
+      const merged = [...existingData, ...oldData];
+      const seen = new Set();
+      const deduped = merged.filter(entry => {
+        if (!entry || !entry.date) return false;
+        const key = entry.date + JSON.stringify(entry.sets);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      deduped.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      this.saveExerciseHistory(newName, deduped);
+      this.storage.removeItem(oldKey);
+      migratedCount++;
+    }
+
+    if (migratedCount > 0) {
+      console.log(`[Storage] v4 migration: merged ${migratedCount} renamed exercise(s)`);
     }
   }
 

@@ -4053,53 +4053,15 @@ class App {
     }
 
     // Calculate analytics
-    const volume = this.analyticsCalculator.calculateVolume(7);
     const performance = this.analyticsCalculator.calculatePerformanceMetrics(28);
     const recovery = this.analyticsCalculator.calculateRecoveryTrends(28);
     const patterns = this.analyticsCalculator.detectPatterns();
 
     // Render sections
     analyticsContent.innerHTML = `
-      ${this.renderVolumeSection(volume)}
       ${this.renderPerformanceSection(performance)}
       ${this.renderRecoverySection(recovery)}
       ${this.renderPatternsSection(patterns)}
-    `;
-  }
-
-  renderVolumeSection(volume) {
-    const trendIcon = volume.trend > 10 ? '↑' :
-                      volume.trend < -10 ? '↓' : '↔';
-    const trendClass = volume.trend > 10 ? 'trend-up' :
-                       volume.trend < -10 ? 'trend-down' : 'trend-stable';
-
-    const workoutTypeRows = Object.entries(volume.byWorkoutType)
-      .map(([type, data]) => `
-        <div class="volume-row">
-          <span>${this.escapeHtml(type)}:</span>
-          <span>${data.volume.toLocaleString()} kg (${data.sessions} sessions)</span>
-        </div>
-      `).join('');
-
-    return `
-      <div class="analytics-section">
-        <h3>📊 Training Volume (Last 7 Days)</h3>
-        <div class="analytics-card">
-          <div class="metric-primary">
-            <span class="metric-label">Total:</span>
-            <span class="metric-value">${volume.total.toLocaleString()} kg</span>
-            <span class="metric-trend ${trendClass}">
-              ${trendIcon} ${Math.abs(volume.trend).toFixed(0)}% vs last week
-            </span>
-          </div>
-          ${workoutTypeRows.length > 0 ? `
-            <div class="volume-breakdown">
-              <strong>By Workout Type:</strong>
-              ${workoutTypeRows}
-            </div>
-          ` : ''}
-        </div>
-      </div>
     `;
   }
 
