@@ -41,7 +41,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.9);
-  z-index: 2000;
+  z-index: var(--z-layer-overlay);
   justify-content: center;
   align-items: center;
   padding: var(--spacing-md);
@@ -79,8 +79,10 @@
   color: var(--color-text-secondary);
   cursor: pointer;
   padding: 0;
-  width: 40px;
-  height: 40px;
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  width: 44px;
+  height: 44px;
 }
 
 .overlay-display {

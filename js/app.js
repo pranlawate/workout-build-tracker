@@ -39,6 +39,31 @@ import { getOptionalFifthDay } from './modules/optional-fifth-day.js';
 import { getVideoByExercise, getVideoPath, searchVideos, getVideosByMuscleGroup, getVideosByCategory } from './modules/exercise-videos.js';
 import { ExerciseLibrary } from './screens/exercise-library.js';
 
+/**
+ * Last-resort UI when the app cannot construct (e.g. StorageManager failure).
+ * @param {unknown} error
+ */
+function showFatalAppBootstrapError(error) {
+  console.error('[App] Fatal bootstrap error:', error);
+  const msg = error && typeof error === 'object' && 'message' in error && error.message != null
+    ? String(error.message)
+    : 'Unknown error';
+  const safe = msg
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+  const body = document.body;
+  if (!body) return;
+  body.innerHTML = `
+    <div class="app-fatal-error" style="padding:1.5rem;font-family:system-ui,sans-serif;max-width:32rem;margin:2rem auto;line-height:1.5;">
+      <h1 style="font-size:1.25rem;margin-top:0;">Something went wrong</h1>
+      <p>BUILD could not start. Try reloading the page.</p>
+      <p style="color:#666;font-size:0.875rem;">${safe}</p>
+      <p><button type="button" id="app-fatal-reload" style="padding:0.5rem 1rem;">Reload</button></p>
+    </div>`;
+  document.getElementById('app-fatal-reload')?.addEventListener('click', () => location.reload());
+}
+
 class App {
   constructor() {
     this.storage = new StorageManager();
@@ -102,6 +127,25 @@ class App {
     const str = String(text ?? '');
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return str.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  /**
+   * Sync RIR select color classes (CSS attribute selectors do not track live select value).
+   * @param {HTMLSelectElement} select
+   */
+  syncRirSelectClass(select) {
+    if (!select || select.tagName !== 'SELECT' || !select.classList.contains('rir-select')) return;
+    for (let i = 0; i <= 5; i += 1) {
+      select.classList.remove(`rir-${i}`);
+    }
+    const v = select.value;
+    if (/^[0-5]$/.test(v)) {
+      select.classList.add(`rir-${v}`);
+    }
+  }
+
+  syncAllRirSelectClasses() {
+    document.querySelectorAll('select.rir-select').forEach((el) => this.syncRirSelectClass(el));
   }
 
   /**
@@ -873,8 +917,6 @@ class App {
 
     // Show modal
     modal.style.display = 'flex';
-
-    console.log('[App] Cooldown modal shown');
   }
 
   /**
@@ -1050,8 +1092,6 @@ class App {
         weighIn: weighInData
       };
 
-      console.log('[App] Cooldown completed:', this.workoutSession.cooldownData);
-
       // Close modal
       const modal = document.getElementById('cooldown-modal');
       if (modal) {
@@ -1189,7 +1229,7 @@ class App {
       if (formCues) {
         formCuesHTML = `
           <div class="form-guide-section">
-            <button class="form-guide-toggle" onclick="app.toggleFormGuide(${index})" id="form-toggle-${index}">
+            <button type="button" class="form-guide-toggle" onclick="app.toggleFormGuide(${index})" id="form-toggle-${index}" aria-expanded="false" aria-controls="form-guide-${index}" aria-label="Toggle form guide for ${this.escapeHtml(exercise.name)}">
               📋 Form Guide ▼
             </button>
 
@@ -1275,6 +1315,7 @@ class App {
 
     // Attach input listeners
     this.attachSetInputListeners();
+    this.syncAllRirSelectClasses();
 
     // Show complete workout button
     const completeBtn = document.getElementById('complete-workout-btn');
@@ -1439,7 +1480,6 @@ class App {
               data-exercise="${exerciseIndex}"
               data-set="${setIndex}"
               data-field="rir"
-              value="${defaultRir}"
               ${disabledAttr}
             >
               <option value="0" ${defaultRir === 0 ? 'selected' : ''}>0 (Failure)</option>
@@ -1678,9 +1718,8 @@ class App {
     // Update the value
     exercise.sets[setIndex][field] = value;
 
-    // Update color for RIR dropdown
     if (field === 'rir' && input.tagName === 'SELECT') {
-      input.setAttribute('value', value.toString());
+      this.syncRirSelectClass(input);
     }
 
     // Check if this set is complete (has weight, reps, and RIR)
@@ -1761,16 +1800,6 @@ class App {
 
     if (missingFields.length > 0) {
       alert(`Please fill in: ${missingFields.join(', ')}`);
-      console.log('Debug - Looking for inputs:', {
-        exerciseIndex,
-        setIndex,
-        weightInput,
-        repsInput,
-        rirInput,
-        weight,
-        reps,
-        rir
-      });
       return;
     }
 
@@ -2625,8 +2654,6 @@ class App {
 
       // Refresh UI
       this.showHomeScreen();
-
-      console.log(`[App] ✓ Rotated ${oldExerciseName} → ${newExerciseName}`);
     } catch (e) {
       console.error('[App] Error accepting rotation:', e);
     }
@@ -2672,9 +2699,11 @@ class App {
       if (content.style.display === 'none') {
         content.style.display = 'block';
         toggle.textContent = '📋 Form Guide ▲';
+        toggle.setAttribute('aria-expanded', 'true');
       } else {
         content.style.display = 'none';
         toggle.textContent = '📋 Form Guide ▼';
+        toggle.setAttribute('aria-expanded', 'false');
       }
     }
   }
@@ -2948,25 +2977,20 @@ class App {
   }
 
   checkAndRollbackRotation(deletedExerciseKey, deletedDate) {
-    console.log('[ROLLBACK DEBUG] Starting rollback check for:', deletedExerciseKey);
     const rotation = this.storage.getRotation();
 
     // Step 1: Check if deleted entry was from the most recent completed workout
     if (!rotation.lastDate) {
-      console.log('[ROLLBACK DEBUG] Early exit: No lastDate in rotation');
       return;
     }
 
     const deletedDateObj = new Date(deletedDate);
     const lastWorkoutDateObj = new Date(rotation.lastDate);
-    console.log('[ROLLBACK DEBUG] Deleted date:', deletedDateObj.toISOString().split('T')[0]);
-    console.log('[ROLLBACK DEBUG] Last workout date:', lastWorkoutDateObj.toISOString().split('T')[0]);
 
     // Compare dates (same calendar day, UTC key)
     if (
       deletedDateObj.toISOString().split('T')[0] !== lastWorkoutDateObj.toISOString().split('T')[0]
     ) {
-      console.log('[ROLLBACK DEBUG] Early exit: Date mismatch (deleted from older workout)');
       return; // Deleted entry is from an older workout, don't roll back
     }
 
@@ -2974,34 +2998,27 @@ class App {
     const allWorkouts = getAllWorkouts();
     const workout = allWorkouts.find(w => w.exercises.some(e => e.name === deletedExerciseKey));
     const workoutName = workout?.name;
-    console.log('[ROLLBACK DEBUG] Workout name:', workoutName);
 
     if (!workout) {
-      console.log('[ROLLBACK DEBUG] Early exit: Workout not found for exercise:', deletedExerciseKey);
       return;
     }
 
     // Step 3: Check if ANY exercises from that workout still have history for that date
-    console.log('[ROLLBACK DEBUG] Checking for remaining exercises from this workout...');
     const hasRemainingExercises = workout.exercises.some(exercise => {
       const history = this.storage.getExerciseHistory(exercise.name);
       const deletedDay = deletedDateObj.toISOString().split('T')[0];
       const hasMatch = history.some(
         h => new Date(h.date).toISOString().split('T')[0] === deletedDay
       );
-      if (hasMatch) {
-        console.log('[ROLLBACK DEBUG] Found remaining exercise:', exercise.name);
-      }
       return hasMatch;
     });
 
     if (hasRemainingExercises) {
-      console.log('[ROLLBACK DEBUG] Early exit: Other exercises from this session still exist');
       return; // Other exercises from that session still exist, don't roll back
     }
 
     // Step 4: All exercises from that workout session are deleted - roll back rotation
-    console.log('Rolling back rotation state - all exercises from last workout deleted');
+    console.warn('[App] Rotation rolled back: last workout session removed from history');
 
     // Decrement streak
     rotation.currentStreak = Math.max(0, rotation.currentStreak - 1);
@@ -3211,9 +3228,10 @@ class App {
       // Slot header
       const headerDiv = document.createElement('div');
       headerDiv.className = 'slot-header';
+      const currentLabel = currentSelections[slotKey] || path.current;
       headerDiv.innerHTML = `
-        <span class="slot-name">${path.slotName}</span>
-        <span class="current-badge">Current: ${currentSelections[slotKey] || path.current}</span>
+        <span class="slot-name">${this.escapeHtml(path.slotName)}</span>
+        <span class="current-badge">Current: ${this.escapeHtml(currentLabel)}</span>
       `;
       slotDiv.appendChild(headerDiv);
 
@@ -3314,7 +3332,7 @@ class App {
         : '';
 
       optionDiv.innerHTML = `
-        <span class="exercise-name">${name}</span>
+        <span class="exercise-name">${this.escapeHtml(name)}</span>
         <div class="exercise-status">
           ${phaseBadge}
           <span class="status-badge ${unlocked ? 'unlocked' : 'locked'}">
@@ -3370,7 +3388,6 @@ class App {
     if (logBtn) {
       logBtn.onclick = () => {
         const weight = parseFloat(input.value);
-        console.log('[WeighIn] Attempting to log weight:', weight);
 
         if (!weight || weight < 30 || weight > 200) {
           alert('Please enter a valid weight between 30-200 kg');
@@ -3378,7 +3395,6 @@ class App {
         }
 
         const result = bodyWeight.addEntry(weight);
-        console.log('[WeighIn] Weight saved, data:', bodyWeight.getData());
         modal.style.display = 'none';
 
         // Show feedback message
@@ -3669,112 +3685,7 @@ class App {
     };
   }
 
-  /* DEPRECATED: Pain tracking now happens post-workout
-  showPainTrackingPrompt(exerciseKey, exerciseName) {
-    const modal = document.getElementById('pain-tracking-modal');
-    const titleEl = document.getElementById('pain-exercise-title');
-    const locationSection = document.getElementById('pain-location-section');
-    const historyEl = document.getElementById('pain-history');
-
-    // Set title
-    titleEl.textContent = `${exerciseName} Complete`;
-
-    // Show recent pain history
-    const history = this.storage.getPainHistory(exerciseKey);
-    const recent = history.slice(-5);
-    const icons = recent.map(p => p.hadPain ? '⚠️' : '✓');
-    const painCount = recent.filter(p => p.hadPain).length;
-
-    if (painCount === 0) {
-      historyEl.textContent = `Recent history: ${icons.join('')} (pain-free)`;
-      historyEl.style.color = '#4caf50';
-    } else {
-      historyEl.textContent = `Recent history: ${icons.join('')} (${painCount} painful sessions)`;
-      historyEl.style.color = '#ff9800';
-    }
-
-    // Initially hide location section
-    locationSection.style.display = 'none';
-
-    // Show modal
-    modal.style.display = 'flex';
-
-    // "No pain" button
-    document.getElementById('pain-no').onclick = () => {
-      this.storage.savePainReport(exerciseKey, false, null, null);
-      modal.style.display = 'none';
-    };
-
-    // "Yes, minor" button
-    document.getElementById('pain-minor').onclick = () => {
-      locationSection.style.display = 'block';
-      this.setupLocationSelection(exerciseKey, 'minor', modal);
-    };
-
-    // "Yes, significant" button
-    document.getElementById('pain-significant').onclick = () => {
-      locationSection.style.display = 'block';
-      this.setupLocationSelection(exerciseKey, 'significant', modal);
-    };
-  }
-
-  setupLocationSelection(exerciseKey, severity, modal) {
-    const locationButtons = document.querySelectorAll('.pain-location-btn');
-
-    locationButtons.forEach(btn => {
-      btn.onclick = () => {
-        const location = btn.dataset.location;
-        this.storage.savePainReport(exerciseKey, true, location, severity);
-        modal.style.display = 'none';
-      };
-    });
-  }
-  */
-
-  /**
-   * Render warm-up protocol section
-   * DEPRECATED: Warm-up is now shown in pre-workout modal
-   *
-   * @param {string} workoutKey - Workout key
-   * @returns {string} HTML for warm-up section
-   */
-  // renderWarmupProtocol(workoutKey) {
-  //   const equipmentProfile = this.storage.getEquipmentProfile();
-  //   const protocol = getWarmupProtocol(workoutKey, equipmentProfile);
-  //
-  //   return `
-  //     <div class="warmup-section">
-  //       <h3>🔥 Warm-Up (${protocol.estimatedDuration})</h3>
-  //       <div class="warmup-exercises">
-  //         ${protocol.exercises.map((ex, index) => `
-  //           <div class="warmup-exercise">
-  //             <span class="warmup-number">${index + 1}.</span>
-  //             <div class="warmup-details">
-  //               <div class="warmup-name">${this.escapeHtml(ex.name)}</div>
-  //               <div class="warmup-meta">
-  //                 ${this.escapeHtml(ex.duration || ex.reps)}
-  //                 ${ex.note ? `<span class="warmup-note">(${this.escapeHtml(ex.note)})</span>` : ''}
-  //               </div>
-  //             </div>
-  //           </div>
-  //         `).join('')}
-  //       </div>
-  //
-  //       <div class="warmup-sets-info">
-  //         <h4>Warm-up Sets (First Exercise Only)</h4>
-  //         <p>Complete 3 progressive sets before working sets:</p>
-  //         <ul>
-  //           <li>Set 1: 50% weight × 8 reps (45-60s rest)</li>
-  //           <li>Set 2: 70% weight × 3-4 reps (45-60s rest)</li>
-  //           <li>Set 3: 90% weight × 1 rep (2 min rest)</li>
-  //         </ul>
-  //       </div>
-  //     </div>
-  //   `;
-  // }
-
   showProgressDashboard(pushHistory = true) {
-    console.log('[Dashboard] showProgressDashboard called');
     try {
       this.hideAllScreens();
       const progressScreen = document.getElementById('progress-screen');
@@ -3833,7 +3744,7 @@ class App {
           <div style="padding: 20px; text-align: center; color: var(--color-danger);">
             <h3>Error Loading Dashboard</h3>
             <p>There was an error loading the progress dashboard. Please check the console for details.</p>
-            <p style="font-size: 14px; margin-top: 10px;">Error: ${error.message}</p>
+            <p style="font-size: 14px; margin-top: 10px;">Error: ${this.escapeHtml(String(error?.message ?? error))}</p>
           </div>
         `;
       }
@@ -5408,14 +5319,7 @@ class App {
       return;
     }
 
-    // Save weight
-    const result = this.bodyWeight.addEntry(weight);
-
-    if (result.replaced) {
-      console.log(`[Summary] Updated today's weight to ${weight} kg`);
-    } else {
-      console.log(`[Summary] Logged weight: ${weight} kg`);
-    }
+    this.bodyWeight.addEntry(weight);
   }
 
   /**
@@ -6068,8 +5972,6 @@ class App {
       console.error('[VideoModal] Video load error:', e);
       this.showVideoError();
     });
-
-    console.log('[VideoModal] Initialized');
   }
 
   /**
@@ -6099,8 +6001,6 @@ class App {
         alert(`Could not load video for "${exerciseName}".`);
         return;
       }
-
-      console.log('[VideoModal] Opening video:', exerciseName, videoPath);
 
       // Set video source (triggers lazy load)
       const videoElement = this.videoPlayer;
@@ -6136,9 +6036,6 @@ class App {
       // Prevent body scroll
       document.body.style.overflow = 'hidden';
 
-      // Log for debugging
-      console.log('[VideoModal] Modal opened, video loading...');
-
     } catch (error) {
       console.error('[VideoModal] Error opening modal:', error);
       alert('Something went wrong opening the video. Please try again.');
@@ -6173,8 +6070,6 @@ class App {
       if (this.videoFormGuideToggle) {
         this.videoFormGuideToggle.textContent = '📋 Form Guide ▼';
       }
-
-      console.log('[VideoModal] Modal closed');
 
     } catch (error) {
       console.error('[VideoModal] Error closing modal:', error);
@@ -6244,10 +6139,12 @@ class App {
 
     if (formContent.style.display === 'none') {
       formContent.style.display = 'block';
-      this.videoFormGuideToggle.textContent = '📋 Form Guide ▲';
+      this.videoFormGuideToggle.innerHTML = '<span aria-hidden="true">📋</span> Form Guide ▲';
+      this.videoFormGuideToggle.setAttribute('aria-expanded', 'true');
     } else {
       formContent.style.display = 'none';
-      this.videoFormGuideToggle.textContent = '📋 Form Guide ▼';
+      this.videoFormGuideToggle.innerHTML = '<span aria-hidden="true">📋</span> Form Guide ▼';
+      this.videoFormGuideToggle.setAttribute('aria-expanded', 'false');
     }
   }
 
@@ -6298,19 +6195,19 @@ class App {
   }
 }
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+function startBuildApp() {
+  try {
     window.app = new App();
-    // Make acceptRotation accessible from onclick handlers
     window.acceptRotation = (slotKey, exerciseName) => {
       window.app.acceptRotation(slotKey, exerciseName);
     };
-  });
+  } catch (error) {
+    showFatalAppBootstrapError(error);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startBuildApp);
 } else {
-  window.app = new App();
-  // Make acceptRotation accessible from onclick handlers
-  window.acceptRotation = (slotKey, exerciseName) => {
-    window.app.acceptRotation(slotKey, exerciseName);
-  };
+  startBuildApp();
 }

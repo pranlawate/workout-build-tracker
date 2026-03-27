@@ -43,12 +43,12 @@
   <div id="app">
     <!-- Home Screen -->
     <div id="home-screen" class="screen active">
-      <header class="app-header">
+      <header class="app-header" role="banner">
         <h1>BUILD Tracker</h1>
-        <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
+        <button type="button" id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
       </header>
 
-      <main class="screen-content">
+      <main class="screen-content" role="main">
         <section class="workout-card">
           <h2>Next Workout</h2>
           <p id="next-workout-name" class="workout-name">Upper A - Horizontal</p>
@@ -62,9 +62,9 @@
         <section class="quick-actions">
           <h3>Quick Actions</h3>
           <div class="action-grid">
-            <button class="action-btn">📊 History</button>
-            <button id="progress-btn" class="action-btn">📈 Progress</button>
-            <button type="button" id="exercise-library-btn" class="action-btn">🎥 Exercise Library</button>
+            <button type="button" class="action-btn" aria-label="Open workout history">📊 History</button>
+            <button type="button" id="progress-btn" class="action-btn" aria-label="Open progress dashboard">📈 Progress</button>
+            <button type="button" id="exercise-library-btn" class="action-btn" aria-label="Open exercise library">🎥 Exercise Library</button>
           </div>
         </section>
 
@@ -90,14 +90,14 @@
 
     <!-- In-Workout Screen (hidden by default) -->
     <div id="workout-screen" class="screen">
-      <header class="app-header">
-        <button id="back-btn" class="icon-btn">←</button>
+      <header class="app-header" role="banner">
+        <button type="button" id="back-btn" class="icon-btn" aria-label="Back to home">←</button>
         <h1 id="workout-title">Upper A</h1>
-        <span id="timer">00:00</span>
-        <button id="workout-settings-btn" class="icon-btn">⚙️</button>
+        <span id="timer" aria-live="polite" aria-atomic="true">00:00</span>
+        <button type="button" id="workout-settings-btn" class="icon-btn" aria-label="Workout settings">⚙️</button>
       </header>
 
-      <main class="screen-content">
+      <main class="screen-content" role="main">
         <div id="exercise-list">
           <!-- Dynamically populated -->
         </div>
@@ -110,13 +110,13 @@
 
     <!-- Post-Workout Summary Screen -->
     <div id="summary-screen" class="screen">
-      <header class="app-header">
-        <button id="summary-back-btn" class="icon-btn" aria-label="Back">←</button>
+      <header class="app-header" role="banner">
+        <button type="button" id="summary-back-btn" class="icon-btn" aria-label="Back">←</button>
         <h1>Workout Summary</h1>
         <span></span>
       </header>
 
-      <main class="screen-content">
+      <main class="screen-content" role="main">
         <h2 class="summary-title">✅ Workout Complete!</h2>
 
         <!-- Stats Section -->
@@ -174,13 +174,13 @@
 
     <!-- History Screen -->
     <div id="history-screen" class="screen">
-      <header class="app-header">
-        <button id="history-back-btn" class="icon-btn">←</button>
+      <header class="app-header" role="banner">
+        <button type="button" id="history-back-btn" class="icon-btn" aria-label="Back">←</button>
         <h1>Workout History</h1>
         <span></span>
       </header>
 
-      <main class="screen-content">
+      <main class="screen-content" role="main">
         <div id="history-list">
           <!-- Populated by HistoryListScreen -->
         </div>
@@ -189,13 +189,13 @@
 
     <!-- Exercise Detail Screen -->
     <div id="exercise-detail-screen" class="screen">
-      <header class="app-header">
-        <button id="exercise-detail-back-btn" class="icon-btn">←</button>
+      <header class="app-header" role="banner">
+        <button type="button" id="exercise-detail-back-btn" class="icon-btn" aria-label="Back">←</button>
         <h1 id="exercise-detail-title">Exercise</h1>
         <span></span>
       </header>
 
-      <main class="screen-content">
+      <main class="screen-content" role="main">
         <div class="chart-container">
           <h3 class="chart-title">Weight Progression</h3>
           <canvas id="progress-chart"></canvas>
@@ -213,18 +213,18 @@
 
     <!-- Progress Dashboard Screen -->
     <div id="progress-screen" class="screen">
-      <header class="app-header">
-        <button id="progress-back-btn" class="icon-btn">←</button>
+      <header class="app-header" role="banner">
+        <button type="button" id="progress-back-btn" class="icon-btn" aria-label="Back">←</button>
         <h1>Progress Dashboard</h1>
-        <button id="progress-settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
+        <button type="button" id="progress-settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
       </header>
 
-      <main class="screen-content">
-        <div class="progress-tabs">
-          <button class="tab-btn active" data-tab="overview">Overview</button>
-          <button class="tab-btn" data-tab="body-weight">Body Weight</button>
-          <button class="tab-btn" data-tab="barbell">Progressions</button>
-          <button class="tab-btn" data-tab="analytics">Analytics</button>
+      <main class="screen-content" role="main">
+        <div class="progress-tabs" role="navigation" aria-label="Progress dashboard sections">
+          <button type="button" class="tab-btn active" data-tab="overview">Overview</button>
+          <button type="button" class="tab-btn" data-tab="body-weight">Body Weight</button>
+          <button type="button" class="tab-btn" data-tab="barbell">Progressions</button>
+          <button type="button" class="tab-btn" data-tab="analytics">Analytics</button>
         </div>
 
         <div class="tab-content overview-tab" id="overview-tab">
@@ -251,13 +251,13 @@
 
     <!-- Fifth Day Screen -->
     <div id="fifth-day-screen" class="screen">
-      <header class="app-header">
-        <button id="fifth-day-back-btn" class="icon-btn">←</button>
+      <header class="app-header" role="banner">
+        <button type="button" id="fifth-day-back-btn" class="icon-btn" aria-label="Back">←</button>
         <h1>Optional Training</h1>
         <span></span>
       </header>
 
-      <main class="screen-content">
+      <main class="screen-content" role="main">
         <div id="fifth-day-content"></div>
       </main>
     </div>
@@ -282,7 +282,7 @@
     <div class="overlay-content">
       <div class="overlay-header">
         <h3 id="overlay-title">Edit Weight</h3>
-        <button id="overlay-close" class="overlay-close">✕</button>
+        <button type="button" id="overlay-close" class="overlay-close" aria-label="Close number pad">✕</button>
       </div>
 
       <div class="overlay-display">
@@ -291,28 +291,28 @@
       </div>
 
       <div class="number-pad">
-        <button class="num-btn" data-value="7">7</button>
-        <button class="num-btn" data-value="8">8</button>
-        <button class="num-btn" data-value="9">9</button>
-        <button class="quick-btn" data-value="+2.5">+2.5</button>
+        <button type="button" class="num-btn" data-value="7">7</button>
+        <button type="button" class="num-btn" data-value="8">8</button>
+        <button type="button" class="num-btn" data-value="9">9</button>
+        <button type="button" class="quick-btn" data-value="+2.5">+2.5</button>
 
-        <button class="num-btn" data-value="4">4</button>
-        <button class="num-btn" data-value="5">5</button>
-        <button class="num-btn" data-value="6">6</button>
-        <button class="quick-btn" data-value="+5.0">+5.0</button>
+        <button type="button" class="num-btn" data-value="4">4</button>
+        <button type="button" class="num-btn" data-value="5">5</button>
+        <button type="button" class="num-btn" data-value="6">6</button>
+        <button type="button" class="quick-btn" data-value="+5.0">+5.0</button>
 
-        <button class="num-btn" data-value="1">1</button>
-        <button class="num-btn" data-value="2">2</button>
-        <button class="num-btn" data-value="3">3</button>
-        <button class="quick-btn" data-value="-2.5">-2.5</button>
+        <button type="button" class="num-btn" data-value="1">1</button>
+        <button type="button" class="num-btn" data-value="2">2</button>
+        <button type="button" class="num-btn" data-value="3">3</button>
+        <button type="button" class="quick-btn" data-value="-2.5">-2.5</button>
 
-        <button class="num-btn backspace" data-value="back">←</button>
-        <button class="num-btn" data-value="0">0</button>
-        <button class="num-btn" data-value=".">.</button>
-        <button class="num-btn clear" data-value="clear">C</button>
+        <button type="button" class="num-btn backspace" data-value="back" aria-label="Backspace">←</button>
+        <button type="button" class="num-btn" data-value="0">0</button>
+        <button type="button" class="num-btn" data-value=".">.</button>
+        <button type="button" class="num-btn clear" data-value="clear" aria-label="Clear entry">C</button>
       </div>
 
-      <button id="overlay-confirm" class="overlay-confirm">CONFIRM</button>
+      <button type="button" id="overlay-confirm" class="overlay-confirm">CONFIRM</button>
     </div>
   </div>
 
@@ -333,8 +333,8 @@
       </div>
 
       <div class="edit-modal-actions">
-        <button id="edit-entry-cancel">Cancel</button>
-        <button id="edit-entry-save">Save Changes</button>
+        <button type="button" id="edit-entry-cancel">Cancel</button>
+        <button type="button" id="edit-entry-save">Save Changes</button>
       </div>
     </div>
   </div>
@@ -360,36 +360,42 @@
         </div>
 
         <div class="recovery-input-group">
-          <label>😰 Stress Level</label>
-          <div class="radio-button-group stress-buttons">
-            <button type="button" class="radio-btn selected" data-value="Low">Low</button>
-            <button type="button" class="radio-btn" data-value="Medium">Medium</button>
-            <button type="button" class="radio-btn" data-value="High">High</button>
-          </div>
+          <fieldset class="recovery-fieldset">
+            <legend class="recovery-legend">😰 Stress Level</legend>
+            <div class="radio-button-group stress-buttons">
+              <button type="button" class="radio-btn selected" data-value="Low">Low</button>
+              <button type="button" class="radio-btn" data-value="Medium">Medium</button>
+              <button type="button" class="radio-btn" data-value="High">High</button>
+            </div>
+          </fieldset>
           <input type="hidden" id="stress-level" value="Low">
         </div>
 
         <div class="recovery-input-group">
-          <label>⚡ Energy Level</label>
-          <div class="radio-button-group energy-buttons">
-            <button type="button" class="radio-btn" data-value="1">1</button>
-            <button type="button" class="radio-btn" data-value="2">2</button>
-            <button type="button" class="radio-btn selected" data-value="3">3</button>
-            <button type="button" class="radio-btn" data-value="4">4</button>
-            <button type="button" class="radio-btn" data-value="5">5</button>
-          </div>
-          <span class="input-hint">1 = very low, 5 = very high</span>
+          <fieldset class="recovery-fieldset">
+            <legend class="recovery-legend">⚡ Energy Level</legend>
+            <div class="radio-button-group energy-buttons">
+              <button type="button" class="radio-btn" data-value="1">1</button>
+              <button type="button" class="radio-btn" data-value="2">2</button>
+              <button type="button" class="radio-btn selected" data-value="3">3</button>
+              <button type="button" class="radio-btn" data-value="4">4</button>
+              <button type="button" class="radio-btn" data-value="5">5</button>
+            </div>
+            <span class="input-hint">1 = very low, 5 = very high</span>
+          </fieldset>
           <input type="hidden" id="energy-level" value="3">
         </div>
 
         <div class="recovery-input-group">
-          <label>💊 Muscle Soreness</label>
-          <div class="radio-button-group soreness-buttons">
-            <button type="button" class="radio-btn selected" data-value="None">None</button>
-            <button type="button" class="radio-btn" data-value="Mild">Mild</button>
-            <button type="button" class="radio-btn" data-value="Moderate">Moderate</button>
-            <button type="button" class="radio-btn" data-value="Severe">Severe</button>
-          </div>
+          <fieldset class="recovery-fieldset">
+            <legend class="recovery-legend">💊 Muscle Soreness</legend>
+            <div class="radio-button-group soreness-buttons">
+              <button type="button" class="radio-btn selected" data-value="None">None</button>
+              <button type="button" class="radio-btn" data-value="Mild">Mild</button>
+              <button type="button" class="radio-btn" data-value="Moderate">Moderate</button>
+              <button type="button" class="radio-btn" data-value="Severe">Severe</button>
+            </div>
+          </fieldset>
           <input type="hidden" id="muscle-soreness" value="None">
         </div>
       </div>
@@ -451,7 +457,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>⚙️ Settings</h2>
-        <button id="settings-close-btn" class="icon-btn">✕</button>
+        <button type="button" id="settings-close-btn" class="icon-btn" aria-label="Close settings">✕</button>
       </div>
 
       <div class="modal-body">
@@ -532,7 +538,8 @@
               📥 Import Data
             </button>
 
-            <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+            <label for="import-file-input" class="visually-hidden">Choose backup JSON file to import</label>
+            <input type="file" id="import-file-input" accept=".json" style="display: none;" aria-label="Choose backup JSON file to import" />
           </div>
 
         </section>
@@ -723,7 +730,7 @@
     <div class="modal-content progressions-modal-content">
       <div class="modal-header">
         <h2>Exercise Progressions</h2>
-        <button class="close-modal" id="close-progressions-modal">&times;</button>
+        <button type="button" class="close-modal" id="close-progressions-modal" aria-label="Close exercise progressions">&times;</button>
       </div>
 
       <div class="progressions-body">
@@ -811,19 +818,19 @@
             <label class="radio-item recommended">
               <input type="radio" name="liss-type" value="bike" checked>
               <span class="radio-text">
-                Bike - <input type="number" id="liss-bike-duration" value="10" min="5" max="20" class="duration-input"> min
+                Bike - <input type="number" id="liss-bike-duration" value="10" min="5" max="20" class="duration-input" aria-label="Bike duration in minutes"> min
               </span>
             </label>
             <label class="radio-item">
               <input type="radio" name="liss-type" value="elliptical">
               <span class="radio-text">
-                Elliptical - <input type="number" id="liss-elliptical-duration" value="10" min="5" max="20" class="duration-input"> min
+                Elliptical - <input type="number" id="liss-elliptical-duration" value="10" min="5" max="20" class="duration-input" aria-label="Elliptical duration in minutes"> min
               </span>
             </label>
             <label class="radio-item">
               <input type="radio" name="liss-type" value="treadmill">
               <span class="radio-text">
-                Treadmill - <input type="number" id="liss-treadmill-duration" value="10" min="5" max="20" class="duration-input"> min
+                Treadmill - <input type="number" id="liss-treadmill-duration" value="10" min="5" max="20" class="duration-input" aria-label="Treadmill duration in minutes"> min
               </span>
             </label>
             <label class="radio-item">
@@ -856,13 +863,13 @@
 
   <!-- Exercise Library Screen -->
   <div id="exercise-library-screen" class="screen">
-    <header class="app-header">
-      <button type="button" class="icon-btn" id="library-back-btn">←</button>
+    <header class="app-header" role="banner">
+      <button type="button" class="icon-btn" id="library-back-btn" aria-label="Back">←</button>
       <h1>Exercise Library</h1>
       <span></span>
     </header>
 
-    <main class="screen-content">
+    <main class="screen-content" role="main">
       <div class="library-controls">
         <!-- Search bar -->
         <input
@@ -874,7 +881,7 @@
         >
 
         <!-- Filter pills -->
-        <div class="filter-pills" id="library-filters">
+        <div class="filter-pills" id="library-filters" role="navigation" aria-label="Exercise filters">
           <button type="button" class="filter-pill active" data-filter="all">All</button>
           <button type="button" class="filter-pill" data-filter="chest">Chest</button>
           <button type="button" class="filter-pill" data-filter="back">Back</button>
@@ -928,7 +935,7 @@
 
       <!-- Form guide (embedded in modal) -->
       <div class="video-form-guide">
-        <button type="button" class="form-guide-toggle" id="video-form-guide-toggle">
+        <button type="button" class="form-guide-toggle" id="video-form-guide-toggle" aria-expanded="false" aria-controls="video-form-guide-content" aria-label="Toggle form guide">
           <span aria-hidden="true">📋</span> Form Guide ▼
         </button>
         <div id="video-form-guide-content" class="form-guide-content" style="display: none;">

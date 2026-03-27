@@ -125,7 +125,7 @@ export class HistoryListScreen {
     else lastWorkoutText = `${daysAgo} days ago`;
 
     return `
-      <div class="exercise-card" data-exercise-key="${exercise.exerciseKey}">
+      <div class="exercise-card" data-exercise-key="${this.escapeHtml(exercise.exerciseKey)}">
         <div class="exercise-card-header">
           <h4 class="exercise-card-title">${this.escapeHtml(exercise.exerciseName)}</h4>
           <span class="exercise-card-arrow">→</span>
@@ -159,6 +159,6 @@ export class HistoryListScreen {
       '"': '&quot;',
       "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(text ?? '').replace(/[&<>"']/g, m => map[m]);
   }
 }

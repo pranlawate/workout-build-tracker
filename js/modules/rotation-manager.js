@@ -34,7 +34,7 @@ export class RotationManager {
   /**
    * Check if rotation is due for an exercise
    *
-   * @param {string} exerciseKey - Full exercise key (e.g., 'UPPER_A - Tricep Pushdowns')
+   * @param {string} exerciseKey - Exercise identifier (plain exercise name for history/tenure)
    * @param {string} currentExerciseName - Current exercise name
    * @returns {Object|null} Rotation suggestion or null
    */
@@ -43,7 +43,6 @@ export class RotationManager {
       // 1. Suppress rotation suggestions during deload (focus on recovery)
       const deloadState = this.storage.getDeloadState();
       if (deloadState && deloadState.active) {
-        console.log('[RotationManager] Suppressing rotation - deload week active');
         return null;
       }
 
@@ -63,7 +62,6 @@ export class RotationManager {
       if (milestone) {
         const progress = this.getMilestoneProgress(currentExerciseName, exerciseKey);
         if (progress >= 0.8) {
-          console.log(`[RotationManager] Suppressing rotation - user at ${(progress * 100).toFixed(0)}% toward unlock`);
           return null; // Don't disrupt unlock momentum
         }
       }
@@ -155,8 +153,6 @@ export class RotationManager {
       };
 
       this.storage.saveExerciseTenureMap(allTenure);
-
-      console.log(`[RotationManager] Recorded rotation: ${exerciseKey} → ${newExerciseName}`);
     } catch (e) {
       console.error('[RotationManager] Error recording rotation:', e);
     }

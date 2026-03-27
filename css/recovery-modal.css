@@ -27,12 +27,26 @@
   gap: var(--spacing-xs);
 }
 
-.recovery-input-group label {
+.recovery-fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.recovery-input-group label,
+.recovery-legend {
   font-size: 16px;
   font-weight: 600;
   color: var(--color-text);
   text-align: center;
   display: block;
+}
+
+.recovery-legend {
+  width: 100%;
+  padding: 0;
+  margin-bottom: var(--spacing-xs);
 }
 
 .input-hint {
@@ -56,8 +70,9 @@
   display: block;
 }
 
-.recovery-number-input:focus {
-  outline: none;
+.recovery-number-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
   border-color: var(--color-primary);
 }
 
@@ -119,7 +134,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1100;
+  z-index: var(--z-layer-modal-raised);
   width: 90%;
   max-width: 600px;
   background: rgba(245, 158, 11, 0.15);

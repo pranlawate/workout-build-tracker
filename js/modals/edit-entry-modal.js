@@ -1,5 +1,11 @@
 // src/js/modals/edit-entry-modal.js
 
+/** Safe string for HTML double-quoted attributes (set from stored numbers). */
+function attrNumber(value) {
+  const n = typeof value === 'number' ? value : parseFloat(value);
+  return Number.isFinite(n) ? String(n) : '';
+}
+
 export class EditEntryModal {
   constructor(storage, onSave) {
     this.storage = storage;
@@ -58,7 +64,7 @@ export class EditEntryModal {
               class="edit-input"
               data-set="${i}"
               data-field="weight"
-              value="${set.weight}"
+              value="${attrNumber(set.weight)}"
               step="0.5"
               min="0"
             />
@@ -70,7 +76,7 @@ export class EditEntryModal {
               class="edit-input"
               data-set="${i}"
               data-field="reps"
-              value="${set.reps}"
+              value="${attrNumber(set.reps)}"
               min="1"
             />
           </div>

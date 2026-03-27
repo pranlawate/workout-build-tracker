@@ -66,8 +66,9 @@
   width: 100%;
 }
 
-.set-input:focus {
-  outline: none;
+.set-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
   border-color: var(--color-primary);
 }
 
@@ -123,22 +124,22 @@
 
 .badge-normal {
   background: rgba(66, 153, 225, 0.2);
-  color: var(--color-info);
+  color: var(--color-info-readable, #93c5fd);
 }
 
 .badge-ready {
   background: rgba(72, 187, 120, 0.2);
-  color: var(--color-success);
+  color: var(--color-success-readable, #6ee7b7);
 }
 
 .badge-plateau {
   background: rgba(246, 173, 85, 0.2);
-  color: var(--color-warning);
+  color: var(--color-warning-readable, #fde68a);
 }
 
 .badge-regressed {
   background: rgba(252, 129, 129, 0.2);
-  color: var(--color-danger);
+  color: var(--color-danger-readable, #fecaca);
 }
 
 .progression-hint {
@@ -153,7 +154,7 @@
 }
 
 .progression-hint.warning {
-  color: var(--color-warning);
+  color: var(--color-warning-readable, #fde68a);
 }
 
 /* Smart Suggestion Banner */
@@ -205,15 +206,15 @@
 }
 
 .smart-suggestion.urgent .suggestion-type {
-  color: var(--color-danger);
+  color: var(--color-danger-readable, #fecaca);
 }
 
 .smart-suggestion.warning .suggestion-type {
-  color: var(--color-warning);
+  color: var(--color-warning-readable, #fde68a);
 }
 
 .smart-suggestion.info .suggestion-type {
-  color: var(--color-info);
+  color: var(--color-info-readable, #93c5fd);
 }
 
 .suggestion-message {
@@ -277,8 +278,9 @@
   flex: 1 1 calc(50% - var(--spacing-sm) / 2);
   text-align: left;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-sm);
   min-width: 140px;
+  min-height: var(--tap-target-min);
 }
 
 .form-guide-content {
@@ -314,21 +316,21 @@
   transition: all 0.2s ease;
 }
 
-/* Color coding based on selected value */
-.rir-select[value="0"],
-.rir-select[value="1"] {
+/* Color coding by class (updated from JS when value changes) */
+.rir-select.rir-0,
+.rir-select.rir-1 {
   border-color: var(--color-danger);
   background: rgba(244, 67, 54, 0.1);
 }
 
-.rir-select[value="2"],
-.rir-select[value="3"] {
+.rir-select.rir-2,
+.rir-select.rir-3 {
   border-color: var(--color-success);
   background: rgba(76, 175, 80, 0.1);
 }
 
-.rir-select[value="4"],
-.rir-select[value="5"] {
+.rir-select.rir-4,
+.rir-select.rir-5 {
   border-color: var(--color-warning);
   background: rgba(255, 152, 0, 0.1);
 }
@@ -497,5 +499,9 @@
   #post-workout-pain-modal .modal-content {
     max-width: 95%;
     padding: 16px;
+  }
+
+  .input-label {
+    font-size: max(14px, var(--font-sm));
   }
 }

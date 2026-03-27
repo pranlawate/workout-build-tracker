@@ -148,37 +148,6 @@ function pickSubstituteFromBrackets(regressionMap, userWeight) {
 }
 
 /**
- * Filter exercises by equipment profile
- *
- * @param {string[]} exercises - Array of exercise names
- * @param {Object} profile - Equipment profile {gym: bool, dumbbells: bool, ...}
- * @returns {string[]} Filtered exercise array
- */
-export function filterExercisesByProfile(exercises, profile) {
-  if (!exercises || !Array.isArray(exercises)) {
-    console.warn('[EquipmentProfiles] Invalid exercises array');
-    return [];
-  }
-
-  if (!profile || typeof profile !== 'object') {
-    console.warn('[EquipmentProfiles] Invalid equipment profile');
-    return exercises; // Return all if no profile (safe default)
-  }
-
-  return exercises.filter(exercise => {
-    const requirements = EQUIPMENT_REQUIREMENTS[exercise];
-
-    // If no requirements defined, assume bodyweight (always available)
-    if (!requirements) {
-      return true;
-    }
-
-    // Exercise available if user has ANY of the required equipment
-    return requirements.some(equipmentType => profile[equipmentType] === true);
-  });
-}
-
-/**
  * Get bodyweight substitute for dumbbell exercise
  *
  * @param {string} exerciseName - DB exercise name

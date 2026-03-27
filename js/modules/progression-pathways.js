@@ -1,7 +1,7 @@
 /**
  * Progression Pathways Module
  *
- * Defines progression paths (Easier/Harder/Alternate) for all 26 exercises.
+ * Defines progression paths (Easier/Harder/Alternate) for all 27 slot keys.
  * Each exercise occupies a slot with biomechanically appropriate progressions.
  *
  * @module progression-pathways

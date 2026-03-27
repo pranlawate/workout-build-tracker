@@ -86,13 +86,11 @@ export class BodyWeightManager {
     let replaced = false;
     if (todayIndex !== -1) {
       // Replace existing entry for today
-      const oldWeight = data.entries[todayIndex].weight_kg;
       data.entries[todayIndex] = {
         date: now.toISOString(),
         weight_kg: weight_kg
       };
       replaced = true;
-      console.log(`[BodyWeightManager] Replaced today's entry: ${oldWeight} kg → ${weight_kg} kg`);
     } else {
       // Add new entry
       data.entries.push({

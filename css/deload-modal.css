@@ -81,7 +81,7 @@
   right: 0;
   background: var(--color-warning);
   color: var(--color-bg);
-  z-index: 100;
+  z-index: var(--z-layer-banner);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -120,9 +120,12 @@
   color: white;
   border: none;
   padding: var(--spacing-xs) var(--spacing-sm);
+  min-height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
   border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
+  box-sizing: border-box;
 }
 
 .btn-tertiary {

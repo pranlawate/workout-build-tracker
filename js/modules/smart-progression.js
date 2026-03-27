@@ -996,7 +996,6 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
   if (rotationManager) {
     const deloadState = rotationManager.storage.getDeloadState();
     if (deloadState && deloadState.active) {
-      console.log('[SmartProgression] Priority 0: Deload active - suppressing all suggestions');
       return {
         type: 'DELOAD',
         message: 'Focus on recovery this week',
@@ -1035,7 +1034,6 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     const rotationSuggestion = rotationManager.checkRotationDue(exerciseKey, exerciseName);
 
     if (rotationSuggestion) {
-      console.log(`[SmartProgression] Priority 3: Rotation variety - ${rotationSuggestion.reason}`);
       return {
         ...rotationSuggestion,
         priority: 3

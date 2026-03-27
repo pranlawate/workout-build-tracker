@@ -96,13 +96,10 @@ export class ExerciseLibrary {
       window.history.pushState({ screen: 'exercise-library' }, '', '');
     }
 
-    console.log('[ExerciseLibrary] Library opened');
   }
 
   hideLibrary() {
     window.history.back();
-
-    console.log('[ExerciseLibrary] Library closed');
   }
 
   setFilter(filter) {

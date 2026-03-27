@@ -49,7 +49,6 @@ export class StorageManager {
       }
 
       this.storage.setItem('build_migration_version', '3');
-      console.log('[Storage] Migrations complete, now at version 3');
     } catch (error) {
       console.error('[Storage] Migration failed:', error);
     }
@@ -75,8 +74,6 @@ export class StorageManager {
   }
 
   _migrateExerciseKeysV2() {
-    console.log('[Storage] Running migration v2: rekey exercise history');
-
     const historyFullKeys = [];
     if (this.storage.data) {
       for (const k of Object.keys(this.storage.data)) {
@@ -149,9 +146,6 @@ export class StorageManager {
       }
     }
 
-    console.log(
-      `[Storage] Migration v2 complete: ${migratedCount.history} history keys, ${migratedCount.pain} pain keys migrated`
-    );
   }
 
   _getRawPainHistory() {

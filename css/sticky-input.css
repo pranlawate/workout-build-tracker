@@ -2,7 +2,7 @@
 .sticky-set {
   position: sticky;
   top: 60px; /* Below header */
-  z-index: 10;
+  z-index: var(--z-layer-sticky);
   background: var(--color-surface);
   padding: var(--spacing-md);
   border-radius: 8px;
