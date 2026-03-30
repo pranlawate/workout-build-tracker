@@ -279,9 +279,13 @@
   font-size: 1rem;
   border: 2px solid var(--color-border);
   border-radius: 8px;
-  background: white;
+  background: var(--color-surface);
   color: var(--color-text);
   margin-bottom: 1rem;
+}
+
+#cooldown-modal #weight-input-cooldown::placeholder {
+  color: var(--color-text-dim);
 }
 
 #cooldown-modal #weight-input-cooldown:focus {
