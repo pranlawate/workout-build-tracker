@@ -199,6 +199,11 @@ export const EXERCISE_COMPLEXITY = {
   // MODERATE tier additions
   'Ardha Baithak': COMPLEXITY_TIERS.MODERATE,          // Half squat - partial ROM, less demanding
   'KB Swings': COMPLEXITY_TIERS.MODERATE,
+  'Weighted 45° Hyperextension': COMPLEXITY_TIERS.MODERATE,
+  'Reverse Hyperextension': COMPLEXITY_TIERS.SIMPLE,
+  'Smith Machine Squat': COMPLEXITY_TIERS.SIMPLE,
+  'Close-Stance Leg Press': COMPLEXITY_TIERS.SIMPLE,
+  'Light DB RDL': COMPLEXITY_TIERS.SIMPLE,
 
   // COMPLEX tier (22 exercises: multi-joint + unstable base + multi-plane, or advanced barbell/bodyweight/traditional)
   // Barbell compound movements

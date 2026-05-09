@@ -6,6 +6,8 @@
  * 2. ALL sets maintained RIR >= minimum target
  */
 
+import { daysBetween } from '../utils/date-utils.js';
+
 // Plateau detection threshold (number of sessions at same weight)
 const PLATEAU_THRESHOLD = 3;
 
@@ -172,6 +174,10 @@ export function getProgressionStatus(history, exercise, phaseManager) {
       const repDropPercent = previous.reps > 0 ? (previous.reps - current.reps) / previous.reps : 0;
       const significantRepDrop = current.weight === previous.weight && repDropPercent >= 0.25;
       if (weightDropped || significantRepDrop) {
+        if (currentWorkout.date && previousWorkout.date &&
+            daysBetween(currentWorkout.date, previousWorkout.date) >= 7) {
+          return 'returning';
+        }
         return 'regressed';
       }
     }

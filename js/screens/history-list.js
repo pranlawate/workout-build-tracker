@@ -1,6 +1,7 @@
 // src/js/screens/history-list.js
 
 import { WORKOUTS } from '../modules/workouts.js';
+import { calendarDaysAgo } from '../utils/date-utils.js';
 
 export class HistoryListScreen {
   constructor(storage, onExerciseSelect) {
@@ -118,7 +119,7 @@ export class HistoryListScreen {
   }
 
   renderExerciseCard(exercise) {
-    const daysAgo = Math.floor((new Date() - exercise.lastDate) / (1000 * 60 * 60 * 24));
+    const daysAgo = calendarDaysAgo(exercise.lastDate);
     let lastWorkoutText = '';
     if (daysAgo === 0) lastWorkoutText = 'Today';
     else if (daysAgo === 1) lastWorkoutText = 'Yesterday';

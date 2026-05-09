@@ -12,6 +12,7 @@ import { getWorkout, getWorkoutWithSelections, getWarmup, getAllWorkouts } from 
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { getSuggestion } from './modules/smart-progression.js';
 import { getFormCues } from './modules/form-cues.js';
+import { calendarDaysAgo } from './utils/date-utils.js';
 import { HistoryListScreen } from './screens/history-list.js';
 import { ExerciseDetailScreen } from './screens/exercise-detail.js';
 import { EditEntryModal } from './modals/edit-entry-modal.js';
@@ -178,7 +179,8 @@ class App {
   updatePerformanceBadge(exerciseIndex) {
     if (!this.currentWorkout || !this.workoutSession) return;
 
-    const exercise = this.currentWorkout.exercises[exerciseIndex];
+    const exercises = this.orderedExercises || this.currentWorkout.exercises;
+    const exercise = exercises[exerciseIndex];
     const exerciseKey = exercise.name;
     const exerciseSession = this.workoutSession.exercises[exerciseIndex];
 
@@ -376,8 +378,7 @@ class App {
     const lastTrainedEl = document.getElementById('last-trained');
     if (lastTrainedEl) {
       if (rotation.lastDate) {
-        const date = new Date(rotation.lastDate);
-        const daysAgo = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
+        const daysAgo = calendarDaysAgo(rotation.lastDate);
 
         if (daysAgo === 0) {
           lastTrainedEl.textContent = 'Last trained: Today';
@@ -1202,7 +1203,12 @@ class App {
       exercises: []
     };
 
-    const exercisesHtml = this.currentWorkout.exercises.map((exercise, index) => {
+    const mainExercises = this.currentWorkout.exercises.filter(ex => !ex.optional);
+    const optionalExercises = this.currentWorkout.exercises.filter(ex => ex.optional);
+    this.orderedExercises = [...mainExercises, ...optionalExercises];
+    const mainCount = mainExercises.length;
+
+    const exercisesHtml = this.orderedExercises.map((exercise, index) => {
       const exerciseKey = exercise.name;
       const history = this.storage.getExerciseHistory(exerciseKey);
       const rawPain = this.storage.getPainHistory(exerciseKey);
@@ -1297,10 +1303,18 @@ class App {
         stateClass = 'upcoming';
       }
 
-      return `
-        <div class="exercise-item ${stateClass}" data-exercise-index="${index}">
+      const bonusDivider = (index === mainCount && optionalExercises.length > 0)
+        ? `<div class="bonus-round-divider"><span class="bonus-round-label">Bonus Round (Optional)</span></div>`
+        : '';
+
+      const optionalLabel = exercise.optional
+        ? ' <span class="optional-badge">Optional</span>'
+        : '';
+
+      return `${bonusDivider}
+        <div class="exercise-item ${stateClass} ${exercise.optional ? 'optional-exercise' : ''}" data-exercise-index="${index}">
           <div class="exercise-header">
-            <h3 class="exercise-name">${this.escapeHtml(exercise.name)}</h3>
+            <h3 class="exercise-name">${this.escapeHtml(exercise.name)}${optionalLabel}</h3>
             <div class="exercise-badges">
               ${this.renderProgressionBadge(exercise, history)}
             </div>
@@ -1527,7 +1541,8 @@ class App {
       normal: '<span class="progression-badge badge-normal">🔵 In Progress</span>',
       ready: '<span class="progression-badge badge-ready">🟢 Ready to Progress</span>',
       plateau: '<span class="progression-badge badge-plateau">🟡 Plateau</span>',
-      regressed: '<span class="progression-badge badge-regressed">🔴 Regressed</span>'
+      regressed: '<span class="progression-badge badge-regressed">🔴 Regressed</span>',
+      returning: '<span class="progression-badge badge-returning">🔵 Returning</span>'
     };
 
     return badges[status] || badges.normal;
@@ -1656,7 +1671,8 @@ class App {
       'PAIN_WARNING': '🚨',
       'PLATEAU_WARNING': '📊',
       'RECOVERY_WARNING': '💤',
-      'CONTINUE': '✅'
+      'CONTINUE': '✅',
+      'GAP_RETURN': '🔄'
     };
     return iconMap[type] || '💡';
   }
@@ -1677,7 +1693,8 @@ class App {
       'PAIN_WARNING': 'PAIN DETECTED',
       'PLATEAU_WARNING': 'PLATEAU DETECTED',
       'RECOVERY_WARNING': 'RECOVERY CHECK',
-      'CONTINUE': 'ON TRACK'
+      'CONTINUE': 'ON TRACK',
+      'GAP_RETURN': 'WELCOME BACK'
     };
     return labelMap[type] || 'SUGGESTION';
   }
@@ -1855,7 +1872,8 @@ class App {
   }
 
   showPostSetFeedback(exerciseIndex, setIndex, set) {
-    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const exercises = this.orderedExercises || this.currentWorkout.exercises;
+    const exerciseDef = exercises[exerciseIndex];
     const sessionExercise = this.workoutSession.exercises[exerciseIndex];
     const isTimeBased = this.isTimeBasedExercise(exerciseDef);
 
@@ -2061,7 +2079,8 @@ class App {
   }
 
   checkSetProgression(exerciseIndex, setIndex) {
-    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const exercises = this.orderedExercises || this.currentWorkout.exercises;
+    const exerciseDef = exercises[exerciseIndex];
     const set = this.workoutSession.exercises[exerciseIndex].sets[setIndex];
     const isTimeBased = exerciseDef.repRange.toLowerCase().includes('s');
 
@@ -2109,7 +2128,8 @@ class App {
   }
 
   unlockNextSet(exerciseIndex, completedSetIndex) {
-    const exercise = this.currentWorkout.exercises[exerciseIndex];
+    const exercises = this.orderedExercises || this.currentWorkout.exercises;
+    const exercise = exercises[exerciseIndex];
     const nextSetIndex = completedSetIndex + 1;
 
     // Don't unlock beyond total sets
@@ -2212,7 +2232,8 @@ class App {
     // Check if an exercise has all its sets logged
     if (!this.workoutSession || !this.currentWorkout) return false;
 
-    const exerciseDef = this.currentWorkout.exercises[exerciseIndex];
+    const exercises = this.orderedExercises || this.currentWorkout.exercises;
+    const exerciseDef = exercises[exerciseIndex];
     const exerciseSession = this.workoutSession.exercises[exerciseIndex];
 
     if (!exerciseDef || !exerciseSession) return false;
@@ -2603,7 +2624,8 @@ class App {
   advanceToNextExercise() {
     // Get completed exercise info FIRST (before early return)
     const justCompletedIndex = this.currentExerciseIndex;
-    const justCompletedExercise = this.currentWorkout.exercises[justCompletedIndex];
+    const exercises = this.orderedExercises || this.currentWorkout.exercises;
+    const justCompletedExercise = exercises[justCompletedIndex];
     const exerciseKey = justCompletedExercise.name;
 
     // ALWAYS show mobility check for completed exercises
@@ -2611,7 +2633,8 @@ class App {
     // Pain tracking moved to post-workout modal
 
     // Don't advance past last exercise (but prompts still shown above)
-    if (this.currentExerciseIndex >= this.currentWorkout.exercises.length - 1) {
+    const exCount = (this.orderedExercises || this.currentWorkout.exercises).length;
+    if (this.currentExerciseIndex >= exCount - 1) {
       return;
     }
 
@@ -2676,7 +2699,8 @@ class App {
 
   jumpToExercise(exerciseIndex) {
     // Validate index
-    if (exerciseIndex < 0 || exerciseIndex >= this.currentWorkout.exercises.length) {
+    const exList = this.orderedExercises || this.currentWorkout.exercises;
+    if (exerciseIndex < 0 || exerciseIndex >= exList.length) {
       return;
     }
 
@@ -4520,9 +4544,7 @@ class App {
 
     try {
       const date = new Date(dateStr);
-      const now = new Date();
-      const diffTime = Math.abs(now - date);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = calendarDaysAgo(date);
 
       if (diffDays === 0) return 'Today';
       if (diffDays === 1) return 'Yesterday';
@@ -5639,18 +5661,25 @@ class App {
     if (this._completingWorkout) return;
     this._completingWorkout = true;
 
-    // Check how many exercises are completed
-    const totalExercises = this.currentWorkout.exercises.length;
-    const completedCount = this.currentWorkout.exercises.filter((_, index) =>
-      this.isExerciseCompleted(index)
-    ).length;
+    // Check how many main (non-optional) exercises are completed
+    const mainExercises = this.currentWorkout.exercises.filter(ex => !ex.optional);
+    const optionalExercises = this.currentWorkout.exercises.filter(ex => ex.optional);
+    const orderedExercises = [...mainExercises, ...optionalExercises];
+    const totalExercises = mainExercises.length;
+    const completedCount = mainExercises.filter((ex) => {
+      const originalIndex = orderedExercises.indexOf(ex);
+      return this.isExerciseCompleted(originalIndex);
+    }).length;
 
-    // If not all exercises are completed, show warning (before committing to completion)
+    // If not all main exercises are completed, show warning (before committing to completion)
     const isPartialWorkout = completedCount < totalExercises;
 
     if (isPartialWorkout) {
-      const incompleteExercises = this.currentWorkout.exercises
-        .map((ex, idx) => ({ name: ex.name, completed: this.isExerciseCompleted(idx) }))
+      const incompleteExercises = mainExercises
+        .map((ex) => {
+          const originalIndex = orderedExercises.indexOf(ex);
+          return { name: ex.name, completed: this.isExerciseCompleted(originalIndex) };
+        })
         .filter(ex => !ex.completed)
         .map(ex => ex.name);
 
@@ -5666,8 +5695,9 @@ class App {
 
     try {
       // Save each exercise's history
+      const orderedExList = this.orderedExercises || this.currentWorkout.exercises;
       this.workoutSession.exercises.forEach((exerciseSession, index) => {
-        const exerciseDef = this.currentWorkout.exercises[index];
+        const exerciseDef = orderedExList[index];
         const exerciseKey = exerciseDef.name;
 
         // Get existing history

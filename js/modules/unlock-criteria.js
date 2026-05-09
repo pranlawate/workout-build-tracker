@@ -61,18 +61,6 @@ export const EXERCISE_UNLOCK_CRITERIA = {
     mobilityCheck: 'Shoulder overhead mobility',
     painFreeWeeks: 5,
     trainingWeeks: 8
-  },
-
-  // KB Swings (MODERATE tier with specific safety requirements)
-  'KB Swings': {
-    strengthMilestone: {
-      exercise: 'Hip Thrust',
-      threshold: { weight: 40, reps: 12, sets: 3 }
-    },
-    mobilityCheck: 'Hip hinge pattern proficiency',
-    painFreeWeeks: 4,  // No lower back pain in last 4 weeks
-    trainingWeeks: 8
-    // TODO: Add prerequisiteExercise: 'DB Romanian Deadlift' when evaluator supports it
   }
 };
 

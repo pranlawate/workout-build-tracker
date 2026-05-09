@@ -3,6 +3,7 @@
 import { ProgressChart } from '../components/progress-chart.js';
 import { getProgressionStatus } from '../modules/progression.js';
 import { WORKOUTS } from '../modules/workouts.js';
+import { calendarDaysAgo } from '../utils/date-utils.js';
 
 export class ExerciseDetailScreen {
   constructor(storage, performanceAnalyzer, deloadManager, onBack, onEdit, onDelete) {
@@ -80,7 +81,7 @@ export class ExerciseDetailScreen {
 
   renderHistoryEntry(entry, index) {
     const date = new Date(entry.date);
-    const daysAgo = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
+    const daysAgo = calendarDaysAgo(date);
     let dateText = date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',

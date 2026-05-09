@@ -104,7 +104,7 @@ export const PROGRESSION_PATHS = {
 
   'LOWER_A_SLOT_1': {
     slotName: 'Squat Compound',
-    easier: ['Leg Press'],
+    easier: ['Smith Machine Squat'],
     current: 'Hack Squat',
     harder: ['Barbell Back Squat', 'Front Squat'],
     alternate: ['Bulgarian Split Squat', 'KB Goblet Squat']
@@ -114,15 +114,15 @@ export const PROGRESSION_PATHS = {
     slotName: 'Posterior Chain/Hinge',
     easier: ['Glute Bridges'],
     current: '45° Hyperextension',
-    harder: ['DB Romanian Deadlift', 'Barbell RDL'],
-    alternate: ['Good Mornings']
+    harder: ['Weighted 45° Hyperextension'],
+    alternate: ['Reverse Hyperextension']
   },
 
   'LOWER_A_SLOT_3': {
     slotName: 'Glute Isolation',
     easier: ['Bodyweight Hip Thrust', 'Glute Bridges'],
     current: 'Hip Thrust',
-    harder: ['Weighted Hip Thrust', 'Single-leg Hip Thrust', 'KB Swings'],
+    harder: ['Weighted Hip Thrust', 'Single-leg Hip Thrust'],
     alternate: ['Cable Pull-Through']
   },
 
@@ -240,13 +240,13 @@ export const PROGRESSION_PATHS = {
     slotName: 'Squat Compound',
     easier: ['Bodyweight Squats', 'Goblet Squat'],
     current: 'Leg Press',
-    harder: ['Hack Squat', 'Barbell Back Squat'],
+    harder: ['Close-Stance Leg Press', 'Barbell Back Squat'],
     alternate: ['Bulgarian Split Squat']
   },
 
   'LOWER_B_SLOT_2': {
     slotName: 'Hinge Compound',
-    easier: ['45° Hyperextension', 'Glute Bridges'],
+    easier: ['Light DB RDL', 'Glute Bridges'],
     current: 'DB Romanian Deadlift',
     harder: ['Barbell RDL', 'Conventional Deadlift'],
     alternate: ['Single-leg RDL']

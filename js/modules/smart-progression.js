@@ -11,6 +11,7 @@ import { EXERCISE_METADATA, PAIN_LEVELS, SWAP_REASONS, findAlternative, ROTATION
 import { TEMPO_PHASES, getTempoGuidance, TEMPO_GUIDANCE } from './tempo-guidance.js';
 import { getFormCues } from './form-cues.js';
 import { WORKOUTS, EXERCISE_DEFINITIONS } from './workouts.js';
+import { daysBetween, getGapReductionPercent } from '../utils/date-utils.js';
 
 /**
  * Fallback rep ranges when an exercise is not in WORKOUTS / EXERCISE_DEFINITIONS
@@ -311,6 +312,13 @@ export function detectRegression(history) {
       previous.reps === undefined || previous.reps === null) {
     console.warn('[SmartProgression] detectRegression: Missing weight or rep data');
     return false;
+  }
+
+  if (currentWorkout.date && previousWorkout.date) {
+    const gap = daysBetween(currentWorkout.date, previousWorkout.date);
+    if (gap >= 7) {
+      return false;
+    }
   }
 
   // Regression if weight dropped OR (same weight but reps dropped 25%+)
@@ -943,6 +951,44 @@ export function suggestRecoveryCheck(history) {
 }
 
 /**
+ * Suggest a reduced weight when returning after a training gap.
+ * Uses evidence-based detraining rates to calculate reduction.
+ */
+export function suggestGapReturn(exerciseKey, history) {
+  if (!history || history.length === 0) return null;
+
+  const lastSession = history[history.length - 1];
+  if (!lastSession?.date) return null;
+
+  const gap = daysBetween(lastSession.date, new Date().toISOString());
+  if (gap < 7) return null;
+
+  const reductionPercent = getGapReductionPercent(gap);
+  if (reductionPercent === 0) return null;
+
+  const exerciseName = exerciseNameFromKey(exerciseKey);
+  const bestSet = getBestSet(lastSession.sets);
+  if (!bestSet || !bestSet.weight) return null;
+
+  const exerciseDef = getWorkoutExerciseDefinition(exerciseName);
+  const increment = exerciseDef?.weightIncrement || 2.5;
+
+  const reducedWeight = Math.max(0,
+    Math.round((bestSet.weight * (1 - reductionPercent / 100)) / increment) * increment
+  );
+
+  return {
+    type: 'GAP_RETURN',
+    message: `Returning after ${gap} days. Try ${reducedWeight}kg (~${reductionPercent}% lighter)`,
+    reason: `Based on detraining research: ${reductionPercent}% conservative reduction for ${gap}-day gap`,
+    weight: reducedWeight,
+    previousWeight: bestSet.weight,
+    gapDays: gap,
+    reductionPercent
+  };
+}
+
+/**
  * Get smart progression suggestion for an exercise
  * Main decision engine using priority-based system
  *
@@ -1030,6 +1076,12 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
         return techniqueSuggestion;
       }
     }
+  }
+
+  // PRIORITY 2.5: Gap return (suggest lower weight after training break)
+  const gapSuggestion = suggestGapReturn(exerciseKey, history);
+  if (gapSuggestion) {
+    return gapSuggestion;
   }
 
   // PRIORITY 3: Rotation variety (8-12 week cycles)

@@ -1,3 +1,5 @@
+import { daysBetween } from '../utils/date-utils.js';
+
 /**
  * Manages deload system state and triggers
  */
@@ -122,8 +124,16 @@ export class DeloadManager {
         const history = this.storage.getExerciseHistory(exerciseKey);
         if (!history || history.length < 2) continue;
 
-        const prev = bestSessionWeight(history[history.length - 2]);
-        const latest = bestSessionWeight(history[history.length - 1]);
+        const prevSession = history[history.length - 2];
+        const latestSession = history[history.length - 1];
+
+        if (prevSession.date && latestSession.date &&
+            daysBetween(prevSession.date, latestSession.date) >= 7) {
+          continue;
+        }
+
+        const prev = bestSessionWeight(prevSession);
+        const latest = bestSessionWeight(latestSession);
         if (prev === null || latest === null) continue;
         if (latest < prev) count += 1;
       }

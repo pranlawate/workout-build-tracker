@@ -142,6 +142,11 @@
   color: var(--color-danger-readable, #fecaca);
 }
 
+.badge-returning {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--color-primary-readable, #93c5fd);
+}
+
 .progression-hint {
   font-size: var(--font-xs);
   color: var(--color-text-dim);
@@ -504,4 +509,43 @@
   .input-label {
     font-size: max(14px, var(--font-sm));
   }
+}
+
+/* Bonus Round (Optional Exercises) */
+.bonus-round-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0 1rem;
+  gap: 1rem;
+}
+
+.bonus-round-divider::before,
+.bonus-round-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.bonus-round-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.optional-exercise {
+  opacity: 0.85;
+  border-left: 3px solid var(--color-text-secondary);
+}
+
+.optional-badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 0.25rem;
 }

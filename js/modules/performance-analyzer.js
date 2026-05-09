@@ -1,5 +1,7 @@
 // src/js/modules/performance-analyzer.js
 
+import { daysBetween } from '../utils/date-utils.js';
+
 /**
  * PerformanceAnalyzer - Automated form quality and regression detection
  *
@@ -78,6 +80,11 @@ export class PerformanceAnalyzer {
     return reps.reduce((a, b) => a + b, 0) / reps.length;
   }
 
+  _hasLargeGap(sessionA, sessionB, thresholdDays = 7) {
+    if (!sessionA?.date || !sessionB?.date) return false;
+    return daysBetween(sessionA.date, sessionB.date) >= thresholdDays;
+  }
+
   /**
    * Check if weight decreased vs previous session (not vs all-time best)
    * @param {Array} history - Exercise history array (sorted oldest to newest)
@@ -92,6 +99,10 @@ export class PerformanceAnalyzer {
     if (hasCurrentWork && history.length >= 1) {
       const previousSession = history[history.length - 1];
       if (!previousSession?.sets?.length) return null;
+
+      if (this._hasLargeGap(previousSession, { date: new Date().toISOString() })) {
+        return null;
+      }
 
       const prevW = this._bestWeight(previousSession.sets);
       const curW = this._bestWeight(currentSets);
@@ -111,6 +122,10 @@ export class PerformanceAnalyzer {
     const lastSession = history[history.length - 1];
 
     if (!previousSession?.sets?.length || !lastSession?.sets?.length) {
+      return null;
+    }
+
+    if (this._hasLargeGap(previousSession, lastSession)) {
       return null;
     }
 
@@ -147,6 +162,10 @@ export class PerformanceAnalyzer {
       const previousSession = history[history.length - 1];
       if (!previousSession?.sets?.length) return null;
 
+      if (this._hasLargeGap(previousSession, { date: new Date().toISOString() })) {
+        return null;
+      }
+
       const avgRepsOld = this._avgReps(previousSession.sets);
       const avgRepsNew = this._avgReps(currentSets);
       if (avgRepsOld === undefined || avgRepsNew === undefined) return null;
@@ -169,6 +188,10 @@ export class PerformanceAnalyzer {
     const lastSession = history[history.length - 1];
 
     if (!previousSession?.sets?.length || !lastSession?.sets?.length) {
+      return null;
+    }
+
+    if (this._hasLargeGap(previousSession, lastSession)) {
       return null;
     }
 

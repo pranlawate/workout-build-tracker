@@ -139,6 +139,7 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         notes: 'Isolation | Mid Chest | Pec deck stretch & squeeze',
+        optional: true,
       },
       {
         name: 'Face Pulls',
@@ -295,6 +296,7 @@ export const WORKOUTS = {
         startingWeight: 7.5,
         weightIncrement: 1.25,
         notes: 'Isolation | Biceps + Brachialis',
+        optional: true,
       },
       {
         name: 'Reverse Crunch',
@@ -353,6 +355,7 @@ export const WORKOUTS = {
         startingWeight: 15,
         weightIncrement: 2.5,
         notes: 'Isolation | Hip Adductors | Pairs with abduction for balance',
+        optional: true,
       },
       {
         name: 'Leg Curl',

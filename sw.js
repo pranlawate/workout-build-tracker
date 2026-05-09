@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'build-tracker-v108';
+const CACHE_VERSION = 'build-tracker-v109';
 const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',
@@ -66,7 +66,8 @@ const CACHE_URLS = [
   './js/screens/exercise-detail.js',
   './js/screens/exercise-library.js',
   './js/screens/history-list.js',
-  './js/utils/export-import.js'
+  './js/utils/export-import.js',
+  './js/utils/date-utils.js'
 ];
 
 // Install event - cache static assets
