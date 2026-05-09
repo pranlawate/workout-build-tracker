@@ -3322,10 +3322,15 @@ class App {
     const currentSelections = this.storage.getExerciseSelections();
     const currentExercise = currentSelections[slotKey];
 
+    const baseExercises = new Set(
+      Object.values(PROGRESSION_PATHS).map(p => p.current)
+    );
+
     // Evaluate each exercise with phase-aware priority
     const evaluatedExercises = exercises.map(exerciseName => {
       const unlocked = this.storage.isExerciseUnlocked(exerciseName) ||
-                       getComplexityTier(exerciseName) === COMPLEXITY_TIERS.SIMPLE;
+                       getComplexityTier(exerciseName) === COMPLEXITY_TIERS.SIMPLE ||
+                       baseExercises.has(exerciseName);
 
       // Get phase-aware evaluation for unlocked exercises
       let priority = 1;
