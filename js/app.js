@@ -1172,6 +1172,7 @@ class App {
     // Clean up session data
     this.workoutSession = null;
     this.currentWorkout = null;
+    this.orderedExercises = null;
     this.currentExerciseIndex = 0;
 
     // Hide all screens first (consistent with other navigation methods)
@@ -1316,7 +1317,7 @@ class App {
           <div class="exercise-header">
             <h3 class="exercise-name">${this.escapeHtml(exercise.name)}${optionalLabel}</h3>
             <div class="exercise-badges">
-              ${this.renderProgressionBadge(exercise, history)}
+              ${this.renderProgressionBadge(exercise, history, suggestion)}
             </div>
           </div>
 
@@ -1530,12 +1531,18 @@ class App {
     return html;
   }
 
-  renderProgressionBadge(exercise, history) {
+  renderProgressionBadge(exercise, history, suggestion) {
     if (history.length === 0) {
       return '<span class="progression-badge badge-normal">🔵 First Time</span>';
     }
 
     const status = getProgressionStatus(history, exercise, this.phaseManager);
+
+    // Suppress "Ready to Progress" when the smart suggestion already covers it
+    if (status === 'ready' && suggestion &&
+        (suggestion.type === 'TRY_TEMPO' || suggestion.type === 'INCREASE_WEIGHT')) {
+      return '';
+    }
 
     const badges = {
       normal: '<span class="progression-badge badge-normal">🔵 In Progress</span>',
@@ -1757,7 +1764,7 @@ class App {
 
     // Check if this set is complete (has weight, reps, and RIR)
     const set = exercise.sets[setIndex];
-    const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
+    const exerciseDef = (this.orderedExercises || this.currentWorkout?.exercises)?.[exerciseIndex];
     const isTimeBased = this.isTimeBasedExercise(exerciseDef);
     // For bodyweight exercises, weight can be 0
     const hasValidWeight = typeof set.weight === 'number' && set.weight >= 0;
@@ -1778,7 +1785,7 @@ class App {
     const setIndex = parseInt(button.dataset.set);
 
     // Get exercise definition to check exercise type
-    const exerciseDef = this.currentWorkout?.exercises[exerciseIndex];
+    const exerciseDef = (this.orderedExercises || this.currentWorkout?.exercises)?.[exerciseIndex];
     const isBodyweightExercise = this.isBodyweightExercise(exerciseDef);
     const isBand = this.isBandExercise(exerciseDef);
     const isTimeBased = this.isTimeBasedExercise(exerciseDef);
@@ -3277,6 +3284,13 @@ class App {
       // Progression options
       const optionsDiv = document.createElement('div');
       optionsDiv.className = 'progression-options';
+
+      // Default exercise (show when user has switched away from it)
+      const activeSelection = currentSelections[slotKey];
+      if (activeSelection && activeSelection !== path.current) {
+        const category = this.renderProgressionCategory('Default', [path.current], slotKey);
+        optionsDiv.appendChild(category);
+      }
 
       // Easier options
       if (path.easier && path.easier.length > 0) {

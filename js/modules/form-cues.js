@@ -150,9 +150,9 @@ export const FORM_CUES = {
   },
 
   'Chest-Supported Row': {
-    setup: ['Chest on pad', 'Neutral spine', 'Dumbbells hanging'],
-    execution: ['Controlled concentric - 2s pull to sides of ribs', 'Squeeze shoulder blades', 'Slow eccentric - 2s descent'],
-    mistakes: ['Lifting chest off pad', 'Using momentum', 'Partial ROM']
+    setup: ['Chest firmly on pad', 'Neutral spine', 'Grip handles or dumbbells at arm\'s length'],
+    execution: ['Controlled concentric - 2s pull to sides of ribs', 'Squeeze shoulder blades together at top', 'Slow eccentric - 2s descent, full stretch'],
+    mistakes: ['Lifting chest off pad to cheat ROM', 'Using momentum', 'Cutting range of motion short']
   },
 
   'Incline DB Press': {

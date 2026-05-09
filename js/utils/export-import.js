@@ -220,7 +220,7 @@ export function validateImportData(data) {
           throw new Error(`Invalid set in ${key}: reps must be a positive integer (set ${i + 1})`);
         }
 
-        if (typeof set.rir !== 'number' || set.rir < 0 || !Number.isInteger(set.rir)) {
+        if (set.rir != null && (typeof set.rir !== 'number' || set.rir < 0 || !Number.isInteger(set.rir))) {
           throw new Error(`Invalid set in ${key}: rir must be a non-negative integer (set ${i + 1})`);
         }
       }
