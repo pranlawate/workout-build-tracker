@@ -237,6 +237,8 @@ body {
   color: white;
   border: none;
   border-radius: 12px;
+  padding: var(--spacing-md);
+  min-height: var(--tap-target-min);
   font-size: var(--font-lg);
   font-weight: 600;
   cursor: pointer;

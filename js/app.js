@@ -3407,8 +3407,13 @@ class App {
       if (selectBtn && unlocked) {
         selectBtn.onclick = () => {
           this.storage.saveExerciseSelection(slotKey, name);
-          document.getElementById('progressions-modal').style.display = 'none';
-          this.showHomeScreen(); // Refresh
+          // Re-render the current tab's list in place
+          const activeTab = document.querySelector('.prog-tab.active');
+          const workoutKey = activeTab?.dataset.workout;
+          const listContainer = document.getElementById('progressions-list');
+          if (workoutKey && listContainer) {
+            this.renderProgressionsList(workoutKey, listContainer);
+          }
         };
       }
 
