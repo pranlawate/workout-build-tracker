@@ -42,7 +42,7 @@ export class StorageManager {
   _runMigrations() {
     try {
       const version = parseInt(this.storage.getItem('build_migration_version') || '0', 10);
-      if (version >= 4) return;
+      if (version >= 5) return;
 
       if (version < 2) {
         this._migrateExerciseKeysV2();
@@ -53,8 +53,11 @@ export class StorageManager {
       if (version < 4) {
         this._migrateRenamedExercisesV4();
       }
+      if (version < 5) {
+        this._migrateMobilityCriteriaKeysV5();
+      }
 
-      this.storage.setItem('build_migration_version', '4');
+      this.storage.setItem('build_migration_version', '5');
     } catch (error) {
       console.error('[Storage] Migration failed:', error);
     }
@@ -121,6 +124,39 @@ export class StorageManager {
 
     if (migratedCount > 0) {
       console.log(`[Storage] v4 migration: merged ${migratedCount} renamed exercise(s)`);
+    }
+  }
+
+  /**
+   * Remap old mobility criteria keys to match what the mobility modal writes.
+   * Old unlock-evaluator keys were never written by the modal, so any
+   * accumulated checks under those keys would be invisible to the evaluator.
+   */
+  _migrateMobilityCriteriaKeysV5() {
+    const RENAMES = {
+      'scapular_retraction': 'bench_overhead_mobility',
+      'shoulder_overhead_mobility': 'bench_overhead_mobility',
+      'hip_ankle_squat_mobility': 'squat_heel_flat',
+      'hip_hinge_mobility': 'deadlift_toe_touch'
+    };
+
+    const allChecks = this.getMobilityChecksData();
+    let changed = false;
+
+    for (const [oldKey, newKey] of Object.entries(RENAMES)) {
+      if (!allChecks[oldKey]) continue;
+
+      if (!allChecks[newKey]) {
+        allChecks[newKey] = [];
+      }
+      allChecks[newKey] = [...allChecks[newKey], ...allChecks[oldKey]];
+      delete allChecks[oldKey];
+      changed = true;
+    }
+
+    if (changed) {
+      this.storage.setItem(KEYS.MOBILITY_CHECKS, JSON.stringify(allChecks));
+      console.log('[Storage] v5 migration: remapped mobility criteria keys');
     }
   }
 

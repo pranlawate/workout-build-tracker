@@ -289,25 +289,22 @@ export class ProgressAnalyzer {
 
         if (!oldSession || !oldSession.sets || oldSession.sets.length === 0) continue;
 
-        const recentAvgWeight = recentSession.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / recentSession.sets.length;
-        const oldAvgWeight = oldSession.sets.reduce((sum, set) => sum + (set.weight || 0), 0) / oldSession.sets.length;
+        const recentBestWeight = Math.max(...recentSession.sets.map(set => set.weight || 0));
+        const oldBestWeight = Math.max(...oldSession.sets.map(set => set.weight || 0));
 
-        // Skip if no progression or division by zero
-        if (oldAvgWeight === 0 || recentAvgWeight <= oldAvgWeight) continue;
+        if (oldBestWeight === 0 || recentBestWeight <= oldBestWeight) continue;
 
-        // Compute absolute and percentage gain
-        const absoluteGain = recentAvgWeight - oldAvgWeight;
-        const percentGain = Math.round((absoluteGain / oldAvgWeight) * 100);
+        const absoluteGain = recentBestWeight - oldBestWeight;
+        const percentGain = Math.round((absoluteGain / oldBestWeight) * 100);
 
-        // Extract exercise name (remove workout prefix like "UPPER_A - ")
         const exerciseName = exerciseKey.includes(' - ')
           ? exerciseKey.split(' - ')[1]
           : exerciseKey;
 
         progressions.push({
           name: exerciseName,
-          oldWeight: Math.round(oldAvgWeight * 10) / 10,
-          newWeight: Math.round(recentAvgWeight * 10) / 10,
+          oldWeight: oldBestWeight,
+          newWeight: recentBestWeight,
           percentGain,
           absoluteGain
         });

@@ -285,35 +285,35 @@ export class UnlockEvaluator {
     // Map exercises to mobility check criteria
     // All COMPLEX tier exercises require mobility validation
     const MOBILITY_CHECKS = {
-      // Upper body pressing (barbell)
-      'Barbell Bench Press': 'scapular_retraction',
-      'Barbell Overhead Press': 'shoulder_overhead_mobility',
+      // Upper body pressing: matches bench_overhead_mobility written by mobility modal
+      'Barbell Bench Press': 'bench_overhead_mobility',
+      'Barbell Overhead Press': 'bench_overhead_mobility',
 
-      // Traditional Indian Dand (push-up) variations - all require thoracic mobility
-      'Sadharan Dand': 'thoracic_mobility',           // Basic push-up with hip bridge
-      'Rammurti Dand': 'thoracic_mobility',           // Flowing sweep movement
-      'Hanuman Dand': 'thoracic_mobility',            // Dips with leg lunge
-      'Vrushchik Dand': 'thoracic_mobility',          // Scorpion leg crossing
-      'Vrushchik Dand 2': 'thoracic_mobility',        // Forearm stand scorpion
-      'Parshava Dand': 'thoracic_mobility',           // Lateral leg crossing
-      'Chakra Dand': 'thoracic_mobility',             // Circular leg movements
-      'Advance Hanuman Dand': 'thoracic_mobility',    // Explosive leg thrust
-      'Vaksh vikasak Dand': 'thoracic_mobility',      // Chest expansion with inward palms
-      'Palat Dand': 'thoracic_mobility',              // Rotation to side plank
-      'Sher Dand': 'thoracic_mobility',               // Handstand push-up
-      'Sarp Dand': 'thoracic_mobility',               // Snake pulsing or dog↔cobra
-      'Mishr Dand': 'thoracic_mobility',              // Plyometric jumping
+      // Traditional Indian Dand variations: thoracic_mobility
+      'Sadharan Dand': 'thoracic_mobility',
+      'Rammurti Dand': 'thoracic_mobility',
+      'Hanuman Dand': 'thoracic_mobility',
+      'Vrushchik Dand': 'thoracic_mobility',
+      'Vrushchik Dand 2': 'thoracic_mobility',
+      'Parshava Dand': 'thoracic_mobility',
+      'Chakra Dand': 'thoracic_mobility',
+      'Advance Hanuman Dand': 'thoracic_mobility',
+      'Vaksh vikasak Dand': 'thoracic_mobility',
+      'Palat Dand': 'thoracic_mobility',
+      'Sher Dand': 'thoracic_mobility',
+      'Sarp Dand': 'thoracic_mobility',
+      'Mishr Dand': 'thoracic_mobility',
 
-      // Squatting movements (traditional Indian)
-      'Barbell Back Squat': 'hip_ankle_squat_mobility',
-      'Sadharan Baithak': 'hip_ankle_squat_mobility',
-      'Pehalwani Baithak': 'hip_ankle_squat_mobility',
-      'Pehalwani Baithak 2': 'hip_ankle_squat_mobility',
-      'Rammurti Baithak': 'hip_ankle_squat_mobility',
-      'Hanuman Baithak': 'hip_ankle_squat_mobility',  // Side lunge - lateral plane
+      // Squatting: matches squat_heel_flat written by mobility modal
+      'Barbell Back Squat': 'squat_heel_flat',
+      'Sadharan Baithak': 'squat_heel_flat',
+      'Pehalwani Baithak': 'squat_heel_flat',
+      'Pehalwani Baithak 2': 'squat_heel_flat',
+      'Rammurti Baithak': 'squat_heel_flat',
+      'Hanuman Baithak': 'squat_heel_flat',
 
-      // Hip hinge / Deadlift
-      'Barbell Deadlift': 'hip_hinge_mobility'
+      // Hip hinge: matches deadlift_toe_touch written by mobility modal
+      'Barbell Deadlift': 'deadlift_toe_touch'
     };
 
     const criteriaKey = MOBILITY_CHECKS[exerciseName];

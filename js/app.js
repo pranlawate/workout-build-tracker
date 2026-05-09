@@ -3,7 +3,6 @@ import { WorkoutManager } from './modules/workout-manager.js';
 import { DeloadManager } from './modules/deload.js';
 import { PhaseManager } from './modules/phase-manager.js';
 import { PerformanceAnalyzer } from './modules/performance-analyzer.js';
-import { BarbellProgressionTracker } from './modules/barbell-progression-tracker.js';
 import { BodyWeightManager } from './modules/body-weight.js';
 import { ProgressAnalyzer } from './modules/progress-analyzer.js';
 import { AnalyticsCalculator } from './modules/analytics-calculator.js';
@@ -4277,53 +4276,155 @@ class App {
       barbellTab.style.display = 'block';
     }
 
-    // Get progression data
-    const tracker = new BarbellProgressionTracker(this.storage);
+    const WORKOUT_GROUPS = {
+      'Upper A': { prefix: 'UPPER_A_SLOT_', count: 7 },
+      'Upper B': { prefix: 'UPPER_B_SLOT_', count: 7 },
+      'Lower A': { prefix: 'LOWER_A_SLOT_', count: 6 },
+      'Lower B': { prefix: 'LOWER_B_SLOT_', count: 7 }
+    };
 
-    // Barbell exercises
-    const benchReadiness = tracker.getBarbellBenchReadiness();
-    const squatReadiness = tracker.getBarbellSquatReadiness();
-    const deadliftReadiness = tracker.getBarbellDeadliftReadiness();
+    let html = '';
 
-    // Traditional exercises
-    const dandReadiness = tracker.getSadharanDandReadiness();
-    const baithakReadiness = tracker.getSadharanBaithakReadiness();
+    for (const [groupName, { prefix, count }] of Object.entries(WORKOUT_GROUPS)) {
+      let slotsHtml = '';
+      let totalOptions = 0;
+      let unlockedCount = 0;
 
-    // Pull-up progression
-    const pullUpReadiness = tracker.getPullUpReadiness();
+      for (let i = 1; i <= count; i++) {
+        const slotKey = `${prefix}${i}`;
+        const path = PROGRESSION_PATHS[slotKey];
+        if (!path) continue;
 
-    // Mudgal/Club progression
-    const mudgalReadiness = tracker.getMudgalReadiness();
+        const allOptions = [
+          ...(path.harder || []),
+          ...(path.alternate || [])
+        ];
+        totalOptions += allOptions.length;
 
-    // Render advanced exercise progression content
-    barbellTab.innerHTML = `
-      <div class="progress-dashboard">
-        <h3 class="dashboard-title">🎯 Advanced Exercise Milestones</h3>
+        let optionsHtml = '';
+        for (const exercise of allOptions) {
+          const result = this.unlockEvaluator.evaluateUnlock(exercise, path.current);
+          if (result.unlocked) unlockedCount++;
 
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Barbell Exercises</h4>
-          ${this.renderProgressionCard('Barbell Bench Press', benchReadiness)}
-          ${this.renderProgressionCard('Barbell Back Squat', squatReadiness)}
-          ${this.renderProgressionCard('Barbell Deadlift', deadliftReadiness)}
+          const statusIcon = result.unlocked ? '✅' : '🔒';
+          const statusClass = result.unlocked ? 'slot-unlocked' : 'slot-locked';
+
+          let criteriaHtml = '';
+          if (!result.unlocked) {
+            const missing = result.missing || [];
+            criteriaHtml = `<div class="slot-missing">${missing.map(m => this.escapeHtml(m)).join(', ')}</div>`;
+          }
+
+          optionsHtml += `
+            <div class="slot-option ${statusClass}">
+              <span class="slot-option-icon">${statusIcon}</span>
+              <span class="slot-option-name">${this.escapeHtml(exercise)}</span>
+              ${criteriaHtml}
+            </div>
+          `;
+        }
+
+        slotsHtml += `
+          <div class="progression-slot-card">
+            <div class="slot-card-header" data-slot="${slotKey}">
+              <span class="slot-card-name">${this.escapeHtml(path.slotName)}</span>
+              <span class="slot-card-current">${this.escapeHtml(path.current)}</span>
+              <span class="slot-card-chevron">▸</span>
+            </div>
+            <div class="slot-card-body" style="display: none;">
+              ${allOptions.length > 0 ? optionsHtml : '<div class="slot-no-options">No harder/alternate options for this slot</div>'}
+            </div>
+          </div>
+        `;
+      }
+
+      const summaryText = totalOptions > 0
+        ? `${unlockedCount}/${totalOptions} unlocked`
+        : 'Base exercises only';
+
+      html += `
+        <div class="workout-group-accordion">
+          <div class="accordion-header" data-group="${groupName}">
+            <span class="accordion-title">${this.escapeHtml(groupName)}</span>
+            <span class="accordion-summary">${summaryText}</span>
+            <span class="accordion-chevron">▾</span>
+          </div>
+          <div class="accordion-body">
+            ${slotsHtml}
+          </div>
         </div>
+      `;
+    }
 
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Traditional Exercises</h4>
-          ${this.renderProgressionCard('Sadharan Dand', dandReadiness)}
-          ${this.renderProgressionCard('Sadharan Baithak', baithakReadiness)}
-        </div>
+    barbellTab.innerHTML = `<div class="grouped-progressions">${html}</div>`;
 
-        <div style="margin-bottom: 1.5rem;">
-          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Pull-Up Progressions</h4>
-          ${this.renderProgressionCard('Pull-ups', pullUpReadiness)}
-        </div>
+    this._attachAccordionListeners(barbellTab);
+  }
 
-        <div>
-          <h4 style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Mudgal/Club Exercises</h4>
-          ${this.renderProgressionCard('Mudgal Training', mudgalReadiness)}
-        </div>
-      </div>
-    `;
+  _attachAccordionListeners(container) {
+    container.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.accordion-chevron');
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'block';
+        chevron.textContent = isOpen ? '▾' : '▴';
+        header.classList.toggle('accordion-open', !isOpen);
+      });
+    });
+
+    container.querySelectorAll('.slot-card-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const body = header.nextElementSibling;
+        const chevron = header.querySelector('.slot-card-chevron');
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'block';
+        chevron.textContent = isOpen ? '▾' : '▸';
+        header.classList.toggle('slot-open', !isOpen);
+      });
+    });
+
+    container.querySelectorAll('.slot-missing').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = el.textContent.trim();
+        const guidance = this._getCriteriaGuidance(text);
+        if (guidance) {
+          this._showCriteriaTooltip(el, guidance);
+        }
+      });
+    });
+  }
+
+  _getCriteriaGuidance(criteriaText) {
+    const lower = criteriaText.toLowerCase();
+    if (lower.includes('strength milestone'))
+      return 'Keep progressing weight on the current exercise. Strength milestones unlock once you consistently hit target weights.';
+    if (lower.includes('mobility check'))
+      return 'Complete mobility checks during workouts. You need 3 consecutive "yes" responses to the mobility question.';
+    if (lower.includes('pain-free'))
+      return 'Report no pain for the prerequisite exercise over consecutive sessions. Pain reports reset the counter.';
+    if (lower.includes('weeks training'))
+      return 'Keep training consistently. The system counts unique weeks with logged sessions for the prerequisite exercise.';
+    if (lower.includes('evaluation error'))
+      return 'An error occurred evaluating this exercise. Try refreshing the page.';
+    return 'Keep training consistently to meet this requirement.';
+  }
+
+  _showCriteriaTooltip(element, text) {
+    const existing = document.querySelector('.criteria-tooltip');
+    if (existing) existing.remove();
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'criteria-tooltip';
+    tooltip.textContent = text;
+    element.parentElement.appendChild(tooltip);
+
+    setTimeout(() => tooltip.classList.add('tooltip-visible'), 10);
+    setTimeout(() => {
+      tooltip.classList.remove('tooltip-visible');
+      setTimeout(() => tooltip.remove(), 300);
+    }, 4000);
   }
 
   showPostWorkoutPainModal() {
