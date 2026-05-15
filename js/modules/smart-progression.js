@@ -1062,19 +1062,11 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 2: Progression (weight increase or bodyweight tempo / technique)
+  // PRIORITY 2: Progression (weight increase only)
   if (detectSuccessfulProgression(history, exerciseName)) {
     const weightSuggestion = suggestWeightIncrease(history, exerciseName);
     if (weightSuggestion) {
       return weightSuggestion;
-    }
-
-    const exerciseDef = getWorkoutExerciseDefinition(exerciseName);
-    if (exerciseDef && Number(exerciseDef.weightIncrement) === 0) {
-      const techniqueSuggestion = suggestBodyweightTechniqueProgression(exerciseName, history);
-      if (techniqueSuggestion) {
-        return techniqueSuggestion;
-      }
     }
   }
 
@@ -1104,8 +1096,10 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 5: Plateau detection
-  if (detectPlateau(history)) {
+  // PRIORITY 5: Plateau detection (skip for bodyweight/fixed-load exercises)
+  const exerciseDef = getWorkoutExerciseDefinition(exerciseName);
+  const isBodyweight = exerciseDef && Number(exerciseDef.weightIncrement) === 0;
+  if (!isBodyweight && detectPlateau(history)) {
     const plateauSuggestion = suggestPlateauAlternative(exerciseKey, history);
     if (plateauSuggestion) {
       return plateauSuggestion;

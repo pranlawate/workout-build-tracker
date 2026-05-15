@@ -7,7 +7,7 @@ import { BodyWeightManager } from './modules/body-weight.js';
 import { ProgressAnalyzer } from './modules/progress-analyzer.js';
 import { AnalyticsCalculator } from './modules/analytics-calculator.js';
 import { WeightTrendChart } from './components/weight-trend-chart.js';
-import { getWorkout, getWorkoutWithSelections, getWarmup, getAllWorkouts } from './modules/workouts.js';
+import { getWorkout, getWorkoutWithSelections, getWarmup, getAllWorkouts, EXERCISE_DEFINITIONS } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { getSuggestion } from './modules/smart-progression.js';
 import { getFormCues } from './modules/form-cues.js';
@@ -1315,6 +1315,7 @@ class App {
         <div class="exercise-item ${stateClass} ${exercise.optional ? 'optional-exercise' : ''}" data-exercise-index="${index}">
           <div class="exercise-header">
             <h3 class="exercise-name">${this.escapeHtml(exercise.name)}${optionalLabel}</h3>
+            <button type="button" class="swap-exercise-btn" data-exercise-index="${index}" aria-label="Swap exercise" title="Swap exercise">⇄</button>
             <div class="exercise-badges">
               ${this.renderProgressionBadge(exercise, history, suggestion)}
             </div>
@@ -1346,6 +1347,7 @@ class App {
     // Attach input listeners
     this.attachSetInputListeners();
     this.syncAllRirSelectClasses();
+    this.attachSwapListeners();
 
     // Show complete workout button
     const completeBtn = document.getElementById('complete-workout-btn');
@@ -1703,6 +1705,129 @@ class App {
       'GAP_RETURN': 'WELCOME BACK'
     };
     return labelMap[type] || 'SUGGESTION';
+  }
+
+  attachSwapListeners() {
+    document.querySelectorAll('.swap-exercise-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.exerciseIndex, 10);
+        this.showSwapModal(idx);
+      });
+    });
+  }
+
+  showSwapModal(exerciseIndex) {
+    const exercises = this.orderedExercises || this.currentWorkout?.exercises;
+    if (!exercises || !exercises[exerciseIndex]) return;
+
+    const exercise = exercises[exerciseIndex];
+    const workoutName = this.currentWorkout.name;
+
+    const originalExercises = this.currentWorkout.exercises;
+    const origIdx = originalExercises.findIndex(ex => ex.name === exercise.name);
+    const slotIndex = origIdx >= 0 ? origIdx : exerciseIndex;
+    const slotKey = `${workoutName}_SLOT_${slotIndex + 1}`;
+
+    const path = PROGRESSION_PATHS[slotKey];
+    if (!path) {
+      console.warn('[Swap] No progression path for slot:', slotKey);
+      return;
+    }
+
+    const alternatives = [
+      ...(path.easier || []).map(name => ({ name, tier: 'Easier' })),
+      ...(path.harder || []).map(name => ({ name, tier: 'Harder' })),
+      ...(path.alternate || []).map(name => ({ name, tier: 'Alternate' }))
+    ].filter(alt => alt.name !== exercise.name);
+
+    if (path.current !== exercise.name) {
+      alternatives.unshift({ name: path.current, tier: 'Default' });
+    }
+
+    if (alternatives.length === 0) {
+      alert('No alternatives available for this exercise slot.');
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'swap-modal-overlay';
+    modal.innerHTML = `
+      <div class="swap-modal">
+        <div class="swap-modal-header">
+          <h3>Swap: ${this.escapeHtml(exercise.name)}</h3>
+          <button type="button" class="icon-btn swap-modal-close">✕</button>
+        </div>
+        <div class="swap-modal-body">
+          ${alternatives.map(alt => `
+            <button type="button" class="swap-option" data-name="${this.escapeHtml(alt.name)}">
+              <span class="swap-option-name">${this.escapeHtml(alt.name)}</span>
+              <span class="swap-option-tier">${alt.tier}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector('.swap-modal-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+
+    modal.querySelectorAll('.swap-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const newName = opt.dataset.name;
+        modal.remove();
+        this.executeSwap(exerciseIndex, slotIndex, newName);
+      });
+    });
+  }
+
+  executeSwap(displayIndex, slotIndex, newExerciseName) {
+    const exercises = this.orderedExercises || this.currentWorkout?.exercises;
+    if (!exercises || !exercises[displayIndex]) return;
+
+    const oldName = exercises[displayIndex].name;
+
+    const altDef = this._getExerciseDefinition(newExerciseName);
+    const newExercise = altDef
+      ? { ...altDef, name: newExerciseName }
+      : { ...exercises[displayIndex], name: newExerciseName };
+
+    if (exercises[displayIndex].optional) {
+      newExercise.optional = true;
+    }
+
+    exercises[displayIndex] = newExercise;
+
+    const origIdx = this.currentWorkout.exercises.findIndex(ex => ex.name === oldName);
+    if (origIdx >= 0) {
+      this.currentWorkout.exercises[origIdx] = newExercise;
+    }
+
+    if (this.workoutSession?.exercises?.[displayIndex]) {
+      this.workoutSession.exercises[displayIndex] = {
+        name: newExerciseName,
+        sets: [],
+        swappedFrom: oldName
+      };
+    }
+
+    console.log(`[Swap] ${oldName} -> ${newExerciseName}`);
+    this.renderExercises();
+  }
+
+  _getExerciseDefinition(exerciseName) {
+    if (EXERCISE_DEFINITIONS[exerciseName]) {
+      return EXERCISE_DEFINITIONS[exerciseName];
+    }
+    for (const workout of getAllWorkouts()) {
+      const found = workout.exercises.find(ex => ex.name === exerciseName);
+      if (found) return { ...found };
+    }
+    return null;
   }
 
   attachSetInputListeners() {

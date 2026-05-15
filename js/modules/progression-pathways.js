@@ -119,6 +119,14 @@ export const PROGRESSION_PATHS = {
   },
 
   'LOWER_A_SLOT_3': {
+    slotName: 'Quad Isolation',
+    easier: ['Bodyweight Squats'],
+    current: 'Leg Extension',
+    harder: ['Weighted Leg Extension'],
+    alternate: ['Sissy Squats', 'Walking Lunges']
+  },
+
+  'LOWER_A_SLOT_4': {
     slotName: 'Glute Isolation',
     easier: ['Bodyweight Hip Thrust', 'Glute Bridges'],
     current: 'Hip Thrust',
@@ -126,22 +134,11 @@ export const PROGRESSION_PATHS = {
     alternate: ['Cable Pull-Through']
   },
 
-  'LOWER_A_SLOT_4': {
-    slotName: 'Quad Isolation',
-    easier: ['Bodyweight Squats'],
-    current: 'Leg Extension',
-    harder: ['Weighted Leg Extension'],
-    alternate: ['Sissy Squats']
-  },
-
   'LOWER_A_SLOT_5': {
-    slotName: 'Gastrocnemius (Calf)',
-    easier: ['Machine calf raise'],
-    current: 'Standing Calf Raise',
-    harder: [
-      'Single-leg Calf Raise',
-      'Weighted Single-leg'
-    ],
+    slotName: 'Soleus (Calf)',
+    easier: ['Lighter weight'],
+    current: 'Seated Calf Raise',
+    harder: ['Single-leg Seated Calf'],
     alternate: []
   },
 
@@ -277,10 +274,13 @@ export const PROGRESSION_PATHS = {
   },
 
   'LOWER_B_SLOT_6': {
-    slotName: 'Soleus (Calf)',
-    easier: ['Lighter weight'],
-    current: 'Seated Calf Raise',
-    harder: ['Single-leg Seated Calf'],
+    slotName: 'Gastrocnemius (Calf)',
+    easier: ['Machine calf raise'],
+    current: 'Standing Calf Raise',
+    harder: [
+      'Single-leg Calf Raise',
+      'Weighted Single-leg'
+    ],
     alternate: []
   },
 

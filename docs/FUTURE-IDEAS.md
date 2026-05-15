@@ -2,12 +2,12 @@
 
 Ideas collected during development for potential future implementation.
 
-## Mid-Session Exercise Swap
+## ~~Mid-Session Exercise Swap~~ (Implemented)
 
-Allow swapping an exercise mid-workout (e.g., equipment occupied, joint feels off).
-- Show alternatives from the same progression slot
-- Carry over completed sets or start fresh
+Basic mid-session swap is now available via the swap button on each exercise header.
+Future enhancements:
 - Log the swap reason for pattern detection
+- Track swap frequency per exercise for insights
 
 ## Superset Tracking
 
