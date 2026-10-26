@@ -90,6 +90,20 @@ export const PROGRESSION_PATHS = {
   },
 
   'UPPER_A_SLOT_7': {
+    slotName: 'Lateral Deltoids',
+    easier: [
+      'Cable Lateral Raises',
+      'Seated DB Lateral Raises'
+    ],
+    current: 'DB Lateral Raises',
+    harder: [
+      'Lean-Away Cable Laterals',
+      'Single-arm variations'
+    ],
+    alternate: ['Machine Lateral Raises']
+  },
+
+  'UPPER_A_SLOT_8': {
     slotName: 'Tricep Isolation',
     easier: ['Light Tricep Pushdowns'],
     current: 'Tricep Pushdowns',

@@ -35,6 +35,91 @@ export function getWarmup(workoutName) {
   return WARMUPS[workoutName] || [];
 }
 
+/**
+ * Tendon Hold Protocol
+ *
+ * After the last working set of key exercises, reduce to ~70% working weight
+ * and hold at the stretched position for the prescribed duration.
+ * Progressive overload: start at startSeconds, add 5s/week until reaching targetSeconds.
+ * Then increase load slightly and reset duration.
+ *
+ * exerciseName: which exercise triggers the tendon hold
+ * position: joint angle / body position for the hold
+ * tendon: primary tendon being loaded
+ * startSeconds: initial hold duration (week 1)
+ * targetSeconds: goal duration before increasing load
+ * loadPercent: percentage of working weight to use
+ * cue: short coaching cue shown during the hold
+ */
+const TENDON_HOLDS = {
+  UPPER_A: [
+    {
+      exerciseName: 'Face Pulls',
+      position: 'Peak external rotation (elbows back, hands apart)',
+      tendon: 'Rotator cuff (supraspinatus, infraspinatus)',
+      startSeconds: 20,
+      targetSeconds: 45,
+      loadPercent: 70,
+      cue: 'Hold rope at face height, elbows back, externally rotated. Breathe steadily.'
+    }
+  ],
+  LOWER_A: [
+    {
+      exerciseName: 'Hack Squat',
+      position: 'Bottom of squat (thighs at or below parallel)',
+      tendon: 'Patellar tendon',
+      startSeconds: 20,
+      targetSeconds: 45,
+      loadPercent: 70,
+      cue: 'Settle into bottom position, knees tracking over toes. Breathe steadily, stay tight.'
+    },
+    {
+      exerciseName: 'Seated Calf Raise',
+      position: 'Heels fully below platform (max dorsiflexion)',
+      tendon: 'Soleus / Achilles tendon',
+      startSeconds: 20,
+      targetSeconds: 45,
+      loadPercent: 70,
+      cue: 'Let heels sink as far as comfortable. Maintain contact with pad. Breathe.'
+    }
+  ],
+  UPPER_B: [
+    {
+      exerciseName: 'Lat Pulldown',
+      position: 'Arms fully extended overhead (dead hang position)',
+      tendon: 'Lat / bicep tendon at shoulder',
+      startSeconds: 20,
+      targetSeconds: 45,
+      loadPercent: 70,
+      cue: 'Let the weight stretch you. Shoulders by ears, relax into the stretch. Breathe.'
+    }
+  ],
+  LOWER_B: [
+    {
+      exerciseName: 'DB Romanian Deadlift',
+      position: 'Bottom stretch (DBs at shin level, hips back)',
+      tendon: 'Proximal hamstring tendon',
+      startSeconds: 20,
+      targetSeconds: 45,
+      loadPercent: 70,
+      cue: 'Maintain flat back, feel hamstring stretch. Do not round. Breathe steadily.'
+    },
+    {
+      exerciseName: 'Standing Calf Raise',
+      position: 'Heels fully below platform (max dorsiflexion)',
+      tendon: 'Gastrocnemius / Achilles tendon',
+      startSeconds: 20,
+      targetSeconds: 45,
+      loadPercent: 70,
+      cue: 'Straight knees, heels as low as possible. Breathe and hold.'
+    }
+  ]
+};
+
+export function getTendonHolds(workoutName) {
+  return TENDON_HOLDS[workoutName] || [];
+}
+
 // Exercise definitions for progression pathway exercises
 export const EXERCISE_DEFINITIONS = {
   'KB Goblet Squat': {
@@ -161,6 +246,16 @@ export const WORKOUTS = {
         notes: 'Isolation | Rear Delts, Rotator Cuff | External rotation focus',
       },
       {
+        name: 'DB Lateral Raises',
+        sets: 2,
+        repRange: '12-15',
+        rirTarget: '2-3',
+        restMinutes: 1,
+        startingWeight: 3.5,
+        weightIncrement: 1.25,
+        notes: 'Isolation | Side Delts | Thumbs up, never above shoulder height',
+      },
+      {
         name: 'Tricep Pushdowns',
         sets: 2,
         repRange: '12-15',
@@ -278,7 +373,7 @@ export const WORKOUTS = {
       },
       {
         name: 'DB Lateral Raises',
-        sets: 2,
+        sets: 3,
         repRange: '12-15',
         rirTarget: '2-3',
         restMinutes: 1,

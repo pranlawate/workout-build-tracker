@@ -37,7 +37,8 @@ export const FORM_CUES = {
   'Decline DB Press': {
     setup: ['Lock ankles under pads', 'Retract shoulder blades', 'Head supported on bench'],
     execution: ['Press toward hips (not vertical)', 'Slow eccentric - 2s down to lower chest', 'Explosive concentric - 1s up'],
-    mistakes: ['Pressing straight up instead of toward hips', 'Dumbbells drifting apart', 'Losing scapular retraction']
+    mistakes: ['Pressing straight up instead of toward hips', 'Dumbbells drifting apart', 'Losing scapular retraction'],
+    tendonCue: 'Last rep: hold 2-3s at bottom stretch. Loads pec/elbow tendons under length.'
   },
 
   'Seated Cable Row': {
@@ -56,13 +57,15 @@ export const FORM_CUES = {
   'T-Bar Row': {
     setup: ['Feet shoulder-width', 'Hip hinge position', 'Neutral spine, chest up'],
     execution: ['Pull to lower chest', 'Squeeze shoulder blades', 'Keep elbows close to body'],
-    mistakes: ['Rounding back', 'Using legs/momentum', 'Pulling too high (to neck)']
+    mistakes: ['Rounding back', 'Using legs/momentum', 'Pulling too high (to neck)'],
+    tendonCue: 'Last rep: hold 3s at peak contraction (blades squeezed). Strengthens grip and mid-back tendons.'
   },
 
   'DB Lateral Raises': {
     setup: ['Slight forward lean', 'Slight elbow bend', 'Thumbs slightly up (not down)', 'Dumbbells in front of thighs'],
     execution: ['Lead with elbows', 'Raise to shoulder height ONLY — never higher', 'Control descent (3 sec)'],
-    mistakes: ['Raising above shoulder height (impingement risk)', 'Thumbs pointing down', 'Swinging/momentum', 'Shrugging shoulders']
+    mistakes: ['Raising above shoulder height (impingement risk)', 'Thumbs pointing down', 'Swinging/momentum', 'Shrugging shoulders'],
+    tendonCue: 'Every rep: 3s controlled descent. Loads supraspinatus tendon safely below impingement zone.'
   },
 
   'Face Pulls': {
@@ -89,19 +92,22 @@ export const FORM_CUES = {
   'Leg Curl': {
     setup: ['Align knee with machine pivot', 'Pad at lower calf', 'Hips pressed into pad', 'Grip handles for stability'],
     execution: ['Curl to full contraction', 'Squeeze hamstrings (1 sec)', 'Control descent (3 sec)'],
-    mistakes: ['Lifting hips off pad (most common cheat)', 'Jerking with momentum', 'Partial ROM']
+    mistakes: ['Lifting hips off pad (most common cheat)', 'Jerking with momentum', 'Partial ROM'],
+    tendonCue: 'Last rep: hold 3s at full stretch (legs extended). Loads hamstring tendons at knee insertion.'
   },
 
   'Leg Extension': {
     setup: ['Align knee with machine pivot', 'Back against pad', 'Ankles under pad'],
     execution: ['Extend fully to lockout', 'Pause at top (2 sec)', 'Control descent (3 sec)'],
-    mistakes: ['Jerking with momentum', 'Partial extension', 'Lifting butt off seat']
+    mistakes: ['Jerking with momentum', 'Partial extension', 'Lifting butt off seat'],
+    tendonCue: 'Every rep: hold 2s at full lockout. Loads patellar tendon under peak contraction.'
   },
 
   '45° Hyperextension': {
     setup: ['Hips on pad', 'Feet secured', 'Arms crossed on chest', 'Chin tucked, neutral neck'],
     execution: ['Lower controlled (3 sec)', 'Maintain neutral spine', 'Rise to parallel ONLY'],
-    mistakes: ['Hyperextending back (going too high)', 'Rounding spine', 'Looking up (neck strain)', 'Using momentum']
+    mistakes: ['Hyperextending back (going too high)', 'Rounding spine', 'Looking up (neck strain)', 'Using momentum'],
+    tendonCue: 'Last rep: hold 3s at bottom (full stretch). Loads erector and hamstring tendons under length.'
   },
 
   'Standing Calf Raise': {
@@ -120,7 +126,8 @@ export const FORM_CUES = {
   'Reverse Crunch': {
     setup: ['Lie on bench or floor', 'Arms at sides gripping bench/floor', 'Knees bent at 90°'],
     execution: ['Curl hips off bench toward chest', 'Squeeze lower abs at top (1 sec)', 'Lower slowly (3 sec) — don\'t let feet touch floor'],
-    mistakes: ['Using momentum/swinging legs', 'Straightening legs (turns into leg raise)', 'Arching lower back on the way down']
+    mistakes: ['Using momentum/swinging legs', 'Straightening legs (turns into leg raise)', 'Arching lower back on the way down'],
+    tendonCue: 'Every rep: 3s controlled lowering. Loads abdominal fascia and hip flexor tendons eccentrically.'
   },
 
   // UPPER_B exercises
@@ -140,7 +147,8 @@ export const FORM_CUES = {
   'Landmine Press': {
     setup: ['Barbell in landmine or corner', 'Stand with staggered stance', 'Hold bar end at shoulder with one hand', 'Core braced, slight forward lean'],
     execution: ['Press up and forward following the arc', 'Fully extend arm without locking', 'Control descent to shoulder (2 sec)', 'Alternate arms each set'],
-    mistakes: ['Arching lower back', 'Pressing straight up (follow the bar\'s natural arc)', 'Rotating torso excessively', 'Using too wide a stance']
+    mistakes: ['Arching lower back', 'Pressing straight up (follow the bar\'s natural arc)', 'Rotating torso excessively', 'Using too wide a stance'],
+    tendonCue: 'Every rep: 2s controlled descent to shoulder. Loads deltoid and tricep tendons through safe arc.'
   },
 
   'DB Chest Fly': {
@@ -152,31 +160,36 @@ export const FORM_CUES = {
   'Machine Fly': {
     setup: ['Adjust seat so handles align with mid-chest', 'Back flat against pad', 'Feet flat on floor', 'Grip handles with slight elbow bend'],
     execution: ['Bring handles together in front of chest (2 sec)', 'Squeeze chest at the center (1 sec)', 'Open slowly until gentle chest stretch (3 sec)'],
-    mistakes: ['Letting weight slam back', 'Going too far back (overstretching shoulder)', 'Shrugging shoulders up', 'Using momentum']
+    mistakes: ['Letting weight slam back', 'Going too far back (overstretching shoulder)', 'Shrugging shoulders up', 'Using momentum'],
+    tendonCue: 'Last rep: hold 2s at full stretch (arms open). Loads pec tendons at insertion point.'
   },
 
   'Chest-Supported Row': {
     setup: ['Chest firmly on pad', 'Neutral spine', 'Grip handles or dumbbells at arm\'s length'],
     execution: ['Controlled concentric - 2s pull to sides of ribs', 'Squeeze shoulder blades together at top', 'Slow eccentric - 2s descent, full stretch'],
-    mistakes: ['Lifting chest off pad to cheat ROM', 'Using momentum', 'Cutting range of motion short']
+    mistakes: ['Lifting chest off pad to cheat ROM', 'Using momentum', 'Cutting range of motion short'],
+    tendonCue: 'Last rep: hold 3s at full stretch (arms extended). Loads lat/bicep tendons under length.'
   },
 
   'Incline DB Press': {
     setup: ['Bench at 30° MAX (lower is safer for rotator cuff)', 'Retract shoulder blades', 'Feet flat on floor'],
     execution: ['Elbows at 45°', 'Slow eccentric - 2s down', 'Explosive concentric - 1s up to lockout'],
-    mistakes: ['Bench too steep (>30° increases shoulder strain)', 'Dumbbells drifting apart', 'Shoulders rolling forward']
+    mistakes: ['Bench too steep (>30° increases shoulder strain)', 'Dumbbells drifting apart', 'Shoulders rolling forward'],
+    tendonCue: 'Last rep: hold 2-3s at bottom stretch. Loads pec/shoulder tendons at longest length.'
   },
 
   'Reverse Fly': {
     setup: ['Bend at hips 45°', 'Slight knee bend', 'Dumbbells hanging, palms in'],
     execution: ['Raise arms to sides', 'Squeeze rear delts (1 sec)', 'Control descent (2 sec)'],
-    mistakes: ['Using momentum', 'Raising too high', 'Bending elbows too much']
+    mistakes: ['Using momentum', 'Raising too high', 'Bending elbows too much'],
+    tendonCue: 'Every rep: hold 1-2s at peak contraction. Strengthens rear delt and rotator cuff tendons.'
   },
 
   'Dead Bug': {
     setup: ['Lie on back', 'Arms straight up', 'Knees at 90°, shins parallel to floor'],
     execution: ['Extend opposite arm/leg', 'Keep lower back pressed down', 'Breathe normally'],
-    mistakes: ['Back arching off floor', 'Moving too fast', 'Holding breath']
+    mistakes: ['Back arching off floor', 'Moving too fast', 'Holding breath'],
+    tendonCue: 'Every rep: 3s extension, 2s return. Slow tempo loads core tendons and deep stabilizers isometrically.'
   },
 
   // LOWER_B exercises
@@ -196,13 +209,15 @@ export const FORM_CUES = {
   'Leg Abduction': {
     setup: ['Sit upright', 'Back against pad', 'Pads on outer thighs'],
     execution: ['Push legs apart slowly', 'Pause at full abduction (2 sec)', 'Control return'],
-    mistakes: ['Using momentum', 'Leaning forward', 'Partial ROM']
+    mistakes: ['Using momentum', 'Leaning forward', 'Partial ROM'],
+    tendonCue: 'Last rep: hold 3s at full abduction. Loads glute medius tendon at peak contraction.'
   },
 
   'Hip Thrust': {
     setup: ['Upper back on bench', 'Feet flat, knees at 90°', 'Weight on hips'],
     execution: ['Drive hips up', 'Squeeze glutes at top (1 sec)', 'Lower controlled (2 sec)'],
-    mistakes: ['Hyperextending back', 'Pushing with lower back', 'Partial ROM']
+    mistakes: ['Hyperextending back', 'Pushing with lower back', 'Partial ROM'],
+    tendonCue: 'Every rep: hold 2s at top lockout. Loads glute and hip flexor tendons under peak contraction.'
   },
 
   'Seated Calf Raise': {
@@ -221,7 +236,8 @@ export const FORM_CUES = {
   'Pallof Press': {
     setup: ['Cable or band at chest height', 'Stand sideways to anchor', 'Feet shoulder-width, knees soft', 'Hold handle at chest with both hands'],
     execution: ['Press hands straight out from chest', 'Hold extended position (2 sec) — resist the pull', 'Return to chest slowly', 'Keep hips and shoulders square (don\'t rotate)'],
-    mistakes: ['Rotating toward the cable', 'Leaning away to compensate', 'Locking knees', 'Rushing — this is about control, not speed']
+    mistakes: ['Rotating toward the cable', 'Leaning away to compensate', 'Locking knees', 'Rushing — this is about control, not speed'],
+    tendonCue: 'Every rep: hold 3s at full extension. Pure isometric tendon loading for obliques and core stabilizers.'
   },
 
   // Kettlebell progressions
@@ -290,39 +306,45 @@ export const FORM_CUES = {
   'Tricep Pushdowns': {
     setup: ['Cable at chest height', 'Elbows tucked at sides', 'Slight forward lean', 'Feet hip-width'],
     execution: ['Press down to full extension', 'Keep elbows stationary', 'Squeeze triceps at bottom', 'Control return (2 sec)'],
-    mistakes: ['Elbows flaring out', 'Using momentum/swinging', 'Not achieving full extension', 'Shoulder involvement']
+    mistakes: ['Elbows flaring out', 'Using momentum/swinging', 'Not achieving full extension', 'Shoulder involvement'],
+    tendonCue: 'Every rep: hold 1s at full lockout, 2s return. Loads tricep tendon at elbow insertion.'
   },
 
   'Overhead Tricep Extension': {
     setup: ['DB overhead with both hands', 'Elbows pointing forward', 'Core braced', 'Feet shoulder-width'],
     execution: ['Lower behind head slowly (3 sec)', 'Keep elbows stationary', 'Extend to full lockout', 'Feel stretch in long head'],
-    mistakes: ['Elbows flaring out', 'Arching back excessively', 'Partial range of motion', 'Dropping weight too fast']
+    mistakes: ['Elbows flaring out', 'Arching back excessively', 'Partial range of motion', 'Dropping weight too fast'],
+    tendonCue: 'Last rep: hold 3s at bottom stretch (behind head). Loads tricep long head tendon at full length.'
   },
 
   // UPPER_B - Biceps
   'Standard DB Curls': {
     setup: ['DBs at sides', 'Palms forward', 'Elbows at sides', 'Feet shoulder-width'],
     execution: ['Curl to shoulder height', 'Keep elbows stationary', 'Squeeze biceps at top (1 sec)', 'Control descent (2 sec)'],
-    mistakes: ['Swinging/momentum', 'Elbows moving forward', 'Not achieving full ROM', 'Rushing reps']
+    mistakes: ['Swinging/momentum', 'Elbows moving forward', 'Not achieving full ROM', 'Rushing reps'],
+    tendonCue: 'Every rep: 2s controlled descent. Loads bicep tendon eccentrically at elbow and shoulder.'
   },
 
   'DB Hammer Curls': {
     setup: ['DBs at sides', 'Palms facing each other', 'Elbows at sides', 'Feet shoulder-width'],
     execution: ['Curl to shoulder height', 'Keep palms neutral', 'Squeeze at top (1 sec)', 'Control descent (2 sec)'],
-    mistakes: ['Swinging/momentum', 'Rotating wrists', 'Elbows moving forward', 'Partial ROM']
+    mistakes: ['Swinging/momentum', 'Rotating wrists', 'Elbows moving forward', 'Partial ROM'],
+    tendonCue: 'Every rep: 2s controlled descent. Neutral grip loads brachialis and forearm tendons.'
   },
 
   // LOWER_A - Leg Press and Adduction
   'Leg Press': {
     setup: ['Back flat against pad', 'Feet shoulder-width on platform', 'Knees aligned with toes', 'Grip handles for stability'],
     execution: ['Lower slowly to 90° (3 sec)', 'Knees track over toes', 'Push through heels', 'Don\'t lock knees at top'],
-    mistakes: ['Knees caving in', 'Bouncing at bottom', 'Locking knees', 'Lifting hips off pad']
+    mistakes: ['Knees caving in', 'Bouncing at bottom', 'Locking knees', 'Lifting hips off pad'],
+    tendonCue: 'Last rep: hold 2-3s at 90° (bottom). Loads patellar and quad tendons under stretch.'
   },
 
   'Leg Adduction': {
     setup: ['Sit with back against pad', 'Pads on inner thighs', 'Adjust range of motion', 'Core engaged'],
     execution: ['Bring legs together smoothly', 'Squeeze inner thighs (1 sec)', 'Control opening (2 sec)', 'Maintain posture'],
-    mistakes: ['Using momentum', 'Leaning forward', 'Rushing reps', 'Not achieving full contraction']
+    mistakes: ['Using momentum', 'Leaning forward', 'Rushing reps', 'Not achieving full contraction'],
+    tendonCue: 'Last rep: hold 3s at full adduction (legs together). Loads adductor tendons at peak contraction.'
   }
 };
 

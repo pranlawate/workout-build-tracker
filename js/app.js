@@ -7,7 +7,7 @@ import { BodyWeightManager } from './modules/body-weight.js';
 import { ProgressAnalyzer } from './modules/progress-analyzer.js';
 import { AnalyticsCalculator } from './modules/analytics-calculator.js';
 import { WeightTrendChart } from './components/weight-trend-chart.js';
-import { getWorkout, getWorkoutWithSelections, getWarmup, getAllWorkouts, EXERCISE_DEFINITIONS } from './modules/workouts.js';
+import { getWorkout, getWorkoutWithSelections, getWarmup, getTendonHolds, getAllWorkouts, EXERCISE_DEFINITIONS } from './modules/workouts.js';
 import { getProgressionStatus, getNextWeight } from './modules/progression.js';
 import { getSuggestion } from './modules/smart-progression.js';
 import { getFormCues } from './modules/form-cues.js';
@@ -1279,8 +1279,8 @@ class App {
                 </ul>
               </div>
               ${formCues.tendonCue ? `
-              <div class="form-cue-category tendon-cue">
-                <strong>Tendon Strength:</strong>
+              <div class="form-cue-category tempo-cue">
+                <strong>Form Tempo:</strong>
                 <p class="form-cue-paragraph">${this.escapeHtml(formCues.tendonCue.replace('', ''))}</p>
               </div>` : ''}
             </div>
@@ -2669,6 +2669,9 @@ class App {
     const justCompletedExercise = exercises[justCompletedIndex];
     const exerciseKey = justCompletedExercise.name;
 
+    // Show tendon hold prompt if this exercise has one
+    this.showTendonHoldIfNeeded(exerciseKey);
+
     // ALWAYS show mobility check for completed exercises
     this.showMobilityCheckIfNeeded(exerciseKey);
     // Pain tracking moved to post-workout modal
@@ -3702,6 +3705,201 @@ class App {
       // Reset file input
       event.target.value = '';
     }
+  }
+
+  showTendonHoldIfNeeded(exerciseName) {
+    if (!this.currentWorkout) return;
+
+    const holds = getTendonHolds(this.currentWorkout.name);
+    const hold = holds.find(h => h.exerciseName === exerciseName);
+    if (!hold) return;
+
+    // Get stored progress for this hold
+    const progressKey = `build_tendon_hold_${this.currentWorkout.name}_${exerciseName}`;
+    const stored = localStorage.getItem(progressKey);
+    const currentSeconds = stored ? Math.min(parseInt(stored, 10), hold.targetSeconds) : hold.startSeconds;
+
+    // Build modal
+    const modal = document.createElement('div');
+    modal.className = 'tendon-hold-overlay';
+    modal.innerHTML = `
+      <div class="tendon-hold-modal">
+        <div class="tendon-hold-header">
+          <h3>Tendon Hold</h3>
+          <p class="tendon-hold-exercise">${this.escapeHtml(exerciseName)}</p>
+        </div>
+        <div class="tendon-hold-body">
+          <p class="tendon-hold-tendon">${this.escapeHtml(hold.tendon)}</p>
+          <p class="tendon-hold-position">${this.escapeHtml(hold.position)}</p>
+          <p class="tendon-hold-load">Load: ~${hold.loadPercent}% of working weight</p>
+          <p class="tendon-hold-cue">${this.escapeHtml(hold.cue)}</p>
+          <div class="tendon-hold-timer">
+            <span class="tendon-hold-countdown">${currentSeconds}</span>
+            <span class="tendon-hold-unit">seconds</span>
+          </div>
+          <div class="tendon-hold-progress-bar">
+            <div class="tendon-hold-fill"></div>
+          </div>
+          <div class="tendon-hold-controls">
+            <button type="button" class="tendon-hold-control-btn tendon-hold-mute" aria-label="Mute sounds">Sound: On</button>
+            <button type="button" class="tendon-hold-control-btn tendon-hold-reset" aria-label="Reset timer" style="display:none;">Reset</button>
+          </div>
+          <div class="tendon-hold-actions">
+            <button type="button" class="btn btn-primary tendon-hold-start">Start Hold</button>
+            <button type="button" class="btn btn-secondary tendon-hold-skip">Skip</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const countdownEl = modal.querySelector('.tendon-hold-countdown');
+    const fillEl = modal.querySelector('.tendon-hold-fill');
+    const startBtn = modal.querySelector('.tendon-hold-start');
+    const skipBtn = modal.querySelector('.tendon-hold-skip');
+    const muteBtn = modal.querySelector('.tendon-hold-mute');
+    const resetBtn = modal.querySelector('.tendon-hold-reset');
+    let timer = null;
+    let remaining = currentSeconds;
+    const total = currentSeconds;
+    let muted = false;
+    let paused = false;
+    let phase = 'idle'; // idle | prep | hold | done
+
+    const cleanup = () => {
+      if (timer) clearInterval(timer);
+      modal.remove();
+    };
+
+    // Short beep via Web Audio API (no dependencies)
+    const beep = (freq = 880, duration = 200) => {
+      if (muted) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        gain.gain.value = 0.3;
+        osc.start();
+        osc.stop(ctx.currentTime + duration / 1000);
+      } catch (e) { /* silent fallback */ }
+    };
+
+    // Mute toggle
+    muteBtn.addEventListener('click', () => {
+      muted = !muted;
+      muteBtn.textContent = muted ? 'Sound: Off' : 'Sound: On';
+    });
+
+    // Reset: return to start of hold (not prep)
+    const resetTimer = () => {
+      if (timer) clearInterval(timer);
+      timer = null;
+      paused = false;
+      remaining = total;
+      phase = 'idle';
+      countdownEl.textContent = total;
+      fillEl.style.width = '0%';
+      startBtn.textContent = 'Start Hold';
+      startBtn.disabled = false;
+      skipBtn.textContent = 'Skip';
+      skipBtn.style.display = '';
+      resetBtn.style.display = 'none';
+    };
+
+    resetBtn.addEventListener('click', resetTimer);
+
+    const PREP_SECONDS = 5;
+
+    const startHoldTimer = () => {
+      phase = 'hold';
+      startBtn.textContent = 'Pause';
+      startBtn.disabled = false;
+      resetBtn.style.display = '';
+      beep(660, 300);
+
+      timer = setInterval(() => {
+        remaining--;
+        countdownEl.textContent = remaining;
+        const pct = ((total - remaining) / total) * 100;
+        fillEl.style.width = `${pct}%`;
+
+        if (remaining <= 0) {
+          clearInterval(timer);
+          timer = null;
+          phase = 'done';
+          countdownEl.textContent = '✓';
+          fillEl.style.width = '100%';
+          startBtn.textContent = 'Done';
+          startBtn.disabled = false;
+          skipBtn.style.display = 'none';
+          resetBtn.style.display = 'none';
+
+          beep(880, 150);
+          setTimeout(() => beep(880, 150), 250);
+          setTimeout(() => beep(1100, 300), 500);
+
+          const next = Math.min(currentSeconds + 5, hold.targetSeconds);
+          localStorage.setItem(progressKey, next.toString());
+
+          startBtn.onclick = cleanup;
+        }
+      }, 1000);
+    };
+
+    startBtn.addEventListener('click', () => {
+      if (phase === 'done') {
+        cleanup();
+        return;
+      }
+
+      // Pause/resume during hold
+      if (phase === 'hold' && !paused) {
+        paused = true;
+        if (timer) clearInterval(timer);
+        timer = null;
+        startBtn.textContent = 'Resume';
+        return;
+      }
+
+      if (phase === 'hold' && paused) {
+        paused = false;
+        startHoldTimer();
+        return;
+      }
+
+      // Start prep countdown
+      phase = 'prep';
+      startBtn.disabled = true;
+      skipBtn.textContent = 'Cancel';
+      resetBtn.style.display = '';
+
+      let prep = PREP_SECONDS;
+      countdownEl.textContent = prep;
+      startBtn.textContent = 'Get ready...';
+      fillEl.style.width = '0%';
+
+      beep(440, 100);
+
+      timer = setInterval(() => {
+        prep--;
+        if (prep > 0) {
+          countdownEl.textContent = prep;
+          beep(440, 100);
+        } else {
+          clearInterval(timer);
+          remaining = total;
+          countdownEl.textContent = remaining;
+          skipBtn.textContent = 'Stop';
+          startHoldTimer();
+        }
+      }, 1000);
+    });
+
+    skipBtn.addEventListener('click', cleanup);
   }
 
   showMobilityCheckIfNeeded(exerciseKey) {
