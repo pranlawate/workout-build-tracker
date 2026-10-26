@@ -130,21 +130,19 @@ export class ExerciseDetailScreen {
       // Original format for regular exercises
       const weights = sets.map(s => `${s.weight}kg`).join(', ');
       const reps = sets.map(s => s.reps).join(',');
-      const rirs = sets.map(s => s.rir).join(',');
-      return `${sets.length} sets: ${weights} × ${reps} @ RIR ${rirs}`;
+      return `${sets.length} sets: ${weights} × ${reps}`;
     }
   }
 
   /**
    * Format individual set display (band-aware)
-   * @param {Object} set - Set object { reps, weight, rir }
+   * @param {Object} set - Set object { reps, weight }
    * @param {boolean} isBand - True if band exercise
    * @returns {string} Formatted string
    */
   formatSetDisplay(set, isBand) {
     const reps = set.reps;
     const weight = set.weight;
-    const rir = set.rir;
 
     let weightDisplay;
     if (isBand) {
@@ -160,7 +158,7 @@ export class ExerciseDetailScreen {
       weightDisplay = `${weight}kg`;
     }
 
-    return `${reps}×${weightDisplay} (RIR ${rir})`;
+    return `${reps}×${weightDisplay}`;
   }
 
   /**

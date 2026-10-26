@@ -218,7 +218,7 @@
   background: var(--color-background-hover);
 }
 
-#cooldown-modal .radio-item.recommended {
+#cooldown-modal .radio-item:has(input[type="radio"]:checked) {
   background: var(--color-success-bg);
   border: 2px solid var(--color-success);
 }
@@ -292,6 +292,19 @@
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Hide number input spinners on weight inputs */
+#weight-input-cooldown::-webkit-inner-spin-button,
+#weight-input-cooldown::-webkit-outer-spin-button,
+#weight-input::-webkit-inner-spin-button,
+#weight-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#weight-input-cooldown,
+#weight-input {
+  -moz-appearance: textfield;
 }
 
 #cooldown-modal #weighin-save-cooldown {

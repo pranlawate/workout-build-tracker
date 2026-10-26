@@ -51,9 +51,20 @@ export class DeloadManager {
       }[sensitivity] || 6; // Fallback to 6 if sensitivity is undefined
 
       // Check time-based trigger (dynamic threshold)
+      // Only trigger if there has been recent training activity.
+      // After a gap of 14+ days the body has already rested, so a
+      // calendar-only deload trigger would contradict gap-return logic.
       const weeksSinceDeload = this.calculateWeeksSinceDeload(deloadState.lastDeloadDate);
       if (weeksSinceDeload >= baseWeeks) {
-        return { trigger: true, reason: 'time', weeks: weeksSinceDeload };
+        const lastWorkoutDate = this._getLastWorkoutDate();
+        const daysSinceLastWorkout = lastWorkoutDate
+          ? Math.floor((Date.now() - new Date(lastWorkoutDate).getTime()) / (1000 * 60 * 60 * 24))
+          : null;
+
+        if (daysSinceLastWorkout === null || daysSinceLastWorkout < 14) {
+          return { trigger: true, reason: 'time', weeks: weeksSinceDeload };
+        }
+        // Gap of 14+ days: skip time-based trigger (body already rested)
       }
 
       // Check performance-based trigger (regression on 2+ exercises)
@@ -96,6 +107,33 @@ export class DeloadManager {
     const diffWeeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
 
     return diffWeeks;
+  }
+
+  /**
+   * Finds the most recent workout date across all exercise history.
+   * @returns {string|null} ISO date string of the last workout, or null if none found
+   * @private
+   */
+  _getLastWorkoutDate() {
+    try {
+      const keys = this.storage.getAllExerciseKeys();
+      let latest = null;
+
+      for (const key of keys) {
+        const history = this.storage.getExerciseHistory(key);
+        if (!history || history.length === 0) continue;
+        const last = history[history.length - 1];
+        if (!last?.date) continue;
+        if (!latest || last.date > latest) {
+          latest = last.date;
+        }
+      }
+
+      return latest;
+    } catch (error) {
+      console.error('[DeloadManager] _getLastWorkoutDate:', error);
+      return null;
+    }
   }
 
   /**

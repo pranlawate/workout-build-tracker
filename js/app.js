@@ -130,25 +130,6 @@ class App {
   }
 
   /**
-   * Sync RIR select color classes (CSS attribute selectors do not track live select value).
-   * @param {HTMLSelectElement} select
-   */
-  syncRirSelectClass(select) {
-    if (!select || select.tagName !== 'SELECT' || !select.classList.contains('rir-select')) return;
-    for (let i = 0; i <= 5; i += 1) {
-      select.classList.remove(`rir-${i}`);
-    }
-    const v = select.value;
-    if (/^[0-5]$/.test(v)) {
-      select.classList.add(`rir-${v}`);
-    }
-  }
-
-  syncAllRirSelectClasses() {
-    document.querySelectorAll('select.rir-select').forEach((el) => this.syncRirSelectClass(el));
-  }
-
-  /**
    * Get performance badge HTML for an exercise during workout
    * @param {string} exerciseKey - Exercise identifier
    * @param {Array} currentSets - Current logged sets for this exercise
@@ -1346,7 +1327,6 @@ class App {
 
     // Attach input listeners
     this.attachSetInputListeners();
-    this.syncAllRirSelectClasses();
     this.attachSwapListeners();
 
     // Show complete workout button
@@ -1367,8 +1347,7 @@ class App {
         !s ||
         s.reps === 0 ||
         s.weight === undefined ||
-        s.weight === null ||
-        typeof s.rir !== 'number'
+        s.weight === null
       );
       if (currentSetIndex === -1) currentSetIndex = 0;
     }
@@ -1391,16 +1370,6 @@ class App {
         ? sessionSet.weight
         : (prevSessionSet?.weight || lastSet?.weight || exercise.startingWeight);
       const defaultReps = hasSessionData ? sessionSet.reps : (lastSet?.reps || '');
-
-      // Default RIR to minimum of target range (per design spec)
-      // Time-based exercises don't have RIR; null/undefined last RIR uses target min
-      const defaultRir = hasSessionData && typeof sessionSet.rir === 'number'
-        ? sessionSet.rir
-        : (typeof lastSet?.rir === 'number' ? lastSet.rir : (() => {
-          if (!exercise.rirTarget) return 0; // Time-based exercises
-          const [min] = exercise.rirTarget.split('-').map(Number);
-          return min;
-        })());
 
       // Determine set state
       const isCurrent = setIndex === currentSetIndex;
@@ -1501,28 +1470,7 @@ class App {
             />
           </div>
 
-          ${!isTimeBased ? `
-          <div class="set-inputs">
-            <label class="input-label">
-              RIR
-              <span class="rir-help" title="Reps In Reserve - How many more reps you could do">ℹ️</span>
-            </label>
-            <select
-              class="set-input rir-select"
-              data-exercise="${exerciseIndex}"
-              data-set="${setIndex}"
-              data-field="rir"
-              ${disabledAttr}
-            >
-              <option value="0" ${defaultRir === 0 ? 'selected' : ''}>0 (Failure)</option>
-              <option value="1" ${defaultRir === 1 ? 'selected' : ''}>1</option>
-              <option value="2" ${defaultRir === 2 ? 'selected' : ''}>2 (Target)</option>
-              <option value="3" ${defaultRir === 3 ? 'selected' : ''}>3 (Target)</option>
-              <option value="4" ${defaultRir === 4 ? 'selected' : ''}>4</option>
-              <option value="5" ${defaultRir >= 5 ? 'selected' : ''}>5+</option>
-            </select>
-          </div>
-          ` : ''}
+          
 
           ${logButtonHtml}
         </div>
@@ -1865,36 +1813,28 @@ class App {
     const setIndex = parseInt(input.dataset.set);
     const field = input.dataset.field;
     const value =
-      field === 'reps' || field === 'rir'
+      field === 'reps'
         ? parseInt(input.value, 10)
         : parseFloat(input.value);
 
     // Validate input
     if (isNaN(value) || value < 0) return;
-    if (field === 'rir' && value > 10) return;
 
     // Ensure sets array exists for this exercise
     const exercise = this.workoutSession.exercises[exerciseIndex];
     if (!exercise.sets[setIndex]) {
-      exercise.sets[setIndex] = { weight: 0, reps: 0, rir: 0 };
+      exercise.sets[setIndex] = { weight: 0, reps: 0 };
     }
 
     // Update the value
     exercise.sets[setIndex][field] = value;
 
-    if (field === 'rir' && input.tagName === 'SELECT') {
-      this.syncRirSelectClass(input);
-    }
-
-    // Check if this set is complete (has weight, reps, and RIR)
+    // Check if this set is complete (has weight and reps)
     const set = exercise.sets[setIndex];
     const exerciseDef = (this.orderedExercises || this.currentWorkout?.exercises)?.[exerciseIndex];
-    const isTimeBased = this.isTimeBasedExercise(exerciseDef);
     // For bodyweight exercises, weight can be 0
     const hasValidWeight = typeof set.weight === 'number' && set.weight >= 0;
-    // Time-based exercises don't have RIR; null/undefined RIR is not "0 RIR"
-    const hasValidRir = isTimeBased || (typeof set.rir === 'number' && set.rir >= 0);
-    if (hasValidWeight && set.reps > 0 && hasValidRir) {
+    if (hasValidWeight && set.reps > 0) {
       this.checkSetProgression(exerciseIndex, setIndex);
 
       // Note: We don't unlock next set or check exercise completion here
@@ -1921,10 +1861,6 @@ class App {
     const repsInput = document.querySelector(
       `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="reps"]`
     );
-    const rirInput = document.querySelector(
-      `.set-input[data-exercise="${exerciseIndex}"][data-set="${setIndex}"][data-field="rir"]`
-    );
-
     // Get weight value (from band dropdown OR regular input)
     let weight;
     if (isBand) {
@@ -1940,7 +1876,6 @@ class App {
     }
 
     const reps = parseInt(repsInput?.value);
-    const rir = parseInt(rirInput?.value);
 
     // Validate all fields are filled with detailed error messages
     const missingFields = [];
@@ -1955,12 +1890,6 @@ class App {
 
     if (!repsInput) missingFields.push('Reps input not found');
     else if (!reps || reps <= 0) missingFields.push('Reps');
-
-    // Skip RIR validation for time-based exercises (Plank, Side Plank)
-    if (!isTimeBased) {
-      if (!rirInput) missingFields.push('RIR input not found');
-      else if (rir === undefined || isNaN(rir)) missingFields.push('RIR');
-    }
 
     if (missingFields.length > 0) {
       alert(`Please fill in: ${missingFields.join(', ')}`);
@@ -1977,10 +1906,6 @@ class App {
     const set = exercise.sets[setIndex];
     set.weight = weight;
     set.reps = reps;
-    // Only store RIR for rep-based exercises (time-based exercises don't have RIR)
-    if (!isTimeBased) {
-      set.rir = rir;
-    }
 
     // Visual feedback
     button.textContent = '✓ LOGGED';
@@ -2031,50 +1956,31 @@ class App {
       return;
     }
 
-    // Rep-based exercises: Full RIR feedback
+    // Rep-based exercises: rep range feedback
     const cleanRepRange = exerciseDef.repRange.replace(/[^\d-]/g, '');
     const [minReps, maxReps] = cleanRepRange.split('-').map(Number);
 
-    // Defensive: should always have rirTarget for rep-based exercises
-    if (!exerciseDef.rirTarget) {
-      console.error('[showPostSetFeedback] Rep-based exercise missing rirTarget:', exerciseDef.name);
-      return;
-    }
-    const [minRir, maxRir] = exerciseDef.rirTarget.split('-').map(Number);
-
-    // Determine feedback message and color
     let message = '';
     let colorClass = 'info';
 
-    const rirRecorded = typeof set.rir === 'number';
-
-    // Check if hitting progression criteria
-    if (set.reps >= maxReps && rirRecorded && set.rir >= minRir) {
-      message = `🟢 Great set! Hitting max reps with good reserve.`;
+    if (set.reps >= maxReps) {
+      message = `🟢 Great set! Hitting max reps.`;
       colorClass = 'success';
 
-      // Check if this could trigger progression
       const allSetsMaxReps = sessionExercise.sets
         .filter(s => s && s.reps > 0)
-        .every(s => s.reps >= maxReps && typeof s.rir === 'number' && s.rir >= minRir);
+        .every(s => s.reps >= maxReps);
 
       if (allSetsMaxReps && setIndex === exerciseDef.sets - 1) {
         message = `🟢 All sets hit ${maxReps} reps! Increase weight next workout.`;
       }
     }
-    // Check if reps too low
     else if (set.reps < minReps) {
       message = `🔴 Below target range. Consider reducing weight next set.`;
       colorClass = 'danger';
     }
-    // Check if RIR too low (only when RIR was logged)
-    else if (rirRecorded && set.rir < minRir) {
-      message = `🟡 Too close to failure (RIR ${set.rir}). Aim for RIR ${minRir}-${maxRir}.`;
-      colorClass = 'warning';
-    }
-    // Normal progress
     else {
-      message = `🔵 Good progress - aim for ${maxReps} reps on next set.`;
+      message = `🔵 Good progress, aim for ${maxReps} reps on next set.`;
       colorClass = 'info';
     }
 
@@ -2240,15 +2146,8 @@ class App {
         setRow.style.borderLeft = '4px solid var(--color-info)';
       }
     } else {
-      // Rep-based: check reps AND RIR
-      // Defensive: should always have rirTarget for rep-based exercises
-      if (!exerciseDef.rirTarget) {
-        console.error('[checkSetProgression] Rep-based exercise missing rirTarget:', exerciseDef.name);
-        return;
-      }
-      const [rirMin] = exerciseDef.rirTarget.split('-').map(Number);
-      const rirOk = typeof set.rir === 'number' && set.rir >= rirMin;
-      if (set.reps >= max && rirOk) {
+      // Rep-based: check reps against target range
+      if (set.reps >= max) {
         setRow.style.borderLeft = '4px solid var(--color-success)';
       } else if (set.reps < min) {
         setRow.style.borderLeft = '4px solid var(--color-danger)';
@@ -2341,8 +2240,6 @@ class App {
       repsInput.value = completedSet.reps;
     }
 
-    // RIR select keeps its default value from initial render
-
     // Remove any existing LOG SET button from next set (prevent duplicates)
     const existingBtn = nextSetRow.querySelector('.log-set-btn');
     if (existingBtn) existingBtn.remove();
@@ -2371,14 +2268,11 @@ class App {
 
     const isTimeBased = exerciseDef.repRange.toLowerCase().includes('s');
 
-    // Count completed sets
-    // For bodyweight exercises, weight can be 0
-    // For time-based exercises, RIR is optional
+    // Count completed sets (bodyweight exercises can have weight 0)
     const completedSets = exerciseSession.sets.filter(set => {
       const hasValidWeight = set && typeof set.weight === 'number' && set.weight >= 0;
       const hasValidReps = set.reps > 0;
-      const hasValidRir = isTimeBased || (set.rir >= 0);
-      return hasValidWeight && hasValidReps && hasValidRir;
+      return hasValidWeight && hasValidReps;
     }).length;
 
     // Exercise is completed if all required sets are logged
@@ -2475,21 +2369,19 @@ class App {
 
   /**
    * Format set display for history (band-aware, time-aware)
-   * @param {Object} set - Set object { reps, weight, rir }
+   * @param {Object} set - Set object { reps, weight }
    * @param {Object} exercise - Exercise definition
    * @returns {string} Formatted string like "15 reps @ 🔴 Medium", "15 reps @ 20 kg", or "45s"
    */
   formatSetDisplay(set, exercise) {
     const reps = set.reps;
     const weight = set.weight;
-    const rir = set.rir;
 
     // Time-based exercises: just show duration
     if (this.isTimeBasedExercise(exercise)) {
       return `${reps}s`;
     }
 
-    // Rep-based exercises: show reps, weight, and RIR
     let weightDisplay;
     if (this.isBandExercise(exercise)) {
       const bandInfo = this.weightToBandColor(weight);
@@ -2504,7 +2396,7 @@ class App {
       weightDisplay = `${weight} kg`;
     }
 
-    return `${reps} reps @ ${weightDisplay}${rir !== undefined ? ` (RIR ${rir})` : ''}`;
+    return `${reps} reps @ ${weightDisplay}`;
   }
 
   /**
@@ -4238,9 +4130,6 @@ class App {
   }
 
   renderPerformanceSection(performance) {
-    const rirTrend = performance.avgRIR > 2.5 ? '(easier)' :
-                     performance.avgRIR < 2 ? '(harder)' : '(stable)';
-
     const topProgressorsList = performance.topProgressors
       .map(p => `<li>${this.escapeHtml(p.name)} (+${p.gain}kg)</li>`)
       .join('');
@@ -4250,10 +4139,6 @@ class App {
         <h3>🎯 Performance Quality (4 Weeks)</h3>
         <div class="analytics-card">
           <div class="metrics-grid">
-            <div class="metric">
-              <span class="metric-label">Avg RIR:</span>
-              <span class="metric-value">${performance.avgRIR.toFixed(1)} ${rirTrend}</span>
-            </div>
             <div class="metric">
               <span class="metric-label">Compliance:</span>
               <span class="metric-value">${performance.compliance.toFixed(0)}%</span>

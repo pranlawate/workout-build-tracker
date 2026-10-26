@@ -1,142 +1,82 @@
 # System Interaction Matrix
 
-**Date:** 2026-02-23
+**Last Updated:** 2026-10-26
 **Purpose:** Document all system interactions to prevent conflicts and ensure correct priorities
 
 ## Systems Overview
 
-1. **Rotation** - 8-12 week exercise variety cycles for muscle coverage
-2. **Deload** - Recovery weeks (reduced volume/intensity)
-3. **Progression** - Double progression (reps → weight)
-4. **Pain** - Exercise swaps for injuries
-5. **Unlock** - Barbell progression milestones
-6. **Phase** - Building vs Maintenance cycles
-
----
-
-## Interaction Matrix
-
-| System A → System B | Current Status | Priority Rule | Implementation |
-|---------------------|---------------|---------------|----------------|
-| **Pain → Progression** | ✅ HANDLED | Pain blocks progression | Priority 1 in smart-progression.js |
-| **Pain → Rotation** | ✅ HANDLED | Pain blocks rotation | Pain checked before rotation in priority order |
-| **Pain → Unlock** | ⚠️ UNKNOWN | Pain should NOT block unlock progress | Need to verify |
-| **Deload → Progression** | ❌ MISSING | Deload blocks progression | NOT checked in smart-progression.js |
-| **Deload → Rotation** | ✅ FIXED | Deload blocks rotation | Added in rotation-manager.js line 43 |
-| **Rotation → Unlock** | ✅ HANDLED | Rotation suppressed at 80%+ unlock | rotation-manager.js line 56-61 |
-| **Rotation → Progression** | ✅ HANDLED | Progression checked before rotation | Priority 2 vs Priority 3 |
-| **Phase → Deload** | ✅ HANDLED | Phase affects deload sensitivity | deload.js line 25-31 |
-| **Phase → Progression** | ⚠️ PARTIAL | Maintenance affects tempo focus | Checked in progression hints, not smart suggestions |
-| **Unlock → Progression** | ⚠️ UNKNOWN | Need to verify barbell unlock doesn't break progression | Need to test |
+1. **Deload** - Recovery weeks (reduced volume/intensity), time-based trigger gap-aware
+2. **Pain** - Exercise swaps for injuries
+3. **Gap Return** - Lighter weight after training break (7+ days)
+4. **Progression** - Rep-range-only progression (all sets hit max reps)
+5. **Rotation** - 8-12 week exercise variety cycles
+6. **Unlock** - Barbell progression milestones (checked in rotation logic)
+7. **Phase** - Building vs Maintenance cycles (affects deload sensitivity)
 
 ---
 
 ## Priority Order (Smart Progression System)
 
-Current implementation in `smart-progression.js`:
+Implementation in `smart-progression.js` `getSuggestion()`:
 
 ```
-PRIORITY 0: Deload active? → MISSING ❌
-PRIORITY 1: Pain handling → HANDLED ✅
-PRIORITY 2: Progression (weight increase) → HANDLED ✅
-PRIORITY 3: Rotation variety → HANDLED ✅
-PRIORITY 4: Weight gap (tempo) → HANDLED ✅
-PRIORITY 5: Plateau detection → HANDLED ✅
-PRIORITY 6: Regression warning → HANDLED ✅
-PRIORITY 7: Default (continue) → HANDLED ✅
+PRIORITY 0: Deload active? → Suppress all suggestions ✅
+PRIORITY 1: Pain handling → Safety first ✅
+PRIORITY 2: Gap return (7+ day break) → Suggest lighter weight ✅
+PRIORITY 3: Progression (weight increase) → All sets hit max reps ✅
+PRIORITY 4: Rotation variety → 8-12 week cycles ✅
+PRIORITY 5: Weight gap (tempo) → Failed weight jump ✅
+PRIORITY 6: Plateau detection → Same weight 3+ sessions ✅
+PRIORITY 7: Regression warning → Recovery check ✅
+PRIORITY 8: Default (continue) ✅
 ```
 
 ---
 
-## Critical Gaps Found
+## Interaction Matrix
 
-### 1. Deload State Not Checked in Smart Progression ❌
-
-**Issue:** During deload week, smart progression still suggests weight increases and tempo changes.
-
-**Expected Behavior:**
-- During deload: Suppress all progression suggestions
-- Show deload-specific message instead
-
-**Fix Required:** Add deload check as Priority 0 in `getSuggestion()`
-
-**Code Location:** `js/modules/smart-progression.js` line 819
-
----
-
-### 2. Phase-Based Progression Partially Implemented ⚠️
-
-**Issue:** Maintenance phase tempo focus is checked in old `renderProgressionHint()` but not in smart suggestions.
-
-**Current:** Old system shows tempo suggestions during maintenance
-**Smart System:** Doesn't consider phase for tempo recommendations
-
-**Fix Required:** Pass `PhaseManager` to smart-progression and check phase in tempo suggestions
+| System A → System B | Status | Rule | Implementation |
+|---------------------|--------|------|----------------|
+| **Deload → Progression** | ✅ HANDLED | Deload suppresses progression | Priority 0 early return |
+| **Deload → Rotation** | ✅ HANDLED | Deload suppresses rotation | Priority 0 + rotation-manager internal check |
+| **Deload → Gap Return** | ✅ HANDLED | Deload suppresses gap return | Priority 0 early return |
+| **Pain → Progression** | ✅ HANDLED | Pain blocks progression | Priority 1 early return |
+| **Pain → Rotation** | ✅ HANDLED | Pain blocks rotation | Priority 1 early return |
+| **Gap → Progression** | ✅ HANDLED | Gap return overrides stale progression data | Priority 2 before Priority 3 |
+| **Rotation → Unlock** | ✅ HANDLED | Rotation suppressed at 80%+ unlock | rotation-manager.js |
+| **Phase → Deload** | ✅ HANDLED | Phase affects deload sensitivity | deload.js sensitivity thresholds |
+| **Time Deload → Gap** | ✅ HANDLED | 14+ day gap suppresses time-based deload trigger | deload.js `shouldTriggerDeload()` |
 
 ---
 
-### 3. Pain-Unlock Interaction Unknown ⚠️
+## Gap-Aware Deload Logic
 
-**Question:** If user has pain on an exercise they're trying to unlock, what should happen?
+The time-based deload trigger counts calendar weeks since last deload. Without a gap check,
+a 2-month absence triggers both:
+- Time-based deload ("8 weeks since deload")
+- Gap return ("try lighter weight after 60-day break")
 
-**Options:**
-1. **Continue unlock progress** - Pain swap doesn't affect unlock counter (current assumption)
-2. **Pause unlock progress** - Must be pain-free to count toward unlock
-3. **Reset unlock progress** - Pain restarts unlock journey
+These contradict each other. Fix (implemented in `deload.js`):
+- If last workout was 14+ days ago, skip time-based deload trigger
+- The body already rested during the gap, so a formal deload is unnecessary
+- Performance-based and fatigue-based triggers still work normally
 
-**Decision Needed:** Which behavior is correct?
+## RIR Removal (Oct 2026)
 
----
-
-## Recommended Priority Order (Fixed)
-
-```javascript
-// Priority 0: Deload active check (NEW)
-if (isDeloadActive()) {
-  return {
-    type: 'DELOAD',
-    message: 'Focus on recovery this week',
-    reason: 'Active deload week - reduced volume/intensity'
-  };
-}
-
-// Priority 1: Safety (pain) ✅
-// Priority 2: Progression (weight) ✅
-// Priority 3: Rotation variety ✅
-// Priority 4: Weight gap (tempo) ✅
-// Priority 5: Plateau ✅
-// Priority 6: Regression ✅
-// Priority 7: Default ✅
-```
+RIR (Reps In Reserve) was removed from all tracking, UI, and progression logic.
+- Progression now uses rep range only: all sets hitting max reps triggers weight increase
+- Historical data with RIR values is accepted by import but the field is ignored
+- Exercise definitions still carry `rirTarget` as inert metadata (not read by any logic)
 
 ---
 
 ## Testing Checklist
 
-- [ ] **Deload + Progression:** During deload, no weight increase suggestions
-- [ ] **Deload + Rotation:** During deload, no rotation suggestions (FIXED)
-- [ ] **Pain + Progression:** With pain, no weight increase suggestions
-- [ ] **Pain + Rotation:** With pain, no rotation suggestions
-- [ ] **Pain + Unlock:** With pain, verify unlock behavior
-- [ ] **Rotation + Unlock:** At 80%+ unlock, no rotation suggestions
-- [ ] **Phase + Progression:** Maintenance phase shows tempo focus
-- [ ] **Multi-system:** Deload + Pain + Rotation = pain takes priority
-
----
-
-## Implementation Plan
-
-1. **Add deload check to smart-progression.js** (Priority 0)
-2. **Pass PhaseManager to smart-progression** (for maintenance tempo)
-3. **Clarify pain-unlock interaction** (document decision)
-4. **Add comprehensive system interaction tests**
-5. **Update CLAUDE.md with interaction rules**
-
----
-
-## Notes
-
-- Single source of truth: `smart-progression.js` handles all suggestion logic
-- Old system (`renderProgressionHint()`) removed to prevent conflicts
-- Rotation manager checks deload internally (defense in depth)
-- Each system should check dependencies before returning suggestions
+- [x] Deload + Progression: During deload, no weight increase suggestions
+- [x] Deload + Rotation: During deload, no rotation suggestions
+- [x] Pain + Progression: With pain, no weight increase suggestions
+- [x] Pain + Rotation: With pain, no rotation suggestions
+- [x] Rotation + Unlock: At 80%+ unlock, no rotation suggestions
+- [x] Gap + Progression: After 7+ day gap, lighter weight suggestion (not increase)
+- [x] Gap + Time Deload: After 14+ day gap, no time-based deload trigger
+- [x] Multi-system: Deload + Pain + Rotation = deload takes priority (Priority 0)

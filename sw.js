@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'build-tracker-v119';
+const CACHE_VERSION = 'build-tracker-v120';
 const VIDEO_CACHE = 'build-tracker-videos-v1';
 const CACHE_URLS = [
   './',
@@ -40,7 +40,6 @@ const CACHE_URLS = [
   './js/modals/edit-entry-modal.js',
   './js/modules/achievements.js',
   './js/modules/analytics-calculator.js',
-  './js/modules/barbell-progression-tracker.js',
   './js/modules/body-weight.js',
   './js/modules/complexity-tiers.js',
   './js/modules/deload.js',

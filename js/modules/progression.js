@@ -1,9 +1,7 @@
 /**
  * Double Progression Logic
  *
- * Weight increases ONLY when:
- * 1. ALL sets hit the top of the rep range
- * 2. ALL sets maintained RIR >= minimum target
+ * Weight increases ONLY when ALL sets hit the top of the rep range.
  */
 
 import { daysBetween } from '../utils/date-utils.js';
@@ -64,36 +62,6 @@ function parseRepRange(repRange) {
   return { min, max };
 }
 
-/**
- * Parse RIR target to extract min and max values
- * Handles formats: '2-3', '3'
- */
-function parseRIRTarget(rirTarget) {
-  if (!rirTarget || typeof rirTarget !== 'string') {
-    throw new Error('Invalid RIR target: must be a non-empty string');
-  }
-
-  const parts = rirTarget.split('-');
-
-  if (parts.length === 1) {
-    // Single value like '3'
-    const value = Number(parts[0]);
-    if (isNaN(value)) {
-      throw new Error(`Invalid RIR target format: ${rirTarget}`);
-    }
-    return { min: value, max: value };
-  }
-
-  const min = Number(parts[0]);
-  const max = Number(parts[1]);
-
-  if (isNaN(min) || isNaN(max)) {
-    throw new Error(`Invalid RIR target format: ${rirTarget}`);
-  }
-
-  return { min, max };
-}
-
 export function shouldIncreaseWeight(sets, exercise, phaseManager) {
   // Input validation
   if (!sets || !Array.isArray(sets) || sets.length === 0) {
@@ -126,33 +94,8 @@ export function shouldIncreaseWeight(sets, exercise, phaseManager) {
   // Building phase - existing logic unchanged
   const { max } = parseRepRange(exercise.repRange);
 
-  // Time-based exercises: duration targets only (rep field holds seconds)
-  const isTimeBased = /\d+s\b/.test(exercise.repRange);
-  if (isTimeBased) {
-    return sets.every(set => set.reps >= max);
-  }
-
-  // Rep-based without RIR metadata: do not silently skip quality checks; warn and use conservative default
-  if (!exercise.rirTarget) {
-    console.warn(
-      '[Progression] Missing rirTarget for rep-based exercise; using default RIR floor of 2 for progression check'
-    );
-    const rirMin = 2;
-    const allSetsMaxReps = sets.every(set => set.reps >= max);
-    const allSetsGoodRIR = sets.every(set => typeof set.rir === 'number' && set.rir >= rirMin);
-    return allSetsMaxReps && allSetsGoodRIR;
-  }
-
-  // Rep-based exercises: check reps AND RIR
-  const { min: rirMin } = parseRIRTarget(exercise.rirTarget);
-
-  // All sets must hit max reps
-  const allSetsMaxReps = sets.every(set => set.reps >= max);
-
-  // All sets must have RIR >= minimum target (numeric RIR only; null/undefined do not count as met)
-  const allSetsGoodRIR = sets.every(set => typeof set.rir === 'number' && set.rir >= rirMin);
-
-  return allSetsMaxReps && allSetsGoodRIR;
+  // All sets must hit max reps to trigger progression
+  return sets.every(set => set.reps >= max);
 }
 
 export function getProgressionStatus(history, exercise, phaseManager) {

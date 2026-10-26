@@ -28,14 +28,6 @@ function sleepHoursFromMetric(m) {
   return Number.isFinite(n) ? n : 0;
 }
 
-/**
- * @param {unknown} rir
- * @returns {boolean}
- */
-function isUsableRir(rir) {
-  return typeof rir === 'number' && Number.isFinite(rir);
-}
-
 export class AnalyticsCalculator {
   /**
    * Creates an AnalyticsCalculator instance
@@ -85,56 +77,15 @@ export class AnalyticsCalculator {
   }
 
   /**
-   * Calculates performance metrics including RIR, compliance, and progression
+   * Calculates performance metrics: compliance and progression
    * @param {number} [days=28] - Number of days to include in calculation
-   * @returns {Object} Performance metrics with avgRIR, rirTrend, compliance, progressedCount, and topProgressors
-   * @returns {number} returns.avgRIR - Average RIR across all sets in the period
-   * @returns {Array<{date: string, rir: number}>} returns.rirTrend - 7-day rolling average of RIR by workout date
-   * @returns {number} returns.compliance - Workout compliance as percentage (actual vs expected 3/week)
-   * @returns {number} returns.progressedCount - Number of exercises that increased weight
-   * @returns {Array<{name: string, gain: number}>} returns.topProgressors - Top 5 exercises by weight gain
+   * @returns {Object} Performance metrics with compliance, progressedCount, and topProgressors
    */
   calculatePerformanceMetrics(days = 28) {
     try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
       const cutoffStr = cutoffDate.toISOString().split('T')[0];
-
-      // Get all sets from period
-      const allSets = [];
-      const workoutDates = new Set();
-
-      const allKeys = this.storage.getAllExerciseKeys();
-
-      allKeys.forEach(key => {
-        const history = this.storage.getExerciseHistory(key);
-        if (!history || history.length === 0) {
-          return;
-        }
-
-        history.forEach(entry => {
-          if (!entry || !entry.date || !Array.isArray(entry.sets)) {
-            return;
-          }
-
-          if (entry.date >= cutoffStr) {
-            workoutDates.add(entry.date);
-            entry.sets.forEach(set => {
-              if (set && isUsableRir(set.rir)) {
-                allSets.push({ ...set, date: entry.date });
-              }
-            });
-          }
-        });
-      });
-
-      // Calculate average RIR
-      const avgRIR = allSets.length > 0
-        ? allSets.reduce((sum, set) => sum + set.rir, 0) / allSets.length
-        : 0;
-
-      // Calculate RIR trend (7-day rolling average)
-      const rirTrend = this.calculateRIRTrend(days);
 
       const actualWorkouts = this.getCompletedWorkoutDates(cutoffStr).length;
 
@@ -143,68 +94,12 @@ export class AnalyticsCalculator {
         ? (actualWorkouts / expectedWorkouts) * 100
         : 0;
 
-      // Find progressed exercises (same window as other metrics)
       const { progressedCount, topProgressors } = this.findProgressedExercises(days);
 
-      return { avgRIR, rirTrend, compliance, progressedCount, topProgressors };
+      return { compliance, progressedCount, topProgressors };
     } catch (error) {
       console.error('[AnalyticsCalculator] Performance metrics error:', error);
-      return { avgRIR: 0, rirTrend: [], compliance: 0, progressedCount: 0, topProgressors: [] };
-    }
-  }
-
-  /**
-   * Calculates RIR trend as 7-day rolling average
-   * @private
-   * @param {number} days - Number of days to include in calculation
-   * @returns {Array<{date: string, rir: number}>} Rolling average RIR by date
-   */
-  calculateRIRTrend(days) {
-    try {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - days);
-      const cutoffStr = cutoffDate.toISOString().split('T')[0];
-
-      const workoutDates = this.getCompletedWorkoutDates(cutoffStr);
-
-      // Calculate RIR for each workout date
-      const rirByDate = workoutDates.map(date => {
-        const allKeys = this.storage.getAllExerciseKeys();
-
-        let totalRIR = 0;
-        let setCount = 0;
-
-        allKeys.forEach(key => {
-          const history = this.storage.getExerciseHistory(key);
-          if (!history || history.length === 0) {
-            return;
-          }
-
-          const entry = history.find(e => e && e.date && e.date.split('T')[0] === date);
-          if (entry && Array.isArray(entry.sets)) {
-            entry.sets.forEach(set => {
-              if (set && typeof set.rir === 'number') {
-                totalRIR += set.rir;
-                setCount++;
-              }
-            });
-          }
-        });
-
-        const avgRIR = setCount > 0 ? totalRIR / setCount : 0;
-        return { date, rir: avgRIR };
-      });
-
-      // Apply 7-day rolling average
-      return rirByDate.map((point, i) => {
-        const start = Math.max(0, i - 6);
-        const window = rirByDate.slice(start, i + 1);
-        const rollingAvg = window.reduce((sum, p) => sum + p.rir, 0) / window.length;
-        return { date: point.date, rir: rollingAvg };
-      });
-    } catch (error) {
-      console.error('[AnalyticsCalculator] RIR trend error:', error);
-      return [];
+      return { compliance: 0, progressedCount: 0, topProgressors: [] };
     }
   }
 

@@ -80,21 +80,7 @@ export class EditEntryModal {
               min="1"
             />
           </div>
-          <div class="edit-input-group">
-            <label class="edit-label">RIR</label>
-            <select
-              class="edit-input"
-              data-set="${i}"
-              data-field="rir"
-            >
-              <option value="0" ${set.rir === 0 ? 'selected' : ''}>0 (Failure)</option>
-              <option value="1" ${set.rir === 1 ? 'selected' : ''}>1</option>
-              <option value="2" ${set.rir === 2 ? 'selected' : ''}>2</option>
-              <option value="3" ${set.rir === 3 ? 'selected' : ''}>3</option>
-              <option value="4" ${set.rir === 4 ? 'selected' : ''}>4</option>
-              <option value="5" ${set.rir === 5 ? 'selected' : ''}>5+</option>
-            </select>
-          </div>
+          
         </div>
       </div>
     `).join('');
@@ -149,11 +135,8 @@ export class EditEntryModal {
       const set = entry.sets[i];
       const weightInput = document.querySelector(`.edit-input[data-set="${i}"][data-field="weight"]`);
       const repsInput = document.querySelector(`.edit-input[data-set="${i}"][data-field="reps"]`);
-      const rirInput = document.querySelector(`.edit-input[data-set="${i}"][data-field="rir"]`);
-
       if (weightInput) set.weight = parseFloat(weightInput.value);
       if (repsInput) set.reps = parseInt(repsInput.value);
-      if (rirInput) set.rir = parseInt(rirInput.value);
 
       if (!Number.isFinite(set.weight) || set.weight < 0) {
         alert(`Invalid weight for Set ${i + 1}. Please enter a non-negative number.`);
@@ -162,11 +145,6 @@ export class EditEntryModal {
 
       if (!Number.isFinite(set.reps) || set.reps <= 0) {
         alert(`Invalid reps for Set ${i + 1}. Please enter a positive number.`);
-        return;
-      }
-
-      if (!Number.isFinite(set.rir) || set.rir < 0 || set.rir > 5) {
-        alert(`Invalid RIR for Set ${i + 1}. Must be between 0 and 5.`);
         return;
       }
     }

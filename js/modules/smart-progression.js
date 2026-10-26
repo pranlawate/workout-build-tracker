@@ -156,8 +156,8 @@ export function hitTopOfReps(reps, exerciseName) {
  *   {
  *     date: '2026-02-10T...',
  *     sets: [
- *       { weight: 10, reps: 12, rir: 2 },
- *       { weight: 10, reps: 11, rir: 2 }
+ *       { weight: 10, reps: 12 },
+ *       { weight: 10, reps: 11 }
  *     ],
  *     startTime: '...',
  *     endTime: '...'
@@ -169,15 +169,15 @@ export function hitTopOfReps(reps, exerciseName) {
  * detectPlateau([
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }]
+ *     sets: [{ weight: 10, reps: 12 }]
  *   },
  *   {
  *     date: '2026-02-07T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }]
+ *     sets: [{ weight: 10, reps: 12 }]
  *   },
  *   {
  *     date: '2026-02-04T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }]
+ *     sets: [{ weight: 10, reps: 12 }]
  *   }
  * ])
  * // Returns: true
@@ -258,7 +258,7 @@ function getBestSet(sets) {
  *   Each entry is a workout session with structure:
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }, ...]
+ *     sets: [{ weight: 10, reps: 12 }, ...]
  *   }
  * @returns {boolean} True if regression detected
  *
@@ -266,11 +266,11 @@ function getBestSet(sets) {
  * detectRegression([
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 10, reps: 8, rir: 3 }]
+ *     sets: [{ weight: 10, reps: 8 }]
  *   },
  *   {
  *     date: '2026-02-07T...',
- *     sets: [{ weight: 12.5, reps: 10, rir: 2 }]
+ *     sets: [{ weight: 12.5, reps: 10 }]
  *   }
  * ])
  * // Returns: true (weight dropped)
@@ -365,7 +365,7 @@ export function canIncreaseWeight(currentWeight, incrementSize = 2.5) {
  *   Each entry is a workout session with structure:
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 12.5, reps: 6, rir: 0 }, ...]
+ *     sets: [{ weight: 12.5, reps: 6 }, ...]
  *   }
  * @param {string} exerciseName - Name of exercise
  * @returns {boolean} True if weight gap failure detected
@@ -374,11 +374,11 @@ export function canIncreaseWeight(currentWeight, incrementSize = 2.5) {
  * detectWeightGapFailure([
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 12.5, reps: 6, rir: 0 }]
+ *     sets: [{ weight: 12.5, reps: 6 }]
  *   },
  *   {
  *     date: '2026-02-07T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }]
+ *     sets: [{ weight: 10, reps: 12 }]
  *   }
  * ], 'DB Lateral Raises')
  * // Returns: true
@@ -424,8 +424,7 @@ export function detectWeightGapFailure(history, exerciseName) {
   // Additional null safety for individual fields
   if (current.weight === undefined || current.weight === null ||
       previous.weight === undefined || previous.weight === null ||
-      current.reps === undefined || current.reps === null ||
-      current.rir === undefined || current.rir === null) {
+      current.reps === undefined || current.reps === null) {
     console.warn('[SmartProgression] detectWeightGapFailure: Missing required data fields');
     return false;
   }
@@ -435,17 +434,15 @@ export function detectWeightGapFailure(history, exerciseName) {
   // Weight gap failure if:
   // 1. Weight increased from previous
   // 2. Failed to hit minimum reps (below range.min)
-  // 3. RIR was 0 (went to failure)
   const weightIncreased = current.weight > previous.weight;
   const failedMinReps = current.reps < range.min;
-  const wentToFailure = current.rir === 0;
 
-  const isFailure = weightIncreased && failedMinReps && wentToFailure;
+  const isFailure = weightIncreased && failedMinReps;
 
   if (isFailure) {
     console.warn('[SmartProgression] detectWeightGapFailure: Weight gap failure detected', {
       exerciseName,
-      current: { weight: current.weight, reps: current.reps, rir: current.rir },
+      current: { weight: current.weight, reps: current.reps },
       previous: { weight: previous.weight, reps: previous.reps },
       range
     });
@@ -461,7 +458,7 @@ export function detectWeightGapFailure(history, exerciseName) {
  *   Each entry is a workout session with structure:
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }, ...]
+ *     sets: [{ weight: 10, reps: 12 }, ...]
  *   }
  * @param {string} exerciseName - Name of exercise
  * @returns {boolean} True if successful progression
@@ -470,10 +467,10 @@ export function detectWeightGapFailure(history, exerciseName) {
  * detectSuccessfulProgression([
  *   {
  *     date: '2026-02-10T...',
- *     sets: [{ weight: 10, reps: 12, rir: 2 }]
+ *     sets: [{ weight: 10, reps: 12 }]
  *   }
  * ], 'DB Lateral Raises')
- * // Returns: true (hit 12 reps with RIR 2)
+ * // Returns: true (hit 12 reps, top of range)
  */
 export function detectSuccessfulProgression(history, exerciseName) {
   // Null safety
@@ -504,20 +501,14 @@ export function detectSuccessfulProgression(history, exerciseName) {
     return false;
   }
 
-  // Additional null safety for individual fields
-  if (latest.reps === undefined || latest.reps === null ||
-      latest.rir === undefined || latest.rir === null) {
-    console.warn('[SmartProgression] detectSuccessfulProgression: Missing reps or RIR data');
+  if (latest.reps === undefined || latest.reps === null) {
+    console.warn('[SmartProgression] detectSuccessfulProgression: Missing reps data');
     return false;
   }
 
   const range = getRepRange(exerciseName);
 
-  // Successful if hit top of range with good RIR (2-3)
-  const hitTop = latest.reps >= range.max;
-  const goodRIR = latest.rir >= 2 && latest.rir <= 3;
-
-  return hitTop && goodRIR;
+  return latest.reps >= range.max;
 }
 
 /**
@@ -530,13 +521,13 @@ export function detectSuccessfulProgression(history, exerciseName) {
  * @example
  * suggestWeightIncrease([{
  *   date: '2026-02-10',
- *   sets: [{weight: 10, reps: 12, rir: 2}]
+ *   sets: [{weight: 10, reps: 12}]
  * }], 'DB Lateral Raises')
  * // Returns: {
  * //   type: 'INCREASE_WEIGHT',
  * //   suggestedWeight: 12.5,
  * //   message: 'Try 12.5kg today (+2.5kg)',
- * //   reason: 'You hit top of rep range with good RIR'
+ * //   reason: 'You hit the top of your rep range'
  * // }
  */
 export function suggestWeightIncrease(history, exerciseName) {
@@ -571,7 +562,7 @@ export function suggestWeightIncrease(history, exerciseName) {
     type: 'INCREASE_WEIGHT',
     suggestedWeight: suggestedWeight,
     message: `Try ${suggestedWeight}kg today (+${incLabel}kg)`,
-    reason: 'You hit top of rep range with good RIR'
+    reason: 'You hit the top of your rep range'
   };
 }
 
@@ -703,10 +694,10 @@ export function detectAdaptiveWeightPattern(history) {
  * @example
  * suggestTempoProgression('UPPER_A - DB Lateral Raises', [{
  *   date: '2026-02-10',
- *   sets: [{weight: 12.5, reps: 6, rir: 0}]  // Failed weight increase
+ *   sets: [{weight: 12.5, reps: 6}]  // Failed weight increase
  * }, {
  *   date: '2026-02-07',
- *   sets: [{weight: 10, reps: 12, rir: 2}]   // Was successful
+ *   sets: [{weight: 10, reps: 12}]   // Was successful
  * }])
  * // Returns: {
  * //   type: 'TRY_TEMPO',
@@ -1062,7 +1053,15 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 2: Progression (weight increase only)
+  // PRIORITY 2: Gap return (suggest lighter weight after training break)
+  // Must come before progression: stale "successful" data from weeks ago
+  // should not trigger a weight increase recommendation.
+  const gapSuggestion = suggestGapReturn(exerciseKey, history);
+  if (gapSuggestion) {
+    return gapSuggestion;
+  }
+
+  // PRIORITY 3: Progression (weight increase only)
   if (detectSuccessfulProgression(history, exerciseName)) {
     const weightSuggestion = suggestWeightIncrease(history, exerciseName);
     if (weightSuggestion) {
@@ -1070,25 +1069,19 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 2.5: Gap return (suggest lower weight after training break)
-  const gapSuggestion = suggestGapReturn(exerciseKey, history);
-  if (gapSuggestion) {
-    return gapSuggestion;
-  }
-
-  // PRIORITY 3: Rotation variety (8-12 week cycles)
+  // PRIORITY 4: Rotation variety (8-12 week cycles)
   if (rotationManager) {
     const rotationSuggestion = rotationManager.checkRotationDue(exerciseKey, exerciseName);
 
     if (rotationSuggestion) {
       return {
         ...rotationSuggestion,
-        priority: 3
+        priority: 4
       };
     }
   }
 
-  // PRIORITY 4: Weight gap (tempo progression)
+  // PRIORITY 5: Weight gap (tempo progression)
   if (detectWeightGapFailure(history, exerciseName)) {
     const tempoSuggestion = suggestTempoProgression(exerciseKey, history);
     if (tempoSuggestion) {
@@ -1096,7 +1089,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 5: Plateau detection (skip for bodyweight/fixed-load exercises)
+  // PRIORITY 6: Plateau detection (skip for bodyweight/fixed-load exercises)
   const exerciseDef = getWorkoutExerciseDefinition(exerciseName);
   const isBodyweight = exerciseDef && Number(exerciseDef.weightIncrement) === 0;
   if (!isBodyweight && detectPlateau(history)) {
@@ -1106,7 +1099,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 6: Regression warning
+  // PRIORITY 7: Regression warning
   if (detectRegression(history)) {
     const regressionWarning = suggestRecoveryCheck(history);
     if (regressionWarning) {
@@ -1114,7 +1107,7 @@ export function getSuggestion(exerciseKey, history, painHistory = null, rotation
     }
   }
 
-  // PRIORITY 7: Default (continue current approach)
+  // PRIORITY 8: Default (continue current approach)
   const latestWorkout = history[history.length - 1];
   const bestSet = getBestSet(latestWorkout?.sets);
 

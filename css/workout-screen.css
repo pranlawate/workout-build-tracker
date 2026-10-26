@@ -308,53 +308,6 @@
   margin: 4px 0;
 }
 
-/* RIR Dropdown Styling */
-.rir-select {
-  appearance: none;
-  background: var(--color-bg-secondary);
-  border: 2px solid var(--color-border);
-  color: var(--color-text);
-  padding: var(--spacing-xs);
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* Color coding by class (updated from JS when value changes) */
-.rir-select.rir-0,
-.rir-select.rir-1 {
-  border-color: var(--color-danger);
-  background: rgba(244, 67, 54, 0.1);
-}
-
-.rir-select.rir-2,
-.rir-select.rir-3 {
-  border-color: var(--color-success);
-  background: rgba(76, 175, 80, 0.1);
-}
-
-.rir-select.rir-4,
-.rir-select.rir-5 {
-  border-color: var(--color-warning);
-  background: rgba(255, 152, 0, 0.1);
-}
-
-/* RIR help icon */
-.rir-help {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  font-size: 12px;
-  cursor: help;
-  opacity: 0.7;
-  margin-left: 4px;
-}
-
-.rir-help:hover {
-  opacity: 1;
-}
-
 /* Band Color Buttons */
 .band-color-buttons {
   display: grid;

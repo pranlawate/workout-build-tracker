@@ -13,7 +13,7 @@ import { daysBetween } from '../utils/date-utils.js';
  *
  * DETECTION RULES:
  * - Red Alert (regression): Weight dropped OR reps dropped 25%+
- * - Yellow Warning (form breakdown): Reps vary 50%+ OR all sets RIR 0-1
+ * - Yellow Warning (form breakdown): Reps vary 50%+ within session
  * - Regression compares the current session (in progress or last saved) to the previous session only
  * - Can detect form breakdown with just current session data
  *
@@ -36,7 +36,6 @@ export class PerformanceAnalyzer {
    * - Weight regression: vs previous session (or in-progress vs last saved), using best weight in session
    * - Rep drop: Must be 25%+ decline (not minor fluctuation)
    * - Intra-set variance: Must be 50%+ difference (allows normal fatigue)
-   * - Low RIR: Must be ALL logged sets at 0-1 (RIR not recorded is ignored)
    * - Skips analysis during deload (prevents false alarms)
    *
    * Design goal: Warn only on clear patterns, not normal variation.
@@ -249,38 +248,6 @@ export class PerformanceAnalyzer {
   }
 
   /**
-   * Check if RIR is consistently 0-1 (training too close to failure)
-   * @param {Array} history - Exercise history array
-   * @param {Array} currentSets - Current session sets (optional)
-   * @returns {Object|null} Warning object if low RIR detected, null otherwise
-   */
-  detectLowRIR(history, currentSets = []) {
-    // Use current session if logging in progress, otherwise use last completed session
-    const setsToAnalyze = currentSets.length > 0 ? currentSets : history[history.length - 1]?.sets || [];
-
-    if (!Array.isArray(setsToAnalyze) || setsToAnalyze.length === 0) {
-      return null;
-    }
-
-    const withRecordedRir = setsToAnalyze.filter(set => set && typeof set.rir === 'number');
-    if (withRecordedRir.length === 0) {
-      return null;
-    }
-
-    const allLowRIR = withRecordedRir.every(set => set.rir <= 1);
-
-    if (allLowRIR) {
-      return {
-        status: 'warning',
-        message: '⚠️ Training too close to failure - leave 2-3 reps in reserve',
-        pattern: 'form_breakdown'
-      };
-    }
-
-    return null;
-  }
-
-  /**
    * Analyze exercise performance and return warnings if issues detected
    * @param {string} exerciseKey - Exercise identifier (e.g., "UPPER_A - Dumbbell Bench Press")
    * @param {Array} currentSets - Current session sets being logged (optional, for real-time analysis)
@@ -323,9 +290,6 @@ export class PerformanceAnalyzer {
       // Check for form breakdown (yellow warnings) - works with current session
       const variance = this.detectIntraSetVariance(history, currentSets);
       if (variance) return variance;
-
-      const lowRIR = this.detectLowRIR(history, currentSets);
-      if (lowRIR) return lowRIR;
 
       // No issues detected
       return {
