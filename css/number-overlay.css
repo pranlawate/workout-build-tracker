@@ -53,7 +53,8 @@
 
 .overlay-content {
   background: var(--color-bg-secondary);
-  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   max-width: 400px;
   width: 100%;
@@ -89,7 +90,7 @@
   text-align: center;
   padding: var(--spacing-lg);
   background: var(--color-bg-primary);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-bottom: var(--spacing-md);
 }
 
@@ -118,7 +119,7 @@
   font-size: 24px;
   font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.1s ease;
 }
@@ -135,7 +136,7 @@
 }
 
 .quick-btn {
-  background: rgba(102, 126, 234, 0.2);
+  background: var(--color-primary-background);
   color: var(--color-primary);
 }
 
@@ -156,7 +157,7 @@
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 20px;
   font-weight: 700;
   cursor: pointer;

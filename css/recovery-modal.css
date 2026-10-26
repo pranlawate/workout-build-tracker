@@ -62,8 +62,8 @@
   height: 50px;
   font-size: 20px;
   text-align: center;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-bg-secondary);
   color: var(--color-text);
   margin: 0 auto;
@@ -99,12 +99,12 @@
   min-height: 50px;
   font-size: 16px;
   font-weight: 600;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-secondary);
   color: var(--color-text);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .radio-btn:hover {
@@ -137,11 +137,10 @@
   z-index: var(--z-layer-modal-raised);
   width: 90%;
   max-width: 600px;
-  background: rgba(245, 158, 11, 0.15);
-  border: 2px solid #f59e0b;
-  border-radius: 12px;
+  background: var(--color-warning-background);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
   padding: var(--spacing-lg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .fatigue-warning-banner h2 {
@@ -162,7 +161,7 @@
 .warning-options {
   background: rgba(0, 0, 0, 0.1);
   padding: var(--spacing-md);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-bottom: var(--spacing-md);
 }
 

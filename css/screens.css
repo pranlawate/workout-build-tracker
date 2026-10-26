@@ -7,8 +7,8 @@
 
 /* Cycle Progress */
 .cycle-progress {
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 8px;
+  background: var(--color-primary-background);
+  border-radius: var(--radius-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }

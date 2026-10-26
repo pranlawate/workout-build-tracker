@@ -110,7 +110,7 @@ export class ProgressChart {
   }
 
   drawGrid(padding, width, height, minWeight, maxWeight) {
-    this.ctx.strokeStyle = '#334155'; // --color-surface-light
+    this.ctx.strokeStyle = '#262a33'; // --color-surface-light
     this.ctx.lineWidth = 1;
 
     // Horizontal grid lines (5 lines)
@@ -136,7 +136,7 @@ export class ProgressChart {
     // Defensive check: need at least 2 points to draw a line
     if (data.length < 2) return;
 
-    this.ctx.strokeStyle = '#06b6d4'; // --color-primary
+    this.ctx.strokeStyle = '#5a9ca0'; // --color-primary
     this.ctx.lineWidth = 3;
     this.ctx.beginPath();
 
@@ -158,7 +158,7 @@ export class ProgressChart {
     // Defensive check: need at least 2 points for this coordinate calculation
     if (data.length < 2) return;
 
-    this.ctx.fillStyle = '#06b6d4'; // --color-primary
+    this.ctx.fillStyle = '#5a9ca0'; // --color-primary
 
     data.forEach((point, index) => {
       const x = padding + (index / (data.length - 1)) * width;
@@ -171,7 +171,7 @@ export class ProgressChart {
   }
 
   drawLabels(data, padding, width, height, minWeight, maxWeight) {
-    this.ctx.fillStyle = '#94a3b8'; // --color-text-dim
+    this.ctx.fillStyle = '#7d8694'; // --color-text-dim
     this.ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
     this.ctx.textAlign = 'center';
 
@@ -195,7 +195,7 @@ export class ProgressChart {
 
   drawEmptyState() {
     this.ctx.clearRect(0, 0, this.width, this.height);
-    this.ctx.fillStyle = '#94a3b8'; // --color-text-dim
+    this.ctx.fillStyle = '#7d8694'; // --color-text-dim
     this.ctx.font = '16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
     this.ctx.textAlign = 'center';
     this.ctx.fillText('No workout data yet', this.width / 2, this.height / 2);
@@ -209,13 +209,13 @@ export class ProgressChart {
     const y = this.height / 2;
 
     // Draw point
-    this.ctx.fillStyle = '#06b6d4';
+    this.ctx.fillStyle = '#5a9ca0';
     this.ctx.beginPath();
     this.ctx.arc(x, y, 6, 0, Math.PI * 2);
     this.ctx.fill();
 
     // Draw label
-    this.ctx.fillStyle = '#f1f5f9'; // --color-text
+    this.ctx.fillStyle = '#dfe3ea'; // --color-text
     this.ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
     this.ctx.textAlign = 'center';
     this.ctx.fillText(

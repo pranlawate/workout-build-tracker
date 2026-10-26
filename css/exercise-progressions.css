@@ -59,10 +59,11 @@
 
 .current-badge {
   padding: 0.25rem 0.75rem;
-  background: var(--color-success);
-  color: white;
-  border-radius: 20px;
+  background: var(--color-success-background);
+  color: var(--color-success);
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .progression-options {
@@ -136,9 +137,9 @@
 
 .phase-badge {
   padding: 0.25rem 0.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 4px;
+  background: var(--color-primary-background);
+  color: var(--color-primary);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.3px;

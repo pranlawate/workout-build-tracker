@@ -2,9 +2,10 @@
 
 .exercise-item {
   background: var(--color-surface);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .exercise-header {
@@ -55,8 +56,8 @@
 
 .set-input {
   background: var(--color-surface-light);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   color: var(--color-text);
   font-size: var(--font-sm);
   font-weight: 600;
@@ -100,8 +101,8 @@
   color: var(--color-info);
   margin-top: var(--spacing-sm);
   padding: var(--spacing-sm);
-  background: rgba(66, 153, 225, 0.1);
-  border-radius: 6px;
+  background: var(--color-info-bg);
+  border-radius: var(--radius-sm);
 }
 
 /* Exercise Badges Container */
@@ -114,8 +115,8 @@
 /* Progression Badges */
 .progression-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-xs);
   font-weight: 600;
   text-transform: uppercase;
@@ -168,11 +169,11 @@
   align-items: flex-start;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-top: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
-  background: rgba(124, 58, 237, 0.15);
-  border-left: 4px solid var(--color-primary);
+  background: var(--color-primary-background);
+  border-left: 3px solid var(--color-primary);
 }
 
 .smart-suggestion.urgent {
@@ -249,11 +250,11 @@
 
 /* Tempo Guidance */
 .tempo-guidance {
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: var(--color-surface-light);
+  border: 1px solid var(--color-border);
   padding: 12px;
   margin: 8px 0;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 .tempo-visual {
@@ -291,8 +292,8 @@
 .form-guide-content {
   margin-top: 8px;
   padding: 12px;
-  background: rgba(102, 126, 234, 0.05);
-  border-radius: 4px;
+  background: var(--color-surface-light);
+  border-radius: var(--radius-sm);
 }
 
 .form-cue-category {
@@ -326,8 +327,8 @@
 
 .band-color-btn {
   background: var(--color-surface-light);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   color: var(--color-text);
   font-size: var(--font-xs);
   font-weight: 600;
@@ -335,17 +336,16 @@
   text-align: center;
   min-height: var(--tap-target-min);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s;
 }
 
 .band-color-btn:hover:not(:disabled) {
-  background: var(--color-surface);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--color-text-dim);
 }
 
 .band-color-btn.selected {
   border-color: var(--color-primary);
-  background: rgba(124, 58, 237, 0.15);
+  background: var(--color-primary-background);
 }
 
 .band-color-btn:disabled {
@@ -422,19 +422,19 @@
   display: flex;
   align-items: center;
   padding: 12px;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s;
 }
 
 .pain-exercise-checkbox-item:hover {
-  background-color: rgba(124, 58, 237, 0.1);
+  border-color: var(--color-text-dim);
 }
 
 .pain-exercise-checkbox-item.selected {
-  border-color: var(--color-accent);
-  background-color: rgba(124, 58, 237, 0.15);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-background);
 }
 
 .pain-exercise-checkbox-item input[type="checkbox"] {

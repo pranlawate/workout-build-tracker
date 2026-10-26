@@ -16,7 +16,8 @@
 
 .analytics-card {
   background: var(--color-surface);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
 }
@@ -47,11 +48,11 @@
 }
 
 .trend-up {
-  color: #10b981; /* Green */
+  color: var(--color-success);
 }
 
 .trend-down {
-  color: #ef4444; /* Red */
+  color: var(--color-danger);
 }
 
 .trend-stable {
@@ -97,7 +98,7 @@
 .pattern-card {
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
 }
@@ -138,12 +139,12 @@
   min-height: 44px;
   font-size: var(--font-sm);
   font-weight: 600;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-secondary);
   color: var(--color-text);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .tab-btn:hover {

@@ -3,7 +3,8 @@
 /* Exercise Detail Screen */
 .history-entry {
   background: var(--color-surface);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
@@ -42,7 +43,7 @@
 .performance-badge {
   display: inline-block;
   padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-size: var(--font-sm);
   font-weight: 500;
   margin-top: var(--spacing-xs);
@@ -116,7 +117,7 @@
   font-size: var(--font-sm);
   padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--color-surface);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   color: var(--color-text);
   display: inline-flex;

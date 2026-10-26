@@ -39,7 +39,7 @@
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--color-border);
 }
 
 /* Close button */
@@ -95,8 +95,8 @@
 
 .badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-sm);
   font-weight: 500;
 }
