@@ -1,26 +1,26 @@
 :root {
-  /* Muted slate base: warm-shifted, not stock Tailwind */
-  --color-bg: #111318;
-  --color-surface: #1a1d24;
-  --color-surface-light: #262a33;
-  --color-text: #dfe3ea;
-  --color-text-dim: #7d8694;
+  /* Frieren dark: deep indigo with warm undertone */
+  --color-bg: #13131e;
+  --color-surface: #1b1b2a;
+  --color-surface-light: #252538;
+  --color-text: #e0d8cc;
+  --color-text-dim: #8a8298;
 
-  /* Single restrained accent: muted teal, not neon cyan */
-  --color-primary: #5a9ca0;
-  --color-accent: #4a8488;
+  /* Warm gold accent: Frieren's magic / RPG gold */
+  --color-primary: #c4a46c;
+  --color-accent: #a88b56;
 
-  /* Functional colors: muted, reserved for status only */
-  --color-success: #4d9a7e;
-  --color-warning: #c49a52;
-  --color-danger: #c45c5c;
-  --color-info: #5f86b8;
+  /* Muted functional colors */
+  --color-success: #6b9f7a;
+  --color-warning: #c4964a;
+  --color-danger: #b85c5c;
+  --color-info: #7d9bb8;
 
   /* Readable variants for tinted badge backgrounds */
-  --color-success-readable: #6ee7b7;
-  --color-warning-readable: #fde68a;
-  --color-danger-readable: #fecaca;
-  --color-info-readable: #93c5fd;
+  --color-success-readable: #8fc9a0;
+  --color-warning-readable: #e8c88a;
+  --color-danger-readable: #e0a0a0;
+  --color-info-readable: #a0bcd8;
 
   /* Z-index scale */
   --z-layer-base: 1;
@@ -37,29 +37,29 @@
   /* Aliases */
   --color-background: var(--color-bg);
   --color-background-secondary: var(--color-surface);
-  --color-background-hover: rgba(125, 134, 148, 0.1);
-  --color-primary-background: rgba(90, 156, 160, 0.12);
-  --color-primary-dark: #3d7275;
-  --color-success-background: rgba(77, 154, 126, 0.12);
-  --color-warning-background: rgba(196, 154, 82, 0.12);
-  --color-info-bg: rgba(95, 134, 184, 0.1);
-  --color-success-bg: rgba(77, 154, 126, 0.1);
+  --color-background-hover: rgba(138, 130, 152, 0.1);
+  --color-primary-background: rgba(196, 164, 108, 0.1);
+  --color-primary-dark: #8a7444;
+  --color-success-background: rgba(107, 159, 122, 0.1);
+  --color-warning-background: rgba(196, 150, 74, 0.1);
+  --color-info-bg: rgba(125, 155, 184, 0.08);
+  --color-success-bg: rgba(107, 159, 122, 0.08);
 
   /* Semantic aliases */
   --color-bg-primary: var(--color-bg);
   --color-bg-secondary: var(--color-surface);
   --color-bg-tertiary: var(--color-surface-light);
-  --color-bg-quaternary: #363b46;
+  --color-bg-quaternary: #32324a;
   --color-text-secondary: var(--color-text-dim);
-  --color-text-muted: #5a6270;
-  --color-border: #2a2e38;
-  --color-border-subtle: rgba(125, 134, 148, 0.15);
+  --color-text-muted: #5e566e;
+  --color-border: #2e2e42;
+  --color-border-subtle: rgba(138, 130, 152, 0.12);
 
-  /* Corners: restrained, not puffy */
-  --radius-md: 6px;
-  --radius-sm: 3px;
+  /* Corners: soft, not sharp, not bubbly */
+  --radius-md: 4px;
+  --radius-sm: 2px;
 
-  /* Spacing: room to breathe */
+  /* Spacing */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -71,13 +71,18 @@
   --tap-target-large: 60px;
   --tap-target-huge: 70px;
 
-  /* Type scale: stronger hierarchy */
+  /* Type scale */
   --font-xs: 11px;
   --font-sm: 13px;
   --font-md: 15px;
   --font-lg: 18px;
   --font-xl: 26px;
   --font-xxl: 34px;
+
+  /* Font stacks */
+  --font-heading: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-data: 'Courier New', 'Consolas', monospace;
 }
 
 * {
@@ -87,7 +92,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: var(--font-body);
   font-size: max(14px, 1rem);
   background: var(--color-bg);
   color: var(--color-text);
@@ -95,6 +100,20 @@ body {
   letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings: elegant serif (Frieren) */
+h1, h2, h3, .workout-name, .summary-title, .dashboard-title,
+.section-title, .modal-title, .modal-header h2 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+/* Data values: monospace RPG feel */
+#timer, .stat-value, .metric-value, .progression-percentage,
+.set-input, .edit-input, .recovery-number-input,
+#overlay-value, .history-sets, .comp-value, .count-number {
+  font-family: var(--font-data);
 }
 
 /* Keyboard focus: visible ring (mouse clicks stay uncluttered) */
@@ -190,6 +209,7 @@ body {
   min-height: 100vh;
   position: absolute;
   top: 0;
+  animation: screenFadeIn 0.2s ease-out;
   left: 0;
   right: 0;
   width: 100%;
@@ -212,10 +232,11 @@ body {
 }
 
 .app-header h1 {
+  font-family: var(--font-heading);
   font-size: var(--font-lg);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
 }
 
 .icon-btn {
@@ -276,11 +297,8 @@ body {
 .workout-card,
 .recovery-card,
 .quick-actions {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  padding: 0 0 var(--spacing-md);
+  margin-bottom: var(--spacing-md);
 }
 
 .workout-card h2,
@@ -292,11 +310,12 @@ body {
 }
 
 .workout-name {
+  font-family: var(--font-heading);
   font-size: var(--font-xxl);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   margin-bottom: var(--spacing-sm);
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .meta {
@@ -514,18 +533,18 @@ body {
 }
 
 .progress-bar-container {
-  height: 6px;
+  height: 10px;
   background: var(--color-surface-light);
-  border-radius: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: 1px;
   overflow: hidden;
   margin-bottom: var(--spacing-md);
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: var(--color-success);
+  background: var(--color-primary);
   transition: width 0.3s ease;
-  border-radius: 3px;
 }
 
 .criteria-list {
@@ -806,6 +825,18 @@ body {
 
 .warmup-video-icon:hover {
   opacity: 1;
+}
+
+/* Animations */
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .screen.active { animation: none; }
+  * { transition-duration: 0s !important; }
 }
 
 /* Mobile responsive */

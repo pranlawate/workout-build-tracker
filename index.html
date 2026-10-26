@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111318">
+  <meta name="theme-color" content="#13131e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
@@ -49,42 +49,42 @@
       </header>
 
       <main class="screen-content" role="main">
-        <section class="workout-card">
-          <h2>Next Workout</h2>
+        <section class="hero-workout">
+          <span class="hero-label">Next Workout</span>
           <p id="next-workout-name" class="workout-name">Upper A - Horizontal</p>
           <p id="last-trained" class="meta">Last trained: Never</p>
+        </section>
 
+        <div class="hero-action">
           <button id="start-workout-btn" class="btn-primary btn-large">
             START WORKOUT
           </button>
-        </section>
+        </div>
 
-        <section class="quick-actions">
-          <h3>Quick Actions</h3>
+        <nav class="quick-actions">
           <div class="action-grid">
             <button type="button" class="action-btn" aria-label="Open workout history">History</button>
             <button type="button" id="progress-btn" class="action-btn" aria-label="Open progress dashboard">Progress</button>
             <button type="button" id="exercise-library-btn" class="action-btn" aria-label="Open exercise library">Library</button>
           </div>
-        </section>
-
-        <div class="optional-training-card">
-          <h3>Optional Training</h3>
-          <button id="optional-fifth-day-btn" class="btn-secondary">
-            Injury Prevention + Core Day
-          </button>
-        </div>
+        </nav>
 
         <div id="cycle-progress" class="cycle-progress">
           <!-- populated by JavaScript -->
         </div>
 
         <section id="recovery-status" class="recovery-card">
-          <h3>Recovery Status</h3>
+          <h3>Recovery</h3>
           <div id="recovery-list">
             <p class="recovery-ok">✓ All muscles recovered</p>
           </div>
         </section>
+
+        <div class="optional-training-card">
+          <button id="optional-fifth-day-btn" class="btn-tertiary">
+            Injury Prevention + Core Day
+          </button>
+        </div>
       </main>
     </div>
 
@@ -452,15 +452,15 @@
     </div>
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Settings</h2>
-        <button type="button" id="settings-close-btn" class="icon-btn" aria-label="Close settings">✕</button>
-      </div>
+  <!-- Settings Screen -->
+  <div id="settings-screen" class="screen">
+    <header class="app-header" role="banner">
+      <button type="button" id="settings-back-btn" class="icon-btn" aria-label="Back">←</button>
+      <h1>Settings</h1>
+      <span></span>
+    </header>
 
-      <div class="modal-body">
+    <main class="screen-content" role="main">
         <!-- Exercise Progressions Section -->
         <section class="settings-section">
           <h3>Exercise Progressions</h3>
@@ -573,8 +573,7 @@
             Zero-dependency PWA for progressive overload tracking
           </p>
         </section>
-      </div>
-    </div>
+      </main>
   </div>
 
   <!-- Weigh-In Modal -->
@@ -657,33 +656,33 @@
 
       <!-- Initial pain check -->
       <div id="pain-initial-check">
-        <p style="font-size: 18px; margin-bottom: 24px;">Did you experience any pain during this workout?</p>
-        <button id="pain-no-btn" class="btn btn-primary" style="height: 60px; font-size: 18px; margin-bottom: 12px;">No Pain ✓</button>
-        <button id="pain-yes-btn" class="btn btn-secondary" style="height: 60px; font-size: 18px;">Yes, I had pain</button>
+        <p class="pain-prompt">Did you experience any pain during this workout?</p>
+        <button id="pain-no-btn" class="btn btn-primary btn-large">No Pain ✓</button>
+        <button id="pain-yes-btn" class="btn btn-secondary btn-large pain-yes-btn">Yes, I had pain</button>
       </div>
 
       <!-- Exercise selection (hidden initially) -->
       <div id="pain-exercise-selection" style="display: none;">
-        <p style="font-size: 16px; margin-bottom: 16px;">Which exercises had pain? (Select all that apply)</p>
+        <p class="pain-prompt-sm">Which exercises had pain? (Select all that apply)</p>
         <div id="pain-exercise-list" class="pain-exercise-checkboxes">
           <!-- Populated dynamically -->
         </div>
-        <button id="pain-selection-next-btn" class="btn btn-primary" style="margin-top: 16px; height: 50px;">Next</button>
+        <button id="pain-selection-next-btn" class="btn btn-primary pain-next-btn">Next</button>
       </div>
 
       <!-- Pain details for selected exercise (hidden initially) -->
       <div id="pain-details" style="display: none;">
-        <h3 id="pain-detail-exercise-name" style="margin-bottom: 16px;"></h3>
-        <p id="pain-detail-progress" style="font-size: 14px; color: #888; margin-bottom: 16px;"></p>
+        <h3 id="pain-detail-exercise-name" class="pain-detail-name"></h3>
+        <p id="pain-detail-progress" class="pain-detail-meta"></p>
 
-        <p style="margin-bottom: 12px;">How severe was the pain?</p>
-        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-          <button class="pain-severity-btn btn btn-secondary" data-severity="minor" style="flex: 1; height: 50px;">Minor</button>
-          <button class="pain-severity-btn btn btn-secondary" data-severity="significant" style="flex: 1; height: 50px;">Significant</button>
+        <p class="pain-label">How severe was the pain?</p>
+        <div class="pain-severity-row">
+          <button class="pain-severity-btn btn btn-secondary" data-severity="minor">Minor</button>
+          <button class="pain-severity-btn btn btn-secondary" data-severity="significant">Significant</button>
         </div>
 
-        <p style="margin-bottom: 12px;">Where was the pain?</p>
-        <div class="pain-location-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <p class="pain-label">Where was the pain?</p>
+        <div class="pain-location-buttons pain-location-grid">
           <button class="pain-location-btn btn btn-secondary" data-location="shoulder">Shoulder</button>
           <button class="pain-location-btn btn btn-secondary" data-location="elbow">Elbow</button>
           <button class="pain-location-btn btn btn-secondary" data-location="wrist">Wrist</button>

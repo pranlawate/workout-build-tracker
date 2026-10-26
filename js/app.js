@@ -232,22 +232,16 @@ class App {
       // Handle browser back/forward buttons
     window.addEventListener('popstate', (event) => {
       if (this._importInProgress) {
-        window.history.pushState({ screen: 'modal' }, '', '');
-        const modal = document.getElementById('settings-modal');
-        if (modal) {
-          modal.style.display = 'flex';
-        }
+        window.history.pushState({ screen: 'settings' }, '', '');
+        this.showScreen('settings-screen');
         alert('Import in progress. Please wait until it finishes.');
         return;
       }
 
-      const settingsModal = document.getElementById('settings-modal');
-      const settingsOpen = settingsModal && settingsModal.style.display === 'flex';
-      if (settingsOpen && event.state && event.state.screen !== 'modal') {
-        if (!confirm('Leave settings?')) {
-          window.history.pushState({ screen: 'modal' }, '', '');
-          return;
-        }
+      const settingsScreen = document.getElementById('settings-screen');
+      const settingsOpen = settingsScreen && settingsScreen.classList.contains('active');
+      if (settingsOpen && event.state && event.state.screen !== 'settings') {
+        this.closeSettingsModal();
       }
 
       if (!event.state) {
@@ -288,10 +282,10 @@ class App {
   }
 
   navigateToScreen(screen, data = {}) {
-    // Always close modal when navigating (modals are overlays, not screens)
-    this.closeSettingsModal();
-
     switch (screen) {
+      case 'settings':
+        this.showSettingsModal();
+        return;
       case 'home':
         this.showHomeScreen(false); // false = don't push to history
         break;
@@ -3028,6 +3022,12 @@ class App {
     screens.forEach(screen => screen.classList.remove('active'));
   }
 
+  showScreen(id) {
+    this.hideAllScreens();
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  }
+
   editEntry(exerciseKey, index) {
     this.editEntryModal.show(exerciseKey, index);
   }
@@ -3144,22 +3144,20 @@ class App {
   }
 
   showSettingsModal() {
-    const modal = document.getElementById('settings-modal');
     const fileInput = document.getElementById('import-file-input');
 
-    if (modal) {
-      modal.style.display = 'flex';
-    }
+    // Show as a screen
+    this.showScreen('settings-screen');
 
-    // Push modal state to history
-    window.history.pushState({ screen: 'modal' }, '', '');
+    // Push screen state to history
+    window.history.pushState({ screen: 'settings' }, '', '');
 
-    // Attach handlers
-    const closeBtn = document.getElementById('settings-close-btn');
-    if (closeBtn) {
-      closeBtn.onclick = () => {
+    // Attach back button handler
+    const backBtn = document.getElementById('settings-back-btn');
+    if (backBtn) {
+      backBtn.onclick = () => {
         if (!this.closeSettingsModal()) return;
-        window.history.back(); // Go back in history when closing via button
+        window.history.back();
       };
     }
 
@@ -3203,14 +3201,11 @@ class App {
       return false;
     }
 
-    const modal = document.getElementById('settings-modal');
     const fileInput = document.getElementById('import-file-input');
 
-    if (modal) {
-      modal.style.display = 'none';
-    }
+    // Navigate back to home
+    this.showScreen('home-screen');
 
-    // Reset file input when closing modal
     if (fileInput) {
       fileInput.value = '';
     }
