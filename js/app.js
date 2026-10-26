@@ -1181,6 +1181,9 @@ class App {
       };
     }
 
+    // Stamp each exercise with its original slot index before reordering
+    this.currentWorkout.exercises.forEach((ex, i) => { ex._slotIndex = i; });
+
     const mainExercises = this.currentWorkout.exercises.filter(ex => !ex.optional);
     const optionalExercises = this.currentWorkout.exercises.filter(ex => ex.optional);
     this.orderedExercises = [...mainExercises, ...optionalExercises];
@@ -1683,9 +1686,8 @@ class App {
     const exercise = exercises[exerciseIndex];
     const workoutName = this.currentWorkout.name;
 
-    const originalExercises = this.currentWorkout.exercises;
-    const origIdx = originalExercises.findIndex(ex => ex.name === exercise.name);
-    const slotIndex = origIdx >= 0 ? origIdx : exerciseIndex;
+    // Use the stamped slot index (set at session start), not a name lookup
+    const slotIndex = exercise._slotIndex != null ? exercise._slotIndex : exerciseIndex;
     const slotKey = `${workoutName}_SLOT_${slotIndex + 1}`;
 
     const path = PROGRESSION_PATHS[slotKey];
@@ -1748,22 +1750,27 @@ class App {
     const exercises = this.orderedExercises || this.currentWorkout?.exercises;
     if (!exercises || !exercises[displayIndex]) return;
 
-    const oldName = exercises[displayIndex].name;
+    const oldExercise = exercises[displayIndex];
+    const oldName = oldExercise.name;
+    const preservedSlotIndex = oldExercise._slotIndex;
 
     const altDef = this._getExerciseDefinition(newExerciseName);
     const newExercise = altDef
       ? { ...altDef, name: newExerciseName }
-      : { ...exercises[displayIndex], name: newExerciseName };
+      : { ...oldExercise, name: newExerciseName };
 
-    if (exercises[displayIndex].optional) {
+    if (oldExercise.optional) {
       newExercise.optional = true;
     }
 
+    // Preserve the original slot index through swaps
+    newExercise._slotIndex = preservedSlotIndex;
+
     exercises[displayIndex] = newExercise;
 
-    const origIdx = this.currentWorkout.exercises.findIndex(ex => ex.name === oldName);
-    if (origIdx >= 0) {
-      this.currentWorkout.exercises[origIdx] = newExercise;
+    // Update the original exercises array using the stable slot index
+    if (preservedSlotIndex != null && this.currentWorkout.exercises[preservedSlotIndex]) {
+      this.currentWorkout.exercises[preservedSlotIndex] = newExercise;
     }
 
     if (this.workoutSession?.exercises?.[displayIndex]) {
@@ -1774,7 +1781,7 @@ class App {
       };
     }
 
-    console.log(`[Swap] ${oldName} -> ${newExerciseName}`);
+    console.log(`[Swap] ${oldName} -> ${newExerciseName} (slot ${preservedSlotIndex})`);
     this.renderExercises();
   }
 

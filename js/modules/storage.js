@@ -995,9 +995,9 @@ export class StorageManager {
           'UPPER_A_SLOT_7': 'Tricep Pushdowns',
           'LOWER_A_SLOT_1': 'Hack Squat',
           'LOWER_A_SLOT_2': '45° Hyperextension',
-          'LOWER_A_SLOT_3': 'Hip Thrust',
-          'LOWER_A_SLOT_4': 'Leg Extension',
-          'LOWER_A_SLOT_5': 'Standing Calf Raise',
+          'LOWER_A_SLOT_3': 'Leg Extension',
+          'LOWER_A_SLOT_4': 'Hip Thrust',
+          'LOWER_A_SLOT_5': 'Seated Calf Raise',
           'LOWER_A_SLOT_6': 'Dead Bug',
           'UPPER_B_SLOT_1': 'Lat Pulldown',
           'UPPER_B_SLOT_2': 'Landmine Press',
@@ -1011,7 +1011,7 @@ export class StorageManager {
           'LOWER_B_SLOT_3': 'Leg Abduction',
           'LOWER_B_SLOT_4': 'Leg Adduction',
           'LOWER_B_SLOT_5': 'Leg Curl',
-          'LOWER_B_SLOT_6': 'Seated Calf Raise',
+          'LOWER_B_SLOT_6': 'Standing Calf Raise',
           'LOWER_B_SLOT_7': 'Pallof Press'
         };
       }
