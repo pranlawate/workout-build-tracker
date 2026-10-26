@@ -1,5 +1,9 @@
 # Project Context for Claude Code
 
+## Training Philosophy
+
+Full philosophy documented in `docs/training-philosophy.md`. Key points: tendon-first training (sustained isometric holds, not short tempo cues), functional density over mass (Bruce Lee aesthetic), Upper/Lower split over bro-splits (2x/week frequency), injury constraints as design constraints, swap lists stay within their muscle group.
+
 ## User Physical Profile
 
 - **Rotator cuff weakness** — avoid overhead pressing through impingement zone (no DB Shoulder Press, no behind-neck movements)

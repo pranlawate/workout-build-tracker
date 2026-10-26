@@ -21,21 +21,28 @@ Three integration points, no plan overhaul:
 - **Lower:** Wall Sit Isometric Hold replaces Standing Quad Stretch
 - **Lower:** Single-Leg Calf Raise Bottom Hold replaces Standing Calf Stretch
 
-### 3. Intra-Workout Tendon Cues (Form Guide)
-Exercises with a 🦴 tendon cue in the form guide:
-- DB Flat Bench Press: 2-3s hold at bottom stretch (pec/shoulder tendons)
-- Seated Cable Row: 3s hold at peak contraction (scapular tendons)
-- Face Pulls: 3s hold at peak, every rep (rotator cuff tendons)
-- Hack Squat: 2-3s hold at bottom (patellar/quad tendons)
-- DB Romanian Deadlift: 2-3s hold at bottom stretch (hamstring tendons)
-- Lat Pulldown: 3s hold at full stretch (lat/bicep tendons)
-- Standing Calf Raise: 2s hold at bottom, every rep (Achilles tendon)
-- Seated Calf Raise: 2s hold at bottom, every rep (soleus tendon)
+### 3. Post-Set Tendon Holds (Dedicated Isometric Protocol)
+
+After the last working set of key exercises, reduce to ~70% working weight and hold at the stretched position. These are real tendon stimulus (15s+ continuous load), not tempo cues.
+
+| Workout | Exercise | Hold Position | Tendon Target | Duration |
+|---------|----------|---------------|---------------|----------|
+| Upper A | Face Pulls | Peak external rotation | Rotator cuff | 20-45s |
+| Lower A | Hack Squat | Bottom of squat (parallel+) | Patellar | 20-45s |
+| Lower A | Seated Calf Raise | Heels below platform | Soleus / Achilles | 20-45s |
+| Upper B | Lat Pulldown | Arms fully extended | Lat / bicep tendon | 20-45s |
+| Lower B | DB Romanian Deadlift | Bottom stretch | Proximal hamstring | 20-45s |
+| Lower B | Standing Calf Raise | Heels below platform | Gastrocnemius / Achilles | 20-45s |
 
 ### Progression Protocol
-- **Holds:** Start at listed duration, add 1-2s per week
-- **Wall Sit:** Start 30s, progress to 60s, then add light weight (hold DB at chest)
-- **Calf holds:** Start bodyweight, then do them on the loaded machine
+- **Start:** 20 seconds per hold
+- **Progress:** +5 seconds per session (auto-tracked in app)
+- **Cap:** 45 seconds, then increase load slightly and reset to 20s
+- **Load:** ~70% of working weight (enough to exceed collagen synthesis threshold)
+
+### 4. Form Tempo Cues (Muscle Quality, Not Tendon Stimulus)
+
+All 30 exercises have a "Form Tempo" cue in the form guide (previously mislabelled "Tendon Strength"). These are 2-3 second holds or controlled eccentrics for motor control and muscle quality. They are good practice but do NOT substitute for the dedicated tendon holds above.
 
 ## Yi Jin Jing (易筋经): 12 Postures for Rest Days
 
