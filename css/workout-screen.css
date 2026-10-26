@@ -40,7 +40,7 @@
 
 .set-row {
   display: grid;
-  grid-template-columns: 50px 1fr 65px 95px;
+  grid-template-columns: 50px 1fr 1fr 95px;
   gap: var(--spacing-xs);
   align-items: start;
   margin-bottom: var(--spacing-md);
@@ -306,6 +306,14 @@
 
 .form-cue-category li {
   margin: 4px 0;
+}
+
+.form-cue-category.tendon-cue {
+  background: rgba(234, 179, 8, 0.1);
+  border-left: 3px solid #eab308;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 8px;
 }
 
 /* Band Color Buttons */

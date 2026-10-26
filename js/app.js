@@ -1176,13 +1176,16 @@ class App {
     const exerciseList = document.getElementById('exercise-list');
     if (!exerciseList || !this.currentWorkout) return;
 
-    // Initialize workout session data
-    this.workoutSession = {
-      workoutName: this.currentWorkout.name,
-      startTime: new Date(),
-      warmupCompleted: false,
-      exercises: []
-    };
+    // Initialize workout session data only on first render (preserve logged sets on re-render)
+    const existingSession = this.workoutSession;
+    if (!existingSession || existingSession.workoutName !== this.currentWorkout.name) {
+      this.workoutSession = {
+        workoutName: this.currentWorkout.name,
+        startTime: new Date(),
+        warmupCompleted: false,
+        exercises: []
+      };
+    }
 
     const mainExercises = this.currentWorkout.exercises.filter(ex => !ex.optional);
     const optionalExercises = this.currentWorkout.exercises.filter(ex => ex.optional);
@@ -1211,11 +1214,20 @@ class App {
       }
       const lastWorkout = history.length > 0 ? history[history.length - 1] : null;
 
-      // Initialize session data for this exercise
-      this.workoutSession.exercises.push({
-        name: exercise.name,
-        sets: []
-      });
+      // Initialize session data for this exercise (preserve existing logged sets)
+      if (!this.workoutSession.exercises[index]) {
+        this.workoutSession.exercises[index] = {
+          name: exercise.name,
+          sets: []
+        };
+      } else if (this.workoutSession.exercises[index].name !== exercise.name) {
+        // Exercise was swapped: reset only this slot
+        this.workoutSession.exercises[index] = {
+          name: exercise.name,
+          sets: [],
+          swappedFrom: this.workoutSession.exercises[index].name
+        };
+      }
 
       // Get performance badge for this exercise
       const exerciseSession = this.workoutSession.exercises[index];
@@ -1269,6 +1281,11 @@ class App {
                   ${formCues.mistakes.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
                 </ul>
               </div>
+              ${formCues.tendonCue ? `
+              <div class="form-cue-category tendon-cue">
+                <strong>🦴 Tendon Strength:</strong>
+                <p class="form-cue-paragraph">${this.escapeHtml(formCues.tendonCue.replace('🦴 ', ''))}</p>
+              </div>` : ''}
             </div>
           </div>
         `;

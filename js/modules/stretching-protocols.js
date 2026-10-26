@@ -50,10 +50,10 @@ export function getUpperBodyStretches() {
       instructions: 'Pull arm across chest, hold with opposite hand'
     },
     {
-      name: 'Overhead Tricep Stretch',
-      duration: '30s per side',
-      target: 'triceps, lats',
-      instructions: 'Reach arm overhead, bend elbow, pull with opposite hand'
+      name: 'Isometric Scapular Retraction Hold',
+      duration: '2 × 20-30s',
+      target: 'mid/lower traps, rhomboids (tendon)',
+      instructions: '🦴 Stand tall, squeeze shoulder blades together hard, arms at sides. Hold max contraction. Strengthens scapular retractor tendons.'
     },
     {
       name: 'Behind-Back Lat Stretch',
@@ -62,10 +62,10 @@ export function getUpperBodyStretches() {
       instructions: 'Clasp hands behind back, straighten arms, lift gently'
     },
     {
-      name: 'Wrist Flexor/Extensor Stretch',
-      duration: '30s each',
-      target: 'forearms',
-      instructions: 'Extend arm, pull fingers back/forward with opposite hand'
+      name: 'Wrist Isometric Wall Press',
+      duration: '20-30s each direction',
+      target: 'forearm tendons (flexor/extensor)',
+      instructions: '🦴 Palm flat on wall at waist height, lean in gently for flexor load. Then back of hand on wall for extensor load. Loaded stretch beats passive.'
     },
     {
       name: 'Upper Trap Stretch',
@@ -91,10 +91,10 @@ export function getUpperBodyStretches() {
 export function getLowerBodyStretches() {
   return [
     {
-      name: 'Standing Quad Stretch',
-      duration: '30-60s per side',
-      target: 'quadriceps',
-      instructions: 'Stand on one leg, pull heel to glute, keep knees together'
+      name: 'Wall Sit Isometric Hold',
+      duration: '1 × 30-45s',
+      target: 'quad/patellar tendons',
+      instructions: '🦴 Back flat on wall, thighs parallel to floor. Loaded hold strengthens patellar and quad tendons more than passive stretching. Progress by adding 10s weekly.'
     },
     {
       name: 'Standing Hamstring Stretch',
@@ -115,10 +115,10 @@ export function getLowerBodyStretches() {
       instructions: 'Seated, cross ankle over opposite knee, lean forward'
     },
     {
-      name: 'Standing Calf Stretch',
-      duration: '30s per side',
-      target: 'gastrocnemius, soleus',
-      instructions: 'Step forward, keep back leg straight, heel down'
+      name: 'Single-Leg Calf Raise Bottom Hold',
+      duration: '20-30s per side',
+      target: 'Achilles tendon, soleus',
+      instructions: '🦴 Stand on step edge, lower heel below platform on one leg. Hold the deep stretch under bodyweight. Loaded Achilles tendon strengthening.'
     },
     {
       name: 'Seated Spinal Twist',

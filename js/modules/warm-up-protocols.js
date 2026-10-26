@@ -19,7 +19,7 @@ export function getUpperBodyWarmup(equipmentProfile) {
 
   return [
     { name: 'Wrist Circles', reps: '10 each direction', duration: null },
-    { name: 'Arm Circles', reps: '10 forward, 10 back', duration: null },
+    { name: 'Isometric Wall Push', reps: '2 × 15s', duration: '30s', note: '🦴 Tendon prep: hands at chest height, push wall with full effort. Warms chest/tricep tendons under load.' },
     {
       name: hasBands ? 'Band Over-and-Backs' : 'Arm Circles Extended',
       reps: hasBands ? '5 reps' : '15 reps',
@@ -54,7 +54,8 @@ export function getLowerBodyWarmup() {
     { name: 'Forward & Back Leg Swings', reps: '10-15 per side', duration: null },
     { name: 'Side-to-Side Leg Swings', reps: '10-15 per side', duration: null },
     { name: 'Spiderman Lunge w/ Thoracic Extension', reps: '5 per side', duration: null },
-    { name: 'Wall Ankle Mobilization', reps: '5 per side w/ 2 sec hold', duration: null }
+    { name: 'Wall Ankle Mobilization', reps: '5 per side w/ 2 sec hold', duration: null },
+    { name: 'Wall Sit Isometric', reps: '1 × 30-45s', duration: '30-45s', note: '🦴 Tendon prep: back flat on wall, thighs parallel. Loads patellar and quad tendons. Progress by adding 10s per week.' }
   ];
 }
 

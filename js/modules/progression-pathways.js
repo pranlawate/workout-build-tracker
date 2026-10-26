@@ -176,7 +176,7 @@ export const PROGRESSION_PATHS = {
       'Heavy Landmine Press',
       'Single-Arm Landmine Press'
     ],
-    alternate: ['Cable Press']
+    alternate: ['Cable Press', 'DB Shoulder Press']
   },
 
   'UPPER_B_SLOT_3': {
