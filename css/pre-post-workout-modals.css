@@ -19,6 +19,7 @@
 #warmup-modal .checklist-item {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   padding: 1rem;
   background: var(--color-surface-light);
   border-radius: 8px;
@@ -60,9 +61,12 @@
 
 #warmup-modal .exercise-note {
   display: block;
+  width: 100%;
   font-size: 0.8rem;
-  color: var(--color-text-dim);
-  font-style: italic;
+  color: var(--color-primary);
+  font-style: normal;
+  margin-top: 0.25rem;
+  line-height: 1.4;
 }
 
 #warmup-modal .progress-indicator {

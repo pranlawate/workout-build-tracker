@@ -669,7 +669,7 @@ class App {
         <input type="checkbox" data-index="${index}">
         <span class="exercise-name">${exercise.name}</span>
         <span class="exercise-detail">${exercise.reps || exercise.duration}</span>
-        ${exercise.note ? `<span class="exercise-note">${exercise.note}</span>` : ''}
+        ${exercise.note ? `<div class="exercise-note">${exercise.note}</div>` : ''}
       </label>
     `).join('');
 
