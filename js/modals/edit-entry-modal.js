@@ -124,7 +124,7 @@ export class EditEntryModal {
     if (dateInput) {
       const parsed = new Date(dateInput.value);
       if (isNaN(parsed.getTime())) {
-        alert('⚠️ Please enter a valid date');
+        alert('Please enter a valid date');
         return;
       }
       entry.date = parsed.toISOString();

@@ -22,7 +22,7 @@ const WORKOUT_TYPE_PREFIX = {
 };
 
 const WARNINGS = {
-  EMOJI_CAUTION: '⚠️',
+  EMOJI_CAUTION: '',
   LOWER_FATIGUE: 'Legs are fatigued - avoid high-impact',
   UPPER_FRESH: 'Legs are fresh - any low-impact cardio works',
   TREADMILL_LOWER: 'Walking only - legs need rest',
@@ -53,7 +53,7 @@ export function getUpperBodyStretches() {
       name: 'Isometric Scapular Retraction Hold',
       duration: '2 × 20-30s',
       target: 'mid/lower traps, rhomboids (tendon)',
-      instructions: '🦴 Stand tall, squeeze shoulder blades together hard, arms at sides. Hold max contraction. Strengthens scapular retractor tendons.'
+      instructions: 'Stand tall, squeeze shoulder blades together hard, arms at sides. Hold max contraction. Strengthens scapular retractor tendons.'
     },
     {
       name: 'Behind-Back Lat Stretch',
@@ -65,7 +65,7 @@ export function getUpperBodyStretches() {
       name: 'Wrist Isometric Wall Press',
       duration: '20-30s each direction',
       target: 'forearm tendons (flexor/extensor)',
-      instructions: '🦴 Palm flat on wall at waist height, lean in gently for flexor load. Then back of hand on wall for extensor load. Loaded stretch beats passive.'
+      instructions: 'Palm flat on wall at waist height, lean in gently for flexor load. Then back of hand on wall for extensor load. Loaded stretch beats passive.'
     },
     {
       name: 'Upper Trap Stretch',
@@ -94,7 +94,7 @@ export function getLowerBodyStretches() {
       name: 'Wall Sit Isometric Hold',
       duration: '1 × 30-45s',
       target: 'quad/patellar tendons',
-      instructions: '🦴 Back flat on wall, thighs parallel to floor. Loaded hold strengthens patellar and quad tendons more than passive stretching. Progress by adding 10s weekly.'
+      instructions: 'Back flat on wall, thighs parallel to floor. Loaded hold strengthens patellar and quad tendons more than passive stretching. Progress by adding 10s weekly.'
     },
     {
       name: 'Standing Hamstring Stretch',
@@ -118,7 +118,7 @@ export function getLowerBodyStretches() {
       name: 'Single-Leg Calf Raise Bottom Hold',
       duration: '20-30s per side',
       target: 'Achilles tendon, soleus',
-      instructions: '🦴 Stand on step edge, lower heel below platform on one leg. Hold the deep stretch under bodyweight. Loaded Achilles tendon strengthening.'
+      instructions: 'Stand on step edge, lower heel below platform on one leg. Hold the deep stretch under bodyweight. Loaded Achilles tendon strengthening.'
     },
     {
       name: 'Seated Spinal Twist',

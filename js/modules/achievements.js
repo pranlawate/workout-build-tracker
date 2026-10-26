@@ -89,7 +89,7 @@ function detectPersonalRecord(exerciseKey, storage) {
         id: `pr_${exerciseKey}_${Date.now()}`,
         type: 'PERSONAL_RECORD',
         exerciseKey,
-        badge: '🔥',
+        badge: '',
         description: `${exerciseName}: ${latestBest.weight}kg × ${latestBest.reps} reps`
       };
     }
@@ -134,7 +134,7 @@ function detectTempoMastery(storage) {
           id: `tempo_${exerciseKey}_${Date.now()}`,
           type: 'TEMPO_MASTERY',
           exerciseKey,
-          badge: '🏆',
+          badge: '',
           description: `Conquered ${state.weight}kg→${state.targetWeight}kg gap with tempo progression`
         };
       }
@@ -211,7 +211,7 @@ function detectProgressionStreak(storage) {
         id: `streak_${exerciseKey}_${Date.now()}`,
         type: 'PROGRESSION_STREAK',
         exerciseKey,
-        badge: '⚡',
+        badge: 'PR',
         description: `${exerciseName}: ${streak + 1} sessions, each heavier than the last`
       });
     }
@@ -241,7 +241,7 @@ function detectSmartRecovery(storage) {
           id: `recovery_${exerciseKey}_${Date.now()}`,
           type: 'SMART_RECOVERY',
           exerciseKey,
-          badge: '🧠',
+          badge: 'Smart',
           description: `Prevented injury by switching to ${info.current}`
         };
       }

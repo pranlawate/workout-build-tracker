@@ -109,13 +109,13 @@ export function getFatigueWarning(lastWorkout, nextWorkout) {
     if (hoursUntilNext < 48) {
       return {
         level: 'warning',
-        message: '⚠️ Consider skipping Block 2 (shoulders) and Block 3 (Mudgal) to prevent fatigue',
+        message: 'Consider skipping Block 2 (shoulders) and Block 3 (Mudgal) to prevent fatigue',
         recommendSkip: ['mobility', 'user-choice']
       };
     }
     return {
       level: 'info',
-      message: '✅ Best day: Tomorrow (2 days until Upper A)',
+      message: 'Best day: Tomorrow (2 days until Upper A)',
       recommendSkip: []
     };
   }

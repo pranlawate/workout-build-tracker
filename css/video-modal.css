@@ -148,8 +148,16 @@
 }
 
 .error-icon {
-  font-size: 48px;
-  margin-bottom: var(--spacing-md);
+  font-size: var(--font-xl);
+  font-weight: 700;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
+  margin: 0 auto var(--spacing-md);
 }
 
 .error-message {

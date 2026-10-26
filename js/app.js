@@ -143,7 +143,7 @@ class App {
     }
 
     const badgeClass = analysis.status === 'alert' ? 'badge-alert' : 'badge-warning';
-    const icon = analysis.status === 'alert' ? '🔴' : '🟡';
+    const icon = analysis.status === 'alert' ? '!' : '·';
 
     return `
       <div class="performance-badge ${badgeClass}">
@@ -415,7 +415,7 @@ class App {
 
     if (recoveryCheck.warn) {
       recoveryListEl.innerHTML = recoveryCheck.muscles
-        .map(m => `<p class="recovery-warning">⚠️ ${m.name} needs ${m.hoursNeeded}h more recovery</p>`)
+        .map(m => `<p class="recovery-warning">${m.name} needs ${m.hoursNeeded}h more recovery</p>`)
         .join('');
     } else {
       recoveryListEl.innerHTML = '<p class="recovery-ok">✓ All muscles recovered</p>';
@@ -835,12 +835,12 @@ class App {
 
       // Update recommendation text
       recElement.innerHTML = `
-        💡 Recommended: ${recommendation.recommended.charAt(0).toUpperCase() + recommendation.recommended.slice(1)} ${recommendation.duration}<br>
+        Recommended: ${recommendation.recommended.charAt(0).toUpperCase() + recommendation.recommended.slice(1)} ${recommendation.duration}<br>
         <small>${this.escapeHtml(recommendation.warning)}</small>
       `;
 
       // Add warning to treadmill option if needed
-      if (recommendation.treadmillNote.includes('⚠️')) {
+      if (recommendation.treadmillNote.includes('')) {
         const treadmillInput = document.querySelector('input[value="treadmill"]');
         if (!treadmillInput) {
           console.error('[App] Treadmill input element not found');
@@ -966,7 +966,7 @@ class App {
         }
         const result = this.bodyWeight.addEntry(weight);
         if (!result.success) {
-          alert('⚠️ Failed to save weight. Please try again.');
+          alert('Failed to save weight. Please try again.');
           return;
         }
 
@@ -974,12 +974,12 @@ class App {
         container.innerHTML = `
           <div class="weighin-section">
             <p style="color: #10b981; font-weight: 500; text-align: center;">
-              ✅ Weight saved: ${weight} kg
+              Weight saved: ${weight} kg
             </p>
           </div>
         `;
       } else {
-        alert('⚠️ Please enter a valid weight (30-200 kg)');
+        alert('Please enter a valid weight (30-200 kg)');
       }
     };
   }
@@ -1030,14 +1030,14 @@ class App {
         }
         const result = this.bodyWeight.addEntry(weight);
         if (!result.success) {
-          alert('⚠️ Failed to save weight. Please try again.');
+          alert('Failed to save weight. Please try again.');
           return;
         }
 
-        alert(`✅ Weight saved: ${weight} kg`);
+        alert(`Weight saved: ${weight} kg`);
         inputDiv.style.display = 'none';
       } else {
-        alert('⚠️ Please enter a valid weight (30-200 kg)');
+        alert('Please enter a valid weight (30-200 kg)');
       }
     };
   }
@@ -1061,7 +1061,7 @@ class App {
         }
         const weighResult = this.bodyWeight.addEntry(weighInData.weight);
         if (!weighResult.success) {
-          alert('⚠️ Failed to save body weight. You can try again from the progress screen.');
+          alert('Failed to save body weight. You can try again from the progress screen.');
         }
       }
 
@@ -1245,7 +1245,7 @@ class App {
         formCuesHTML = `
           <div class="form-guide-section">
             <button type="button" class="form-guide-toggle" onclick="app.toggleFormGuide(${index})" id="form-toggle-${index}" aria-expanded="false" aria-controls="form-guide-${index}" aria-label="Toggle form guide for ${this.escapeHtml(exercise.name)}">
-              📋 Form Guide ▼
+              Form Guide ▼
             </button>
 
             ${this.renderWatchDemoButton(exercise.name, index)}
@@ -1276,15 +1276,15 @@ class App {
                 </ul>
               </div>` : ''}
               <div class="form-cue-category">
-                <strong>⚠️ Avoid:</strong>
+                <strong>Avoid:</strong>
                 <ul>
                   ${formCues.mistakes.map(cue => `<li>${this.escapeHtml(cue)}</li>`).join('')}
                 </ul>
               </div>
               ${formCues.tendonCue ? `
               <div class="form-cue-category tendon-cue">
-                <strong>🦴 Tendon Strength:</strong>
-                <p class="form-cue-paragraph">${this.escapeHtml(formCues.tendonCue.replace('🦴 ', ''))}</p>
+                <strong>Tendon Strength:</strong>
+                <p class="form-cue-paragraph">${this.escapeHtml(formCues.tendonCue.replace('', ''))}</p>
               </div>` : ''}
             </div>
           </div>
@@ -1420,11 +1420,11 @@ class App {
                     data-set="${setIndex}"
                     data-field="weight"
                     ${disabledAttr}>
-              <option value="5" ${defaultWeight === 5 ? 'selected' : ''}>🟡 Light (5kg)</option>
-              <option value="10" ${defaultWeight === 10 ? 'selected' : ''}>🔴 Medium (10kg)</option>
-              <option value="15" ${defaultWeight === 15 ? 'selected' : ''}>🔵 Heavy (15kg)</option>
-              <option value="25" ${defaultWeight === 25 ? 'selected' : ''}>⚫ X-Heavy (25kg)</option>
-              <option value="custom" ${isCustomWeight ? 'selected' : ''}>⚪ Custom</option>
+              <option value="5" ${defaultWeight === 5 ? 'selected' : ''}>Light (5kg)</option>
+              <option value="10" ${defaultWeight === 10 ? 'selected' : ''}>Medium (10kg)</option>
+              <option value="15" ${defaultWeight === 15 ? 'selected' : ''}>Heavy (15kg)</option>
+              <option value="25" ${defaultWeight === 25 ? 'selected' : ''}>X-Heavy (25kg)</option>
+              <option value="custom" ${isCustomWeight ? 'selected' : ''}>Custom</option>
             </select>
             <input type="number"
                    class="band-custom-input set-input"
@@ -1467,7 +1467,7 @@ class App {
         <div class="set-row ${lockedClass} ${stickyClass}" data-set-number="${setNum}">
           <span class="set-label">
             Set ${setNum}
-            ${isLocked ? '<span class="lock-icon">🔒</span>' : ''}
+            ${isLocked ? '<span class="lock-icon"></span>' : ''}
           </span>
 
           ${weightInputHtml}
@@ -1499,7 +1499,7 @@ class App {
 
   renderProgressionBadge(exercise, history, suggestion) {
     if (history.length === 0) {
-      return '<span class="progression-badge badge-normal">🔵 First Time</span>';
+      return '<span class="progression-badge badge-normal">First Time</span>';
     }
 
     const status = getProgressionStatus(history, exercise, this.phaseManager);
@@ -1511,11 +1511,11 @@ class App {
     }
 
     const badges = {
-      normal: '<span class="progression-badge badge-normal">🔵 In Progress</span>',
-      ready: '<span class="progression-badge badge-ready">🟢 Ready to Progress</span>',
-      plateau: '<span class="progression-badge badge-plateau">🟡 Plateau</span>',
-      regressed: '<span class="progression-badge badge-regressed">🔴 Regressed</span>',
-      returning: '<span class="progression-badge badge-returning">🔵 Returning</span>'
+      normal: '<span class="progression-badge badge-normal">In Progress</span>',
+      ready: '<span class="progression-badge badge-ready">Ready to Progress</span>',
+      plateau: '<span class="progression-badge badge-plateau">Plateau</span>',
+      regressed: '<span class="progression-badge badge-regressed">Regressed</span>',
+      returning: '<span class="progression-badge badge-returning">Returning</span>'
     };
 
     return badges[status] || badges.normal;
@@ -1534,12 +1534,12 @@ class App {
 
         if (progressionBehavior.tempoFocus) {
           // Maintenance phase: Suggest tempo variation
-          return `<p class="progression-hint success">💪 Maintenance: Try 3-1-2 tempo (pause at bottom)</p>`;
+          return `<p class="progression-hint success">Maintenance: Try 3-1-2 tempo (pause at bottom)</p>`;
         } else {
           // Building phase: Suggest weight increase
           const lastWeight = lastWorkout.sets[0].weight;
           const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
-          return `<p class="progression-hint success">🎯 Ready to progress! Add ${nextWeight}kg next session</p>`;
+          return `<p class="progression-hint success">Ready to progress! Add ${nextWeight}kg next session</p>`;
         }
       } catch (error) {
         console.error('[App] Error getting phase behavior:', error);
@@ -1547,7 +1547,7 @@ class App {
         if (lastWorkout?.sets?.length > 0) {
           const lastWeight = lastWorkout.sets[0].weight;
           const nextWeight = getNextWeight(lastWeight, exercise.weightIncrement, true);
-          return `<p class="progression-hint success">🎯 Ready to progress! Add ${nextWeight}kg next session</p>`;
+          return `<p class="progression-hint success">Ready to progress! Add ${nextWeight}kg next session</p>`;
         } else {
           // Safe fallback if no workout data
           return '';
@@ -1556,7 +1556,7 @@ class App {
     }
 
     if (status === 'plateau') {
-      return `<p class="progression-hint warning">⚠️ Same weight for 3+ sessions. Consider deload or form check.</p>`;
+      return `<p class="progression-hint warning">Same weight for 3+ sessions. Consider deload or form check.</p>`;
     }
 
     if (status === 'normal' && lastWorkout?.sets?.length > 0) {
@@ -1600,7 +1600,7 @@ class App {
       const tempo = suggestion.tempoGuidance;
       bannerHTML += `
       <div class="tempo-guidance">
-        <strong>📖 How to do it:</strong>
+        <strong>How to do it:</strong>
         <p>${this.escapeHtml(tempo.instruction)}</p>
         <div class="tempo-visual">${this.escapeHtml(tempo.cue)}</div>
         <small>Why? ${this.escapeHtml(tempo.why)}</small>
@@ -1636,18 +1636,18 @@ class App {
    */
   getSuggestionIcon(type) {
     const iconMap = {
-      'INCREASE_WEIGHT': '💪',
+      'INCREASE_WEIGHT': '',
       'TRY_TEMPO': '⏱️',
-      'TRY_ALTERNATIVE': '🔄',
-      'IMMEDIATE_ALTERNATIVE': '⚠️',
+      'TRY_ALTERNATIVE': '↻',
+      'IMMEDIATE_ALTERNATIVE': '',
       'REDUCE_WEIGHT': '⬇️',
-      'PAIN_WARNING': '🚨',
-      'PLATEAU_WARNING': '📊',
-      'RECOVERY_WARNING': '💤',
-      'CONTINUE': '✅',
-      'GAP_RETURN': '🔄'
+      'PAIN_WARNING': '',
+      'PLATEAU_WARNING': '·',
+      'RECOVERY_WARNING': '·',
+      'CONTINUE': '',
+      'GAP_RETURN': '↻'
     };
-    return iconMap[type] || '💡';
+    return iconMap[type] || '·';
   }
 
   /**
@@ -1959,13 +1959,13 @@ class App {
       let colorClass = 'info';
 
       if (set.reps >= maxDuration) {
-        message = `🟢 Great hold! ${set.reps}s completed.`;
+        message = `Great hold! ${set.reps}s completed.`;
         colorClass = 'success';
       } else if (set.reps < minDuration) {
-        message = `🔴 Hold longer - aim for ${minDuration}-${maxDuration}s.`;
+        message = `Hold longer - aim for ${minDuration}-${maxDuration}s.`;
         colorClass = 'danger';
       } else {
-        message = `🔵 Good hold - ${set.reps}s completed.`;
+        message = `Good hold - ${set.reps}s completed.`;
         colorClass = 'info';
       }
 
@@ -1981,7 +1981,7 @@ class App {
     let colorClass = 'info';
 
     if (set.reps >= maxReps) {
-      message = `🟢 Great set! Hitting max reps.`;
+      message = `Great set! Hitting max reps.`;
       colorClass = 'success';
 
       const allSetsMaxReps = sessionExercise.sets
@@ -1989,15 +1989,15 @@ class App {
         .every(s => s.reps >= maxReps);
 
       if (allSetsMaxReps && setIndex === exerciseDef.sets - 1) {
-        message = `🟢 All sets hit ${maxReps} reps! Increase weight next workout.`;
+        message = `All sets hit ${maxReps} reps! Increase weight next workout.`;
       }
     }
     else if (set.reps < minReps) {
-      message = `🔴 Below target range. Consider reducing weight next set.`;
+      message = `Below target range. Consider reducing weight next set.`;
       colorClass = 'danger';
     }
     else {
-      message = `🔵 Good progress, aim for ${maxReps} reps on next set.`;
+      message = `Good progress, aim for ${maxReps} reps on next set.`;
       colorClass = 'info';
     }
 
@@ -2376,19 +2376,19 @@ class App {
    */
   weightToBandColor(weight) {
     const mapping = {
-      5: { color: 'light', symbol: '🟡', label: 'Light' },
-      10: { color: 'medium', symbol: '🔴', label: 'Medium' },
-      15: { color: 'heavy', symbol: '🔵', label: 'Heavy' },
-      25: { color: 'x-heavy', symbol: '⚫', label: 'X-Heavy' }
+      5: { color: 'light', symbol: '', label: 'Light' },
+      10: { color: 'medium', symbol: '', label: 'Medium' },
+      15: { color: 'heavy', symbol: '', label: 'Heavy' },
+      25: { color: 'x-heavy', symbol: '', label: 'X-Heavy' }
     };
-    return mapping[weight] || { color: 'custom', symbol: '⚪', label: 'Custom' };
+    return mapping[weight] || { color: 'custom', symbol: '', label: 'Custom' };
   }
 
   /**
    * Format set display for history (band-aware, time-aware)
    * @param {Object} set - Set object { reps, weight }
    * @param {Object} exercise - Exercise definition
-   * @returns {string} Formatted string like "15 reps @ 🔴 Medium", "15 reps @ 20 kg", or "45s"
+   * @returns {string} Formatted string like "15 reps @ Medium", "15 reps @ 20 kg", or "45s"
    */
   formatSetDisplay(set, exercise) {
     const reps = set.reps;
@@ -2777,11 +2777,11 @@ class App {
     if (content && toggle) {
       if (content.style.display === 'none') {
         content.style.display = 'block';
-        toggle.textContent = '📋 Form Guide ▲';
+        toggle.textContent = 'Form Guide ▲';
         toggle.setAttribute('aria-expanded', 'true');
       } else {
         content.style.display = 'none';
-        toggle.textContent = '📋 Form Guide ▼';
+        toggle.textContent = 'Form Guide ▼';
         toggle.setAttribute('aria-expanded', 'false');
       }
     }
@@ -2804,7 +2804,7 @@ class App {
         id="watch-demo-${index}"
         aria-label="Watch ${this.escapeHtml(exerciseName)} demonstration video"
       >
-        🎥 Watch Demo
+        Watch Demo
       </button>
     `;
   }
@@ -2829,7 +2829,7 @@ class App {
              onclick="app.openVideoModal('${this.escapeHtml(exerciseName)}')"
              aria-label="Watch ${this.escapeHtml(exerciseName)} video"
              title="Watch video"
-           >🎥</button>`
+           >▸</button>`
         : '';
 
       return `
@@ -2845,7 +2845,7 @@ class App {
       <div class="warmup-section" id="warmup-section">
         <div class="warmup-header" id="warmup-header">
           <h3 class="warmup-title">
-            <span>🔥</span>
+            <span></span>
             <span>Warm-Up Protocol</span>
           </h3>
           <span class="warmup-chevron">▼</span>
@@ -3051,7 +3051,7 @@ class App {
 
       // Re-render detail screen
       this.exerciseDetailScreen.render(exerciseKey);
-      this.exerciseDetailScreen.showToast('✅ Workout deleted');
+      this.exerciseDetailScreen.showToast('Workout deleted');
     }
   }
 
@@ -3427,7 +3427,7 @@ class App {
         <div class="exercise-status">
           ${phaseBadge}
           <span class="status-badge ${unlocked ? 'unlocked' : 'locked'}">
-            ${unlocked ? '✓ Unlocked' : '🔒 Locked'}
+            ${unlocked ? '✓ Unlocked' : 'Locked'}
           </span>
           <button class="select-exercise-btn" ${unlocked ? '' : 'disabled'}>
             Select
@@ -3495,9 +3495,9 @@ class App {
 
         // Show feedback message
         if (result.replaced) {
-          alert(`✅ Updated today's weight to ${weight} kg\n\n(Only one entry per day is kept)`);
+          alert(`Updated today's weight to ${weight} kg\n\n(Only one entry per day is kept)`);
         } else {
-          alert(`✅ Weight logged: ${weight} kg`);
+          alert(`Weight logged: ${weight} kg`);
         }
 
         // Refresh dashboard to show new data
@@ -3521,12 +3521,12 @@ class App {
 
   handleResetRotation() {
     const confirmed = confirm(
-      '🔄 Reset Rotation State?\n\n' +
+      'Reset Rotation State?\n\n' +
       'This will:\n' +
       '• Reset workout progression to Upper A\n' +
       '• Clear your current streak\n' +
       '• Reset cycle count\n\n' +
-      '✅ Keep all exercise history\n\n' +
+      'Keep all exercise history\n\n' +
       'Continue?'
     );
 
@@ -3541,7 +3541,7 @@ class App {
       cycleCount: 0
     });
 
-    alert('✅ Rotation reset successfully!\n\nYour workout history is preserved.');
+    alert('Rotation reset successfully!\n\nYour workout history is preserved.');
 
     // Close modal and refresh home screen
     this.closeSettingsModal();
@@ -3551,12 +3551,12 @@ class App {
 
   handleResetHistory() {
     const confirmed = confirm(
-      '🗑️ Clear All Exercise History?\n\n' +
+      'Clear All Exercise History?\n\n' +
       'This will:\n' +
       '• Delete all workout logs\n' +
       '• Remove all exercise history\n\n' +
-      '✅ Keep current rotation state\n\n' +
-      '⚠️ THIS CANNOT BE UNDONE!\n\n' +
+      'Keep current rotation state\n\n' +
+      'THIS CANNOT BE UNDONE!\n\n' +
       'Continue?'
     );
 
@@ -3572,7 +3572,7 @@ class App {
 
     this.storage.clearExerciseHistoryKeys();
 
-    alert('✅ Exercise history cleared!\n\nYour rotation state is preserved.');
+    alert('Exercise history cleared!\n\nYour rotation state is preserved.');
 
     // Close modal and refresh home screen
     this.closeSettingsModal();
@@ -3582,13 +3582,13 @@ class App {
 
   handleResetAll() {
     const confirmed = confirm(
-      '⚠️ Reset Everything?\n\n' +
+      'Reset Everything?\n\n' +
       'This will:\n' +
       '• Delete all workout logs\n' +
       '• Reset all progression\n' +
       '• Clear deload state\n' +
       '• Reset to factory defaults\n\n' +
-      '⚠️ THIS CANNOT BE UNDONE!\n\n' +
+      'THIS CANNOT BE UNDONE!\n\n' +
       'Continue?'
     );
 
@@ -3604,7 +3604,7 @@ class App {
 
     this.storage.clearAllBuildKeys();
 
-    alert('✅ App reset complete!\n\nReloading...');
+    alert('App reset complete!\n\nReloading...');
 
     // Reload the page to reinitialize everything
     location.reload();
@@ -3635,10 +3635,10 @@ class App {
 
       URL.revokeObjectURL(url);
 
-      alert('✅ Data exported successfully');
+      alert('Data exported successfully');
     } catch (error) {
       console.error('Export failed:', error);
-      alert(`❌ Export failed: ${error.message}\n\nPlease check the console for details.`);
+      alert(`Export failed: ${error.message}\n\nPlease check the console for details.`);
     }
   }
 
@@ -3670,7 +3670,7 @@ class App {
         `Date Range: ${summary.dateRange}\n` +
         extraLine +
         `Size: ${(summary.storageSize / 1024).toFixed(1)} KB\n\n` +
-        `⚠️ This will replace all existing data.\n\n` +
+        `This will replace all existing data.\n\n` +
         `Continue with import?`
       );
 
@@ -3682,7 +3682,7 @@ class App {
 
       importValidatedWorkoutData(data, this.storage);
 
-      alert('✅ Data imported successfully');
+      alert('Data imported successfully');
 
       this._importInProgress = false;
 
@@ -3694,7 +3694,7 @@ class App {
 
     } catch (error) {
       console.error('Import failed:', error);
-      alert(`❌ Import failed: ${error.message}`);
+      alert(`Import failed: ${error.message}`);
     } finally {
       this._importInProgress = false;
       // Reset file input
@@ -4046,7 +4046,7 @@ class App {
     // Determine next step or blocker
     const nextStep = blockers.length > 0
       ? `Next: ${blockers[0]}`
-      : '🎉 Ready for barbell transition!';
+      : 'Ready for barbell transition!';
 
     return `
       <div class="progression-card">
@@ -4125,7 +4125,7 @@ class App {
     if (workoutCount < 4) {
       analyticsContent.innerHTML = `
         <div class="empty-state">
-          <h3>📊 Analytics</h3>
+          <h3>Analytics</h3>
           <p>Complete 4+ workouts to unlock analytics and pattern detection.</p>
           <p><strong>Current progress:</strong> ${workoutCount}/4 workouts</p>
         </div>
@@ -4153,7 +4153,7 @@ class App {
 
     return `
       <div class="analytics-section">
-        <h3>🎯 Performance Quality (4 Weeks)</h3>
+        <h3>Performance Quality (4 Weeks)</h3>
         <div class="analytics-card">
           <div class="metrics-grid">
             <div class="metric">
@@ -4180,7 +4180,7 @@ class App {
     if (recovery.avgSleep === 0 && recovery.avgFatigue === 0) {
       return `
         <div class="analytics-section">
-          <h3>💤 Recovery Trends (4 Weeks)</h3>
+          <h3>Recovery Trends (4 Weeks)</h3>
           <div class="analytics-card">
             <p class="empty-state-text">No recovery data available. Start tracking sleep and fatigue before workouts.</p>
           </div>
@@ -4190,7 +4190,7 @@ class App {
 
     return `
       <div class="analytics-section">
-        <h3>💤 Recovery Trends (4 Weeks)</h3>
+        <h3>Recovery Trends (4 Weeks)</h3>
         <div class="analytics-card">
           <div class="metrics-grid">
             <div class="metric">
@@ -4215,7 +4215,7 @@ class App {
     if (patterns.length === 0) {
       return `
         <div class="analytics-section">
-          <h3>🔍 Discovered Patterns</h3>
+          <h3>Discovered Patterns</h3>
           <div class="analytics-card">
             <p class="empty-state-text">Not enough data to detect patterns yet. Keep training!</p>
           </div>
@@ -4226,7 +4226,7 @@ class App {
     if (patterns[0].type === 'insufficient-data') {
       return `
         <div class="analytics-section">
-          <h3>🔍 Discovered Patterns</h3>
+          <h3>Discovered Patterns</h3>
           <div class="analytics-card">
             <p class="empty-state-text">${this.escapeHtml(patterns[0].message)}</p>
           </div>
@@ -4235,8 +4235,8 @@ class App {
     }
 
     const patternCards = patterns.map(pattern => {
-      const confidenceIcon = pattern.confidence >= 80 ? '🟢' :
-                            pattern.confidence >= 60 ? '🟡' : '🔵';
+      const confidenceIcon = pattern.confidence >= 80 ? '' :
+                            pattern.confidence >= 60 ? '' : '';
       const confidenceLabel = pattern.confidence >= 80 ? 'Strong' :
                              pattern.confidence >= 60 ? 'Moderate' : 'Weak';
 
@@ -4253,7 +4253,7 @@ class App {
 
     return `
       <div class="analytics-section">
-        <h3>🔍 Discovered Patterns</h3>
+        <h3>Discovered Patterns</h3>
         <div class="analytics-card">
           ${patternCards}
         </div>
@@ -4333,7 +4333,7 @@ class App {
           const result = this.unlockEvaluator.evaluateUnlock(exercise, path.current);
           if (result.unlocked) unlockedCount++;
 
-          const statusIcon = result.unlocked ? '✅' : '🔒';
+          const statusIcon = result.unlocked ? '' : '';
           const statusClass = result.unlocked ? 'slot-unlocked' : 'slot-locked';
 
           let criteriaHtml = '';
@@ -4621,7 +4621,7 @@ class App {
   }
 
   renderCriterion(name, met, progress) {
-    const icon = met ? '✅' : progress > 0 ? '⏳' : '❌';
+    const icon = met ? '' : progress > 0 ? '' : '';
     const status = met ? 'met' : progress > 0 ? 'progress' : 'not-started';
 
     return `
@@ -4663,7 +4663,7 @@ class App {
 
     return `
       <div class="achievements-gallery">
-        <h3 class="dashboard-title">🏆 Achievements</h3>
+        <h3 class="dashboard-title">Achievements</h3>
         <div class="achievements-summary">
           <div class="achievement-count">
             <span class="count-number">${achievements.length}</span>
@@ -4713,7 +4713,7 @@ class App {
     if (!stats || stats.workoutsCompleted === 0) {
       return `
         <div class="progress-section">
-          <h3 class="section-title">📅 Last 4 Weeks Summary</h3>
+          <h3 class="section-title">Last 4 Weeks Summary</h3>
           <p class="empty-state">Start training to see progress!</p>
         </div>
       `;
@@ -4726,10 +4726,10 @@ class App {
 
     return `
       <div class="progress-section">
-        <h3 class="section-title">📅 Last 4 Weeks Summary</h3>
+        <h3 class="section-title">Last 4 Weeks Summary</h3>
         <div class="stats-grid">
           <div class="stat-item">
-            <span class="stat-icon">✅</span>
+            <span class="stat-icon"></span>
             <span class="stat-label">Workouts</span>
             <span class="stat-value">${stats.workoutsCompleted}/${stats.workoutsPlanned}</span>
           </div>
@@ -4739,12 +4739,12 @@ class App {
             <span class="stat-value">${stats.avgSessionMinutes} min</span>
           </div>
           <div class="stat-item">
-            <span class="stat-icon">📊</span>
+            <span class="stat-icon"></span>
             <span class="stat-label">Progressed</span>
             <span class="stat-value">${stats.exercisesProgressed}/${stats.totalExercises}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-icon">🔥</span>
+            <span class="stat-icon"></span>
             <span class="stat-label">Streak</span>
             <span class="stat-value">${stats.currentStreak} workouts</span>
           </div>
@@ -4763,7 +4763,7 @@ class App {
     if (!exercises || exercises.length === 0) {
       return `
         <div class="progress-section">
-          <h3 class="section-title">💪 Strength Gains</h3>
+          <h3 class="section-title">Strength Gains</h3>
           <p class="empty-state">No progression detected yet. Keep training!</p>
         </div>
       `;
@@ -4781,7 +4781,7 @@ class App {
 
     return `
       <div class="progress-section">
-        <h3 class="section-title">💪 Strength Gains</h3>
+        <h3 class="section-title">Strength Gains</h3>
         <div class="gains-list">
           ${exerciseRows}
         </div>
@@ -4800,7 +4800,7 @@ class App {
       if (!workouts || workouts.length === 0) {
         return `
           <section class="workout-reference">
-            <h3>📋 Workout Reference</h3>
+            <h3>Workout Reference</h3>
             <p style="color: var(--color-text-muted); text-align: center; padding: 20px;">
               No workouts defined.
             </p>
@@ -4810,7 +4810,7 @@ class App {
 
       return `
         <section class="workout-reference">
-          <h3>📋 Workout Reference</h3>
+          <h3>Workout Reference</h3>
           ${workouts.map((workout, index) =>
             this.renderWorkoutCard(workout, index)
           ).join('')}
@@ -4820,7 +4820,7 @@ class App {
       console.error('[renderWorkoutReference] Error:', error);
       return `
         <section class="workout-reference">
-          <h3>📋 Workout Reference</h3>
+          <h3>Workout Reference</h3>
           <p style="color: var(--color-danger); text-align: center; padding: 20px;">
             Error loading workouts. Check console for details.
           </p>
@@ -4931,11 +4931,11 @@ class App {
     }
 
     const statusLabels = {
-      'fast_bulk': '🟡 Fast bulk',
-      'healthy_bulk': '🟢 Healthy lean bulk',
-      'maintenance': '🔵 Maintenance',
-      'slow_cut': '🟡 Slow cut',
-      'rapid_cut': '🔴 Rapid cut'
+      'fast_bulk': 'Fast bulk',
+      'healthy_bulk': 'Healthy lean bulk',
+      'maintenance': 'Maintenance',
+      'slow_cut': 'Slow cut',
+      'rapid_cut': 'Rapid cut'
     };
 
     const statusLabel = statusLabels[weightData.status] || weightData.status;
@@ -4944,7 +4944,7 @@ class App {
 
     return `
       <div class="progress-section">
-        <h3 class="section-title">⚖️ Body Composition</h3>
+        <h3 class="section-title">Body Composition</h3>
         <div class="composition-grid">
           <div class="comp-item">
             <span class="comp-label">Current</span>
@@ -4976,9 +4976,9 @@ class App {
     if (!weightData || !weightData.entries || weightData.entries.length === 0) {
       return `
         <div class="progress-section">
-          <h3 class="section-title">📈 Body Weight Trend</h3>
+          <h3 class="section-title">Body Weight Trend</h3>
           <div class="empty-state">
-            <p class="empty-state-icon">⚖️</p>
+            <p class="empty-state-icon"></p>
             <p class="empty-state-text">No weight data yet</p>
             <p class="empty-state-hint">Click 'Log Weigh-In' to start tracking your body weight.</p>
             <button id="log-weighin-btn" class="btn btn-primary" style="margin-top: 16px;">Log Weigh-In</button>
@@ -4989,7 +4989,7 @@ class App {
 
     return `
       <div class="progress-section">
-        <h3 class="section-title">📈 Body Weight Trend</h3>
+        <h3 class="section-title">Body Weight Trend</h3>
         <div id="weight-chart-container" class="chart-container">
           <!-- Chart will be inserted here -->
         </div>
@@ -5039,7 +5039,7 @@ class App {
 
     // Update title
     document.querySelector('.summary-title').textContent =
-      `✅ ${stats.displayName} Complete!`;
+      `${stats.displayName} Complete!`;
 
     // Build stats HTML
     let html = '';
@@ -5055,7 +5055,7 @@ class App {
     // Total volume
     html += `
       <div class="stat-row">
-        <span class="stat-icon">📊</span>
+        <span class="stat-icon"></span>
         <span>${stats.totalVolume.toLocaleString()} kg total volume</span>
         ${stats.volumeComparison ? this.renderVolumeComparison(stats.volumeComparison) : ''}
       </div>
@@ -5065,7 +5065,7 @@ class App {
     if (newRecords.length > 0) {
       html += `
         <div class="stat-row">
-          <span class="stat-icon">🎉</span>
+          <span class="stat-icon"></span>
           <span class="stat-value">${newRecords.length} New Record${newRecords.length > 1 ? 's' : ''}!</span>
         </div>
         <ul class="records-list">
@@ -5074,7 +5074,7 @@ class App {
       `;
     } else {
       html += `
-        <div class="empty-records">Keep pushing! 💪</div>
+        <div class="empty-records">Keep pushing! </div>
       `;
     }
 
@@ -5093,7 +5093,7 @@ class App {
    */
   renderVolumeComparison(comparison) {
     const directionClass = comparison.direction === 'up' ? '' : 'down';
-    const emoji = comparison.direction === 'up' ? '📈' : '📉';
+    const emoji = comparison.direction === 'up' ? '' : '';
     const sign = comparison.direction === 'up' ? '+' : '';
 
     return `
@@ -5126,7 +5126,7 @@ class App {
 
     return `
       <div class="achievements-earned">
-        <h3 class="achievements-title">🎉 Achievements Earned Today</h3>
+        <h3 class="achievements-title">Achievements Earned Today</h3>
         <div class="achievements-list">
           ${achievements.map(a => `
             <div class="achievement-badge">
@@ -5835,7 +5835,7 @@ class App {
         .filter(ex => !ex.completed)
         .map(ex => ex.name);
 
-      const confirmMessage = `⚠️ Incomplete Workout\n\nYou've completed ${completedCount} of ${totalExercises} exercises.\n\nIncomplete exercises:\n${incompleteExercises.map(name => `• ${name}`).join('\n')}\n\nDo you want to save this partial workout?\n\nNote: This will save your progress but won't:\n• Advance to next workout\n• Update recovery tracking\n• Count toward your streak\n\n✅ YES - Save partial workout\n❌ NO - Continue training`;
+      const confirmMessage = `Incomplete Workout\n\nYou've completed ${completedCount} of ${totalExercises} exercises.\n\nIncomplete exercises:\n${incompleteExercises.map(name => `• ${name}`).join('\n')}\n\nDo you want to save this partial workout?\n\nNote: This will save your progress but won't:\n• Advance to next workout\n• Update recovery tracking\n• Count toward your streak\n\nYES - Save partial workout\nNO - Continue training`;
 
       if (!confirm(confirmMessage)) {
         this._completingWorkout = false;
@@ -5877,10 +5877,10 @@ class App {
 
       // Show appropriate confirmation message
       if (isPartialWorkout) {
-        alert(`💾 Partial workout saved!\n\n${completedCount} of ${totalExercises} exercises completed.\n\nNext time you'll continue with ${this.currentWorkout.displayName}.`);
+        alert(`Partial workout saved!\n\n${completedCount} of ${totalExercises} exercises completed.\n\nNext time you'll continue with ${this.currentWorkout.displayName}.`);
         this.showHomeScreen();
       } else {
-        alert(`✅ ${this.currentWorkout.displayName} completed!`);
+        alert(`${this.currentWorkout.displayName} completed!`);
 
         // Update recovery entry to mark workout completed
         const recoveryEntries = this.getRecoveryMetrics();
@@ -5917,7 +5917,7 @@ class App {
       }
     } catch (error) {
       console.error('Failed to save workout:', error);
-      alert('⚠️ Failed to save workout. Please try again or check storage.');
+      alert('Failed to save workout. Please try again or check storage.');
     } finally {
       this._completingWorkout = false;
     }
@@ -6176,11 +6176,11 @@ class App {
       const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
       const muscleEl = document.getElementById('video-muscle-group');
       if (muscleEl) {
-        muscleEl.textContent = `🏋️ ${capitalize(videoData.muscleGroup)}`;
+        muscleEl.textContent = `${capitalize(videoData.muscleGroup)}`;
       }
       const equipEl = document.getElementById('video-equipment');
       if (equipEl) {
-        equipEl.textContent = `🔧 ${capitalize(videoData.equipment)}`;
+        equipEl.textContent = `${capitalize(videoData.equipment)}`;
       }
 
       videoElement.src = videoPath;
@@ -6227,7 +6227,7 @@ class App {
         formContent.style.display = 'none';
       }
       if (this.videoFormGuideToggle) {
-        this.videoFormGuideToggle.textContent = '📋 Form Guide ▼';
+        this.videoFormGuideToggle.textContent = 'Form Guide ▼';
       }
 
     } catch (error) {
@@ -6298,11 +6298,11 @@ class App {
 
     if (formContent.style.display === 'none') {
       formContent.style.display = 'block';
-      this.videoFormGuideToggle.innerHTML = '<span aria-hidden="true">📋</span> Form Guide ▲';
+      this.videoFormGuideToggle.innerHTML = 'Form Guide ▲';
       this.videoFormGuideToggle.setAttribute('aria-expanded', 'true');
     } else {
       formContent.style.display = 'none';
-      this.videoFormGuideToggle.innerHTML = '<span aria-hidden="true">📋</span> Form Guide ▼';
+      this.videoFormGuideToggle.innerHTML = 'Form Guide ▼';
       this.videoFormGuideToggle.setAttribute('aria-expanded', 'false');
     }
   }

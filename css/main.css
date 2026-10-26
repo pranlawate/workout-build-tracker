@@ -366,7 +366,16 @@ body {
 
 .mobility-help .help-icon {
   flex-shrink: 0;
-  font-size: var(--font-md);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  font-style: italic;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
 }
 
 .mobility-help-text {

@@ -163,19 +163,19 @@ export class ExerciseLibrary {
       // Determine category badge
       const isWarmup = videoData.category === 'warmups';
       const categoryBadge = isWarmup
-        ? '<span class="badge badge-category badge-warmup">🔥 Warmup</span>'
-        : '<span class="badge badge-category badge-exercise">💪 Exercise</span>';
+        ? '<span class="badge badge-category badge-warmup">Warmup</span>'
+        : '<span class="badge badge-category badge-exercise">Exercise</span>';
 
       return `
         <div class="library-exercise-card" onclick="app.openVideoModal('${this.app.escapeHtml(exerciseName)}')">
           <div class="library-card-header">
-            <span class="library-card-icon">🎥</span>
+            <span class="library-card-icon"></span>
             <h4 class="library-card-title">${this.app.escapeHtml(exerciseName)}</h4>
           </div>
           <div class="library-card-metadata">
             ${categoryBadge}
-            <span class="badge badge-muscle">🏋️ ${capitalize(videoData.muscleGroup)}</span>
-            <span class="badge badge-equipment">🔧 ${capitalize(videoData.equipment)}</span>
+            <span class="badge badge-muscle">${capitalize(videoData.muscleGroup)}</span>
+            <span class="badge badge-equipment">${capitalize(videoData.equipment)}</span>
           </div>
           <div class="library-card-footer">
             <span class="library-card-duration">⏱️ ${videoData.duration}</span>

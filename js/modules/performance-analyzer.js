@@ -108,7 +108,7 @@ export class PerformanceAnalyzer {
       if (prevW !== undefined && curW !== undefined && curW < prevW) {
         return {
           status: 'alert',
-          message: `⚠️ Weight below last session (${prevW}kg → ${curW}kg) - check recovery or form`,
+          message: `Weight below last session (${prevW}kg → ${curW}kg) - check recovery or form`,
           pattern: 'regression'
         };
       }
@@ -138,7 +138,7 @@ export class PerformanceAnalyzer {
     if (newWeight < oldWeight) {
       return {
         status: 'alert',
-        message: `⚠️ Weight below previous session (${oldWeight}kg → ${newWeight}kg) - check if recovering from illness/deload`,
+        message: `Weight below previous session (${oldWeight}kg → ${newWeight}kg) - check if recovering from illness/deload`,
         pattern: 'regression'
       };
     }
@@ -174,7 +174,7 @@ export class PerformanceAnalyzer {
       if (dropPercentage >= 0.25) {
         return {
           status: 'alert',
-          message: `⚠️ Rep performance dropped ${Math.round(dropPercentage * 100)}% vs last session - possible overtraining`,
+          message: `Rep performance dropped ${Math.round(dropPercentage * 100)}% vs last session - possible overtraining`,
           pattern: 'regression'
         };
       }
@@ -205,7 +205,7 @@ export class PerformanceAnalyzer {
     if (dropPercentage >= 0.25) {
       return {
         status: 'alert',
-        message: `⚠️ Rep performance dropped ${Math.round(dropPercentage * 100)}% vs previous session - possible overtraining`,
+        message: `Rep performance dropped ${Math.round(dropPercentage * 100)}% vs previous session - possible overtraining`,
         pattern: 'regression'
       };
     }
@@ -239,7 +239,7 @@ export class PerformanceAnalyzer {
     if (variance >= 0.5) {
       return {
         status: 'warning',
-        message: `⚠️ Reps inconsistent within session (${reps.join('/')}) - form may be breaking down`,
+        message: `Reps inconsistent within session (${reps.join('/')}) - form may be breaking down`,
         pattern: 'form_breakdown'
       };
     }

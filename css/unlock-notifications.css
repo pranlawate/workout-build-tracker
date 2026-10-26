@@ -10,15 +10,16 @@
 }
 
 .unlock-icon {
-  font-size: 4rem;
-  display: block;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--color-success-background);
+  color: var(--color-success);
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
-  animation: celebrate 0.6s ease-in-out;
-}
-
-@keyframes celebrate {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2) rotate(10deg); }
 }
 
 #unlock-title {

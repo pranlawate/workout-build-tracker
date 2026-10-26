@@ -77,7 +77,7 @@ export class HistoryListScreen {
       if (exercises.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <p class="empty-state-icon">📊</p>
+            <p class="empty-state-icon"></p>
             <p class="empty-state-text">No workout history yet</p>
             <p class="empty-state-hint">Complete your first workout to see progress here</p>
           </div>
@@ -110,7 +110,7 @@ export class HistoryListScreen {
       console.error('Failed to render history list:', error);
       container.innerHTML = `
         <div class="empty-state">
-          <p class="empty-state-icon">⚠️</p>
+          <p class="empty-state-icon"></p>
           <p class="empty-state-text">Unable to load history</p>
           <p class="empty-state-hint">There was a problem loading your workout data. Please try again later.</p>
         </div>
@@ -132,9 +132,9 @@ export class HistoryListScreen {
           <span class="exercise-card-arrow">→</span>
         </div>
         <div class="exercise-card-meta">
-          <span class="meta-item">📅 ${lastWorkoutText}</span>
-          <span class="meta-item">⚖️ ${exercise.lastWeight}kg</span>
-          <span class="meta-item">📊 ${exercise.totalWorkouts} workouts</span>
+          <span class="meta-item">${lastWorkoutText}</span>
+          <span class="meta-item">${exercise.lastWeight}kg</span>
+          <span class="meta-item">${exercise.totalWorkouts} workouts</span>
         </div>
       </div>
     `;

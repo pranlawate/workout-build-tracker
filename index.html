@@ -45,7 +45,7 @@
     <div id="home-screen" class="screen active">
       <header class="app-header" role="banner">
         <h1>BUILD Tracker</h1>
-        <button type="button" id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
+        <button type="button" id="settings-btn" class="icon-btn" aria-label="Settings">Settings</button>
       </header>
 
       <main class="screen-content" role="main">
@@ -62,9 +62,9 @@
         <section class="quick-actions">
           <h3>Quick Actions</h3>
           <div class="action-grid">
-            <button type="button" class="action-btn" aria-label="Open workout history">📊 History</button>
-            <button type="button" id="progress-btn" class="action-btn" aria-label="Open progress dashboard">📈 Progress</button>
-            <button type="button" id="exercise-library-btn" class="action-btn" aria-label="Open exercise library">🎥 Exercise Library</button>
+            <button type="button" class="action-btn" aria-label="Open workout history">History</button>
+            <button type="button" id="progress-btn" class="action-btn" aria-label="Open progress dashboard">Progress</button>
+            <button type="button" id="exercise-library-btn" class="action-btn" aria-label="Open exercise library">Library</button>
           </div>
         </section>
 
@@ -94,7 +94,7 @@
         <button type="button" id="back-btn" class="icon-btn" aria-label="Back to home">←</button>
         <h1 id="workout-title">Upper A</h1>
         <span id="timer" aria-live="polite" aria-atomic="true">00:00</span>
-        <button type="button" id="workout-settings-btn" class="icon-btn" aria-label="Workout settings">⚙️</button>
+        <button type="button" id="workout-settings-btn" class="icon-btn" aria-label="Workout settings">···</button>
       </header>
 
       <main class="screen-content" role="main">
@@ -117,7 +117,7 @@
       </header>
 
       <main class="screen-content" role="main">
-        <h2 class="summary-title">✅ Workout Complete!</h2>
+        <h2 class="summary-title">Workout Complete</h2>
 
         <!-- Stats Section -->
         <div id="summary-stats" class="summary-section">
@@ -126,7 +126,7 @@
 
         <!-- Pain Tracking Section -->
         <div id="summary-pain" class="summary-section">
-          <h2 class="section-title">💪 Pain Check</h2>
+          <h2 class="section-title">Pain Check</h2>
 
           <!-- Initial selection -->
           <div id="pain-initial-choice" class="pain-choice-buttons">
@@ -206,7 +206,7 @@
         </div>
 
         <button id="export-exercise-btn" class="btn btn-secondary">
-          📤 Export Data
+          Export Data
         </button>
       </main>
     </div>
@@ -216,7 +216,7 @@
       <header class="app-header" role="banner">
         <button type="button" id="progress-back-btn" class="icon-btn" aria-label="Back">←</button>
         <h1>Progress Dashboard</h1>
-        <button type="button" id="progress-settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
+        <button type="button" id="progress-settings-btn" class="icon-btn" aria-label="Settings">···</button>
       </header>
 
       <main class="screen-content" role="main">
@@ -266,7 +266,7 @@
   <!-- Recovery Warning Modal -->
   <div id="recovery-modal" class="modal" style="display: none;">
     <div class="modal-content recovery-warning">
-      <h2>⚠️ Recovery Check</h2>
+      <h2>Recovery Check</h2>
       <div id="recovery-modal-body">
         <!-- populated by JavaScript -->
       </div>
@@ -342,11 +342,11 @@
   <!-- Recovery Metrics Modal -->
   <div id="recovery-metrics-modal" class="modal" style="display: none;">
     <div class="modal-content recovery-metrics-content">
-      <h2>💪 Recovery Check</h2>
+      <h2>Recovery Check</h2>
 
       <div class="recovery-form">
         <div class="recovery-input-group">
-          <label for="sleep-hours">😴 Sleep Last Night</label>
+          <label for="sleep-hours">Sleep Last Night</label>
           <input
             type="number"
             id="sleep-hours"
@@ -361,7 +361,7 @@
 
         <div class="recovery-input-group">
           <fieldset class="recovery-fieldset">
-            <legend class="recovery-legend">😰 Stress Level</legend>
+            <legend class="recovery-legend">Stress Level</legend>
             <div class="radio-button-group stress-buttons">
               <button type="button" class="radio-btn selected" data-value="Low">Low</button>
               <button type="button" class="radio-btn" data-value="Medium">Medium</button>
@@ -373,7 +373,7 @@
 
         <div class="recovery-input-group">
           <fieldset class="recovery-fieldset">
-            <legend class="recovery-legend">⚡ Energy Level</legend>
+            <legend class="recovery-legend">Energy Level</legend>
             <div class="radio-button-group energy-buttons">
               <button type="button" class="radio-btn" data-value="1">1</button>
               <button type="button" class="radio-btn" data-value="2">2</button>
@@ -388,7 +388,7 @@
 
         <div class="recovery-input-group">
           <fieldset class="recovery-fieldset">
-            <legend class="recovery-legend">💊 Muscle Soreness</legend>
+            <legend class="recovery-legend">Muscle Soreness</legend>
             <div class="radio-button-group soreness-buttons">
               <button type="button" class="radio-btn selected" data-value="None">None</button>
               <button type="button" class="radio-btn" data-value="Mild">Mild</button>
@@ -408,7 +408,7 @@
 
   <!-- Fatigue Warning Banner -->
   <div id="fatigue-warning-banner" class="fatigue-warning-banner" style="display: none;">
-    <h2>⚠️ Fatigue Warning</h2>
+    <h2>Fatigue Warning</h2>
     <p class="fatigue-score" id="fatigue-score-text">Your recovery score is 0/9.</p>
     <div class="warning-options">
       <p><strong>Consider:</strong></p>
@@ -428,7 +428,7 @@
   <!-- Deload Modal -->
   <div id="deload-modal" class="modal" style="display: none;">
     <div class="modal-content deload-modal">
-      <h2>⚠️ Deload Week Recommended</h2>
+      <h2>Deload Week Recommended</h2>
       <div id="deload-modal-body">
         <!-- populated by JavaScript -->
       </div>
@@ -443,7 +443,7 @@
   <!-- Deload Banner (shown during deload week) -->
   <div id="deload-banner" class="deload-banner" style="display: none;">
     <div class="banner-content">
-      <span class="banner-icon">🟡</span>
+      <span class="banner-icon">·</span>
       <div class="banner-text">
         <strong>DELOAD WEEK</strong>
         <span id="banner-details"><!-- type and days remaining --></span>
@@ -456,7 +456,7 @@
   <div id="settings-modal" class="modal" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>⚙️ Settings</h2>
+        <h2>Settings</h2>
         <button type="button" id="settings-close-btn" class="icon-btn" aria-label="Close settings">✕</button>
       </div>
 
@@ -489,35 +489,35 @@
           <div class="equipment-toggles">
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-gym" checked>
-              <span class="toggle-label">🏋️ Gym Equipment (cables, machines)</span>
+              <span class="toggle-label">Gym Equipment (cables, machines)</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-dumbbells" checked>
-              <span class="toggle-label">🔩 Dumbbells</span>
+              <span class="toggle-label">Dumbbells</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-barbells" checked>
-              <span class="toggle-label">💪 Barbells</span>
+              <span class="toggle-label">Barbells</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-mudgal" checked>
-              <span class="toggle-label">🪃 Mudgal/Gada</span>
+              <span class="toggle-label">Mudgal / Gada</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-bodyweight" checked disabled>
-              <span class="toggle-label">🧘 Bodyweight (always available)</span>
+              <span class="toggle-label">Bodyweight (always available)</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-bands" checked>
-              <span class="toggle-label">🎯 Resistance Bands</span>
+              <span class="toggle-label">Resistance Bands</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-kettlebells" checked>
-              <span class="toggle-label">⚫ Kettlebells</span>
+              <span class="toggle-label">Kettlebells</span>
             </label>
             <label class="equipment-toggle">
               <input type="checkbox" id="equipment-cables" checked>
-              <span class="toggle-label">🔗 Cables</span>
+              <span class="toggle-label">Cables</span>
             </label>
           </div>
         </section>
@@ -531,11 +531,11 @@
             </p>
 
             <button id="export-data-btn" class="btn-secondary btn-large">
-              📤 Export All Data
+              Export All Data
             </button>
 
             <button id="import-data-btn" class="btn-secondary btn-large">
-              📥 Import Data
+              Import Data
             </button>
 
             <label for="import-file-input" class="visually-hidden">Choose backup JSON file to import</label>
@@ -547,21 +547,21 @@
         <section class="settings-section">
           <h3>Reset Options</h3>
           <p class="section-description warning-text">
-            ⚠️ Use these options if you encounter bugs or need to start fresh.
+            Use these options if you encounter bugs or need to start fresh.
           </p>
 
           <button id="reset-rotation-btn" class="btn-warning btn-large">
-            🔄 Reset Rotation Only
+            Reset Rotation Only
           </button>
           <p class="reset-description">Resets workout progression and streak while keeping all exercise history.</p>
 
           <button id="reset-history-btn" class="btn-danger btn-large">
-            🗑️ Clear History Only
+            Clear History Only
           </button>
           <p class="reset-description">Deletes all exercise history while keeping current rotation state.</p>
 
           <button id="reset-all-btn" class="btn-danger btn-large">
-            ⚠️ Reset Everything
+            Reset Everything
           </button>
           <p class="reset-description">Completely resets the app to initial state. This cannot be undone!</p>
         </section>
@@ -580,7 +580,7 @@
   <!-- Weigh-In Modal -->
   <div id="weighin-modal" class="modal" style="display: none;">
     <div class="modal-content">
-      <h2>📊 Weekly Weigh-In</h2>
+      <h2>Weekly Weigh-In</h2>
       <p>Track your body composition progress</p>
 
       <div class="modal-body">
@@ -608,7 +608,7 @@
       <h2>Mobility Check</h2>
       <p id="mobility-question" class="mobility-question"></p>
       <div class="mobility-help">
-        <span class="help-icon">ℹ️</span>
+        <span class="help-icon">i</span>
         <span id="mobility-help" class="mobility-help-text"></span>
       </div>
       <div class="mobility-buttons">
@@ -653,13 +653,13 @@
   <!-- Post-Workout Pain Modal -->
   <div id="post-workout-pain-modal" class="modal" style="display: none;">
     <div class="modal-content">
-      <h2 class="modal-title">Workout Complete! 💪</h2>
+      <h2 class="modal-title">Workout Complete</h2>
 
       <!-- Initial pain check -->
       <div id="pain-initial-check">
         <p style="font-size: 18px; margin-bottom: 24px;">Did you experience any pain during this workout?</p>
         <button id="pain-no-btn" class="btn btn-primary" style="height: 60px; font-size: 18px; margin-bottom: 12px;">No Pain ✓</button>
-        <button id="pain-yes-btn" class="btn btn-secondary" style="height: 60px; font-size: 18px;">Yes, I had pain ⚠️</button>
+        <button id="pain-yes-btn" class="btn btn-secondary" style="height: 60px; font-size: 18px;">Yes, I had pain</button>
       </div>
 
       <!-- Exercise selection (hidden initially) -->
@@ -700,7 +700,7 @@
   <div id="unlock-notification-modal" class="modal" style="display: none;">
     <div class="modal-content unlock-modal">
       <div class="unlock-header">
-        <span class="unlock-icon">🎉</span>
+        <span class="unlock-icon">NEW</span>
         <h2 id="unlock-title">New Exercise Unlocked!</h2>
       </div>
       <div class="unlock-body">
@@ -751,7 +751,7 @@
   <!-- Warm-up Modal -->
   <div id="warmup-modal" class="modal" style="display: none;">
     <div class="modal-content modal-medium">
-      <h2 class="modal-title">🔥 Warm-up (<span id="warmup-duration">5-7 min</span>)</h2>
+      <h2 class="modal-title">Warm-up (<span id="warmup-duration">5-7 min</span>)</h2>
       <p class="modal-subtitle">Complete all before starting:</p>
 
       <div id="warmup-checklist" class="checklist">
@@ -771,12 +771,11 @@
   <!-- Cooldown Modal -->
   <div id="cooldown-modal" class="modal" style="display: none;">
     <div class="modal-content modal-large">
-      <h2 class="modal-title">🧘 Cool Down</h2>
+      <h2 class="modal-title">Cool Down</h2>
 
       <!-- Section 1: Mandatory Stretching -->
       <div class="cooldown-section">
         <h3 class="section-title required-section">
-          <span class="section-icon">🎯</span>
           STRETCHING (Required)
         </h3>
         <div id="stretching-checklist" class="checklist">
@@ -790,8 +789,7 @@
       <!-- Section 2: Optional Foam Rolling -->
       <div class="cooldown-section collapsible">
         <h3 class="section-title optional-section" onclick="toggleCooldownSection(this)">
-          <span class="section-icon">💆</span>
-          FOAM ROLLING (Optional - 5-8 min)
+          FOAM ROLLING (Optional, 5-8 min)
           <span class="toggle-icon">▼</span>
         </h3>
         <div class="section-content" style="display: none;">
@@ -804,13 +802,12 @@
       <!-- Section 3: Optional LISS Cardio -->
       <div class="cooldown-section collapsible">
         <h3 class="section-title optional-section" onclick="toggleCooldownSection(this)">
-          <span class="section-icon">🚴</span>
-          LISS CARDIO (Optional - 10-15 min)
+          LISS CARDIO (Optional, 10-15 min)
           <span class="toggle-icon">▼</span>
         </h3>
         <div class="section-content" style="display: none;">
           <p class="recommendation" id="liss-recommendation">
-            💡 Recommended: Bike (10-15 min)<br>
+            Recommended: Bike (10-15 min)<br>
             <small>Legs are fresh - any low-impact cardio works</small>
           </p>
 
@@ -846,7 +843,6 @@
       <!-- Section 4: Weigh-in (moved from summary) -->
       <div class="cooldown-section collapsible">
         <h3 class="section-title" onclick="toggleCooldownSection(this)">
-          <span class="section-icon">⚖️</span>
           WEIGH-IN
           <span class="toggle-icon">▼</span>
         </h3>
@@ -928,15 +924,15 @@
       <div class="video-metadata">
         <h3 id="video-exercise-name" class="video-exercise-name">Exercise Name</h3>
         <div class="metadata-badges">
-          <span id="video-muscle-group" class="badge badge-muscle">🏋️ Chest</span>
-          <span id="video-equipment" class="badge badge-equipment">🔧 Dumbbell</span>
+          <span id="video-muscle-group" class="badge badge-muscle">Chest</span>
+          <span id="video-equipment" class="badge badge-equipment">Dumbbell</span>
         </div>
       </div>
 
       <!-- Form guide (embedded in modal) -->
       <div class="video-form-guide">
         <button type="button" class="form-guide-toggle" id="video-form-guide-toggle" aria-expanded="false" aria-controls="video-form-guide-content" aria-label="Toggle form guide">
-          <span aria-hidden="true">📋</span> Form Guide ▼
+          Form Guide ▼
         </button>
         <div id="video-form-guide-content" class="form-guide-content" style="display: none;">
           <!-- Form cues inserted dynamically -->
@@ -945,7 +941,7 @@
 
       <!-- Error placeholder (hidden by default) -->
       <div id="video-error" class="video-error" style="display: none;">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon">!</div>
         <p class="error-message">Video unavailable</p>
         <p class="error-hint">Check your connection or try again later.</p>
         <button type="button" class="btn-retry" id="video-retry">Retry</button>

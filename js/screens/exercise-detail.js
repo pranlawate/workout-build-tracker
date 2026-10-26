@@ -101,10 +101,10 @@ export class ExerciseDetailScreen {
     return `
       <div class="history-entry" data-index="${index}">
         <div class="history-entry-header">
-          <span class="history-date">📅 ${this.escapeHtml(dateText)}</span>
+          <span class="history-date">${this.escapeHtml(dateText)}</span>
           <div class="history-actions">
-            <button class="icon-btn edit-entry-btn" data-index="${index}" title="Edit">✏️</button>
-            <button class="icon-btn delete-entry-btn" data-index="${index}" title="Delete">🗑️</button>
+            <button class="icon-btn edit-entry-btn" data-index="${index}" title="Edit">Edit</button>
+            <button class="icon-btn delete-entry-btn" data-index="${index}" title="Delete">Del</button>
           </div>
         </div>
         <div class="history-sets">${this.escapeHtml(setsText)}</div>
@@ -168,12 +168,12 @@ export class ExerciseDetailScreen {
    */
   weightToBandColor(weight) {
     const mapping = {
-      5: { color: 'light', symbol: '🟡', label: 'Light' },
-      10: { color: 'medium', symbol: '🔴', label: 'Medium' },
-      15: { color: 'heavy', symbol: '🔵', label: 'Heavy' },
-      25: { color: 'x-heavy', symbol: '⚫', label: 'X-Heavy' }
+      5: { color: 'light', symbol: '', label: 'Light' },
+      10: { color: 'medium', symbol: '', label: 'Medium' },
+      15: { color: 'heavy', symbol: '', label: 'Heavy' },
+      25: { color: 'x-heavy', symbol: '·', label: 'X-Heavy' }
     };
-    return mapping[weight] || { color: 'custom', symbol: '⚪', label: 'Custom' };
+    return mapping[weight] || { color: 'custom', symbol: '·', label: 'Custom' };
   }
 
   attachEventListeners() {
@@ -229,10 +229,10 @@ export class ExerciseDetailScreen {
 
       this.render(this.currentExerciseKey);
 
-      this.showToast('✅ Workout deleted');
+      this.showToast('Workout deleted');
     } catch (error) {
       console.error('Failed to delete workout:', error);
-      this.showToast('❌ Failed to delete workout');
+      this.showToast('Failed to delete workout');
     }
   }
 
@@ -279,16 +279,16 @@ export class ExerciseDetailScreen {
       if (this.performanceAnalyzer) {
         const perf = this.performanceAnalyzer.analyzeExercisePerformance(exerciseKey, entry.sets);
         if (perf && perf.status === 'alert') {
-          badges.push({ icon: '🔴', text: perf.message, priority: 1 });
+          badges.push({ icon: '', text: perf.message, priority: 1 });
         }
         if (perf && perf.status === 'warning') {
-          badges.push({ icon: '🟡', text: perf.message, priority: 2 });
+          badges.push({ icon: '', text: perf.message, priority: 2 });
         }
       }
 
       // 2. Check deload status
       if (this.deloadManager && this.wasDeloadActive(entry.date)) {
-        badges.push({ icon: '⚡', text: 'Deload week', priority: 3 });
+        badges.push({ icon: '·', text: 'Deload week', priority: 3 });
       }
 
       // 3. Check pain reports
@@ -312,9 +312,9 @@ export class ExerciseDetailScreen {
         if (exercise && history && history.length > 0) {
           const status = getProgressionStatus(history, exercise);
           if (status === 'ready') {
-            badges.push({ icon: '🟢', text: 'Ready to progress', priority: 5 });
+            badges.push({ icon: '', text: 'Ready to progress', priority: 5 });
           } else {
-            badges.push({ icon: '🔨', text: 'Building reps', priority: 6 });
+            badges.push({ icon: '·', text: 'Building reps', priority: 6 });
           }
         }
       }
@@ -429,10 +429,10 @@ export class ExerciseDetailScreen {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      this.showToast('✅ Exercise data exported');
+      this.showToast('Exercise data exported');
     } catch (error) {
       console.error('[ExerciseDetail] Export error:', error);
-      this.showToast('❌ Export failed');
+      this.showToast('Export failed');
     }
   }
 }

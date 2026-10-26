@@ -31,7 +31,7 @@ export const FORM_CUES = {
     setup: ['Retract shoulder blades', 'Feet flat on floor', 'Arch lower back slightly'],
     execution: ['Elbows at 45° (not 90°)', 'Slow eccentric - 2s down', 'Explosive concentric - 1s up'],
     mistakes: ['Dumbbells drifting apart', 'Bouncing off chest', 'Shoulders rolling forward'],
-    tendonCue: '🦴 Last rep: hold 2-3s at bottom stretch. Loads pec/shoulder tendons at longest length.'
+    tendonCue: 'Last rep: hold 2-3s at bottom stretch. Loads pec/shoulder tendons at longest length.'
   },
 
   'Decline DB Press': {
@@ -44,7 +44,7 @@ export const FORM_CUES = {
     setup: ['Feet on platform', 'Knees slightly bent', 'Chest up, shoulders back'],
     execution: ['Controlled concentric - 2s pull to lower chest', 'Squeeze shoulder blades together', 'Slow eccentric - 2s release'],
     mistakes: ['Rounding back', 'Using momentum/rocking', 'Pulling to stomach instead of chest'],
-    tendonCue: '🦴 Last rep: hold 3s at peak contraction (blades squeezed). Strengthens mid-back/scapular tendons.'
+    tendonCue: 'Last rep: hold 3s at peak contraction (blades squeezed). Strengthens mid-back/scapular tendons.'
   },
 
   'Cable Chest Fly': {
@@ -69,7 +69,7 @@ export const FORM_CUES = {
     setup: ['Rope at face height', 'Step back for tension', 'Chest up, shoulders back'],
     execution: ['Pull rope to face level', 'External rotate (elbows back)', 'Squeeze rear delts'],
     mistakes: ['Pulling down instead of back', 'No external rotation', 'Using momentum'],
-    tendonCue: '🦴 Every rep: hold 3s at peak (elbows back, externally rotated). Key for rotator cuff tendon health.'
+    tendonCue: 'Every rep: hold 3s at peak (elbows back, externally rotated). Key for rotator cuff tendon health.'
   },
 
   'Band Pull-Aparts': {
@@ -83,7 +83,7 @@ export const FORM_CUES = {
     setup: ['Feet shoulder-width', 'Toes slightly out', 'Back against pad'],
     execution: ['Slow eccentric - 3s down', 'Knees track over toes', 'Explosive concentric - 2s up through heels'],
     mistakes: ['Knees caving in', 'Heels lifting off platform', 'Partial ROM (not to 90°)'],
-    tendonCue: '🦴 Last rep: hold 2-3s at bottom position (deepest point). Loads patellar and quad tendons under stretch.'
+    tendonCue: 'Last rep: hold 2-3s at bottom position (deepest point). Loads patellar and quad tendons under stretch.'
   },
 
   'Leg Curl': {
@@ -108,7 +108,7 @@ export const FORM_CUES = {
     setup: ['Balls of feet on platform', 'Heels off edge', 'Shoulders under pads'],
     execution: ['Rise on toes fully (1 sec)', 'Pause at top', 'Lower below platform level (2 sec)'],
     mistakes: ['Bouncing at bottom', 'Bending knees', 'Partial ROM'],
-    tendonCue: '🦴 Every rep: hold 2s at bottom (heels below platform). Loaded Achilles tendon stretch under bodyweight + load.'
+    tendonCue: 'Every rep: hold 2s at bottom (heels below platform). Loaded Achilles tendon stretch under bodyweight + load.'
   },
 
   'Plank': {
@@ -128,7 +128,7 @@ export const FORM_CUES = {
     setup: ['Wide grip on bar', 'Chest up, shoulders back', 'Slight lean back (15°)'],
     execution: ['Controlled concentric - 2s pull to upper chest', 'Lead with elbows, squeeze lats', 'Slow eccentric - 2s release'],
     mistakes: ['Pulling behind neck', 'Leaning back too far', 'Using momentum/swinging'],
-    tendonCue: '🦴 Last rep: hold 3s at full stretch (arms extended overhead). Loads lat/bicep tendons under length.'
+    tendonCue: 'Last rep: hold 3s at full stretch (arms extended overhead). Loads lat/bicep tendons under length.'
   },
 
   'DB Shoulder Press': {
@@ -190,7 +190,7 @@ export const FORM_CUES = {
     setup: ['Feet hip-width', 'Dumbbells at thighs', 'Slight knee bend locked', 'Neutral neck (don\'t look up in mirror)'],
     execution: ['Hinge at hips', 'Slow eccentric - 3s lower to shin level', 'Controlled concentric - 2s up, keep back flat'],
     mistakes: ['Rounding back', 'Squatting down', 'Bending knees more during descent', 'Craning neck up'],
-    tendonCue: '🦴 Last rep: hold 2-3s at bottom stretch. Loads hamstring tendons at longest length. Key for injury prevention.'
+    tendonCue: 'Last rep: hold 2-3s at bottom stretch. Loads hamstring tendons at longest length. Key for injury prevention.'
   },
 
   'Leg Abduction': {
@@ -209,7 +209,7 @@ export const FORM_CUES = {
     setup: ['Balls of feet on platform', 'Pad on thighs', 'Heels off edge'],
     execution: ['Rise on toes fully', 'Pause at top (3 sec)', 'Lower below platform level'],
     mistakes: ['Bouncing at bottom', 'Partial ROM', 'Lifting pad off thighs with hands'],
-    tendonCue: '🦴 Every rep: hold 2s at bottom. Seated targets soleus tendon specifically (knee bent bypasses gastrocnemius).'
+    tendonCue: 'Every rep: hold 2s at bottom. Seated targets soleus tendon specifically (knee bent bypasses gastrocnemius).'
   },
 
   'Side Plank': {
